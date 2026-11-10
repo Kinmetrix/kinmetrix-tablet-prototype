@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- source: src/screens/AssessmentScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Assessment · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="Assessment" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home-start.html">Back</a>
+        <p class="route-chip">Assessment <span class="stack-tag">user</span></p>
+        <h1>Assessment</h1>
+        <p class="enriched-meta">SafeRunDeviceView + protocol batch angles. Hardware capture not stubbed.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Alex Morgan" data-avatar-size="40" style="width: 40px; height: 40px; font-size: 0.55rem" style="width:40px;height:40px"></span>
+          <p class="wire-toolbar__title">Alex Morgan</p>
+          <a class="wire-btn wire-btn--ghost" href="home.html">Leave</a>
+        </div>
+        <section class="wire-card" aria-label="Device run placeholder">
+          <h2>Device run</h2>
+          <p>
+            Live assessment steps rotate through protocol angles (flexion, rotation, and related tilts).
+            Repetitions, arc limits, and isometric/isokinetic mode come from the active assessment batch.
+          </p>
+          <p class="enriched-meta">
+            Placeholder: BLE device UI, rep counter, and force charts live in RunDeviceView — not reproduced here.
+          </p>
+          <div class="wire-center" style="min-height: 200px; border: 2px dashed #999; border-radius: 8px">
+            <p><strong>Step 1 of 8</strong> · Rotation 90°</p>
+            <p>3 reps remaining · Target 40 N</p>
+            <button class="wire-btn wire-btn--primary" type="button">Start rep (noop)</button>
+          </div>
+        </section>
+        <table class="wire-table" aria-label="Assessment steps">
+          <thead>
+            <tr>
+              <th>Angle</th>
+              <th>Type</th>
+              <th>Reps left</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>90° (RF)</td>
+              <td>Isometric</td>
+              <td>3</td>
+            </tr>
+            <tr>
+              <td>45° (RDF)</td>
+              <td>Isometric</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td>0° (FF)</td>
+              <td>Isometric</td>
+              <td>5</td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Assessment outcomes">
+          <h2>When finished</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="group-results.html">Group results</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="home.html">Return home</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="device-control.html">Device control</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

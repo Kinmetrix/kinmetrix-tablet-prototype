@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<!-- source: src/screens/UseProgramTemplateScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Template: Standard assessment · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="UseProgramTemplate" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="select-program-template.html">Back</a>
+        <p class="route-chip">UseProgramTemplate <span class="stack-tag">user</span></p>
+        <h1>Template: Standard assessment</h1>
+        <p class="enriched-meta">Header Create Program posts programs.create with template id; success → ProgramList.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Template: Standard assessment</p>
+          <a class="wire-btn wire-btn--primary" href="program-list.html">Create Program</a>
+        </div>
+        <section class="wire-card wire-form-card" style="max-width: 480px; align-self: center; width: 100%" aria-label="Program details">
+          <h2 style="margin: 0 0 0.25rem; text-align: center">Program details</h2>
+          <p class="enriched-meta" style="text-align: center">
+            Edit the name and description for your new program. The template structure is shown below.
+          </p>
+          <form class="wire-stack" action="program-list.html" method="get" style="margin-top: 1rem">
+            <div class="wire-field">
+              <label for="tpl-program-name">Name</label>
+              <input
+                id="tpl-program-name"
+                name="name"
+                type="text"
+                value="Standard assessment"
+                placeholder="Enter program name"
+              />
+            </div>
+            <div class="wire-field">
+              <label for="tpl-program-desc">Description</label>
+              <textarea
+                id="tpl-program-desc"
+                name="description"
+                rows="4"
+                placeholder="Enter program description"
+                style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+              >Eight-direction baseline copy</textarea>
+            </div>
+          </form>
+        </section>
+        <section class="wire-card" aria-label="Template structure preview">
+          <h2>Template structure</h2>
+          <p class="enriched-meta">ProgramTemplatePreviewPanel — groups and nested steps (read-only).</p>
+          <table class="wire-table">
+            <thead>
+              <tr>
+                <th>Group</th>
+                <th>Steps</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Warm-up</strong></td>
+                <td class="enriched-meta">4 isometric holds</td>
+              </tr>
+              <tr>
+                <td><strong>Assessment</strong></td>
+                <td class="enriched-meta">8 directions · mixed modes</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <nav class="flow-nav" aria-label="Use program template flows">
+          <h2>Submit</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="program-list.html">Create program</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="select-program-template.html">Select program template</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="group-list.html">Program → groups (after create)</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

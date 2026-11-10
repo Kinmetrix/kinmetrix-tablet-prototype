@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<!-- source: src/screens/AddProgramTemplateScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New program template · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="AddProgramTemplate" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="program-template-list.html">Back</a>
+        <p class="route-chip">AddProgramTemplate <span class="stack-tag">team-settings</span></p>
+        <h1>New program template</h1>
+        <p class="enriched-meta">Header Create submits form; success replaces into group template list.</p>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 520px; width: 100%; margin-bottom: 0.5rem">
+          <span></span>
+          <p class="wire-toolbar__title">New program template</p>
+          <a class="wire-btn wire-btn--primary" href="group-template-list.html">Create</a>
+        </div>
+        <section class="wire-card wire-form-card" aria-label="New program template form">
+          <h2 style="margin: 0 0 0.75rem; text-align: center">Create new program template</h2>
+          <form class="wire-stack" action="group-template-list.html" method="get" style="max-width: 390px; margin-inline: auto">
+            <div class="wire-field">
+              <label for="program-template-name">Name</label>
+              <input id="program-template-name" name="name" type="text" placeholder="Enter program template name" value="" />
+            </div>
+            <div class="wire-field">
+              <label for="program-template-desc">Description</label>
+              <textarea
+                id="program-template-desc"
+                name="description"
+                rows="4"
+                placeholder="Enter program template description"
+                style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+              ></textarea>
+            </div>
+            <button class="wire-btn wire-btn--primary" type="submit">Create</button>
+          </form>
+        </section>
+        <nav class="flow-nav" aria-label="Program template flows" style="max-width: 520px; width: 100%">
+          <h2>Cancel</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="program-template-list.html">Program template list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-settings-home.html">Team settings home</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

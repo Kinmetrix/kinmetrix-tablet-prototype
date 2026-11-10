@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!-- source: src/screens/CreateProtocolSessionScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Configure assessments · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="CreateProtocolSession" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home-start.html">Back</a>
+        <p class="route-chip">CreateProtocolSession <span class="stack-tag">user</span></p>
+        <h1>Configure assessments</h1>
+        <p class="enriched-meta">Creates protocol session + assessment batch; replaces to Assessment on submit.</p>
+      </header>
+      <main class="app__content wire-center">
+        <section class="wire-card wire-form-card" aria-label="Assessment parameters" style="max-width: 500px">
+          <h2 style="margin: 0 0 0.25rem; text-align: center">Configure your assessments</h2>
+          <p class="enriched-meta" style="text-align: center">
+            Set assessment parameters before starting. These can be changed later.
+          </p>
+          <div class="wire-stack" style="margin-top: 1.25rem; max-width: 390px; width: 100%; margin-inline: auto">
+            <button class="wire-kv-row" type="button">
+              <span>Mode</span>
+              <strong>Isokinetic</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Tilt</span>
+              <strong>1° – 30°</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Target weight</span>
+              <strong>2 N</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Repetitions</span>
+              <strong>2</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Directions</span>
+              <strong>8</strong>
+            </button>
+            <a class="wire-btn wire-btn--primary" href="assessment.html" style="text-align: center; width: 100%">
+              Start assessment
+            </a>
+          </div>
+        </section>
+        <nav class="flow-nav" aria-label="Protocol session flows" style="max-width: 500px; width: 100%">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="assessment.html">Assessment</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="home-start.html">Home start</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!-- source: src/screens/TeamSettingsScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team settings · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="TeamSettings" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">TeamSettings <span class="stack-tag">team</span></p>
+        <h1>Team settings</h1>
+        <p class="enriched-meta">Operator-only hub. PIN popover for Enter Team View not shown.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <a class="wire-btn wire-btn--primary" href="team-home.html">Team view</a>
+          <p class="wire-toolbar__title">Demo Varsity ▾</p>
+          <a class="wire-btn" href="feedback.html">Feedback</a>
+        </div>
+        <section class="wire-split" aria-label="Settings layout">
+          <div class="wire-split__aside">
+            <div class="wire-logo" style="width: 72px; height: 72px; border-radius: 8px">DV</div>
+            <h2 style="margin: 0; font-size: 1.1rem">Demo Varsity</h2>
+            <p class="enriched-meta">Manage your team and their data.</p>
+            <button class="wire-btn" type="button">Edit profile</button>
+            <div style="width: 100%">
+              <p style="margin: 0.75rem 0 0.35rem; font-size: 0.8rem; font-weight: 600">Force unit preference</p>
+              <div class="wire-segmented" role="group" aria-label="Force unit preference">
+                <span class="is-active">Kilograms (kg)</span>
+                <span>Newtons (N)</span>
+                <span>Pounds (lb)</span>
+              </div>
+            </div>
+          </div>
+          <nav class="wire-split__main" aria-label="Team settings menu">
+            <a class="wire-list-row" href="team-user-list.html">
+              <strong>Members</strong>
+              <span class="enriched-meta">Manage roles, tags, and invitations</span>
+            </a>
+            <a class="wire-list-row" href="edit-team-protocol-session.html">
+              <strong>Assessment template</strong>
+              <span class="enriched-meta">Set the default assessment</span>
+            </a>
+            <a class="wire-list-row" href="team-session-template-list.html">
+              <strong>Session templates</strong>
+              <span class="enriched-meta">Manage user sessions</span>
+            </a>
+            <a class="wire-list-row" href="program-template-list.html">
+              <strong>Program templates</strong>
+              <span class="enriched-meta">Manage training blueprints</span>
+            </a>
+            <a class="wire-list-row" href="onboarding-preference.html">
+              <strong>Onboarding settings</strong>
+              <span class="enriched-meta">Customize user onboarding process</span>
+            </a>
+            <a class="wire-list-row" href="device-calibration.html">
+              <strong>Calibrate device</strong>
+              <span class="enriched-meta">Sensor calibration · Kinmetrix Station A</span>
+            </a>
+          </nav>
+        </section>
+        <nav class="flow-nav" aria-label="Team settings flows">
+          <h2>Entry paths</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="team-settings-home.html">Settings stack home</a></li>
+            <li><a class="wire-btn" href="team-home.html">Team home</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-user.html">Opened from team user</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

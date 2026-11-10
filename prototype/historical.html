@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!-- source: src/screens/HistoricalScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Historical data · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="Historical" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home.html">Back</a>
+        <p class="route-chip">Historical <span class="stack-tag">user</span></p>
+        <h1>Historical data</h1>
+        <p class="enriched-meta">
+          TestMultiChart (force, stability, symmetry) + detail card. Tap node → View session details →
+          UserAnalysisDetails.
+        </p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Historical data</p>
+          <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Alex Morgan" data-avatar-size="36" style="width: 36px; height: 36px"></span>
+        </div>
+        <div class="wire-split" style="min-height: 400px">
+          <div class="wire-split__main wire-pane-fill" aria-label="Trend chart">
+            <div class="proto-chart" data-chart="line" data-chart-label="Historical trends"></div>
+            <p class="enriched-meta">Stable weight, stability, symmetry over time. Assessment type legend below.</p>
+            <p class="enriched-meta" style="text-align: center; margin-top: 0.5rem">
+              ● Manual ○ Light ◆ Regular ■ Performance ▲ Assessment
+            </p>
+          </div>
+          <aside class="wire-split__aside">
+            <h3 style="margin: 0 0 0.5rem; font-size: 1rem">Selected session</h3>
+            <p class="enriched-meta">Nov 6, 2026 · Regular</p>
+            <div style="margin-top: 1rem; text-align: center">
+              <p style="font-size: 1.35rem; font-weight: bold; margin: 0">142 N</p>
+              <p class="enriched-meta">Avg peak force</p>
+              <p style="font-size: 1.35rem; font-weight: bold; margin: 1rem 0 0">94%</p>
+              <p class="enriched-meta">Stability</p>
+              <p style="font-size: 1.35rem; font-weight: bold; margin: 1rem 0 0">87%</p>
+              <p class="enriched-meta">Symmetry</p>
+            </div>
+            <a class="wire-btn wire-btn--primary" href="user-analysis-details.html" style="width: 100%; margin-top: 1rem; text-align: center">
+              View session details
+            </a>
+          </aside>
+        </div>
+        <nav class="flow-nav" aria-label="Historical flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="user-analysis-details.html">User analysis details</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="recent-data.html">Recent data</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="session-history.html">Session history</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

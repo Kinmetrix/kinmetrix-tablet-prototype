@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!-- source: src/screens/onboarding/SportScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>What sport do you play? · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="OnboardingSport" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="onboarding-current-team.html">Back</a>
+        <p class="route-chip">OnboardingSport <span class="stack-tag">onboarding-step</span></p>
+        <h1>Sport</h1>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 480px; width: 100%">
+          <a class="wire-btn wire-btn--ghost" href="onboarding.html">✕</a>
+          <p class="wire-toolbar__title">Step 6 of 11 · Sport</p>
+        </div>
+        <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
+          <h2 style="margin: 0 0 1rem; text-align: center">What sport do you play?</h2>
+          <div class="wire-stack" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem">
+            <button class="wire-btn is-active" type="button">Soccer</button>
+            <button class="wire-btn" type="button">Football</button>
+            <button class="wire-btn" type="button">Baseball</button>
+            <button class="wire-btn" type="button">Basketball</button>
+            <button class="wire-btn" type="button">Hockey</button>
+            <button class="wire-btn" type="button">Other</button>
+          </div>
+          <p style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap">
+            <a class="wire-btn wire-btn--primary" href="onboarding-position.html">Next</a>
+            <a class="wire-btn wire-btn--ghost" href="onboarding-position.html">Skip</a>
+          </p>
+        </section>
+        <nav class="flow-nav" aria-label="Onboarding sport flows" style="max-width: 480px; width: 100%">
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="onboarding-current-team.html">Previous</a></li>
+            <li><a class="wire-btn wire-btn--primary" href="onboarding-position.html">Next</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

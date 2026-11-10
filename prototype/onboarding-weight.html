@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!-- source: src/screens/onboarding/WeightScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>What's your weight? · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="OnboardingWeight" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="onboarding-height.html">Back</a>
+        <p class="route-chip">OnboardingWeight <span class="stack-tag">onboarding-step</span></p>
+        <h1>Weight</h1>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 480px; width: 100%">
+          <a class="wire-btn wire-btn--ghost" href="onboarding.html">✕</a>
+          <p class="wire-toolbar__title">Step 3 of 11 · Weight</p>
+        </div>
+        <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
+          <h2 style="margin: 0 0 1rem; text-align: center">What's your weight?</h2>
+          <div class="wire-segmented" role="group" aria-label="Weight unit" style="margin-bottom: 1rem">
+            <span class="is-active">lb</span>
+            <span>kg</span>
+          </div>
+          <div class="wire-field">
+            <label for="ob-weight">Weight</label>
+            <input id="ob-weight" type="number" value="165" step="0.1" />
+          </div>
+          <a class="wire-btn wire-btn--primary" href="onboarding-date-of-birth.html" style="width: 100%; margin-top: 1rem; text-align: center">Next</a>
+        </section>
+        <nav class="flow-nav" aria-label="Onboarding weight flows" style="max-width: 480px; width: 100%">
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="onboarding-height.html">Previous</a></li>
+            <li><a class="wire-btn wire-btn--primary" href="onboarding-date-of-birth.html">Next</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

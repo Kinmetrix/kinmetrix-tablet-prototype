@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- source: src/screens/DeviceListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Select device · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="DeviceList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">DeviceList <span class="stack-tag">app</span></p>
+        <h1>Select device</h1>
+        <p class="enriched-meta">BLE scan list; Calibrate header action when connected.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <div>
+            <p style="margin: 0; font-weight: 600">Available devices</p>
+            <p class="enriched-meta" style="margin: 0">Select a device to connect</p>
+          </div>
+          <a class="wire-btn" href="device-calibration.html">Calibrate</a>
+        </div>
+        <ul class="wire-stack" style="list-style: none; padding: 0; margin: 0">
+          <li class="wire-list-row" style="display: flex; justify-content: space-between; align-items: center">
+            <span><strong>Kinmetrix Station A</strong><br /><span class="enriched-meta">Connected · −42 dBm</span></span>
+            <span class="wire-pill" style="background: #393; color: #fff">Connected</span>
+          </li>
+          <li class="wire-list-row" style="display: flex; justify-content: space-between; align-items: center">
+            <span><strong>Kinmetrix Station B</strong><br /><span class="enriched-meta">Available · −58 dBm</span></span>
+            <button class="wire-btn" type="button">Connect</button>
+          </li>
+          <li class="wire-list-row" style="display: flex; justify-content: space-between; align-items: center">
+            <span><strong>Kinmetrix Portable 12</strong><br /><span class="enriched-meta">Available · −67 dBm</span></span>
+            <button class="wire-btn" type="button">Connect</button>
+          </li>
+        </ul>
+        <nav class="flow-nav" aria-label="Device list flows">
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="device-calibration.html">Calibrate connected device</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="device-control.html">Device control</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

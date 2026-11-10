@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<!-- source: src/screens/AddGroupTemplateScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Add group template · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="AddGroupTemplate" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="group-template-list.html">Back</a>
+        <p class="route-chip">AddGroupTemplate <span class="stack-tag">team-settings</span></p>
+        <h1>Add new group template</h1>
+        <p class="enriched-meta">Header Create Template submits; success replaces into step template list.</p>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 520px; width: 100%; margin-bottom: 0.5rem">
+          <span></span>
+          <p class="wire-toolbar__title">Add new group template</p>
+          <a class="wire-btn wire-btn--primary" href="step-template-list.html">Create template</a>
+        </div>
+        <section class="wire-card wire-form-card" aria-label="New group template form">
+          <h2 style="margin: 0 0 0.75rem; text-align: center">Create new group template</h2>
+          <form class="wire-stack" action="step-template-list.html" method="get" style="max-width: 390px; margin-inline: auto">
+            <div class="wire-field">
+              <label for="group-template-name">Name</label>
+              <input id="group-template-name" name="name" type="text" placeholder="Enter group template name" value="" />
+            </div>
+            <div class="wire-field">
+              <label for="group-template-desc">Description</label>
+              <textarea
+                id="group-template-desc"
+                name="description"
+                rows="4"
+                placeholder="Enter group template description"
+                style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+              ></textarea>
+            </div>
+            <button class="wire-btn wire-btn--primary" type="submit">Create template</button>
+          </form>
+        </section>
+        <nav class="flow-nav" aria-label="Group template flows" style="max-width: 520px; width: 100%">
+          <h2>Cancel</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="group-template-list.html">Group template list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="program-template-list.html">Program template list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

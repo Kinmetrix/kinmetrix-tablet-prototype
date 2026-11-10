@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!-- source: src/screens/OnboardingPreferenceScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Onboarding settings · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="OnboardingPreference" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-settings.html">Back</a>
+        <p class="route-chip">OnboardingPreference <span class="stack-tag">team-settings</span></p>
+        <h1>Onboarding settings: Varsity football</h1>
+        <p class="enriched-meta">Toggles persist per field; first and last name always required on create.</p>
+      </header>
+      <main class="app__content wire-center">
+        <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%" aria-label="New user fields">
+          <h2 style="margin: 0 0 0.25rem; text-align: center">New user fields</h2>
+          <p class="enriched-meta" style="text-align: center; margin-bottom: 1rem">
+            First and last name are required when creating a new user. Other fields are optional.
+          </p>
+          <ul class="wire-stack" style="list-style: none; padding: 0; margin: 0; gap: 0">
+            <li class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #ddd">
+              <label for="pref-height">Height</label>
+              <input id="pref-height" type="checkbox" checked aria-label="Height enabled" />
+            </li>
+            <li class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #ddd">
+              <label for="pref-weight">Weight</label>
+              <input id="pref-weight" type="checkbox" checked aria-label="Weight enabled" />
+            </li>
+            <li class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #ddd">
+              <label for="pref-dob">Date of birth</label>
+              <input id="pref-dob" type="checkbox" aria-label="Date of birth enabled" />
+            </li>
+            <li class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #ddd">
+              <label for="pref-team">Current team</label>
+              <input id="pref-team" type="checkbox" checked aria-label="Current team enabled" />
+            </li>
+            <li class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #ddd">
+              <label for="pref-sport">Sport</label>
+              <input id="pref-sport" type="checkbox" checked aria-label="Sport enabled" />
+            </li>
+            <li class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #ddd">
+              <label for="pref-position">Position</label>
+              <input id="pref-position" type="checkbox" checked aria-label="Position enabled" />
+            </li>
+            <li class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #ddd">
+              <label for="pref-hand">Hand</label>
+              <input id="pref-hand" type="checkbox" aria-label="Hand enabled" />
+            </li>
+            <li class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #ddd">
+              <label for="pref-competition">Competition level</label>
+              <input id="pref-competition" type="checkbox" aria-label="Competition level enabled" />
+            </li>
+            <li class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #ddd">
+              <label for="pref-email">Email</label>
+              <input id="pref-email" type="checkbox" checked aria-label="Email enabled" />
+            </li>
+            <li class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0">
+              <label for="pref-waiver">Waiver</label>
+              <input id="pref-waiver" type="checkbox" checked aria-label="Waiver enabled" />
+            </li>
+          </ul>
+        </section>
+        <nav class="flow-nav" aria-label="Onboarding preference flows" style="max-width: 480px; width: 100%">
+          <h2>Related onboarding screens</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="onboarding-name.html">Name</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="onboarding-sport.html">Sport</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-settings.html">Team settings</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

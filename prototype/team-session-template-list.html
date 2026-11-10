@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- source: src/screens/TeamSessionTemplateListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Session templates · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="TeamSessionTemplateList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-settings.html">Back</a>
+        <p class="route-chip">TeamSessionTemplateList <span class="stack-tag">team-settings</span></p>
+        <h1>Session templates</h1>
+        <p class="enriched-meta">Searchable draggable grid. Row → TeamSessionTemplateStepsList.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <label class="enriched-meta" for="session-tpl-search" style="flex: 1">Search templates…</label>
+          <input
+            id="session-tpl-search"
+            type="search"
+            placeholder="Search templates..."
+            style="flex: 2; font: inherit; padding: 0.35rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+          />
+          <a class="wire-btn wire-btn--primary" href="create-team-session-template.html">Add session template</a>
+        </div>
+        <table class="wire-table" aria-label="Team session templates">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th style="text-align: center">Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="team-session-template-steps-list.html"><strong>Game day primer</strong></a>
+                <br /><span class="enriched-meta">Short isometric set before competition</span>
+              </td>
+              <td style="text-align: center">Active</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="team-session-template-steps-list.html"><strong>Post-practice recovery</strong></a>
+                <br /><span class="enriched-meta">Low-load cooldown template</span>
+              </td>
+              <td style="text-align: center">Active</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="team-session-template-steps-list.html"><strong>Off-season baseline</strong></a>
+                <br /><span class="enriched-meta">Archived progressive scheme</span>
+              </td>
+              <td style="text-align: center">Inactive</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Session template list flows">
+          <h2>Actions</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="create-team-session-template.html">Add session template</a></li>
+            <li><a class="wire-btn" href="edit-team-session-template.html">Edit session template</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-session-template-steps-list.html">Template steps</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-settings.html">Team settings</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

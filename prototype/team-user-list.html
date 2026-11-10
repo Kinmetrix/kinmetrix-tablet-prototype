@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!-- source: src/screens/TeamUserListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manage users · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="TeamUserList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-settings-home.html">Back</a>
+        <p class="route-chip">TeamUserList <span class="stack-tag">team-settings</span></p>
+        <h1>Manage users</h1>
+        <p class="enriched-meta">Infinite table with custom columns, search, and archived toggle.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <input
+            type="search"
+            placeholder="Search members…"
+            style="flex: 2; font: inherit; padding: 0.35rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+            aria-label="Search users"
+          />
+          <a class="wire-btn" href="column-management.html">Edit columns</a>
+          <a class="wire-btn wire-btn--primary" href="onboarding.html">New user</a>
+        </div>
+        <table class="wire-table" aria-label="Team members">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Is operator</th>
+              <th>Position</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="team-user-details.html" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit">
+                  <span
+                    class="proto-avatar proto-avatar--fixture"
+                    data-default-avatar="Alex Morgan"
+                    data-avatar-size="36"
+                    style="width: 36px; height: 36px"
+                  ></span>
+                  <strong>Alex Morgan</strong>
+                </a>
+              </td>
+              <td>alex.morgan@example.com</td>
+              <td>No</td>
+              <td><span class="wire-pill">Midfielder</span></td>
+              <td>Active</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="team-user-details.html" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit">
+                  <span
+                    class="proto-avatar proto-avatar--fixture"
+                    data-default-avatar="Jordan Lee"
+                    data-avatar-size="36"
+                    style="width: 36px; height: 36px"
+                  ></span>
+                  <strong>Jordan Lee</strong>
+                </a>
+              </td>
+              <td>jordan.lee@example.com</td>
+              <td>Yes</td>
+              <td><span class="wire-pill">Operator</span></td>
+              <td>Active</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="team-user-details.html" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit">
+                  <span
+                    class="proto-avatar proto-avatar--fixture"
+                    data-default-avatar="Sam Rivera"
+                    data-avatar-size="36"
+                    style="width: 36px; height: 36px"
+                  ></span>
+                  <strong>Sam Rivera</strong>
+                </a>
+              </td>
+              <td>—</td>
+              <td>No</td>
+              <td>—</td>
+              <td>Archived</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <label class="wire-field" style="display: flex; align-items: center; gap: 0.5rem; align-self: flex-end">
+          <input type="checkbox" />
+          Show archived users
+        </label>
+        <nav class="flow-nav" aria-label="Team user list flows">
+          <h2>Actions</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="team-user-details.html">Member details</a></li>
+            <li><a class="wire-btn" href="onboarding.html">Onboarding wizard</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="add-team-user.html">Add team user (simple form)</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

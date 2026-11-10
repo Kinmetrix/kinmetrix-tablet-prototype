@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!-- source: src/screens/StepTemplateListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Step templates · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="StepTemplateList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="group-template-list.html">Back</a>
+        <p class="route-chip">StepTemplateList <span class="stack-tag">team-settings</span></p>
+        <h1>Step templates</h1>
+        <p class="enriched-meta">Multi-select grid; column taps open EditStepPopovers; more menu on row.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Warm-up block</p>
+          <a class="wire-btn wire-btn--primary" href="add-step-template.html">Add step template</a>
+        </div>
+        <table class="wire-table" aria-label="Step templates in group">
+          <thead>
+            <tr>
+              <th style="width: 2rem"></th>
+              <th>Name</th>
+              <th style="text-align: center">Type</th>
+              <th style="text-align: center">Duration</th>
+              <th style="text-align: center">Repetitions</th>
+              <th style="text-align: center">Weight</th>
+              <th style="text-align: center">Weight %</th>
+              <th style="text-align: center">Arc</th>
+              <th style="text-align: center">Rotator</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" aria-label="Select template" /></td>
+              <td><strong>Flexion 0°</strong></td>
+              <td style="text-align: center">Isometric</td>
+              <td style="text-align: center">10s</td>
+              <td style="text-align: center">3</td>
+              <td style="text-align: center">35 N</td>
+              <td style="text-align: center">—</td>
+              <td style="text-align: center">0°</td>
+              <td style="text-align: center">0°</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select template" /></td>
+              <td><strong>Rotation 45°</strong></td>
+              <td style="text-align: center">Isometric</td>
+              <td style="text-align: center">10s</td>
+              <td style="text-align: center">5</td>
+              <td style="text-align: center">40 N</td>
+              <td style="text-align: center">—</td>
+              <td style="text-align: center">15°</td>
+              <td style="text-align: center">45°</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select template" /></td>
+              <td><strong>Isokinetic sweep</strong></td>
+              <td style="text-align: center">Isokinetic</td>
+              <td style="text-align: center">—</td>
+              <td style="text-align: center">3</td>
+              <td style="text-align: center">50 N</td>
+              <td style="text-align: center">100%</td>
+              <td style="text-align: center">0° – 30°</td>
+              <td style="text-align: center">90°</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Step template list flows">
+          <h2>Actions</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="add-step-template.html">Add step template</a></li>
+            <li><a class="wire-btn" href="edit-step-template.html">Edit step template</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="group-template-list.html">Group templates</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

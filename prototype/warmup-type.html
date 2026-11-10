@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!-- source: src/screens/WarmupTypeScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Select warmup · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="WarmupType" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home-start.html">Back</a>
+        <p class="route-chip">WarmupType <span class="stack-tag">user</span></p>
+        <h1>Select warmup</h1>
+        <p class="enriched-meta">Card configurator; Continue shows “warmups not recorded” alert in RN.</p>
+      </header>
+      <main class="app__content wire-center">
+        <section class="wire-card wire-form-card" aria-label="Warmup configuration">
+          <h2 style="margin: 0 0 0.25rem">Configure your warmup</h2>
+          <p class="enriched-meta">Set your warmup parameters before starting.</p>
+          <div class="wire-stack" style="gap: 0.75rem; width: 100%; margin-top: 1rem">
+            <button class="wire-kv-row" type="button"><span>Mode</span><strong>Isometric</strong></button>
+            <button class="wire-kv-row" type="button"><span>Tilt</span><strong>0°</strong></button>
+            <button class="wire-kv-row" type="button"><span>Target weight</span><strong>1 kg</strong></button>
+            <button class="wire-kv-row" type="button"><span>Repetitions</span><strong>1</strong></button>
+          </div>
+          <a class="wire-btn wire-btn--primary" href="warmup.html" style="width: 100%; margin-top: 1rem; text-align: center"
+            >Continue</a
+          >
+        </section>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

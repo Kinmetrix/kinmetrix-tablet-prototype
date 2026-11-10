@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Bar chart placeholder">
+  <rect width="480" height="160" fill="#fafafa" stroke="#ccc" rx="8"/>
+  <line x1="48" y1="128" x2="432" y2="128" stroke="#bbb"/>
+  <line x1="48" y1="24" x2="48" y2="128" stroke="#bbb"/>
+  <rect x="72" y="64" width="40" height="64" fill="#1a5f3a" rx="4"/>
+  <rect x="132" y="48" width="40" height="80" fill="#2d7a4f" rx="4"/>
+  <rect x="192" y="72" width="40" height="56" fill="#1a5f3a" rx="4"/>
+  <rect x="252" y="40" width="40" height="88" fill="#BE1E2D" rx="4"/>
+  <rect x="312" y="56" width="40" height="72" fill="#2d7a4f" rx="4"/>
+  <rect x="372" y="32" width="40" height="96" fill="#1a5f3a" rx="4"/>
+</svg>

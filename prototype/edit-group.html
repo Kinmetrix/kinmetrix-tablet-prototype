@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!-- source: src/screens/EditGroupScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit group · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="EditGroup" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="group-list.html">Back</a>
+        <p class="route-chip">EditGroup <span class="stack-tag">user</span></p>
+        <h1>Edit group</h1>
+        <p class="enriched-meta">Save Changes header action; success goBack to group list.</p>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 500px; width: 100%; margin-bottom: 0.5rem">
+          <span></span>
+          <p class="wire-toolbar__title">Edit group</p>
+          <a class="wire-btn wire-btn--primary" href="group-list.html">Save changes</a>
+        </div>
+        <section class="wire-card wire-form-card" aria-label="Edit group form">
+          <h2 style="margin: 0 0 0.75rem; text-align: center">Edit group</h2>
+          <form class="wire-stack" action="group-list.html" method="get">
+            <div class="wire-field">
+              <label for="edit-group-name">Name</label>
+              <input
+                id="edit-group-name"
+                name="name"
+                type="text"
+                placeholder="Enter group name"
+                value="Warm-up block"
+              />
+            </div>
+            <div class="wire-field">
+              <label for="edit-group-desc">Description</label>
+              <textarea
+                id="edit-group-desc"
+                name="description"
+                rows="4"
+                placeholder="Enter group description"
+                style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+              >Light isometrics before main sets.</textarea>
+            </div>
+            <button class="wire-btn wire-btn--primary" type="submit">Save changes</button>
+          </form>
+        </section>
+        <nav class="flow-nav" aria-label="Edit group flows" style="max-width: 500px; width: 100%">
+          <h2>Cancel</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="group-list.html">Group list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="step-list.html">Step list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!-- source: src/screens/EditTeamProtocolSessionScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team assessment settings · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="EditTeamProtocolSession" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-settings.html">Back</a>
+        <p class="route-chip">EditTeamProtocolSession <span class="stack-tag">team-settings</span></p>
+        <h1>Team assessment settings</h1>
+        <p class="enriched-meta">CardButtons open EditStepPopovers; Save Team Settings updates all member assessments.</p>
+      </header>
+      <main class="app__content wire-center">
+        <section class="wire-card wire-form-card" style="max-width: 520px; width: 100%" aria-label="Team assessment configuration">
+          <h2 style="margin: 0 0 0.25rem; text-align: center">Configure team assessment settings</h2>
+          <p class="enriched-meta" style="text-align: center; margin-bottom: 1rem">
+            These settings will be applied to all team members' assessments.
+          </p>
+          <div class="wire-stack" style="gap: 0.75rem">
+            <button class="wire-kv-row" type="button">
+              <span>Mode</span>
+              <strong>Isometric</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Tilt</span>
+              <strong>1°</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Target weight</span>
+              <strong>2 N</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Repetitions</span>
+              <strong>2</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Directions</span>
+              <strong>8</strong>
+            </button>
+          </div>
+          <p style="margin-top: 1.25rem">
+            <a class="wire-btn wire-btn--primary" href="team-settings.html" style="width: 100%; text-align: center; display: block">Save team settings</a>
+          </p>
+        </section>
+        <nav class="flow-nav" aria-label="Team protocol flows" style="max-width: 520px; width: 100%">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="team-settings.html">Team settings</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="program-template-list.html">Program templates</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!-- source: src/screens/WarmupScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Warmup · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="Warmup" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="warmup-type.html">Back</a>
+        <p class="route-chip">Warmup <span class="stack-tag">user</span></p>
+        <h1>Warmup</h1>
+        <p class="enriched-meta">SafeRunDeviceView · 8 rotator angles. Warmup sessions are not recorded.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Alex Morgan" data-avatar-size="40" style="width: 40px; height: 40px; font-size: 0.55rem" style="width:40px;height:40px"></span>
+          <p class="wire-toolbar__title">Alex Morgan</p>
+          <a class="wire-btn wire-btn--ghost" href="home-start.html">Leave</a>
+        </div>
+        <section class="wire-card" aria-label="Device run placeholder">
+          <h2>Device run</h2>
+          <p>
+            Steps cycle through eight compass directions (90°, 45°, 0°, …) using params from
+            <a href="warmup-type.html">warmup configuration</a>.
+          </p>
+          <p class="enriched-meta">
+            Placeholder: live BLE rep UI not reproduced. Personal angle tilts override arc when configured.
+          </p>
+          <div class="wire-center" style="min-height: 200px; border: 2px dashed #999; border-radius: 8px">
+            <p><strong>Direction 3 of 8</strong> · Rotation 0° (Right)</p>
+            <p>1 rep remaining · Target 10 N · Isometric</p>
+            <button class="wire-btn wire-btn--primary" type="button">Start rep (noop)</button>
+          </div>
+        </section>
+        <table class="wire-table" aria-label="Warmup directions">
+          <thead>
+            <tr>
+              <th>Rotator</th>
+              <th>Arc</th>
+              <th>Reps left</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>90° Forward</td>
+              <td>0°</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>45° Fwd-Right</td>
+              <td>0°</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>0° Right</td>
+              <td>0°</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>315° Bwd-Right</td>
+              <td>0°</td>
+              <td>1</td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Warmup flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="warmup-type.html">Warmup type</a></li>
+            <li><a class="wire-btn" href="home-start.html">Home start</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="device-control.html">Device control</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

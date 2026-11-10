@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!-- source: src/screens/CreateProgramChoiceScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create new program · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="CreateProgramChoice" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="program-list.html">Back</a>
+        <p class="route-chip">CreateProgramChoice <span class="stack-tag">user</span></p>
+        <h1>Create new program</h1>
+        <p class="enriched-meta">Chooses blank AddProgram or SelectProgramTemplate path.</p>
+      </header>
+      <main class="app__content wire-center">
+        <section class="wire-card wire-form-card" aria-label="How to start">
+          <h2 style="margin: 0 0 0.25rem; text-align: center">How would you like to start?</h2>
+          <p class="enriched-meta" style="text-align: center">
+            Start from a blank program or use a saved template.
+          </p>
+          <div class="wire-stack" style="margin-top: 1.25rem; max-width: 390px; width: 100%">
+            <a class="wire-list-row" href="add-program.html" style="display: flex; gap: 0.75rem; align-items: center">
+              <span
+                class="wire-logo"
+                style="width: 36px; height: 36px; font-size: 0.45rem; flex-shrink: 0"
+                aria-hidden="true"
+                >doc</span
+              >
+              <span style="flex: 1; text-align: left">
+                <strong>Create a program</strong>
+                <span class="enriched-meta" style="display: block">Build groups and steps from scratch</span>
+              </span>
+              <span aria-hidden="true">›</span>
+            </a>
+            <a
+              class="wire-list-row"
+              href="select-program-template.html"
+              style="display: flex; gap: 0.75rem; align-items: center"
+            >
+              <span
+                class="wire-logo"
+                style="width: 36px; height: 36px; font-size: 0.45rem; flex-shrink: 0"
+                aria-hidden="true"
+                >tpl</span
+              >
+              <span style="flex: 1; text-align: left">
+                <strong>Use a template</strong>
+                <span class="enriched-meta" style="display: block">Copy groups and steps from a template</span>
+              </span>
+              <span aria-hidden="true">›</span>
+            </a>
+          </div>
+        </section>
+        <nav class="flow-nav" aria-label="Create program flows" style="max-width: 500px; width: 100%">
+          <h2>Cancel</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="program-list.html">Program list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- source: src/screens/SessionHistoryScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Session History · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="SessionHistory" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home.html">Back</a>
+        <p class="route-chip">SessionHistory <span class="stack-tag">user</span></p>
+        <h1>Session History</h1>
+        <p class="enriched-meta">
+          4-column AnalysisItem grid. Normalized toggle, type filter bar, compare 2+, bulk delete popover.
+        </p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <label class="enriched-meta" style="display: flex; align-items: center; gap: 0.35rem">
+            Normalized
+            <input type="checkbox" checked aria-label="Normalized scale" />
+          </label>
+          <p class="wire-toolbar__title">Alex Morgan's Session History</p>
+          <a class="wire-btn wire-btn--ghost" href="historical.html">View Chart</a>
+        </div>
+        <div class="wire-toolbar" style="gap: 0.5rem; flex-wrap: wrap">
+          <button class="wire-btn wire-btn--ghost" type="button">All</button>
+          <button class="wire-btn wire-btn--ghost" type="button">Regular</button>
+          <button class="wire-btn wire-btn--ghost" type="button">Assessment</button>
+          <button class="wire-btn wire-btn--ghost" type="button">Performance</button>
+        </div>
+        <div
+          style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; padding: 0.5rem 0"
+          aria-label="Session cards"
+        >
+          <a class="wire-card" href="user-analysis-details.html" style="padding: 0.75rem; text-decoration: none; color: inherit">
+            <p class="enriched-meta" style="margin: 0">Nov 8, 2026</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">142 N</p>
+            <p class="enriched-meta" style="margin: 0">Regular</p>
+          </a>
+          <a class="wire-card" href="user-analysis-details.html" style="padding: 0.75rem; text-decoration: none; color: inherit">
+            <p class="enriched-meta" style="margin: 0">Nov 6, 2026</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">138 N</p>
+            <p class="enriched-meta" style="margin: 0">Assessment</p>
+          </a>
+          <label class="wire-card" style="padding: 0.75rem; border: 2px solid #333">
+            <input type="checkbox" checked aria-label="Select Nov 4 session" />
+            <p class="enriched-meta" style="margin: 0.25rem 0 0">Nov 4, 2026</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">131 N</p>
+          </label>
+          <label class="wire-card" style="padding: 0.75rem; border: 2px solid #333">
+            <input type="checkbox" checked aria-label="Select Nov 2 session" />
+            <p class="enriched-meta" style="margin: 0.25rem 0 0">Nov 2, 2026</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">129 N</p>
+          </label>
+        </div>
+        <div class="wire-toolbar" style="border-top: 1px solid #ddd; padding-top: 0.75rem">
+          <p class="enriched-meta">12 results · page 1</p>
+          <a class="wire-btn" href="compare-session.html">Compare 2 sessions</a>
+          <button class="wire-btn wire-btn--ghost" type="button">Delete</button>
+        </div>
+        <nav class="flow-nav" aria-label="Session history flows">
+          <h2>Drill-down</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="user-analysis-details.html">User analysis details</a></li>
+            <li><a class="wire-btn" href="compare-session.html">Compare sessions</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="historical.html">Historical chart</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

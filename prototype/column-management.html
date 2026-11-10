@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!-- source: src/screens/ColumnManagementScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Column management · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="ColumnManagement" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-user-list.html">Back</a>
+        <p class="route-chip">ColumnManagement <span class="stack-tag">team-settings</span></p>
+        <h1>Manage columns</h1>
+        <p class="enriched-meta">Toggle visibility syncs in background; create and edit use popovers in RN.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Manage columns</p>
+          <button class="wire-btn wire-btn--primary" type="button">Create column</button>
+        </div>
+        <section aria-label="Team columns intro">
+          <h2 style="margin: 0 0 0.35rem">Team columns</h2>
+          <p class="enriched-meta">
+            Manage custom columns for organizing team members. You can show or hide columns, edit their names and options,
+            or delete them.
+          </p>
+        </section>
+        <table class="wire-table">
+          <thead>
+            <tr>
+              <th>Visible</th>
+              <th>Column</th>
+              <th>Options</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" checked aria-label="Show position column" /></td>
+              <td>Position</td>
+              <td>Forward, Guard, Center</td>
+              <td>
+                <button class="wire-btn" type="button">Edit</button>
+                <button class="wire-btn wire-btn--ghost" type="button">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" checked aria-label="Show skill column" /></td>
+              <td>Skill level</td>
+              <td>Varsity, JV, Development</td>
+              <td>
+                <button class="wire-btn" type="button">Edit</button>
+                <button class="wire-btn wire-btn--ghost" type="button">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Show injury column" /></td>
+              <td>Injury status</td>
+              <td>Clear, Limited, Out</td>
+              <td>
+                <button class="wire-btn" type="button">Edit</button>
+                <button class="wire-btn wire-btn--ghost" type="button">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Column management flows">
+          <h2>Flows</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="team-user-list.html">Team user list</a></li>
+            <li><a class="wire-btn" href="add-team-user.html">Add team user</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-settings-home.html">Team settings home</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

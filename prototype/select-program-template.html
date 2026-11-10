@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!-- source: src/screens/SelectProgramTemplateScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Use a Template · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="SelectProgramTemplate" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="create-program-choice.html">Back</a>
+        <p class="route-chip">SelectProgramTemplate <span class="stack-tag">user</span></p>
+        <h1>Use a Template</h1>
+        <p class="enriched-meta">Searchable data grid. Row or View opens structure preview popover; Use → UseProgramTemplate.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <label class="enriched-meta" for="tpl-search" style="flex: 1">Search templates…</label>
+          <input
+            id="tpl-search"
+            type="search"
+            placeholder="Search templates..."
+            style="flex: 2; font: inherit; padding: 0.35rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+          />
+        </div>
+        <table class="wire-table" aria-label="Program templates">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th style="text-align: center">Total groups</th>
+              <th style="text-align: center">Total steps</th>
+              <th style="text-align: center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>Standard assessment</strong>
+                <br /><span class="enriched-meta">Eight-direction baseline</span>
+              </td>
+              <td style="text-align: center">2</td>
+              <td style="text-align: center">16</td>
+              <td style="text-align: center">
+                <button class="wire-btn wire-btn--ghost" type="button">View</button>
+                <a class="wire-btn wire-btn--primary" href="use-program-template.html">Use Template</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>In-season maintenance</strong>
+                <br /><span class="enriched-meta">Lighter rep scheme</span>
+              </td>
+              <td style="text-align: center">3</td>
+              <td style="text-align: center">12</td>
+              <td style="text-align: center">
+                <button class="wire-btn wire-btn--ghost" type="button">View</button>
+                <a class="wire-btn" href="use-program-template.html">Use Template</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Return-to-play</strong>
+                <br /><span class="enriched-meta">Progressive loading</span>
+              </td>
+              <td style="text-align: center">4</td>
+              <td style="text-align: center">20</td>
+              <td style="text-align: center">
+                <button class="wire-btn wire-btn--ghost" type="button">View</button>
+                <a class="wire-btn" href="use-program-template.html">Use Template</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <aside class="wire-card enriched-meta" aria-label="Structure preview (popover)">
+          <p><strong>Popover:</strong> Template name, ProgramTemplatePreviewPanel scroll, Use Template, close.</p>
+        </aside>
+        <nav class="flow-nav" aria-label="Select program template flows">
+          <h2>Empty / alternate</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="use-program-template.html">Use program template</a></li>
+            <li><a class="wire-btn" href="add-program.html">Create blank program</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="create-program-choice.html">Back to options</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

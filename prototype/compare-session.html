@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- source: src/screens/CompareSessionScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Compare sessions · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="CompareSession" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="session-history.html">Back</a>
+        <p class="route-chip">CompareSession <span class="stack-tag">user</span></p>
+        <h1>Compare sessions</h1>
+        <p class="enriched-meta">Multi-select data grid + RadialMultiChart. Plot by weight or stability.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Compare Alex Morgan's sessions</p>
+          <button class="wire-btn wire-btn--ghost" type="button">Plot by: Weight ▾</button>
+        </div>
+        <div class="wire-split" style="min-height: 420px; grid-template-columns: 1.1fr 1fr">
+          <div style="padding: 0.5rem; overflow: auto">
+            <table class="wire-table" aria-label="Sessions to compare">
+              <thead>
+                <tr>
+                  <th>Created</th>
+                  <th style="text-align: center">Stable weight</th>
+                  <th style="text-align: center">Stability</th>
+                  <th style="text-align: center">Symmetry</th>
+                  <th style="width: 2rem"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox" checked aria-label="Select session" /> Nov 6, 2026</td>
+                  <td style="text-align: center">142 N</td>
+                  <td style="text-align: center">94%</td>
+                  <td style="text-align: center">8/8</td>
+                  <td><span style="display: inline-block; width: 12px; height: 12px; background: #06c; border-radius: 2px"></span></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" checked aria-label="Select session" /> Oct 28, 2026</td>
+                  <td style="text-align: center">135 N</td>
+                  <td style="text-align: center">91%</td>
+                  <td style="text-align: center">7/8</td>
+                  <td><span style="display: inline-block; width: 12px; height: 12px; background: #393; border-radius: 2px"></span></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Select session" /> Oct 12, 2026</td>
+                  <td style="text-align: center">128 N</td>
+                  <td style="text-align: center">88%</td>
+                  <td style="text-align: center">7/8</td>
+                  <td><span style="display: inline-block; width: 12px; height: 12px; background: #c33; border-radius: 2px"></span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wire-pane-fill" style="min-height: 380px">
+            <div class="proto-chart" data-chart="radial-multi" data-chart-label="radial-multi label"></div>
+            <p class="enriched-meta">Overlaid polar plots per selected session.</p>
+            <div
+              style="
+                width: 200px;
+                height: 200px;
+                border: 2px dashed #999;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.85rem;
+                color: #666;
+              "
+            >
+              Radar placeholder
+            </div>
+          </div>
+        </div>
+        <nav class="flow-nav" aria-label="Compare flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="session-history.html">Session history</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="historical.html">Historical</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!-- source: src/screens/UserTeamListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team list · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="TeamList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-home.html">Back</a>
+        <p class="route-chip">TeamList <span class="stack-tag">team</span></p>
+        <h1>Team List</h1>
+        <p class="enriched-meta">Paginated team grid. Row opens settings or PIN team switch.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <a class="wire-btn wire-btn--ghost" href="home.html">User Home</a>
+          <p class="wire-toolbar__title">My teams</p>
+          <button class="wire-btn wire-btn--primary" type="button">New Team</button>
+        </div>
+        <table class="wire-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Members</th>
+              <th>Last activity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="team-settings.html">Demo Varsity</a></td>
+              <td>24</td>
+              <td>Nov 8, 2026</td>
+            </tr>
+            <tr>
+              <td><a href="team-settings.html">Clinic Trial</a></td>
+              <td>8</td>
+              <td>Oct 30, 2026</td>
+            </tr>
+            <tr>
+              <td><a href="team-settings.html">Spring Roster</a></td>
+              <td>18</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="enriched-meta">Fixture teams. Add-team popover and org account menu exist in RN.</p>
+        <nav class="flow-nav" aria-label="Team flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="team-home.html">Current team roster</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="user-team-list.html">Same screen in user stack</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

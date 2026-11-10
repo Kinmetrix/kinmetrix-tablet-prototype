@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!-- source: src/screens/TeamMembersScreen.tsx (route TeamHome) -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team home · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="TeamHome" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">TeamHome <span class="stack-tag">team</span></p>
+        <h1>Team members</h1>
+        <p class="enriched-meta">Roster table with search, sort, and team switcher.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <p class="wire-toolbar__title">Demo Varsity ▾</p>
+          <a class="wire-btn" href="team-settings.html">Team settings</a>
+        </div>
+        <div class="wire-field" style="max-width: none">
+          <label for="search">Search members</label>
+          <input id="search" type="search" placeholder="Search by name" value="" />
+        </div>
+        <table class="wire-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Position</th>
+              <th>Last session</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="team-user.html">Alex Morgan</a></td>
+              <td>Forward</td>
+              <td>Nov 8, 2026</td>
+            </tr>
+            <tr>
+              <td><a href="team-user.html">Jordan Lee</a></td>
+              <td>Guard</td>
+              <td>Nov 7, 2026</td>
+            </tr>
+            <tr>
+              <td><a href="team-user.html">Sam Patel</a></td>
+              <td>Center</td>
+              <td>Nov 5, 2026</td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Team flows">
+          <h2>Team flows</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="add-team-user.html">Add member</a></li>
+            <li><a class="wire-btn" href="team-list.html">Switch team</a></li>
+            <li><a class="wire-btn" href="user-team-list.html">User team list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

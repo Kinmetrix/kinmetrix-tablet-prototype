@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!-- source: src/screens/SelectUserSessionScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Select User Session · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="SelectUserSession" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="compare-team-user-sessions-detail.html">Back</a>
+        <p class="route-chip">SelectUserSession <span class="stack-tag">team</span></p>
+        <h1>Select Session — Alex Morgan</h1>
+        <p class="enriched-meta">Grid of past analyses for one team user. Confirm updates compare slot.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <label class="enriched-meta" style="display: flex; align-items: center; gap: 0.35rem">
+            Normalized
+            <input type="checkbox" checked aria-label="Normalized scale" />
+          </label>
+          <p class="wire-toolbar__title">Alex Morgan · all sessions</p>
+          <span></span>
+        </div>
+        <div
+          style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; padding: 0.5rem 0"
+          aria-label="User analysis sessions"
+        >
+          <button
+            type="button"
+            class="wire-card"
+            style="padding: 0.75rem; border: 2px solid #333; text-align: left; cursor: pointer; width: 100%"
+          >
+            <p class="enriched-meta" style="margin: 0">Regular</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">142 N avg</p>
+            <p class="enriched-meta" style="margin: 0">Nov 8, 2026 · selected ✓</p>
+          </button>
+          <button type="button" class="wire-card" style="padding: 0.75rem; text-align: left; cursor: pointer; width: 100%">
+            <p class="enriched-meta" style="margin: 0">Assessment</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">138 N avg</p>
+            <p class="enriched-meta" style="margin: 0">Nov 6, 2026</p>
+          </button>
+          <button type="button" class="wire-card" style="padding: 0.75rem; text-align: left; cursor: pointer; width: 100%">
+            <p class="enriched-meta" style="margin: 0">Regular</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">131 N avg</p>
+            <p class="enriched-meta" style="margin: 0">Nov 4, 2026</p>
+          </button>
+          <button type="button" class="wire-card" style="padding: 0.75rem; text-align: left; cursor: pointer; width: 100%">
+            <p class="enriched-meta" style="margin: 0">Performance</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">145 N avg</p>
+            <p class="enriched-meta" style="margin: 0">Oct 28, 2026</p>
+          </button>
+        </div>
+        <div class="wire-toolbar" style="border-top: 1px solid #ddd; padding-top: 0.75rem">
+          <p class="enriched-meta">8 results · page 1</p>
+          <a class="wire-btn wire-btn--primary" href="compare-team-user-sessions-detail.html">Select This Analysis</a>
+        </div>
+        <nav class="flow-nav" aria-label="Select session flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="compare-team-user-sessions-detail.html">Back to compare</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="user-analysis-details.html">View session details</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

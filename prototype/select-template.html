@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- source: src/screens/SelectTemplateScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Select Template · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="SelectTemplate" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">SelectTemplate <span class="stack-tag">user</span></p>
+        <h1>Select Template</h1>
+        <p class="enriched-meta">Modal KMScreen (800×600). Single-select grid; Confirm calls onSelect then goBack.</p>
+      </header>
+      <main class="app__content wire-center">
+        <section
+          class="wire-card wire-form-card"
+          style="max-width: 720px; width: 100%; min-height: 420px; display: flex; flex-direction: column"
+          aria-label="Select template modal"
+        >
+          <h2 style="margin: 0 0 0.75rem">Select Template</h2>
+          <table class="wire-table" aria-label="Templates" style="flex: 1">
+            <thead>
+              <tr>
+                <th style="width: 2.5rem"></th>
+                <th>Name</th>
+                <th>Team</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="radio" name="template" checked aria-label="Select Standard assessment" /></td>
+                <td>Standard assessment</td>
+                <td class="enriched-meta">Varsity baseball</td>
+              </tr>
+              <tr>
+                <td><input type="radio" name="template" aria-label="Select In-season maintenance" /></td>
+                <td>In-season maintenance</td>
+                <td class="enriched-meta">Varsity baseball</td>
+              </tr>
+              <tr>
+                <td><input type="radio" name="template" aria-label="Select Shared league template" /></td>
+                <td>Shared league template</td>
+                <td class="enriched-meta">League library</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="enriched-meta" style="text-align: center; margin: 0.5rem 0">Page 1 of 3 · 10 per page</p>
+          <div style="display: flex; gap: 0.75rem; border-top: 1px solid #ccc; padding-top: 1rem; margin-top: auto">
+            <button class="wire-btn wire-btn--ghost" type="button" style="flex: 1">Cancel</button>
+            <a class="wire-btn wire-btn--primary" href="add-program.html" style="flex: 1; text-align: center">Confirm</a>
+          </div>
+        </section>
+        <nav class="flow-nav" aria-label="Select template flows" style="max-width: 720px; width: 100%">
+          <h2>Caller context</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="add-program.html">Add program (picker callback)</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="program-list.html">Program list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

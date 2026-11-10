@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!-- source: src/screens/TeamSessionTemplateStepsListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Template steps · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="TeamSessionTemplateStepsList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-session-template-list.html">Back</a>
+        <p class="route-chip">TeamSessionTemplateStepsList <span class="stack-tag">team-settings</span></p>
+        <h1>Game day primer</h1>
+        <p class="enriched-meta">Editable step grid; Mode popover and Save Changes in header.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <button class="wire-btn" type="button">Mode · Isometric</button>
+          <button class="wire-btn wire-btn--primary" type="button">Save changes</button>
+          <label class="enriched-meta"><input type="checkbox" /> Enable reordering</label>
+        </div>
+        <table class="wire-table" aria-label="Session template steps">
+          <thead>
+            <tr>
+              <th>Step</th>
+              <th>Type</th>
+              <th>Duration</th>
+              <th>Reps</th>
+              <th>Weight %</th>
+              <th>Arc</th>
+              <th>Rotator</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Warm-up hold</strong></td>
+              <td>Isometric</td>
+              <td>30s</td>
+              <td>—</td>
+              <td>40%</td>
+              <td>15°</td>
+              <td>0°</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More">⋯</button></td>
+            </tr>
+            <tr>
+              <td><strong>Peak arc</strong></td>
+              <td>Isokinetic</td>
+              <td>—</td>
+              <td>8</td>
+              <td>70%</td>
+              <td>10° – 90°</td>
+              <td>45°</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More">⋯</button></td>
+            </tr>
+            <tr>
+              <td><strong>Cooldown</strong></td>
+              <td>Isometric</td>
+              <td>20s</td>
+              <td>—</td>
+              <td>25%</td>
+              <td>0°</td>
+              <td>0°</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="enriched-meta">EditStepPopovers for duration, reps, arc, and weight % — not shown in prototype.</p>
+        <nav class="flow-nav" aria-label="Template steps flows">
+          <h2>Actions</h2>
+          <ul>
+            <li><a class="wire-btn" href="edit-team-session-template.html">Edit template metadata</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-session-template-list.html">Back to list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-settings-home.html">Team settings</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

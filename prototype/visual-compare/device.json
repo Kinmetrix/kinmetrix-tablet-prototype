@@ -1,0 +1,11 @@
+{
+  "simulatorName": "Kinmetrix IPad",
+  "deviceType": "iPad (10th generation)",
+  "logicalWidth": 1180,
+  "logicalHeight": 820,
+  "pixelWidth": 2360,
+  "pixelHeight": 1640,
+  "udid": "E16E7FA3-9D69-421E-AB28-9E266CFC4BE5",
+  "bundleId": "com.timehero.Kinmetrix",
+  "rnRotateDegrees": 90
+}

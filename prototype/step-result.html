@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!-- source: src/screens/StepResultScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exercise Result · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="StepResult" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="step-details.html">Back</a>
+        <p class="route-chip">StepResult <span class="stack-tag">user</span></p>
+        <h1>Exercise Result</h1>
+        <p class="enriched-meta">Summary card plus StepResultChart force graph from latest step_session frames.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <section class="wire-card" aria-label="Result summary">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem">
+            <h2 style="margin: 0">Flexion 0°</h2>
+            <span class="enriched-meta">Isometric</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1rem">
+            <div>
+              <p class="enriched-meta" style="margin: 0">Angle</p>
+              <p style="margin: 0.25rem 0 0"><strong>0°</strong></p>
+            </div>
+            <div>
+              <p class="enriched-meta" style="margin: 0">Target</p>
+              <p style="margin: 0.25rem 0 0"><strong>35 N</strong></p>
+            </div>
+            <div>
+              <p class="enriched-meta" style="margin: 0">Reps</p>
+              <p style="margin: 0.25rem 0 0"><strong>3 / 3</strong></p>
+            </div>
+            <div>
+              <p class="enriched-meta" style="margin: 0">Completed</p>
+              <p style="margin: 0.25rem 0 0"><strong>Nov 8, 2026</strong></p>
+            </div>
+          </div>
+          <hr style="border: none; border-top: 1px solid #ccc; margin: 0 0 1rem" />
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem">
+            <div>
+              <p class="enriched-meta" style="margin: 0">Max Force</p>
+              <p style="margin: 0.25rem 0 0"><strong>42 N</strong></p>
+            </div>
+            <div>
+              <p class="enriched-meta" style="margin: 0">Avg Force</p>
+              <p style="margin: 0.25rem 0 0"><strong>38 N</strong></p>
+            </div>
+            <div>
+              <p class="enriched-meta" style="margin: 0">Duration</p>
+              <p style="margin: 0.25rem 0 0"><strong>9.8s</strong></p>
+            </div>
+            <div>
+              <p class="enriched-meta" style="margin: 0">Score</p>
+              <p style="margin: 0.25rem 0 0"><strong>92</strong></p>
+            </div>
+          </div>
+        </section>
+        <section class="wire-card wire-pane-fill" aria-label="Force graph">
+          <h2 style="margin: 0 0 0.75rem">Force Graph</h2>
+          <div class="proto-chart" data-chart="line" data-chart-label="Step result force curve"></div>
+        </section>
+        <nav class="flow-nav" aria-label="Step result flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="step-details.html">Step details</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="session-data.html">Session data</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="step-list.html">Step list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

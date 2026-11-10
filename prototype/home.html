@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<!-- source: src/screens/home/HomeScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Home · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="Home" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">Home <span class="stack-tag">user</span></p>
+      </header>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <a class="wire-btn wire-btn--ghost" href="login.html">Logout</a>
+          <p class="wire-toolbar__title">Alex Morgan ▾</p>
+          <a class="wire-btn wire-btn--primary" href="home-start.html">Start</a>
+        </div>
+        <section aria-label="Latest analysis">
+          <h2>Latest session</h2>
+          <table class="wire-table">
+            <thead>
+              <tr>
+                <th>Direction</th>
+                <th>Peak (N)</th>
+                <th>Stability</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="session-data.html">Flexion</a></td>
+                <td>142</td>
+                <td>Stable</td>
+              </tr>
+              <tr>
+                <td><a href="session-data.html">Extension</a></td>
+                <td>138</td>
+                <td>Stable</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="enriched-meta">Shows analysis table when data exists. Empty and waiver states exist in RN.</p>
+        </section>
+        <nav class="flow-nav" aria-label="States and actions">
+          <h2>Other home paths</h2>
+          <ul>
+            <li><a class="wire-btn" href="sign-waiver.html">Sign waiver state</a></li>
+            <li><a class="wire-btn" href="create-protocol-session.html">New assessment (no protocol)</a></li>
+            <li><a class="wire-btn" href="feedback.html">Feedback</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

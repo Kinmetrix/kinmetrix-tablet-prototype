@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- source: src/screens/ProgramTemplateListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Program templates · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="ProgramTemplateList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-settings.html">Back</a>
+        <p class="route-chip">ProgramTemplateList <span class="stack-tag">team-settings</span></p>
+        <h1>Program templates</h1>
+        <p class="enriched-meta">Draggable team-scoped grid. Row → GroupTemplateList.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Program templates</p>
+          <a class="wire-btn wire-btn--primary" href="add-program-template.html">Add program template</a>
+        </div>
+        <table class="wire-table" aria-label="Program templates">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="group-template-list.html"><strong>Standard assessment</strong></a>
+                <br /><span class="enriched-meta">Eight-direction baseline</span>
+              </td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="group-template-list.html"><strong>In-season maintenance</strong></a>
+                <br /><span class="enriched-meta">Lighter rep scheme</span>
+              </td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="group-template-list.html"><strong>Return-to-play</strong></a>
+                <br /><span class="enriched-meta">Progressive loading</span>
+              </td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Program template list flows">
+          <h2>Actions</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="add-program-template.html">Add program template</a></li>
+            <li><a class="wire-btn" href="edit-program-template.html">Edit program template</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="group-template-list.html">Group templates</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-settings.html">Team settings</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

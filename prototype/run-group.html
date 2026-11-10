@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- source: src/screens/RunGroupScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Run Group · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="RunGroup" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="step-list.html">Back</a>
+        <p class="route-chip">RunGroup <span class="stack-tag">user</span></p>
+        <h1>Run Group</h1>
+        <p class="enriched-meta">SafeRunDeviceView over group steps. On finish → GroupResults unless force_back.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Alex Morgan" data-avatar-size="40" style="width: 40px; height: 40px; font-size: 0.55rem" style="width:40px;height:40px"></span>
+          <p class="wire-toolbar__title">Warm-up block</p>
+          <a class="wire-btn wire-btn--ghost" href="step-list.html">Leave</a>
+        </div>
+        <section class="wire-card" aria-label="Device run placeholder">
+          <h2>Device run</h2>
+          <p>
+            Steps from the group rotate through rotator angles with isometric or isokinetic mode from each step record.
+            Rep completion updates step_sessions and may open SessionData for history edits.
+          </p>
+          <p class="enriched-meta">
+            Placeholder: BLE device UI, rep counter, and force charts live in RunDeviceView — not reproduced here.
+          </p>
+          <div class="wire-center" style="min-height: 200px; border: 2px dashed #999; border-radius: 8px">
+            <p><strong>Step 2 of 5</strong> · Rotation 45°</p>
+            <p>4 reps remaining · Target 35 N · 10s hold</p>
+            <button class="wire-btn wire-btn--primary" type="button">Start rep (noop)</button>
+          </div>
+        </section>
+        <table class="wire-table" aria-label="Group steps">
+          <thead>
+            <tr>
+              <th>Angle</th>
+              <th>Type</th>
+              <th>Reps left</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="session-data.html">0°</a></td>
+              <td>Isometric</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>45°</td>
+              <td>Isometric</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td>90°</td>
+              <td>Isokinetic</td>
+              <td>5</td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Run group outcomes">
+          <h2>When finished</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="group-results.html">Group results</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="session-data.html">Session data (history)</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="step-list.html">Step list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

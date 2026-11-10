@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<!-- source: src/screens/UserProfileScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Profile · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="UserProfile" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="user-team-list.html">Back</a>
+        <p class="route-chip">UserProfile <span class="stack-tag">user</span></p>
+        <h1>Profile Information</h1>
+        <p class="enriched-meta">Form + PropertyButton popovers. Photo menu and org/beta toggles exist in RN.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Alex Morgan</p>
+          <button class="wire-btn wire-btn--primary" type="button">Save Changes</button>
+        </div>
+        <section class="wire-card wire-form-card" style="max-width: 420px; align-self: center; width: 100%" aria-label="Profile form">
+          <div class="wire-center" style="margin-bottom: 1rem">
+            <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Alex Morgan" data-avatar-size="72" style="width: 72px; height: 72px"></span>
+            <p class="enriched-meta">Tap photo → camera or library</p>
+          </div>
+          <div class="wire-field">
+            <label for="profile-name">Name</label>
+            <input id="profile-name" type="text" value="Alex Morgan" />
+          </div>
+          <div class="wire-field">
+            <label for="profile-email">Email</label>
+            <input id="profile-email" type="email" value="alex@example.com" readonly />
+          </div>
+          <div class="wire-field">
+            <label for="profile-dob">Date of birth</label>
+            <input id="profile-dob" type="date" value="1998-03-15" />
+          </div>
+          <h2 style="margin: 1rem 0 0.5rem; font-size: 0.95rem">About You</h2>
+          <div class="wire-stack" style="gap: 0.35rem">
+            <button class="wire-kv-row" type="button"><span>Height</span><strong>5'10"</strong></button>
+            <button class="wire-kv-row" type="button"><span>Weight</span><strong>72 kg</strong></button>
+            <button class="wire-kv-row" type="button"><span>Preferred Unit</span><strong>Kilograms (kg)</strong></button>
+            <button class="wire-kv-row" type="button"><span>Sport</span><strong>Basketball</strong></button>
+            <button class="wire-kv-row" type="button"><span>Position</span><strong>Forward</strong></button>
+            <button class="wire-kv-row" type="button"><span>Dominant Hand</span><strong>Right</strong></button>
+            <button class="wire-kv-row" type="button"><span>Competition Level</span><strong>College</strong></button>
+          </div>
+          <h2 style="margin: 1rem 0 0.5rem; font-size: 0.95rem">Movement Profile</h2>
+          <button class="wire-kv-row" type="button"><span>Range of Motion</span><strong>Configured</strong></button>
+        </section>
+        <nav class="flow-nav" aria-label="Profile flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="user-team-list.html">User team list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="home.html">User home</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="settings.html">Settings (stub)</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

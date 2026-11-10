@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!-- source: src/screens/CompareTeamUserSessionsDetailScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Compare Team User Sessions Detail · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="CompareTeamUserSessionsDetail" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="compare-team-user-sessions.html">Back</a>
+        <p class="route-chip">CompareTeamUserSessionsDetail <span class="stack-tag">team</span></p>
+        <h1>Compare Sessions</h1>
+        <p class="enriched-meta">RadialMultiChart + session legend. Metric toggle, add/remove sessions, pick alternate analysis.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <button class="wire-btn" type="button">Peak Force ▾</button>
+          <p class="wire-toolbar__title">Overlay · 2 athletes</p>
+          <a class="wire-btn wire-btn--primary" href="add-session-to-compare.html">Add Session to Compare</a>
+        </div>
+        <div class="wire-split" style="min-height: 420px; grid-template-columns: 1.2fr 0.8fr">
+          <div class="wire-pane-fill wire-center" aria-label="Radial multi chart">
+            <div class="proto-chart" data-chart="radial-multi" data-chart-label="radial-multi label"></div>
+            <p class="enriched-meta">Peak force or stability per direction. Flip 180° control in RN.</p>
+            <div
+              style="
+                width: 280px;
+                height: 280px;
+                border: 2px dashed #999;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.85rem;
+                color: #666;
+              "
+            >
+              Multi radar placeholder
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button">Flip chart</button>
+          </div>
+          <aside class="wire-card" style="padding: 0.75rem" aria-label="Compared sessions">
+            <h2 style="margin: 0 0 0.75rem; font-size: 1rem">Sessions</h2>
+            <div class="wire-stack" style="gap: 0.5rem">
+              <a
+                href="select-user-session.html"
+                class="wire-card"
+                style="padding: 0.5rem 0.65rem; display: block; text-decoration: none; color: inherit; border-left: 4px solid #06c"
+              >
+                <p style="margin: 0; font-weight: bold">Alex Morgan</p>
+                <p class="enriched-meta" style="margin: 0.15rem 0 0">Regular Exercise</p>
+                <p class="enriched-meta" style="margin: 0">Nov 8, 2026 2:14 PM</p>
+              </a>
+              <a
+                href="select-user-session.html"
+                class="wire-card"
+                style="padding: 0.5rem 0.65rem; display: block; text-decoration: none; color: inherit; border-left: 4px solid #393"
+              >
+                <p style="margin: 0; font-weight: bold">Jordan Lee</p>
+                <p class="enriched-meta" style="margin: 0.15rem 0 0">Assessment</p>
+                <p class="enriched-meta" style="margin: 0">Nov 7, 2026 10:02 AM</p>
+              </a>
+            </div>
+            <p class="enriched-meta" style="margin-top: 0.75rem">Remove available when more than two sessions selected.</p>
+          </aside>
+        </div>
+        <nav class="flow-nav" aria-label="Compare detail flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="add-session-to-compare.html">Add session to compare</a></li>
+            <li><a class="wire-btn" href="select-user-session.html">Select user session</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="user-analysis-details.html">User analysis details</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

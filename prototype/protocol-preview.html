@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- source: src/screens/ProtocolPreviewScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Your exercise plan · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="ProtocolPreview" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home-start.html">Back</a>
+        <p class="route-chip">ProtocolPreview <span class="stack-tag">user</span></p>
+        <h1>Your exercise plan</h1>
+        <p class="enriched-meta">
+          Wizard (ProtocolCreatorForm) then exercise list. Settings chips + multi-select step grid. Start → RunGroup.
+          Alternate title: Protocol Preview.
+        </p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <button class="wire-btn wire-btn--ghost" type="button">Reset</button>
+          <p class="wire-toolbar__title">Your exercise plan</p>
+          <a class="wire-btn wire-btn--primary" href="run-group.html">Start ▶</a>
+        </div>
+        <div class="enriched-meta" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-bottom: 0.5rem">
+          <button class="wire-btn wire-btn--ghost" type="button">Template: Light ▾</button>
+          <button class="wire-btn wire-btn--ghost" type="button">Mode: Isokinetic ▾</button>
+          <button class="wire-btn wire-btn--ghost" type="button"># of positions: 8 ▾</button>
+          <button class="wire-btn wire-btn--ghost" type="button">Tilts: User tilts</button>
+        </div>
+        <table class="wire-table" aria-label="Preview steps">
+          <thead>
+            <tr>
+              <th style="width: 2rem"><input type="checkbox" aria-label="Select all steps" /></th>
+              <th>Name</th>
+              <th style="text-align: center">Position</th>
+              <th style="text-align: center">Weight</th>
+              <th style="text-align: center">Reps</th>
+              <th style="text-align: center">Arc angle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" checked aria-label="Select step" /></td>
+              <td>Anteflexion</td>
+              <td style="text-align: center">0°</td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">28 N</span></td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">2</span></td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">1° – 30°</span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select step" /></td>
+              <td>Left lateral</td>
+              <td style="text-align: center">45°</td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">30 N</span></td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">2</span></td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">1° – 30°</span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select step" /></td>
+              <td>Retroflexion</td>
+              <td style="text-align: center">90°</td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">32 N</span></td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">2</span></td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">1° – 30°</span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select step" /></td>
+              <td>Right lateral</td>
+              <td style="text-align: center">135°</td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">29 N</span></td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">2</span></td>
+              <td style="text-align: center"><span style="text-decoration: underline dotted">1° – 30°</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="enriched-meta">First visit shows ProtocolCreatorForm wizard (template vs intensity, mode, positions).</p>
+        <nav class="flow-nav" aria-label="Protocol preview flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="run-group.html">Run group</a></li>
+            <li><a class="wire-btn" href="edit-protocol-session.html">Edit protocol session</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="select-template.html">Select template</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

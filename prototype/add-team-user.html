@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!-- source: src/screens/AddTeamUserScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Add team user · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="AddTeamUser" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-user-list.html">Back</a>
+        <p class="route-chip">AddTeamUser <span class="stack-tag">team-settings</span></p>
+        <h1>Add new team member</h1>
+        <p class="enriched-meta">Form adds roster member; success navigates back to team user list.</p>
+      </header>
+      <main class="app__content wire-stack" style="max-width: 480px">
+        <form class="wire-stack" action="team-user-list.html" method="get">
+          <div class="wire-field">
+            <label for="member-name">Name</label>
+            <input id="member-name" name="name" type="text" placeholder="Enter name" value="" />
+          </div>
+          <div class="wire-field">
+            <label for="member-email">Email</label>
+            <input id="member-email" name="email" type="email" placeholder="member@example.com" value="" autocomplete="email" />
+          </div>
+          <div class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem">
+            <label for="member-operator" style="margin: 0">Make operator</label>
+            <input id="member-operator" name="is_operator" type="checkbox" aria-label="Make operator" />
+          </div>
+          <button class="wire-btn wire-btn--primary" type="submit">Add user</button>
+        </form>
+        <nav class="flow-nav" aria-label="Add team user flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="team-user-list.html">Team user list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="column-management.html">Manage columns</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-user-details.html">Team user details</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

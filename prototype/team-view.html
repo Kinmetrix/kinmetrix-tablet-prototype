@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!-- source: src/navigation/AppNavigator.tsx (TeamView stack root) -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team view · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="TeamView" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">TeamView <span class="stack-tag">app</span></p>
+        <h1>Team view</h1>
+        <p class="enriched-meta">Root stack when coach is in team mode. Hosts TeamNavigator.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <p>
+          Signed-in users with team view active land here instead of the member stack. Review team flows
+          through the entry screens below.
+        </p>
+        <div class="wire-card-grid">
+          <article class="wire-card">
+            <h3>Team roster</h3>
+            <p>Default team home — search, sort, open a member.</p>
+            <a class="wire-btn wire-btn--primary" href="team-home.html">Team home</a>
+          </article>
+          <article class="wire-card">
+            <h3>Switch team</h3>
+            <p>Pick another team or create one.</p>
+            <a class="wire-btn wire-btn--primary" href="team-list.html">Team list</a>
+          </article>
+          <article class="wire-card">
+            <h3>Team settings</h3>
+            <p>Templates, members, and admin.</p>
+            <a class="wire-btn" href="team-settings.html">Open settings</a>
+          </article>
+        </div>
+        <nav class="flow-nav" aria-label="Stack entry">
+          <h2>Member stack contrast</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="user-view.html">User view (member mode)</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="loading.html">Loading team state</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

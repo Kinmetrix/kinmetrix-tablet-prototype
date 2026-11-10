@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!-- source: src/screens/EditProgramScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit program · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="EditProgram" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="program-list.html">Back</a>
+        <p class="route-chip">EditProgram <span class="stack-tag">user</span></p>
+        <h1>Edit program</h1>
+        <p class="enriched-meta">Centered card form. Save Changes in header.</p>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 500px; width: 100%; margin-bottom: 0.5rem">
+          <span></span>
+          <p class="wire-toolbar__title">Edit program</p>
+          <a class="wire-btn wire-btn--primary" href="program-list.html">Save changes</a>
+        </div>
+        <section class="wire-card wire-form-card" aria-label="Edit program form">
+          <h2 style="margin: 0 0 0.75rem; text-align: center">Edit program</h2>
+          <form class="wire-stack" action="program-list.html" method="get" style="max-width: 390px; margin-inline: auto">
+            <div class="wire-field">
+              <label for="edit-program-name">Name</label>
+              <input
+                id="edit-program-name"
+                name="name"
+                type="text"
+                placeholder="Enter program name"
+                value="Neck strength — week 4"
+              />
+            </div>
+            <div class="wire-field">
+              <label for="edit-program-desc">Description</label>
+              <textarea
+                id="edit-program-desc"
+                name="description"
+                rows="4"
+                placeholder="Enter program description (optional)"
+                style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+              >Return-to-play protocol</textarea>
+            </div>
+            <button class="wire-btn wire-btn--primary" type="submit">Save changes</button>
+          </form>
+        </section>
+        <nav class="flow-nav" aria-label="Edit program flows" style="max-width: 500px; width: 100%">
+          <h2>Cancel</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="program-list.html">Program list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="group-list.html">Group list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

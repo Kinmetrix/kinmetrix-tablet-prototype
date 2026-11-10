@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!-- source: src/screens/StepListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Step List · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="StepList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="group-list.html">Back</a>
+        <p class="route-chip">StepList <span class="stack-tag">user</span></p>
+        <h1>Step List</h1>
+        <p class="enriched-meta">
+          Draggable multi-select grid. Header: Add Step, Results (when complete), Run Group. Row → StepDetails.
+        </p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Warm-up block</p>
+          <div style="display: flex; gap: 0.5rem">
+            <a class="wire-btn wire-btn--ghost" href="add-step.html">Add Step</a>
+            <a class="wire-btn wire-btn--ghost" href="group-results.html">Results</a>
+            <a class="wire-btn wire-btn--primary" href="run-group.html">Run Group</a>
+          </div>
+        </div>
+        <table class="wire-table" aria-label="Steps in group">
+          <thead>
+            <tr>
+              <th style="width: 2rem"></th>
+              <th>Name</th>
+              <th style="text-align: center">Type</th>
+              <th style="text-align: center">Duration</th>
+              <th style="text-align: center">Repetitions</th>
+              <th style="text-align: center">Target</th>
+              <th style="text-align: center">Arc</th>
+              <th style="text-align: center">Rotator</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" aria-label="Select step" /></td>
+              <td>
+                <a href="step-details.html"><strong>Flexion 0°</strong></a>
+              </td>
+              <td style="text-align: center">Isometric</td>
+              <td style="text-align: center">10s</td>
+              <td style="text-align: center"><span class="enriched-meta">3 / 3</span></td>
+              <td style="text-align: center">35 N</td>
+              <td style="text-align: center">0°</td>
+              <td style="text-align: center">0°</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select step" /></td>
+              <td>
+                <a href="step-details.html"><strong>Rotation 45°</strong></a>
+              </td>
+              <td style="text-align: center">Isometric</td>
+              <td style="text-align: center">10s</td>
+              <td style="text-align: center">5</td>
+              <td style="text-align: center">40 N</td>
+              <td style="text-align: center">15°</td>
+              <td style="text-align: center">45°</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select step" /></td>
+              <td>
+                <a href="step-details.html"><strong>Isokinetic sweep</strong></a>
+              </td>
+              <td style="text-align: center">Isokinetic</td>
+              <td style="text-align: center">—</td>
+              <td style="text-align: center"><span class="enriched-meta">1 / 5</span></td>
+              <td style="text-align: center">50 N</td>
+              <td style="text-align: center">0° – 30°</td>
+              <td style="text-align: center">90°</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Step list flows">
+          <h2>Actions</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="run-group.html">Run group</a></li>
+            <li><a class="wire-btn" href="add-step.html">Add step</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="group-results.html">Group results</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="step-details.html">Step details</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

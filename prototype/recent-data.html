@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!-- source: src/screens/RecentDataScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recent data · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="RecentData" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home.html">Back</a>
+        <p class="route-chip">RecentData <span class="stack-tag">user</span></p>
+        <h1>Recent data</h1>
+        <p class="enriched-meta">Group-by + date-interval pickers. TestMultiChart bar chart (sd, sw, std_dev, rd).</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <button class="wire-btn wire-btn--ghost" type="button" style="flex: 1">Group by: Date ▾</button>
+          <button class="wire-btn wire-btn--ghost" type="button" style="flex: 1">Interval: Day ▾</button>
+        </div>
+        <div class="wire-pane-fill" style="min-height: 360px">
+          <div class="proto-chart" data-chart="bar" data-chart-label="Recent data"></div>
+          <p class="enriched-meta">Grouped user data — x-axis date or angle; rolling 14-day minimum range.</p>
+          <p class="enriched-meta">
+            Group by options: Date, SRA, SAA, FRA, FAA. Interval: Day, Week, Month.
+          </p>
+        </div>
+        <nav class="flow-nav" aria-label="Recent data flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="historical.html">Historical</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="group-data.html">Group data</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="home.html">Home</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

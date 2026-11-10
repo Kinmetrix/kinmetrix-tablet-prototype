@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!-- source: src/screens/home/HomeStartScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Start · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="HomeStart" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home.html">Back</a>
+        <p class="route-chip">HomeStart <span class="stack-tag">user</span></p>
+        <h1>Start</h1>
+        <p class="enriched-meta">Choice cards from HOME_START_OPTIONS.</p>
+      </header>
+      <main class="app__content">
+        <div class="wire-card-grid">
+          <article class="wire-card">
+            <h3>New Assessment</h3>
+            <p>Get an accurate report of your current neck strength.</p>
+            <a class="wire-btn wire-btn--primary" href="assessment.html">Start Assessment</a>
+          </article>
+          <article class="wire-card">
+            <h3>Smart Session</h3>
+            <p>Choose intensity from your last assessment.</p>
+            <a class="wire-btn wire-btn--primary" href="warmup-type.html">Start Session</a>
+          </article>
+          <article class="wire-card">
+            <h3>Run a Program</h3>
+            <p>Structured program over multiple sessions.</p>
+            <a class="wire-btn wire-btn--primary" href="program-list.html">Choose Program</a>
+          </article>
+        </div>
+        <nav class="flow-nav" aria-label="Related">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="create-protocol-session.html">Create protocol session</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

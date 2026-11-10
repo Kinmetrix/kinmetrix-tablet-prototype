@@ -41,6 +41,31 @@ Absolute path on this machine (update if you move the repo):
 - Links use relative `href` between HTML files. Match the navigator graph as closely as practical.
 - Modals and one-off sheets can be separate pages or labeled stubs.
 
-## Optional index
+## Screen inventory in this repo
 
-Maintain `prototype/docs/screen-index.md` as route → RN file → HTML file grows. Not required for the first pages.
+Regenerate HTML stubs from KinmetrixApp navigators:
+
+```bash
+cd prototype
+yarn screens:sync
+```
+
+Outputs `screens.json`, `prototype/docs/screen-index.md`, and one `*.html` per mirror route. Routes in `prototype/.screenignore` are skipped (see `screen-ignore.md`). Coverage check:
+
+```bash
+node scripts/check-screen-coverage.mjs
+```
+
+## Layout enrichment
+
+Stubs become wireframe layouts from each screen’s `sourceFile` in `screens.json`. Loop until:
+
+```bash
+yarn screens:enrichment-check
+```
+
+Agent playbook: `layout-enrichment-loop.md`. Next batch:
+
+```bash
+node scripts/list-pending-enrichment.mjs --limit 6 --json
+```

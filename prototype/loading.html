@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!-- source: src/screens/LoadingScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loading · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="Loading" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">Loading <span class="stack-tag">app</span></p>
+        <h1>Loading</h1>
+      </header>
+      <main class="app__content">
+        <div class="wire-center">
+          <img class="kin-logo kin-logo--mark" src="assets/kinmetrix-logo.svg" alt="" style="width: 96px; height: 96px" />
+          <p aria-live="polite"><strong>Loading...</strong></p>
+          <p class="enriched-meta">Spinner and logo from KinmetrixLogoLoaderScreen.</p>
+        </div>
+        <nav class="flow-nav" aria-label="After load">
+          <h2>Typical next routes</h2>
+          <ul>
+            <li><a class="wire-btn" href="login.html">Login</a></li>
+            <li><a class="wire-btn" href="team-home.html">Team home</a></li>
+            <li><a class="wire-btn" href="home.html">Member home</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

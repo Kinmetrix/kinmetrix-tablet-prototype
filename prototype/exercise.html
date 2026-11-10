@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!-- source: src/screens/ExerciseScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exercise · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="Exercise" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">Exercise <span class="stack-tag">user</span></p>
+        <h1>Exercise</h1>
+        <p class="enriched-meta">Deprecated screen. TestMultiChart only.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <section class="wire-pane-fill" aria-label="Multi-series chart">
+          <div class="proto-chart" data-chart="line" data-chart-label="Force curves"></div>
+          <p class="enriched-meta">Three sample force curves — not live device data.</p>
+        </section>
+        <nav class="flow-nav" aria-label="Legacy note">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="assessment.html">Assessment (current device UI)</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

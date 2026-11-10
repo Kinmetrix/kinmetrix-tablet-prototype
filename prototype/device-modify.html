@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!-- source: src/screens/DeviceModifyScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Device modify · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="DeviceModify" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="device-calibration.html">Back</a>
+        <p class="route-chip">DeviceModify <span class="stack-tag">app</span></p>
+        <h1>Device motion defaults</h1>
+        <p class="enriched-meta">Feature-flagged override of motion parameters (engineering).</p>
+      </header>
+      <main class="app__content wire-stack">
+        <p class="enriched-meta">Requires connected device. Values persist per station.</p>
+        <section class="wire-card" aria-label="Motion override: sim">
+          <div class="wire-kv-row">
+            <span>sim</span>
+            <span class="enriched-meta">Default: 1</span>
+          </div>
+          <p class="enriched-meta" style="margin: 0.25rem 0 0.5rem">Simulation speed multiplier.</p>
+          <div class="wire-segmented" role="group" aria-label="sim">
+            <span>0</span>
+            <span class="is-active">1</span>
+          </div>
+        </section>
+        <section class="wire-card" aria-label="Motion override: weight change rate">
+          <div class="wire-kv-row">
+            <span>weight_change_rate</span>
+            <span class="enriched-meta">Default: 3</span>
+          </div>
+          <div class="wire-segmented" role="group" aria-label="weight change rate" style="flex-wrap: wrap">
+            <span>0</span><span>1</span><span>2</span><span class="is-active">3</span><span>4</span><span>5</span>
+          </div>
+        </section>
+        <section class="wire-card" aria-label="Motion override: arc act speed">
+          <div class="wire-kv-row">
+            <span>arc_act_speed</span>
+            <span class="enriched-meta">Default: 2</span>
+          </div>
+          <div class="wire-segmented" role="group" aria-label="arc act speed" style="flex-wrap: wrap">
+            <span>1</span><span class="is-active">2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+          </div>
+        </section>
+        <div class="wire-toolbar">
+          <button class="wire-btn" type="button">Reset to defaults</button>
+          <button class="wire-btn wire-btn--primary" type="button">Save</button>
+        </div>
+        <nav class="flow-nav" aria-label="Device modify flows">
+          <ul>
+            <li><a class="wire-btn" href="device-calibration.html">Back to calibration</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="device-list.html">Device list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

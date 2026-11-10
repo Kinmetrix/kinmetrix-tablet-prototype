@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!-- source: src/features/session-details/screens/StepDetailsScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Step Details · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="StepDetails" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="step-list.html">Back</a>
+        <p class="route-chip">StepDetails <span class="stack-tag">user</span></p>
+        <h1>Step Details</h1>
+        <p class="enriched-meta">
+          SessionDataView when sessions exist. CardButton properties open EditStepPopovers when editable.
+        </p>
+      </header>
+      <main class="app__content wire-stack">
+        <section class="wire-pane-fill" aria-label="Session data chart">
+          <p><strong>Isometric · 45°</strong></p>
+          <p class="enriched-meta">Stability 91% · Avg peak 41 N · Target 40 N</p>
+          <div class="proto-chart" data-chart="line" data-chart-label="Force curve"></div>
+        </section>
+        <table class="wire-table" aria-label="Step sessions">
+          <thead>
+            <tr>
+              <th>Rep</th>
+              <th>Peak (N)</th>
+              <th>Completed</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>40</td>
+              <td>Nov 8, 2026</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button">Delete</button></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>42</td>
+              <td>Nov 8, 2026</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button">Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <section class="wire-card" aria-label="Step properties">
+          <h2>Step Properties</h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem">
+            <button class="wire-list-row" type="button" style="text-align: left">
+              <strong>Mode</strong>
+              <span class="enriched-meta" style="display: block">Isometric</span>
+            </button>
+            <button class="wire-list-row" type="button" style="text-align: left">
+              <strong>Duration</strong>
+              <span class="enriched-meta" style="display: block">10s</span>
+            </button>
+            <button class="wire-list-row" type="button" style="text-align: left">
+              <strong>Tilt</strong>
+              <span class="enriched-meta" style="display: block">15°</span>
+            </button>
+            <button class="wire-list-row" type="button" style="text-align: left">
+              <strong>Target Weight</strong>
+              <span class="enriched-meta" style="display: block">40 N</span>
+            </button>
+            <button class="wire-list-row" type="button" style="text-align: left">
+              <strong>Rotation</strong>
+              <span class="enriched-meta" style="display: block">45°</span>
+            </button>
+            <button class="wire-list-row" type="button" style="text-align: left">
+              <strong>Repetitions</strong>
+              <span class="enriched-meta" style="display: block">5</span>
+            </button>
+          </div>
+        </section>
+        <nav class="flow-nav" aria-label="Step details flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="step-result.html">Step result</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="session-data.html">Session data</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="step-list.html">Step list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

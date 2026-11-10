@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<!-- source: src/screens/onboarding/NameScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>What's your name? · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="OnboardingName" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="onboarding.html">Back</a>
+        <p class="route-chip">OnboardingName <span class="stack-tag">onboarding-step</span></p>
+        <h1>Name</h1>
+        <p class="enriched-meta">Photo picker optional; first and last name required.</p>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 480px; width: 100%">
+          <a class="wire-btn wire-btn--ghost" href="onboarding.html" aria-label="Close">✕</a>
+          <p class="wire-toolbar__title">Step 1 of 11 · Name</p>
+        </div>
+        <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
+          <h2 style="margin: 0 0 1rem; text-align: center">What's your name?</h2>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-bottom: 1rem">
+            <span
+              class="proto-avatar proto-avatar--fixture"
+              data-default-avatar="New Member"
+              data-avatar-size="80"
+              style="width: 80px; height: 80px"
+            ></span>
+            <button class="wire-btn" type="button">Add photo</button>
+          </div>
+          <div class="wire-field">
+            <label for="ob-first">First name</label>
+            <input id="ob-first" type="text" placeholder="First name" value="Alex" />
+          </div>
+          <div class="wire-field">
+            <label for="ob-last">Last name</label>
+            <input id="ob-last" type="text" placeholder="Last name" value="Morgan" />
+          </div>
+          <a class="wire-btn wire-btn--primary" href="onboarding-height.html" style="width: 100%; margin-top: 1rem; text-align: center">Next</a>
+        </section>
+        <nav class="flow-nav" aria-label="Onboarding name flows" style="max-width: 480px; width: 100%">
+          <h2>Wizard</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="onboarding-height.html">Next · Height</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="onboarding.html">Onboarding shell</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

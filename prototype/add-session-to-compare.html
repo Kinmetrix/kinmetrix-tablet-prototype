@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!-- source: src/screens/AddSessionToCompareScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Add Session To Compare · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="AddSessionToCompare" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="compare-team-user-sessions-detail.html">Back</a>
+        <p class="route-chip">AddSessionToCompare <span class="stack-tag">team</span></p>
+        <h1>Add Session To Compare</h1>
+        <p class="enriched-meta">4-column AnalysisItem grid. Multi-select then Compare N returns to detail view.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <label class="enriched-meta" style="display: flex; align-items: center; gap: 0.35rem">
+            Normalized
+            <input type="checkbox" checked aria-label="Normalized scale" />
+          </label>
+          <p class="wire-toolbar__title">Team users with analysis</p>
+          <span></span>
+        </div>
+        <div class="wire-toolbar" style="gap: 0.5rem; flex-wrap: wrap">
+          <button class="wire-btn wire-btn--ghost" type="button">All</button>
+          <button class="wire-btn wire-btn--ghost" type="button">Assessment</button>
+          <button class="wire-btn wire-btn--ghost" type="button">Regular</button>
+          <button class="wire-btn wire-btn--ghost" type="button">Performance</button>
+        </div>
+        <div
+          style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; padding: 0.5rem 0"
+          aria-label="Team user session cards"
+        >
+          <label class="wire-card" style="padding: 0.75rem; border: 2px solid #333">
+            <input type="checkbox" checked aria-label="Select Jordan Lee" />
+            <p class="enriched-meta" style="margin: 0.25rem 0 0">Jordan Lee</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">136 N</p>
+            <p class="enriched-meta" style="margin: 0">Regular</p>
+          </label>
+          <label class="wire-card" style="padding: 0.75rem; border: 2px solid #333">
+            <input type="checkbox" checked aria-label="Select Sam Patel" />
+            <p class="enriched-meta" style="margin: 0.25rem 0 0">Sam Patel</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">128 N</p>
+            <p class="enriched-meta" style="margin: 0">Assessment</p>
+          </label>
+          <a class="wire-card" href="user-analysis-details.html" style="padding: 0.75rem; text-decoration: none; color: inherit">
+            <p class="enriched-meta" style="margin: 0">Riley Chen</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">119 N</p>
+            <p class="enriched-meta" style="margin: 0">Light</p>
+          </a>
+          <a class="wire-card" href="user-analysis-details.html" style="padding: 0.75rem; text-decoration: none; color: inherit">
+            <p class="enriched-meta" style="margin: 0">Casey Drew</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">141 N</p>
+            <p class="enriched-meta" style="margin: 0">Performance</p>
+          </a>
+        </div>
+        <div class="wire-toolbar" style="border-top: 1px solid #ddd; padding-top: 0.75rem">
+          <p class="enriched-meta">24 results · page 1 of 2</p>
+          <a class="wire-btn wire-btn--primary" href="compare-team-user-sessions-detail.html">Compare 4 sessions</a>
+        </div>
+        <nav class="flow-nav" aria-label="Add to compare flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="compare-team-user-sessions-detail.html">Compare detail</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="compare-team-user-sessions.html">Compare team sessions</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="user-analysis-details.html">Session details</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

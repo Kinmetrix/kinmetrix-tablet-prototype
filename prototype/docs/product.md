@@ -15,6 +15,8 @@ Screen names, routes, and layout truth come from KinmetrixApp. Read paths and ru
 - One HTML file per RN screen (or clear route), with links that mirror the app graph.
 - Labels and structure should follow the reference screen files. Copy can be simplified.
 - Rebuilt markup in `prototype/`. Visual system is **not locked** (neutral wireframe CSS is fine).
+- Route pages use a **Debug** toggle (`shared.js`) for index links, route chips, and flow-nav. Default view matches app layout for review and screenshots.
+- Brand and fixture art live under `prototype/assets/` (Kinmetrix logos from the RN app, `default-profile.svg`, chart SVGs). Pages use `shared.js` to mount `[data-chart]` and `[data-default-avatar]`.
 
 ## Depth of behavior
 
@@ -33,7 +35,7 @@ Mark device, calibration, live run, and waiver flows with clear **placeholder** 
 
 ## Tablet
 
-Clinic **shared iPad**, landscape station. Target logical canvas **1133×744** inside the device frame in `kin-prototype.css`. Touch-first. Avoid hover-only affordances.
+Clinic **shared iPad**, landscape station. Target logical canvas **1180×820** (Kinmetrix IPad sim, iPad 10th generation) inside the device frame in `kin-prototype.css`, same numbers in `visual-compare/device.json`. Touch-first. Avoid hover-only affordances.
 
 ## Non-goals (for now)
 

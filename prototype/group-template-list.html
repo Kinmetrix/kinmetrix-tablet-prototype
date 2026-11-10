@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- source: src/screens/GroupTemplateListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Group templates · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="GroupTemplateList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="program-template-list.html">Back</a>
+        <p class="route-chip">GroupTemplateList <span class="stack-tag">team-settings</span></p>
+        <h1>Group templates</h1>
+        <p class="enriched-meta">Draggable grid scoped to program template. Row → StepTemplateList.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Standard assessment program</p>
+          <a class="wire-btn wire-btn--primary" href="add-group-template.html">Add group template</a>
+        </div>
+        <table class="wire-table" aria-label="Group templates">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="step-template-list.html"><strong>Warm-up block</strong></a>
+                <br /><span class="enriched-meta">Isometric prep for varsity roster</span>
+              </td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="step-template-list.html"><strong>Main isokinetic</strong></a>
+                <br /><span class="enriched-meta">Eight-direction sweep</span>
+              </td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="step-template-list.html"><strong>Cooldown</strong></a>
+                <br /><span class="enriched-meta">Low-intensity finisher</span>
+              </td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Group template list flows">
+          <h2>Actions</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="add-group-template.html">Add group template</a></li>
+            <li><a class="wire-btn" href="edit-group-template.html">Edit group template</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="program-template-list.html">Program templates</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="step-template-list.html">Step templates</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

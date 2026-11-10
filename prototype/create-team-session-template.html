@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!-- source: src/screens/CreateTeamSessionTemplateScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create team session template · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="CreateTeamSessionTemplate" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-session-template-list.html">Back</a>
+        <p class="route-chip">CreateTeamSessionTemplate <span class="stack-tag">team-settings</span></p>
+        <h1>Create session template</h1>
+        <p class="enriched-meta">Card embeds default step; property tiles open EditStepPopovers in RN.</p>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 600px; width: 100%; margin-bottom: 0.5rem">
+          <span></span>
+          <p class="wire-toolbar__title">Create session template</p>
+          <a class="wire-btn wire-btn--primary" href="team-session-template-list.html">Create</a>
+        </div>
+        <section class="wire-card wire-form-card" style="max-width: 600px; width: 100%" aria-label="Session template form">
+          <h2 style="margin: 0 0 0.75rem">Basic information</h2>
+          <form class="wire-stack" action="team-session-template-list.html" method="get">
+            <div class="wire-field">
+              <label for="session-template-name">Name</label>
+              <input id="session-template-name" name="name" type="text" placeholder="Enter template name" value="" />
+            </div>
+            <div class="wire-field">
+              <label for="session-template-desc">Description</label>
+              <textarea
+                id="session-template-desc"
+                name="description"
+                rows="3"
+                placeholder="Enter template description"
+                style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+              ></textarea>
+            </div>
+            <div class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem">
+              <label for="session-template-enabled" style="margin: 0">Enabled</label>
+              <input id="session-template-enabled" name="is_active" type="checkbox" checked aria-label="Template enabled" />
+            </div>
+          </form>
+          <hr style="border: none; border-top: 1px solid #ccc; margin: 1.25rem 0" />
+          <h2 style="margin: 0 0 0.25rem">Session properties</h2>
+          <p class="enriched-meta">Configure the properties of the session template.</p>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 0.75rem;
+              margin-top: 1rem;
+            "
+          >
+            <button class="wire-kv-row" type="button">
+              <span>Mode</span>
+              <strong>Isokinetic</strong>
+            </button>
+            <button class="wire-kv-row" type="button" disabled>
+              <span>Duration</span>
+              <strong>—</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Tilt</span>
+              <strong>1° – 30°</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Repetitions</span>
+              <strong>3</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Weight %</span>
+              <strong>100%</strong>
+            </button>
+          </div>
+          <p style="margin-top: 1rem">
+            <a class="wire-btn wire-btn--primary" href="team-session-template-list.html">Create</a>
+          </p>
+        </section>
+        <nav class="flow-nav" aria-label="Session template flows" style="max-width: 600px; width: 100%">
+          <h2>Cancel</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="team-session-template-list.html">Session template list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="edit-team-session-template.html">Edit session template</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

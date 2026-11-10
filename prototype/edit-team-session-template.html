@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!-- source: src/screens/EditTeamSessionTemplateScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit session template · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="EditTeamSessionTemplate" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-session-template-list.html">Back</a>
+        <p class="route-chip">EditTeamSessionTemplate <span class="stack-tag">team-settings</span></p>
+        <h1>Edit session template</h1>
+        <p class="enriched-meta">Header Save Changes when dirty; cannot disable last enabled template.</p>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 600px; width: 100%; margin-bottom: 0.5rem">
+          <span></span>
+          <p class="wire-toolbar__title">Edit session template</p>
+          <a class="wire-btn wire-btn--primary" href="team-session-template-list.html">Save changes</a>
+        </div>
+        <section class="wire-card wire-form-card" style="max-width: 600px; width: 100%" aria-label="Session template form">
+          <h2 style="margin: 0 0 0.75rem">Basic information</h2>
+          <form class="wire-stack" action="team-session-template-list.html" method="get">
+            <div class="wire-field">
+              <label for="edit-session-template-name">Name</label>
+              <input
+                id="edit-session-template-name"
+                name="name"
+                type="text"
+                placeholder="Enter template name"
+                value="Game day primer"
+              />
+            </div>
+            <div class="wire-field">
+              <label for="edit-session-template-desc">Description</label>
+              <textarea
+                id="edit-session-template-desc"
+                name="description"
+                rows="3"
+                placeholder="Enter template description"
+                style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+              >Short isometric set before competition</textarea>
+            </div>
+            <div class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem">
+              <label for="edit-session-template-enabled" style="margin: 0">Enabled</label>
+              <input id="edit-session-template-enabled" name="is_active" type="checkbox" checked aria-label="Template enabled" />
+            </div>
+            <button class="wire-btn wire-btn--primary" type="submit">Save changes</button>
+          </form>
+        </section>
+        <nav class="flow-nav" aria-label="Edit session template flows" style="max-width: 600px; width: 100%">
+          <h2>Cancel</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="team-session-template-list.html">Session template list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-session-template-steps-list.html">Template steps</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

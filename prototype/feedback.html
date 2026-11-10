@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!-- source: src/features/feedback/FeedbackScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Send feedback · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="Feedback" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">Feedback <span class="stack-tag">app</span></p>
+        <h1>Send feedback</h1>
+        <p class="enriched-meta">Popover modal · 3-step linear progress.</p>
+      </header>
+      <main class="app__content wire-center">
+        <section class="wire-card wire-form-card" style="max-width: 520px; width: 100%" aria-label="Feedback wizard step 1">
+          <div style="height: 4px; background: #ddd; border-radius: 2px; margin-bottom: 1rem">
+            <div style="width: 33%; height: 100%; background: #333; border-radius: 2px"></div>
+          </div>
+          <h2 style="margin: 0 0 1rem; text-align: center">What kind of feedback?</h2>
+          <div class="wire-stack" style="gap: 0.35rem">
+            <button class="wire-btn is-active" type="button">Bug report</button>
+            <button class="wire-btn" type="button">Feature request</button>
+            <button class="wire-btn" type="button">General feedback</button>
+          </div>
+          <button class="wire-btn wire-btn--primary" type="button" style="width: 100%; margin-top: 1rem">Next</button>
+        </section>
+        <p class="enriched-meta" style="max-width: 520px">Steps 2 (message) and 3 (success) not expanded in static prototype.</p>
+        <nav class="flow-nav" aria-label="Feedback flows" style="max-width: 520px; width: 100%">
+          <ul>
+            <li><a class="wire-btn" href="team-settings.html">Opened from team settings</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-home.html">Team home</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

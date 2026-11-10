@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- source: src/screens/AddStepTemplateScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Add step template · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="AddStepTemplate" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="step-template-list.html">Back</a>
+        <p class="route-chip">AddStepTemplate <span class="stack-tag">team-settings</span></p>
+        <h1>Add step template</h1>
+        <p class="enriched-meta">CardButton grid and unit menu open EditStepPopovers in RN.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <button class="wire-btn" type="button">Weight unit: Default (N) ▾</button>
+          <p class="wire-toolbar__title">Add step template</p>
+          <a class="wire-btn wire-btn--primary" href="step-template-list.html">Create step template</a>
+        </div>
+        <section class="wire-card" aria-label="Step template properties">
+          <h2 style="margin: 0 0 0.25rem">Step template properties</h2>
+          <p class="enriched-meta">Configure the properties of the new step template.</p>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 0.75rem;
+              margin-top: 1rem;
+            "
+          >
+            <button class="wire-kv-row" type="button">
+              <span>Mode</span>
+              <strong>Isometric</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Duration</span>
+              <strong>5s</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Tilt</span>
+              <strong>1°</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Target weight</span>
+              <strong>3 N</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Rotation</span>
+              <strong>0°</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Repetitions</span>
+              <strong>3</strong>
+            </button>
+            <button class="wire-kv-row" type="button">
+              <span>Weight %</span>
+              <strong>Not set</strong>
+            </button>
+          </div>
+        </section>
+        <nav class="flow-nav" aria-label="Step template flows">
+          <h2>After save</h2>
+          <ul>
+            <li><a class="wire-btn" href="step-template-list.html">Step template list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="group-template-list.html">Group template list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="edit-step-template.html">Edit step template</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!-- source: src/screens/UserAnalysisDetailsScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Analysis Details · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="UserAnalysisDetails" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-user.html">Back</a>
+        <p class="route-chip">UserAnalysisDetails <span class="stack-tag">team</span></p>
+        <h1>Session Details</h1>
+        <p class="enriched-meta">UserAnalysisDetailsView: radial chart, direction grid, symmetry, notes, download report.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Nov 8, 2026 · Regular exercise</p>
+          <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Alex Morgan" data-avatar-size="48" style="width: 36px; height: 36px; font-size: 0.5rem" aria-label="Reviewer"></span>
+        </div>
+        <div class="wire-split" style="min-height: 380px">
+          <div class="wire-split__main wire-pane-fill" aria-label="Radial chart and widgets">
+            <div class="wire-center" style="min-height: 220px">
+              <div
+                class="proto-chart proto-chart--radial"
+                data-chart="radial"
+                data-chart-label="Session radial"
+                style="width: 200px; max-width: 200px"
+              ></div>
+            </div>
+            <p class="enriched-meta" style="text-align: center">
+              Peak force / stability toggles · symmetry highlights · flip 180°
+            </p>
+            <div class="wire-stack" style="gap: 0.5rem; max-width: 520px; margin: 0.5rem auto 0">
+              <p><strong>142 N</strong> avg peak · <strong>94%</strong> stability · <strong>7/8</strong> symmetry</p>
+              <button class="wire-btn wire-btn--ghost" type="button">Notes</button>
+              <button class="wire-btn wire-btn--ghost" type="button">Download report</button>
+            </div>
+          </div>
+          <aside class="wire-split__aside" style="overflow: auto">
+            <table class="wire-table" aria-label="Directions">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th style="text-align: center">Pos</th>
+                  <th style="text-align: center">Peak</th>
+                  <th style="text-align: center">Stability</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="session-data.html">Flexion</a></td>
+                  <td style="text-align: center">0°</td>
+                  <td style="text-align: center">142 N</td>
+                  <td style="text-align: center">96%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Right forward</a></td>
+                  <td style="text-align: center">45°</td>
+                  <td style="text-align: center">138 N</td>
+                  <td style="text-align: center">94%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Right</a></td>
+                  <td style="text-align: center">90°</td>
+                  <td style="text-align: center">135 N</td>
+                  <td style="text-align: center">92%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Back right</a></td>
+                  <td style="text-align: center">135°</td>
+                  <td style="text-align: center">130 N</td>
+                  <td style="text-align: center">91%</td>
+                </tr>
+              </tbody>
+            </table>
+          </aside>
+        </div>
+        <nav class="flow-nav" aria-label="Analysis detail flows">
+          <h2>Drill-down</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="session-data.html">Session data (direction)</a></li>
+            <li><a class="wire-btn" href="session-history.html">Session history (user)</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="historical.html">Historical chart</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="compare-team-user-sessions.html">Compare team sessions</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

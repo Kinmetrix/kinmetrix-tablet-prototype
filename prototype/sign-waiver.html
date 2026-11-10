@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<!-- source: src/screens/SignWaiverScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign waiver · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="SignWaiver" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home.html">Back</a>
+        <p class="route-chip">SignWaiver <span class="stack-tag">user</span></p>
+        <h1>Waiver</h1>
+        <p class="enriched-meta">PDF viewer + signature popover. Upload not stubbed.</p>
+      </header>
+      <main class="app__content wire-stack" style="min-height: 560px">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Waiver</p>
+          <button class="wire-btn wire-btn--primary" type="button">Sign</button>
+        </div>
+        <section class="wire-pane-fill" aria-label="Waiver PDF">
+          <p><strong>waiver-dec17-2024.pdf</strong></p>
+          <p class="enriched-meta">RN uses react-native-pdf at scale 1.5. Legal text not reproduced in HTML.</p>
+          <p>Placeholder PDF page 1 of 3</p>
+        </section>
+        <section class="wire-card" aria-label="Signature popover (fixture)">
+          <h2>Sign above</h2>
+          <div
+            class="wire-pane-fill"
+            style="min-height: 160px; border-style: solid; background: #fff"
+            aria-label="Signature pad"
+          >
+            <p class="enriched-meta">SignatureCapture canvas</p>
+          </div>
+          <div class="flow-nav" style="border: none; margin: 0.75rem 0 0; padding: 0">
+            <ul>
+              <li><button class="wire-btn" type="button">Clear</button></li>
+              <li><button class="wire-btn wire-btn--primary" type="button">Save</button></li>
+            </ul>
+          </div>
+        </section>
+        <nav class="flow-nav" aria-label="Waiver flows">
+          <h2>After signing</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="home.html">Return to home</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

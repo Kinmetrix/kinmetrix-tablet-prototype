@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!-- source: src/screens/NotesListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alex Morgan's notes · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="NotesList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="user-profile.html">Back</a>
+        <p class="route-chip">NotesList <span class="stack-tag">user</span></p>
+        <h1>Alex Morgan's notes</h1>
+        <p class="enriched-meta">Paginated grid. Row → UserAnalysisDetails for linked analysis.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <table class="wire-table" aria-label="User notes">
+          <thead>
+            <tr>
+              <th>Created</th>
+              <th>Preview</th>
+              <th>Analysis</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="white-space: nowrap">Nov 6, 2026</td>
+              <td>
+                <a href="user-analysis-details.html">Felt tight on left rotation; eased after warm-up.</a>
+              </td>
+              <td>
+                <strong>Regular</strong>
+                <br /><span class="enriched-meta">Nov 6, 2026</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="white-space: nowrap">Oct 28, 2026</td>
+              <td>
+                <a href="user-analysis-details.html">Good stability today. Continue current load.</a>
+              </td>
+              <td>
+                <strong>Performance</strong>
+                <br /><span class="enriched-meta">Oct 28, 2026</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="white-space: nowrap">Oct 12, 2026</td>
+              <td>
+                <a href="user-analysis-details.html">Post-travel session — lower peak on extension.</a>
+              </td>
+              <td>
+                <strong>Light</strong>
+                <br /><span class="enriched-meta">Oct 12, 2026</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="enriched-meta">Page 1 of 3 · 20 per page</p>
+        <nav class="flow-nav" aria-label="Notes flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="user-analysis-details.html">User analysis details</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="user-profile.html">User profile</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

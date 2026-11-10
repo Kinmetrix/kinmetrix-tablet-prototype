@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<!-- source: src/screens/UserTeamListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Team List · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="UserTeamList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">UserTeamList <span class="stack-tag">user</span></p>
+        <h1>Team List</h1>
+        <p class="enriched-meta">Paginated team grid. Row opens team settings or PIN switch. Org account menu → profile.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <a class="wire-btn wire-btn--ghost" href="home.html">User Home</a>
+          <p class="wire-toolbar__title">My teams</p>
+          <button class="wire-btn wire-btn--primary" type="button">New Team</button>
+        </div>
+        <table class="wire-table" aria-label="Teams">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th style="text-align: center"># Members</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="team-settings.html"><strong>Demo Varsity</strong></a>
+                <span class="enriched-meta"> · owner ★</span>
+              </td>
+              <td style="text-align: center">24</td>
+              <td>Jan 12, 2024</td>
+            </tr>
+            <tr>
+              <td><a href="team-settings.html"><strong>Clinic Trial</strong></a></td>
+              <td style="text-align: center">8</td>
+              <td>Jun 3, 2025</td>
+            </tr>
+            <tr>
+              <td><a href="team-settings.html"><strong>Spring Roster</strong></a></td>
+              <td style="text-align: center">18</td>
+              <td>Aug 21, 2025</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="enriched-meta">Page 1 · 3 of 3 teams shown. Add/edit team popover in RN.</p>
+        <nav class="flow-nav" aria-label="User team flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="user-profile.html">User profile</a></li>
+            <li><a class="wire-btn" href="team-list.html">Same screen (team stack)</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-home.html">Open team roster</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

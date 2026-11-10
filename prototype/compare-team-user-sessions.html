@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- source: src/screens/CompareTeamUserSessionsScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Compare Team User Sessions · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="CompareTeamUserSessions" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-home.html">Back</a>
+        <p class="route-chip">CompareTeamUserSessions <span class="stack-tag">team</span></p>
+        <h1>Compare Team Sessions</h1>
+        <p class="enriched-meta">Search + type filter + 4-column grid. Compare 2+ opens detail with RadialMultiChart.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar" style="flex-wrap: wrap; gap: 0.5rem">
+          <label class="enriched-meta" style="display: flex; align-items: center; gap: 0.35rem">
+            Normalized
+            <input type="checkbox" checked aria-label="Normalized scale" />
+          </label>
+          <div class="wire-field" style="flex: 1; min-width: 200px; margin: 0">
+            <label class="enriched-meta" for="compare-search">Search</label>
+            <input id="compare-search" type="search" placeholder="Search by name..." value="" />
+          </div>
+          <div style="display: flex; gap: 0.35rem; flex-wrap: wrap">
+            <button class="wire-btn wire-btn--ghost" type="button">All</button>
+            <button class="wire-btn wire-btn--ghost" type="button">Assessment</button>
+            <button class="wire-btn wire-btn--ghost" type="button">Regular</button>
+          </div>
+        </div>
+        <div
+          style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; padding: 0.5rem 0"
+          aria-label="Comparable sessions"
+        >
+          <label class="wire-card" style="padding: 0.75rem; border: 2px solid #333">
+            <input type="checkbox" checked aria-label="Select Alex Morgan" />
+            <p class="enriched-meta" style="margin: 0.25rem 0 0">Alex Morgan</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">142 N</p>
+            <p class="enriched-meta" style="margin: 0">Nov 8, 2026</p>
+          </label>
+          <label class="wire-card" style="padding: 0.75rem; border: 2px solid #333">
+            <input type="checkbox" checked aria-label="Select Jordan Lee" />
+            <p class="enriched-meta" style="margin: 0.25rem 0 0">Jordan Lee</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">136 N</p>
+            <p class="enriched-meta" style="margin: 0">Nov 7, 2026</p>
+          </label>
+          <a class="wire-card" href="user-analysis-details.html" style="padding: 0.75rem; text-decoration: none; color: inherit">
+            <p class="enriched-meta" style="margin: 0">Sam Patel</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">128 N</p>
+            <p class="enriched-meta" style="margin: 0">Nov 5, 2026</p>
+          </a>
+          <a class="wire-card" href="user-analysis-details.html" style="padding: 0.75rem; text-decoration: none; color: inherit">
+            <p class="enriched-meta" style="margin: 0">Riley Chen</p>
+            <p style="margin: 0.25rem 0 0; font-weight: bold">119 N</p>
+            <p class="enriched-meta" style="margin: 0">Nov 2, 2026</p>
+          </a>
+        </div>
+        <div class="wire-toolbar" style="border-top: 1px solid #ddd; padding-top: 0.75rem">
+          <p class="enriched-meta">32 results · page 1</p>
+          <a class="wire-btn wire-btn--primary" href="compare-team-user-sessions-detail.html">Compare 2 sessions</a>
+        </div>
+        <nav class="flow-nav" aria-label="Team compare flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="compare-team-user-sessions-detail.html">Compare sessions detail</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="add-session-to-compare.html">Add session to compare</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-home.html">Team home</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

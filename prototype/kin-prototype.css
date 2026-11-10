@@ -1,6 +1,6 @@
 :root {
-  --tablet-logical-width: 1133px;
-  --tablet-logical-height: 744px;
+  --tablet-logical-width: 1180px;
+  --tablet-logical-height: 820px;
 }
 
 body {
@@ -18,8 +18,472 @@ body {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+  position: relative;
+}
+
+body[data-enriched='true'] .device-frame {
+  padding: 1.25rem;
+}
+
+body[data-enriched='true'] .app__content {
+  padding-top: 0;
+  min-height: calc(var(--tablet-logical-height) - 2.5rem);
 }
 
 .app__content {
   padding-top: 0.5rem;
+}
+
+.proto-debug-toggle {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 20;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  background: rgb(255 255 255 / 0.92);
+  color: #555;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.08);
+}
+
+.proto-debug-toggle:hover {
+  border-color: #999;
+  color: #222;
+}
+
+body.proto-debug-open .proto-debug-toggle {
+  border-color: #1a5f3a;
+  color: #1a5f3a;
+}
+
+body.proto-capture .proto-debug-toggle,
+body.proto-capture .proto-debug-panel {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.proto-debug-panel {
+  position: absolute;
+  inset: 0.5rem 0.5rem auto;
+  max-height: min(70vh, 520px);
+  overflow: auto;
+  z-index: 30;
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: rgb(255 255 255 / 0.97);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.15);
+}
+
+.proto-debug-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #444;
+}
+
+.proto-debug-panel__close {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+.proto-debug-panel .screen-header {
+  margin-bottom: 0.75rem;
+}
+
+.proto-debug-panel .flow-nav {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #bbb;
+}
+
+.screen-header {
+  margin-bottom: 1rem;
+}
+
+.back-link {
+  font-size: 0.875rem;
+}
+
+.route-chip {
+  font-size: 0.75rem;
+  color: #555;
+  margin: 0.25rem 0;
+}
+
+.stack-tag {
+  background: #eee;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.stub-note {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.placeholder-panel {
+  padding: 1rem;
+  border: 1px dashed #bbb;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.suggested-nav ul,
+.screen-directory {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+}
+
+.suggested-nav li,
+.screen-directory li {
+  margin: 0.35rem 0;
+}
+
+.stack-section {
+  margin-bottom: 1.25rem;
+}
+
+.stack-section h2 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #444;
+}
+
+.quick-start {
+  font-size: 0.95rem;
+}
+
+.index-directory {
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.wire-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 1rem;
+}
+
+.wire-toolbar__title {
+  font-weight: 600;
+  margin: 0;
+}
+
+.wire-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #f5f5f5;
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.wire-btn--primary {
+  background: #1a5f3a;
+  border-color: #1a5f3a;
+  color: #fff;
+}
+
+.wire-btn--ghost {
+  background: transparent;
+}
+
+.wire-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.wire-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.75rem;
+  min-height: 320px;
+}
+
+.wire-logo {
+  width: min(280px, 70%);
+  height: 64px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #eee 0%, #f8f8f8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.kin-logo {
+  display: block;
+  object-fit: contain;
+}
+
+.kin-logo--full {
+  width: min(320px, 72%);
+  height: auto;
+  max-height: 72px;
+}
+
+.kin-logo--mark {
+  width: 72px;
+  height: 72px;
+}
+
+.proto-avatar {
+  display: inline-flex;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e4e4e8;
+  flex-shrink: 0;
+}
+
+.proto-avatar--fixture {
+  border: 2px solid #ccc;
+}
+
+.proto-avatar__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.proto-chart {
+  width: 100%;
+  max-width: 480px;
+  margin: 0.5rem 0;
+}
+
+.proto-chart__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.proto-chart--radial {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.proto-chart--radial .proto-chart__img {
+  max-width: 200px;
+}
+
+.wire-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+.wire-field label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.wire-field input {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #999;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.wire-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.wire-card {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 1rem;
+  background: #fafafa;
+}
+
+.wire-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.wire-card p {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.wire-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.wire-table th,
+.wire-table td {
+  border: 1px solid #ccc;
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+
+.wire-table th {
+  background: #f0f0f0;
+}
+
+.flow-nav {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #bbb;
+}
+
+.flow-nav h2 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #555;
+  margin: 0 0 0.5rem;
+}
+
+.flow-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.enriched-meta {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0.25rem 0 0;
+}
+
+.wire-split {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(280px, 1.2fr);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 400px;
+}
+
+.wire-split__aside {
+  padding: 1.25rem 1rem;
+  border-right: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.wire-split__main {
+  background: #fafafa;
+}
+
+.wire-list-row {
+  display: block;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.wire-list-row:hover {
+  background: #f0f0f0;
+}
+
+.wire-list-row strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.wire-segmented {
+  display: flex;
+  width: 100%;
+  border: 1px solid #999;
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 0.72rem;
+}
+
+.wire-segmented span {
+  flex: 1;
+  text-align: center;
+  padding: 0.45rem 0.2rem;
+  border-right: 1px solid #999;
+}
+
+.wire-segmented span:last-child {
+  border-right: none;
+}
+
+.wire-segmented span.is-active {
+  background: #333;
+  color: #fff;
+}
+
+.wire-kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #fafafa;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+}
+
+.wire-pane-fill {
+  flex: 1;
+  min-height: 320px;
+  border: 1px dashed #999;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #f8f8f8;
+  padding: 1rem;
+  text-align: center;
+}
+
+.wire-form-card {
+  max-width: 500px;
+  margin: 0 auto;
 }

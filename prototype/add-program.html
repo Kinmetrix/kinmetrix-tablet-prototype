@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!-- source: src/screens/AddProgramScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create program · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="AddProgram" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="program-list.html">Back</a>
+        <p class="route-chip">AddProgram <span class="stack-tag">user</span></p>
+        <h1>Create program</h1>
+        <p class="enriched-meta">Header Create Program submits form; success pops to Program list.</p>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 500px; width: 100%; margin-bottom: 0.5rem">
+          <span></span>
+          <p class="wire-toolbar__title">Create program</p>
+          <a class="wire-btn wire-btn--primary" href="program-list.html">Create program</a>
+        </div>
+        <section class="wire-card wire-form-card" aria-label="New program form">
+          <h2 style="margin: 0 0 0.25rem">Create program</h2>
+          <p class="enriched-meta">Enter the name and description for your program.</p>
+          <form class="wire-stack" action="program-list.html" method="get" style="margin-top: 1rem">
+            <div class="wire-field">
+              <label for="program-name">Name</label>
+              <input id="program-name" name="name" type="text" placeholder="Enter program name" value="" />
+            </div>
+            <div class="wire-field">
+              <label for="program-desc">Description</label>
+              <textarea
+                id="program-desc"
+                name="description"
+                rows="4"
+                placeholder="Enter program description"
+                style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
+              ></textarea>
+            </div>
+            <button class="wire-btn wire-btn--primary" type="submit">Create program</button>
+          </form>
+        </section>
+        <nav class="flow-nav" aria-label="Program flows" style="max-width: 500px; width: 100%">
+          <h2>Cancel</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="program-list.html">Program list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="create-program-choice.html">Create program choice</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

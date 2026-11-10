@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!-- source: src/screens/GroupListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Groups · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="GroupList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="program-list.html">Back</a>
+        <p class="route-chip">GroupList <span class="stack-tag">user</span></p>
+        <h1>Groups</h1>
+        <p class="enriched-meta">Draggable data grid. Row → StepList. More menu: Edit, Duplicate, Delete.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Groups</p>
+          <a class="wire-btn wire-btn--primary" href="add-group.html">Add group</a>
+        </div>
+        <table class="wire-table" aria-label="Groups in program">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th style="text-align: center">Completed at</th>
+              <th style="text-align: center">Steps</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="step-list.html"><strong>Warm-up block</strong></a>
+                <br /><span class="enriched-meta">Light isometrics before main sets</span>
+              </td>
+              <td style="text-align: center">—</td>
+              <td style="text-align: center"><span class="enriched-meta">2 / 8</span></td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="step-list.html"><strong>Main isokinetic</strong></a>
+                <br /><span class="enriched-meta">Eight directions</span>
+              </td>
+              <td style="text-align: center">Nov 7, 2026</td>
+              <td style="text-align: center"><span class="enriched-meta">8 / 8</span></td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="step-list.html"><strong>Cool-down</strong></a>
+                <br /><span class="enriched-meta">Not started</span>
+              </td>
+              <td style="text-align: center">—</td>
+              <td style="text-align: center">4</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Group list flows">
+          <h2>Actions</h2>
+          <ul>
+            <li><a class="wire-btn" href="add-group.html">Add group</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="edit-group.html">Edit group (fixture)</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="step-list.html">Step list</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

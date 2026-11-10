@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!-- source: src/screens/SettingsScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="Settings" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="index.html">All screens</a>
+        <p class="route-chip">Settings <span class="stack-tag">app</span></p>
+        <h1>Settings</h1>
+        <p class="enriched-meta">AsyncStorage toggles for theme, status bar, analytics, debug overlay.</p>
+      </header>
+      <main class="app__content wire-stack" style="max-width: 480px">
+        <section class="wire-card" aria-label="App settings">
+          <div class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid #ddd">
+            <label for="set-theme">Use dark theme</label>
+            <input id="set-theme" type="checkbox" aria-label="Use dark theme" />
+          </div>
+          <div class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid #ddd">
+            <label for="set-status">Show status bar</label>
+            <input id="set-status" type="checkbox" checked aria-label="Show status bar" />
+          </div>
+          <div class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid #ddd">
+            <label for="set-analytics">Enable analytics &amp; bug reporting</label>
+            <input id="set-analytics" type="checkbox" aria-label="Enable analytics" />
+          </div>
+          <div class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 0">
+            <label for="set-debug">Show debug overlay</label>
+            <input id="set-debug" type="checkbox" aria-label="Show debug overlay" />
+          </div>
+        </section>
+        <nav class="flow-nav" aria-label="Settings flows">
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="device-control.html">Device control</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

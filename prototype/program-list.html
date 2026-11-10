@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!-- source: src/screens/ProgramListScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Programs · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="ProgramList" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home-start.html">Back</a>
+        <p class="route-chip">ProgramList <span class="stack-tag">user</span></p>
+        <h1>Programs</h1>
+        <p class="enriched-meta">Data grid with drag reorder and row actions menu in RN.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Programs</p>
+          <a class="wire-btn wire-btn--primary" href="create-program-choice.html">Create New</a>
+        </div>
+        <table class="wire-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th style="text-align: center">Completed</th>
+              <th style="text-align: center">Last Run</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="group-list.html"><strong>Neck strength — week 4</strong></a>
+                <br /><span class="enriched-meta">Return-to-play protocol</span>
+              </td>
+              <td style="text-align: center">—</td>
+              <td style="text-align: center">Nov 6, 2026</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="group-list.html"><strong>Maintenance block A</strong></a>
+                <br /><span class="enriched-meta">2 groups · in progress</span>
+              </td>
+              <td style="text-align: center">—</td>
+              <td style="text-align: center">Oct 28, 2026</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+            <tr>
+              <td>
+                <a href="group-list.html"><strong>Baseline assessment cycle</strong></a>
+                <br /><span class="enriched-meta">Completed</span>
+              </td>
+              <td style="text-align: center">Sep 12, 2026</td>
+              <td style="text-align: center">Sep 12, 2026</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Program flows">
+          <h2>Actions</h2>
+          <ul>
+            <li><a class="wire-btn" href="create-program-choice.html">Create program</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="edit-program.html">Edit program (fixture)</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

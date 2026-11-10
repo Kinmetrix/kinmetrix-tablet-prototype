@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!-- source: src/screens/onboarding/EmailScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>What's your email? · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="OnboardingEmail" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="onboarding-competition-level.html">Back</a>
+        <p class="route-chip">OnboardingEmail <span class="stack-tag">onboarding-step</span></p>
+        <h1>Email</h1>
+        <p class="enriched-meta">“Add Later” secondary action on this step in the app.</p>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 480px; width: 100%">
+          <a class="wire-btn wire-btn--ghost" href="onboarding.html">✕</a>
+          <p class="wire-toolbar__title">Step 10 of 11 · Email</p>
+        </div>
+        <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
+          <h2 style="margin: 0 0 1rem; text-align: center">What's your email?</h2>
+          <div class="wire-field">
+            <label for="ob-email">Email</label>
+            <input id="ob-email" type="email" placeholder="Enter your email" value="alex.morgan@example.com" autocomplete="email" />
+          </div>
+          <p style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap">
+            <a class="wire-btn wire-btn--primary" href="onboarding-onboarding-confirmation.html">Create user</a>
+            <a class="wire-btn wire-btn--ghost" href="onboarding-onboarding-confirmation.html">Add later</a>
+          </p>
+        </section>
+        <nav class="flow-nav" aria-label="Onboarding email flows" style="max-width: 480px; width: 100%">
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="onboarding-competition-level.html">Previous</a></li>
+            <li><a class="wire-btn wire-btn--primary" href="onboarding-onboarding-confirmation.html">Confirmation</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- source: src/screens/onboarding/HeightScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>What's your height? · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="OnboardingHeight" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="onboarding-name.html">Back</a>
+        <p class="route-chip">OnboardingHeight <span class="stack-tag">onboarding-step</span></p>
+        <h1>Height</h1>
+      </header>
+      <main class="app__content wire-center">
+        <div class="wire-toolbar" style="max-width: 480px; width: 100%">
+          <a class="wire-btn wire-btn--ghost" href="onboarding.html">✕</a>
+          <p class="wire-toolbar__title">Step 2 of 11 · Height</p>
+        </div>
+        <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
+          <h2 style="margin: 0 0 1rem; text-align: center">What's your height?</h2>
+          <div class="wire-segmented" role="group" aria-label="Height unit" style="margin-bottom: 1rem">
+            <span class="is-active">ft / in</span>
+            <span>cm</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem">
+            <div class="wire-field" style="flex: 1">
+              <label for="ob-ft">Feet</label>
+              <input id="ob-ft" type="number" value="5" min="0" />
+            </div>
+            <div class="wire-field" style="flex: 1">
+              <label for="ob-in">Inches</label>
+              <input id="ob-in" type="number" value="10" min="0" max="11" />
+            </div>
+          </div>
+          <a class="wire-btn wire-btn--primary" href="onboarding-weight.html" style="width: 100%; margin-top: 1rem; text-align: center">Next</a>
+        </section>
+        <nav class="flow-nav" aria-label="Onboarding height flows" style="max-width: 480px; width: 100%">
+          <ul>
+            <li><a class="wire-btn wire-btn--ghost" href="onboarding-name.html">Previous</a></li>
+            <li><a class="wire-btn wire-btn--primary" href="onboarding-weight.html">Next</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!-- source: src/screens/GroupResultsScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Warm-up block results · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="GroupResults" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="step-list.html">Back</a>
+        <p class="route-chip">GroupResults <span class="stack-tag">user</span></p>
+        <h1>Warm-up block results</h1>
+        <p class="enriched-meta">
+          UserAnalysisDetailsView. Params: group or assessmentBatchId. Row press → SessionData. Empty state when no
+          analysis.
+        </p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <span></span>
+          <p class="wire-toolbar__title">Nov 8, 2026</p>
+          <span class="enriched-meta">Warm-up block</span>
+        </div>
+        <table class="wire-table" aria-label="Analysis by direction">
+          <thead>
+            <tr>
+              <th>Direction</th>
+              <th style="text-align: center">Peak force</th>
+              <th style="text-align: center">Stability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="session-data.html">0°</a></td>
+              <td style="text-align: center">38 N</td>
+              <td style="text-align: center">92%</td>
+            </tr>
+            <tr>
+              <td><a href="session-data.html">45°</a></td>
+              <td style="text-align: center">41 N</td>
+              <td style="text-align: center">89%</td>
+            </tr>
+            <tr>
+              <td><a href="session-data.html">90°</a></td>
+              <td style="text-align: center">36 N</td>
+              <td style="text-align: center">91%</td>
+            </tr>
+            <tr>
+              <td><a href="session-data.html">135°</a></td>
+              <td style="text-align: center">40 N</td>
+              <td style="text-align: center">88%</td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="flow-nav" aria-label="Group results flows">
+          <h2>Related</h2>
+          <ul>
+            <li><a class="wire-btn" href="session-data.html">Session data</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="step-list.html">Step list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="user-analysis-details.html">User analysis details</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

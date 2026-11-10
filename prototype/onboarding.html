@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!-- source: src/screens/onboarding/OnboardingScreen.tsx -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Onboarding · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="Onboarding" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="team-home.html">Back</a>
+        <p class="route-chip">Onboarding <span class="stack-tag">team</span></p>
+        <h1>Add team member</h1>
+        <p class="enriched-meta">Popover wizard; OnboardingProvider swaps step screens.</p>
+      </header>
+      <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <a class="wire-btn wire-btn--ghost" href="team-home.html" aria-label="Close">✕</a>
+          <p class="wire-toolbar__title">Step 1 of 11 · Name</p>
+          <span></span>
+        </div>
+        <section class="wire-card" aria-label="Current step preview">
+          <p>Wizard shell. Step content matches the routes linked below.</p>
+          <a class="wire-btn wire-btn--primary" href="onboarding-name.html">Open name step</a>
+        </section>
+        <ol class="wire-stack" style="padding-left: 1.25rem; margin: 0">
+          <li><a href="onboarding-name.html">Name</a></li>
+          <li><a href="onboarding-height.html">Height</a></li>
+          <li><a href="onboarding-weight.html">Weight</a></li>
+          <li><a href="onboarding-date-of-birth.html">Date of birth</a></li>
+          <li><a href="onboarding-current-team.html">Current team</a></li>
+          <li><a href="onboarding-sport.html">Sport</a></li>
+          <li><a href="onboarding-position.html">Position</a></li>
+          <li><a href="onboarding-hand.html">Hand</a></li>
+          <li><a href="onboarding-competition-level.html">Competition level</a></li>
+          <li><a href="onboarding-email.html">Email</a></li>
+          <li><a href="onboarding-onboarding-confirmation.html">Confirmation</a></li>
+        </ol>
+        <nav class="flow-nav" aria-label="Onboarding entry">
+          <h2>After onboarding</h2>
+          <ul>
+            <li><a class="wire-btn" href="team-user.html">Member detail</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="add-team-user.html">Add team user route</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

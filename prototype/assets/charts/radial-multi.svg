@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 200" role="img" aria-label="Multi-series radial chart placeholder">
+  <circle cx="120" cy="100" r="78" fill="#fafafa" stroke="#ccc"/>
+  <polygon points="120,30 175,68 165,135 75,135 65,68" fill="none" stroke="#1a5f3a" stroke-width="2"/>
+  <polygon points="120,42 160,72 152,125 88,125 80,72" fill="none" stroke="#BE1E2D" stroke-width="2"/>
+  <polygon points="120,54 145,76 140,115 100,115 95,76" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="120" cy="100" r="4" fill="#333"/>
+</svg>
