@@ -1,0 +1,12 @@
+{
+  "artifactRoot": "factory/artifacts",
+  "executionRoot": "factory/executions",
+  "templates": {
+    "prd": "${factoryDir}/templates/prd.md",
+    "analysisStage": "${factoryDir}/templates/analysis-stage.md"
+  },
+  "context": [],
+  "codeRoots": ["."],
+  "verify": { "command": null, "timeoutSeconds": 1800 },
+  "limits": { "maxRejections": 3, "maxRefineRounds": 5 }
+}

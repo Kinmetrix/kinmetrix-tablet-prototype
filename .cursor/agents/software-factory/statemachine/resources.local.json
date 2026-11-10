@@ -1,0 +1,21 @@
+{
+  "InitRunFunctionArn": { "type": "function", "name": "InitRun", "handler": "functions/init-run.mjs" },
+  "ValidatePrdFunctionArn": { "type": "function", "name": "ValidatePrd", "handler": "functions/validate-prd.mjs" },
+  "CommitPrdFunctionArn": { "type": "function", "name": "CommitPrd", "handler": "functions/commit-prd.mjs" },
+  "ValidateReviewFunctionArn": { "type": "function", "name": "ValidateReview", "handler": "functions/validate-review.mjs" },
+  "LockFlowFunctionArn": { "type": "function", "name": "LockFlow", "handler": "functions/lock-flow.mjs" },
+  "ValidateStageFunctionArn": { "type": "function", "name": "ValidateStage", "handler": "functions/validate-stage.mjs" },
+  "CommitAnalysisFunctionArn": { "type": "function", "name": "CommitAnalysis", "handler": "functions/commit-analysis.mjs" },
+  "ValidatePrototypeFunctionArn": { "type": "function", "name": "ValidatePrototype", "handler": "functions/validate-prototype.mjs" },
+  "CommitPrototypeFunctionArn": { "type": "function", "name": "CommitPrototype", "handler": "functions/commit-prototype.mjs" },
+  "ValidateImplementationFunctionArn": { "type": "function", "name": "ValidateImplementation", "handler": "functions/validate-implementation.mjs" },
+  "VerifyFunctionArn": { "type": "function", "name": "Verify", "handler": "functions/verify.mjs" },
+  "FinalizeRunFunctionArn": { "type": "function", "name": "FinalizeRun", "handler": "functions/finalize-run.mjs" },
+  "PrdAuthorActivityArn": { "type": "activity", "name": "PrdAuthor" },
+  "PrdRefineActivityArn": { "type": "activity", "name": "PrdRefine" },
+  "ReverseAnalysisActivityArn": { "type": "activity", "name": "ReverseAnalysis" },
+  "PrdSynthesisActivityArn": { "type": "activity", "name": "PrdSynthesis" },
+  "HumanReviewActivityArn": { "type": "activity", "name": "HumanReview" },
+  "PrototypeActivityArn": { "type": "activity", "name": "Prototype" },
+  "ImplementActivityArn": { "type": "activity", "name": "Implement" }
+}

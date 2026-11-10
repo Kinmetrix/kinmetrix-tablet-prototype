@@ -1,0 +1,25 @@
+:root {
+  --tablet-logical-width: 1133px;
+  --tablet-logical-height: 744px;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #e8e8ed;
+}
+
+.device-frame {
+  box-sizing: border-box;
+  width: min(100vw, var(--tablet-logical-width));
+  min-height: var(--tablet-logical-height);
+  margin: 1rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+}
+
+.app__content {
+  padding-top: 0.5rem;
+}

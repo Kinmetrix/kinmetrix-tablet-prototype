@@ -1,0 +1,23 @@
+---
+description: Concise, readable prose and agent replies
+alwaysApply: true
+---
+
+# Writing style
+
+## Default voice
+- Lead with the answer; keep responses proportional to task complexity.
+- Overviews: segment (headings or short blocks), one idea per block; prefer a clear thread over a flat list.
+- Procedures and steps: Use simplified Technical English. This means short sentences, one action per step, active voice, consistent terms.
+- Do not use jargon.
+
+## Clarity
+- If two nouns could bind to "it/this/that", repeat the noun.
+- In code and comments: describe current state and intent only. No narrative of how we got here (that belongs in commits/PRs).
+
+## Safeword
+If the user says **wut**: they could not parse the last reply. Simplify language, restate grounded context in plain terms, tell it like a short story (situation → what matters → what to do next). Shorter than before.
+
+## Before sending long output
+- Review: would a busy teammate skim this and get the point? If not, cut or restructure.
+- Do not dump huge docs without structure; offer a tight summary first.

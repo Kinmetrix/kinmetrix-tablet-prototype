@@ -1,0 +1,14 @@
+{
+  "artifactRoot": "factory/artifacts",
+  "executionRoot": "factory/executions",
+  "context": [
+    "AGENTS.md",
+    "prototype/docs/product.md",
+    "prototype/docs/reference-app.md"
+  ],
+  "codeRoots": ["<app>/src/", "<app>/tests/"],
+  "verify": {
+    "command": "<shell command run from repo root, or null>",
+    "timeoutSeconds": 1800
+  }
+}

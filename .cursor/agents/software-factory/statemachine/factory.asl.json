@@ -1,0 +1,740 @@
+{
+  "Comment": "Spec-first software factory. forward: feature -> PRD. reverse: repo -> 7 analysis stages -> PRD. refine: committed PRD. Then human review loop -> flow lock -> prototype -> implementation -> verify, cut short by scope. Agents only propose; deterministic functions validate and commit.",
+  "StartAt": "InitRun",
+  "States": {
+    "InitRun": {
+      "Type": "Task",
+      "Resource": "${InitRunFunctionArn}",
+      "Parameters": {
+        "input.$": "$",
+        "executionName.$": "$$.Execution.Name"
+      },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ChooseMode"
+    },
+    "ChooseMode": {
+      "Type": "Choice",
+      "Choices": [
+        { "Variable": "$.run.mode", "StringEquals": "forward", "Next": "AuthorPrd" },
+        { "Variable": "$.run.mode", "StringEquals": "reverse", "Next": "DiscoverServices" },
+        { "Variable": "$.run.mode", "StringEquals": "refine", "Next": "ReviewPrd" }
+      ]
+    },
+
+    "AuthorPrd": {
+      "Type": "Task",
+      "Resource": "${PrdAuthorActivityArn}",
+      "Parameters": {
+        "role": "prd-author",
+        "guide.$": "States.Format('{}/workers/prd-author.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "feature.$": "$.run.feature",
+        "context.$": "$.run.context",
+        "template.$": "$.run.templates.prd",
+        "previousPrdKey.$": "$.run.prd.key",
+        "storeRoot.$": "$.run.storeRoot",
+        "outputKey.$": "States.Format('{}prd.md', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateAuthoredPrd"
+    },
+    "ValidateAuthoredPrd": {
+      "Type": "Task",
+      "Resource": "${ValidatePrdFunctionArn}",
+      "Parameters": { "role": "prd-author", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "AuthorPrd" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "CommitAuthoredPrd"
+    },
+    "CommitAuthoredPrd": {
+      "Type": "Task",
+      "Resource": "${CommitPrdFunctionArn}",
+      "Parameters": { "source": "author", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ReviewPrd"
+    },
+
+    "DiscoverServices": {
+      "Type": "Task",
+      "Resource": "${ReverseAnalysisActivityArn}",
+      "Parameters": {
+        "role": "reverse-analysis",
+        "stage": "01-service-discovery",
+        "guide.$": "States.Format('{}/workers/reverse-analysis.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "repo.$": "$.run.repo",
+        "context.$": "$.run.context",
+        "template.$": "$.run.templates.analysisStage",
+        "storeRoot.$": "$.run.storeRoot",
+        "analysisPrefix.$": "States.Format('{}analysis/', $.run.staging)",
+        "outputKey.$": "States.Format('{}analysis/01-service-discovery.md', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateServiceDiscovery"
+    },
+    "ValidateServiceDiscovery": {
+      "Type": "Task",
+      "Resource": "${ValidateStageFunctionArn}",
+      "Parameters": { "stage": "01-service-discovery", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "DiscoverServices" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "ExtractGraph"
+    },
+    "ExtractGraph": {
+      "Type": "Task",
+      "Resource": "${ReverseAnalysisActivityArn}",
+      "Parameters": {
+        "role": "reverse-analysis",
+        "stage": "02-graph-extraction",
+        "guide.$": "States.Format('{}/workers/reverse-analysis.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "repo.$": "$.run.repo",
+        "context.$": "$.run.context",
+        "template.$": "$.run.templates.analysisStage",
+        "storeRoot.$": "$.run.storeRoot",
+        "analysisPrefix.$": "States.Format('{}analysis/', $.run.staging)",
+        "outputKey.$": "States.Format('{}analysis/02-graph-extraction.md', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateGraphExtraction"
+    },
+    "ValidateGraphExtraction": {
+      "Type": "Task",
+      "Resource": "${ValidateStageFunctionArn}",
+      "Parameters": { "stage": "02-graph-extraction", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "ExtractGraph" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "AnalyzeArchitecture"
+    },
+    "AnalyzeArchitecture": {
+      "Type": "Task",
+      "Resource": "${ReverseAnalysisActivityArn}",
+      "Parameters": {
+        "role": "reverse-analysis",
+        "stage": "03-architecture",
+        "guide.$": "States.Format('{}/workers/reverse-analysis.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "repo.$": "$.run.repo",
+        "context.$": "$.run.context",
+        "template.$": "$.run.templates.analysisStage",
+        "storeRoot.$": "$.run.storeRoot",
+        "analysisPrefix.$": "States.Format('{}analysis/', $.run.staging)",
+        "outputKey.$": "States.Format('{}analysis/03-architecture.md', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateArchitecture"
+    },
+    "ValidateArchitecture": {
+      "Type": "Task",
+      "Resource": "${ValidateStageFunctionArn}",
+      "Parameters": { "stage": "03-architecture", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "AnalyzeArchitecture" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "ExtractDataModel"
+    },
+    "ExtractDataModel": {
+      "Type": "Task",
+      "Resource": "${ReverseAnalysisActivityArn}",
+      "Parameters": {
+        "role": "reverse-analysis",
+        "stage": "04-data-model",
+        "guide.$": "States.Format('{}/workers/reverse-analysis.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "repo.$": "$.run.repo",
+        "context.$": "$.run.context",
+        "template.$": "$.run.templates.analysisStage",
+        "storeRoot.$": "$.run.storeRoot",
+        "analysisPrefix.$": "States.Format('{}analysis/', $.run.staging)",
+        "outputKey.$": "States.Format('{}analysis/04-data-model.md', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateDataModel"
+    },
+    "ValidateDataModel": {
+      "Type": "Task",
+      "Resource": "${ValidateStageFunctionArn}",
+      "Parameters": { "stage": "04-data-model", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "ExtractDataModel" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "AnalyzeIntegrations"
+    },
+    "AnalyzeIntegrations": {
+      "Type": "Task",
+      "Resource": "${ReverseAnalysisActivityArn}",
+      "Parameters": {
+        "role": "reverse-analysis",
+        "stage": "05-integrations",
+        "guide.$": "States.Format('{}/workers/reverse-analysis.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "repo.$": "$.run.repo",
+        "context.$": "$.run.context",
+        "template.$": "$.run.templates.analysisStage",
+        "storeRoot.$": "$.run.storeRoot",
+        "analysisPrefix.$": "States.Format('{}analysis/', $.run.staging)",
+        "outputKey.$": "States.Format('{}analysis/05-integrations.md', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateIntegrations"
+    },
+    "ValidateIntegrations": {
+      "Type": "Task",
+      "Resource": "${ValidateStageFunctionArn}",
+      "Parameters": { "stage": "05-integrations", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "AnalyzeIntegrations" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "ExtractBusinessLogic"
+    },
+    "ExtractBusinessLogic": {
+      "Type": "Task",
+      "Resource": "${ReverseAnalysisActivityArn}",
+      "Parameters": {
+        "role": "reverse-analysis",
+        "stage": "06-business-logic",
+        "guide.$": "States.Format('{}/workers/reverse-analysis.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "repo.$": "$.run.repo",
+        "context.$": "$.run.context",
+        "template.$": "$.run.templates.analysisStage",
+        "storeRoot.$": "$.run.storeRoot",
+        "analysisPrefix.$": "States.Format('{}analysis/', $.run.staging)",
+        "outputKey.$": "States.Format('{}analysis/06-business-logic.md', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateBusinessLogic"
+    },
+    "ValidateBusinessLogic": {
+      "Type": "Task",
+      "Resource": "${ValidateStageFunctionArn}",
+      "Parameters": { "stage": "06-business-logic", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "ExtractBusinessLogic" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "MapUxFlows"
+    },
+    "MapUxFlows": {
+      "Type": "Task",
+      "Resource": "${ReverseAnalysisActivityArn}",
+      "Parameters": {
+        "role": "reverse-analysis",
+        "stage": "07-ux-flows",
+        "guide.$": "States.Format('{}/workers/reverse-analysis.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "repo.$": "$.run.repo",
+        "context.$": "$.run.context",
+        "template.$": "$.run.templates.analysisStage",
+        "storeRoot.$": "$.run.storeRoot",
+        "analysisPrefix.$": "States.Format('{}analysis/', $.run.staging)",
+        "outputKey.$": "States.Format('{}analysis/07-ux-flows.md', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateUxFlows"
+    },
+    "ValidateUxFlows": {
+      "Type": "Task",
+      "Resource": "${ValidateStageFunctionArn}",
+      "Parameters": { "stage": "07-ux-flows", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "MapUxFlows" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "SynthesizePrd"
+    },
+    "SynthesizePrd": {
+      "Type": "Task",
+      "Resource": "${PrdSynthesisActivityArn}",
+      "Parameters": {
+        "role": "prd-synthesis",
+        "stage": "08-prd-synthesis",
+        "guide.$": "States.Format('{}/workers/prd-synthesis.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "repo.$": "$.run.repo",
+        "context.$": "$.run.context",
+        "template.$": "$.run.templates.prd",
+        "previousPrdKey.$": "$.run.prd.key",
+        "storeRoot.$": "$.run.storeRoot",
+        "analysisPrefix.$": "States.Format('{}analysis/', $.run.staging)",
+        "outputKey.$": "States.Format('{}prd.md', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateSynthesizedPrd"
+    },
+    "ValidateSynthesizedPrd": {
+      "Type": "Task",
+      "Resource": "${ValidatePrdFunctionArn}",
+      "Parameters": { "role": "prd-synthesis", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "SynthesizePrd" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "CommitAnalysis"
+    },
+    "CommitAnalysis": {
+      "Type": "Task",
+      "Resource": "${CommitAnalysisFunctionArn}",
+      "Parameters": { "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "CommitSynthesizedPrd"
+    },
+    "CommitSynthesizedPrd": {
+      "Type": "Task",
+      "Resource": "${CommitPrdFunctionArn}",
+      "Parameters": { "source": "synthesis", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ReviewPrd"
+    },
+
+    "ReviewPrd": {
+      "Type": "Task",
+      "Resource": "${HumanReviewActivityArn}",
+      "Parameters": {
+        "role": "human-review",
+        "guide.$": "States.Format('{}/workers/human-review.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "prdKey.$": "$.run.prd.key",
+        "prdVersion.$": "$.run.prd.version",
+        "storeRoot.$": "$.run.storeRoot",
+        "round.$": "$.run.review.round",
+        "maxRounds.$": "$.run.review.maxRounds",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 604800,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateReview"
+    },
+    "ValidateReview": {
+      "Type": "Task",
+      "Resource": "${ValidateReviewFunctionArn}",
+      "Parameters": { "run.$": "$.run", "response.$": "$.worker" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "ReviewPrd" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "ReviewDecision"
+    },
+    "ReviewDecision": {
+      "Type": "Choice",
+      "Choices": [
+        { "Variable": "$.run.review.decision", "StringEquals": "approve", "Next": "LockFlow" },
+        { "Variable": "$.run.review.decision", "StringEquals": "revise", "Next": "RefinePrd" }
+      ]
+    },
+    "RefinePrd": {
+      "Type": "Task",
+      "Resource": "${PrdRefineActivityArn}",
+      "Parameters": {
+        "role": "prd-refine",
+        "guide.$": "States.Format('{}/workers/prd-refine.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "prdKey.$": "$.run.prd.key",
+        "prdVersion.$": "$.run.prd.version",
+        "reviewFeedback.$": "$.run.review.feedback",
+        "reviewer.$": "$.run.review.reviewer",
+        "context.$": "$.run.context",
+        "template.$": "$.run.templates.prd",
+        "storeRoot.$": "$.run.storeRoot",
+        "outputKey.$": "States.Format('{}prd.md', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateRefinedPrd"
+    },
+    "ValidateRefinedPrd": {
+      "Type": "Task",
+      "Resource": "${ValidatePrdFunctionArn}",
+      "Parameters": { "role": "prd-refine", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "RefinePrd" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "CommitRefinedPrd"
+    },
+    "CommitRefinedPrd": {
+      "Type": "Task",
+      "Resource": "${CommitPrdFunctionArn}",
+      "Parameters": { "source": "refine", "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ReviewPrd"
+    },
+    "LockFlow": {
+      "Type": "Task",
+      "Resource": "${LockFlowFunctionArn}",
+      "Parameters": { "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ScopeAfterPrd"
+    },
+    "ScopeAfterPrd": {
+      "Type": "Choice",
+      "Choices": [{ "Variable": "$.run.scope", "StringEquals": "prd", "Next": "FinalizeRun" }],
+      "Default": "BuildPrototype"
+    },
+
+    "BuildPrototype": {
+      "Type": "Task",
+      "Resource": "${PrototypeActivityArn}",
+      "Parameters": {
+        "role": "prototype",
+        "guide.$": "States.Format('{}/workers/prototype.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "prdKey.$": "$.run.prd.key",
+        "prdVersion.$": "$.run.prd.version",
+        "context.$": "$.run.context",
+        "storeRoot.$": "$.run.storeRoot",
+        "outputPrefix.$": "States.Format('{}prototype/', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidatePrototype"
+    },
+    "ValidatePrototype": {
+      "Type": "Task",
+      "Resource": "${ValidatePrototypeFunctionArn}",
+      "Parameters": { "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "BuildPrototype" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "CommitPrototype"
+    },
+    "CommitPrototype": {
+      "Type": "Task",
+      "Resource": "${CommitPrototypeFunctionArn}",
+      "Parameters": { "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ScopeAfterPrototype"
+    },
+    "ScopeAfterPrototype": {
+      "Type": "Choice",
+      "Choices": [{ "Variable": "$.run.scope", "StringEquals": "prototype", "Next": "FinalizeRun" }],
+      "Default": "Implement"
+    },
+
+    "Implement": {
+      "Type": "Task",
+      "Resource": "${ImplementActivityArn}",
+      "Parameters": {
+        "role": "implement",
+        "guide.$": "States.Format('{}/workers/implement.md', $.run.factoryDir)",
+        "slug.$": "$.run.slug",
+        "prdKey.$": "$.run.prd.key",
+        "prdVersion.$": "$.run.prd.version",
+        "prototypeKey.$": "$.run.prototype.key",
+        "context.$": "$.run.context",
+        "codeRoots.$": "$.run.codeRoots",
+        "storeRoot.$": "$.run.storeRoot",
+        "reportKey.$": "States.Format('{}implementation.json', $.run.staging)",
+        "validationFeedback.$": "$.run.feedback"
+      },
+      "ResultPath": "$.worker",
+      "TimeoutSeconds": 86400,
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "ValidateImplementation"
+    },
+    "ValidateImplementation": {
+      "Type": "Task",
+      "Resource": "${ValidateImplementationFunctionArn}",
+      "Parameters": { "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.ProposalInvalid"], "ResultPath": "$.run.feedback", "Next": "Implement" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "VerifyConfigured"
+    },
+    "VerifyConfigured": {
+      "Type": "Choice",
+      "Choices": [{ "Variable": "$.run.verify.configured", "BooleanEquals": true, "Next": "Verify" }],
+      "Default": "FinalizeRun"
+    },
+    "Verify": {
+      "Type": "Task",
+      "Resource": "${VerifyFunctionArn}",
+      "Parameters": { "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 3600,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        { "ErrorEquals": ["Factory.VerifyFailed"], "ResultPath": "$.run.feedback", "Next": "Implement" },
+        { "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }
+      ],
+      "Next": "FinalizeRun"
+    },
+
+    "FinalizeRun": {
+      "Type": "Task",
+      "Resource": "${FinalizeRunFunctionArn}",
+      "Parameters": { "run.$": "$.run" },
+      "ResultPath": "$.run",
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [{ "ErrorEquals": ["States.ALL"], "ResultPath": "$.error", "Next": "RunFailed" }],
+      "Next": "Done"
+    },
+    "Done": {
+      "Type": "Succeed",
+      "OutputPath": "$.run"
+    },
+    "RunFailed": {
+      "Type": "Fail",
+      "ErrorPath": "$.error.Error",
+      "CausePath": "$.error.Cause"
+    }
+  }
+}
