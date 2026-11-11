@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/home/HomeStartScreen.tsx -->
+<!-- route: HomeStart -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -12,27 +12,54 @@
       <header class="screen-header">
         <a class="back-link" href="home.html">Back</a>
         <p class="route-chip">HomeStart <span class="stack-tag">user</span></p>
-        <h1>Start</h1>
+        <h1>Select Exercise Type</h1>
         <p class="enriched-meta">Choice cards from HOME_START_OPTIONS.</p>
       </header>
       <main class="app__content">
-        <div class="wire-card-grid">
-          <article class="wire-card">
-            <h3>New Assessment</h3>
-            <p>Get an accurate report of your current neck strength.</p>
-            <a class="wire-btn wire-btn--primary" href="assessment.html">Start Assessment</a>
-          </article>
-          <article class="wire-card">
-            <h3>Smart Session</h3>
-            <p>Choose intensity from your last assessment.</p>
-            <a class="wire-btn wire-btn--primary" href="warmup-type.html">Start Session</a>
-          </article>
-          <article class="wire-card">
-            <h3>Run a Program</h3>
-            <p>Structured program over multiple sessions.</p>
-            <a class="wire-btn wire-btn--primary" href="program-list.html">Choose Program</a>
-          </article>
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="home.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Select Exercise Type</p>
+          <div class="wire-toolbar__right">
+            <a class="wire-btn wire-btn--ghost" href="team-settings-home.html">Team Settings</a>
+          </div>
         </div>
+        <div class="wire-center">
+          <div class="wire-card-grid">
+            <a class="wire-card wire-card--assessment" href="edit-protocol-session.html">
+              <h3>New Assessment</h3>
+              <p>Get an accurate report of your current neck strength.</p>
+              <span class="wire-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="16" y="12" width="32" height="42" rx="4" />
+                  <rect x="24" y="8" width="16" height="8" rx="2" />
+                  <path d="M26 34l6 6 12-14" />
+                </svg>
+              </span>
+            </a>
+            <article class="wire-card wire-card--session wire-card--selected">
+              <h3>Smart Session</h3>
+              <p>Choose your intensity with strength settings based on your last assessment.</p>
+              <span class="wire-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4">
+                  <path d="M12 24v16M20 20v24M44 20v24M52 24v16M20 32h24" />
+                </svg>
+              </span>
+              <a class="wire-btn wire-btn--primary" href="protocol-preview.html">Start Session</a>
+            </article>
+            <a class="wire-card wire-card--program" href="program-list.html">
+              <h3>Run a Program</h3>
+              <p>Create a structured program can be ran over multiple sessions.</p>
+              <span class="wire-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="12" y="16" width="40" height="36" rx="4" />
+                  <path d="M12 26h40M22 12v8M42 12v8" />
+                  <path d="M24 38h4M32 38h4M40 38h4M24 46h4M32 46h4" />
+                </svg>
+              </span>
+            </a>
+          </div>
+        </div>
+
         <nav class="flow-nav" aria-label="Related">
           <h2>Related</h2>
           <ul>

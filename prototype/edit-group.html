@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/EditGroupScreen.tsx -->
+<!-- route: EditGroup -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,13 +15,14 @@
         <h1>Edit group</h1>
         <p class="enriched-meta">Save Changes header action; success goBack to group list.</p>
       </header>
-      <main class="app__content wire-center">
-        <div class="wire-toolbar" style="max-width: 500px; width: 100%; margin-bottom: 0.5rem">
-          <span></span>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="group-list.html">&lt; Back</a></div>
           <p class="wire-toolbar__title">Edit group</p>
-          <a class="wire-btn wire-btn--primary" href="group-list.html">Save changes</a>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--header" href="group-list.html">Save changes</a></div>
         </div>
-        <section class="wire-card wire-form-card" aria-label="Edit group form">
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" aria-label="Edit group form">
           <h2 style="margin: 0 0 0.75rem; text-align: center">Edit group</h2>
           <form class="wire-stack" action="group-list.html" method="get">
             <div class="wire-field">
@@ -44,9 +45,10 @@
                 style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
               >Light isometrics before main sets.</textarea>
             </div>
-            <button class="wire-btn wire-btn--primary" type="submit">Save changes</button>
-          </form>
+</form>
         </section>
+        </div>
+
         <nav class="flow-nav" aria-label="Edit group flows" style="max-width: 500px; width: 100%">
           <h2>Cancel</h2>
           <ul>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/features/feedback/FeedbackScreen.tsx -->
+<!-- route: Feedback -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,8 +15,9 @@
         <h1>Send feedback</h1>
         <p class="enriched-meta">Popover modal · 3-step linear progress.</p>
       </header>
-      <main class="app__content wire-center">
-        <section class="wire-card wire-form-card" style="max-width: 520px; width: 100%" aria-label="Feedback wizard step 1">
+      <main class="app__content">
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" style="max-width: 520px; width: 100%" aria-label="Feedback wizard step 1">
           <div style="height: 4px; background: #ddd; border-radius: 2px; margin-bottom: 1rem">
             <div style="width: 33%; height: 100%; background: #333; border-radius: 2px"></div>
           </div>
@@ -29,6 +30,8 @@
           <button class="wire-btn wire-btn--primary" type="button" style="width: 100%; margin-top: 1rem">Next</button>
         </section>
         <p class="enriched-meta" style="max-width: 520px">Steps 2 (message) and 3 (success) not expanded in static prototype.</p>
+        </div>
+
         <nav class="flow-nav" aria-label="Feedback flows" style="max-width: 520px; width: 100%">
           <ul>
             <li><a class="wire-btn" href="team-settings.html">Opened from team settings</a></li>

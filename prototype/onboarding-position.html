@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/onboarding/PositionScreen.tsx -->
+<!-- route: OnboardingPosition -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -14,12 +14,14 @@
         <p class="route-chip">OnboardingPosition <span class="stack-tag">onboarding-step</span></p>
         <h1>Position</h1>
       </header>
-      <main class="app__content wire-center">
-        <div class="wire-toolbar" style="max-width: 480px; width: 100%">
-          <a class="wire-btn wire-btn--ghost" href="onboarding.html">✕</a>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="onboarding-sport.html">&lt; Back</a></div>
           <p class="wire-toolbar__title">Step 7 of 11 · Position</p>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--ghost" href="onboarding.html">✕</a></div>
         </div>
-        <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
           <h2 style="margin: 0 0 1rem; text-align: center">What's your position?</h2>
           <div class="wire-field">
             <label for="ob-position">Position</label>
@@ -35,6 +37,8 @@
             <a class="wire-btn wire-btn--ghost" href="onboarding-hand.html">Skip</a>
           </p>
         </section>
+        </div>
+
         <nav class="flow-nav" aria-label="Onboarding position flows" style="max-width: 480px; width: 100%">
           <ul>
             <li><a class="wire-btn wire-btn--ghost" href="onboarding-sport.html">Previous</a></li>

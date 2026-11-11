@@ -1,4 +1,18 @@
 # One exact slug per line — excluded from the HTML mirror (no page, no index, no checks).
-# RN routes may still exist in screens.json for manifest regeneration.
+# Routes may still exist in screens.json; ignore only controls what the mirror ships.
+
+# Add screens that are dead routes or duplicates of existing screens
 
 sandbox
+password-reset
+set-password
+device-list
+device-modify
+team-view
+user-view
+edit-step-template
+group-data
+assessment-session-history
+recent-data
+select-template
+device-control

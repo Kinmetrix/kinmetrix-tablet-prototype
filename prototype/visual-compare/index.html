@@ -1,93 +1,81 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"/><title>Visual compare</title>
 <style>body{font-family:system-ui;max-width:1400px;margin:1rem auto;padding:0 1rem} section{margin:2rem 0;border-top:1px solid #ddd;padding-top:1rem}</style>
-</head><body><h1>KinmetrixApp vs HTML mirror</h1><p>Left = RN simulator · Right = prototype HTML</p><section id="device-calibration"><h2>Device Calibration <code>DeviceCalibration</code></h2><p>RN — · HTML ✓</p></section>
-<section id="device-control"><h2>Device Control <code>DeviceControlScreen</code></h2><p>RN — · HTML ✓</p></section>
-<section id="device-list"><h2>Device List <code>DeviceList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="device-modify"><h2>Device Modify <code>DeviceModify</code></h2><p>RN — · HTML ✓</p></section>
-<section id="feedback"><h2>Feedback <code>Feedback</code></h2><p>RN — · HTML ✓</p></section>
-<section id="loading"><h2>Loading <code>Loading</code></h2><p>RN — · HTML ✓</p></section>
+</head><body><h1>Baseline vs HTML mirror</h1><p>Left = archived iOS baseline · Right = prototype HTML</p><section id="device-calibration"><h2>Device Calibration <code>DeviceCalibration</code></h2><img src="pairs/device-calibration.png" alt="DeviceCalibration" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="feedback"><h2>Feedback <code>Feedback</code></h2><img src="pairs/feedback.png" alt="Feedback" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="loading"><h2>Loading <code>Loading</code></h2><img src="pairs/loading.png" alt="Loading" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
 <section id="login"><h2>Login <code>Login</code></h2><img src="pairs/login.png" alt="Login" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
 <section id="password-login"><h2>Password Login <code>PasswordLogin</code></h2><img src="pairs/password-login.png" alt="PasswordLogin" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
-<section id="password-reset"><h2>Password Reset <code>PasswordReset</code></h2><p>RN — · HTML ✓</p></section>
-<section id="set-password"><h2>Set Password <code>SetPassword</code></h2><p>RN — · HTML ✓</p></section>
-<section id="settings"><h2>Settings <code>Settings</code></h2><p>RN — · HTML ✓</p></section>
-<section id="team-view"><h2>Team View <code>TeamView</code></h2><p>RN — · HTML ✓</p></section>
-<section id="user-view"><h2>User View <code>UserView</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-competition-level"><h2>Onboarding Competition Level <code>OnboardingCompetitionLevel</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-current-team"><h2>Onboarding Current Team <code>OnboardingCurrentTeam</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-date-of-birth"><h2>Onboarding Date Of Birth <code>OnboardingDateOfBirth</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-email"><h2>Onboarding Email <code>OnboardingEmail</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-hand"><h2>Onboarding Hand <code>OnboardingHand</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-height"><h2>Onboarding Height <code>OnboardingHeight</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-name"><h2>Onboarding Name <code>OnboardingName</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-onboarding-confirmation"><h2>Onboarding Onboarding Confirmation <code>OnboardingOnboardingConfirmation</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-position"><h2>Onboarding Position <code>OnboardingPosition</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-sport"><h2>Onboarding Sport <code>OnboardingSport</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-weight"><h2>Onboarding Weight <code>OnboardingWeight</code></h2><p>RN — · HTML ✓</p></section>
-<section id="add-session-to-compare"><h2>Add Session To Compare <code>AddSessionToCompare</code></h2><p>RN — · HTML ✓</p></section>
-<section id="compare-team-user-sessions"><h2>Compare Team User Sessions <code>CompareTeamUserSessions</code></h2><p>RN — · HTML ✓</p></section>
-<section id="compare-team-user-sessions-detail"><h2>Compare Team User Sessions Detail <code>CompareTeamUserSessionsDetail</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding"><h2>Onboarding <code>Onboarding</code></h2><p>RN — · HTML ✓</p></section>
-<section id="select-user-session"><h2>Select User Session <code>SelectUserSession</code></h2><p>RN — · HTML ✓</p></section>
-<section id="team-home"><h2>Team Home <code>TeamHome</code></h2><p>RN — · HTML ✓</p></section>
-<section id="team-list"><h2>Team List <code>TeamList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="team-settings"><h2>Team Settings <code>TeamSettings</code></h2><p>RN — · HTML ✓</p></section>
-<section id="team-user"><h2>Team User <code>TeamUser</code></h2><p>RN — · HTML ✓</p></section>
-<section id="user-analysis-details"><h2>User Analysis Details <code>UserAnalysisDetails</code></h2><p>RN — · HTML ✓</p></section>
-<section id="add-group-template"><h2>Add Group Template <code>AddGroupTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="add-program-template"><h2>Add Program Template <code>AddProgramTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="add-step-template"><h2>Add Step Template <code>AddStepTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="add-team-user"><h2>Add Team User <code>AddTeamUser</code></h2><p>RN — · HTML ✓</p></section>
-<section id="column-management"><h2>Column Management <code>ColumnManagement</code></h2><p>RN — · HTML ✓</p></section>
-<section id="create-team-session-template"><h2>Create Team Session Template <code>CreateTeamSessionTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="edit-group-template"><h2>Edit Group Template <code>EditGroupTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="edit-program-template"><h2>Edit Program Template <code>EditProgramTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="edit-step-template"><h2>Edit Step Template <code>EditStepTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="edit-team-protocol-session"><h2>Edit Team Protocol Session <code>EditTeamProtocolSession</code></h2><p>RN — · HTML ✓</p></section>
-<section id="edit-team-session-template"><h2>Edit Team Session Template <code>EditTeamSessionTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="group-template-list"><h2>Group Template List <code>GroupTemplateList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="onboarding-preference"><h2>Onboarding Preference <code>OnboardingPreference</code></h2><p>RN — · HTML ✓</p></section>
-<section id="program-template-list"><h2>Program Template List <code>ProgramTemplateList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="step-template-list"><h2>Step Template List <code>StepTemplateList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="team-session-template-list"><h2>Team Session Template List <code>TeamSessionTemplateList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="team-session-template-steps-list"><h2>Team Session Template Steps List <code>TeamSessionTemplateStepsList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="team-settings-home"><h2>Team Settings Home <code>TeamSettingsHome</code></h2><p>RN — · HTML ✓</p></section>
-<section id="team-user-details"><h2>Team User Details <code>TeamUserDetails</code></h2><p>RN — · HTML ✓</p></section>
-<section id="team-user-list"><h2>Team User List <code>TeamUserList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="add-group"><h2>Add Group <code>AddGroup</code></h2><p>RN — · HTML ✓</p></section>
-<section id="add-program"><h2>Add Program <code>AddProgram</code></h2><p>RN — · HTML ✓</p></section>
-<section id="add-step"><h2>Add Step <code>AddStep</code></h2><p>RN — · HTML ✓</p></section>
-<section id="assessment"><h2>Assessment <code>Assessment</code></h2><p>RN — · HTML ✓</p></section>
-<section id="assessment-session-history"><h2>Assessment Session History <code>AssessmentSessionHistory</code></h2><p>RN — · HTML ✓</p></section>
-<section id="compare-session"><h2>Compare Session <code>CompareSession</code></h2><p>RN — · HTML ✓</p></section>
-<section id="create-program-choice"><h2>Create Program Choice <code>CreateProgramChoice</code></h2><p>RN — · HTML ✓</p></section>
-<section id="create-protocol-session"><h2>Create Protocol Session <code>CreateProtocolSession</code></h2><p>RN — · HTML ✓</p></section>
-<section id="edit-group"><h2>Edit Group <code>EditGroup</code></h2><p>RN — · HTML ✓</p></section>
-<section id="edit-program"><h2>Edit Program <code>EditProgram</code></h2><p>RN — · HTML ✓</p></section>
-<section id="edit-protocol-session"><h2>Edit Protocol Session <code>EditProtocolSession</code></h2><p>RN — · HTML ✓</p></section>
-<section id="exercise"><h2>Exercise <code>Exercise</code></h2><p>RN — · HTML ✓</p></section>
-<section id="group-data"><h2>Group Data <code>GroupData</code></h2><p>RN — · HTML ✓</p></section>
-<section id="group-list"><h2>Group List <code>GroupList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="group-results"><h2>Group Results <code>GroupResults</code></h2><p>RN — · HTML ✓</p></section>
-<section id="historical"><h2>Historical <code>Historical</code></h2><p>RN — · HTML ✓</p></section>
-<section id="home"><h2>Home <code>Home</code></h2><p>RN — · HTML ✓</p></section>
-<section id="home-start"><h2>Home Start <code>HomeStart</code></h2><p>RN — · HTML ✓</p></section>
-<section id="notes-list"><h2>Notes List <code>NotesList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="program-list"><h2>Program List <code>ProgramList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="protocol-preview"><h2>Protocol Preview <code>ProtocolPreview</code></h2><p>RN — · HTML ✓</p></section>
-<section id="recent-data"><h2>Recent Data <code>RecentData</code></h2><p>RN — · HTML ✓</p></section>
-<section id="run-group"><h2>Run Group <code>RunGroup</code></h2><p>RN — · HTML ✓</p></section>
-<section id="select-program-template"><h2>Select Program Template <code>SelectProgramTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="select-template"><h2>Select Template <code>SelectTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="session-data"><h2>Session Data <code>SessionData</code></h2><p>RN — · HTML ✓</p></section>
-<section id="session-history"><h2>Session History <code>SessionHistory</code></h2><p>RN — · HTML ✓</p></section>
-<section id="sign-waiver"><h2>Sign Waiver <code>SignWaiver</code></h2><p>RN — · HTML ✓</p></section>
-<section id="step-details"><h2>Step Details <code>StepDetails</code></h2><p>RN — · HTML ✓</p></section>
-<section id="step-list"><h2>Step List <code>StepList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="step-result"><h2>Step Result <code>StepResult</code></h2><p>RN — · HTML ✓</p></section>
-<section id="use-program-template"><h2>Use Program Template <code>UseProgramTemplate</code></h2><p>RN — · HTML ✓</p></section>
-<section id="user-profile"><h2>User Profile <code>UserProfile</code></h2><p>RN — · HTML ✓</p></section>
-<section id="user-team-list"><h2>User Team List <code>UserTeamList</code></h2><p>RN — · HTML ✓</p></section>
-<section id="warmup"><h2>Warmup <code>Warmup</code></h2><p>RN — · HTML ✓</p></section>
-<section id="warmup-type"><h2>Warmup Type <code>WarmupType</code></h2><p>RN — · HTML ✓</p></section></body></html>
+<section id="settings"><h2>Settings <code>Settings</code></h2><img src="pairs/settings.png" alt="Settings" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-competition-level"><h2>Onboarding Competition Level <code>OnboardingCompetitionLevel</code></h2><img src="pairs/onboarding-competition-level.png" alt="OnboardingCompetitionLevel" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-current-team"><h2>Onboarding Current Team <code>OnboardingCurrentTeam</code></h2><img src="pairs/onboarding-current-team.png" alt="OnboardingCurrentTeam" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-date-of-birth"><h2>Onboarding Date Of Birth <code>OnboardingDateOfBirth</code></h2><img src="pairs/onboarding-date-of-birth.png" alt="OnboardingDateOfBirth" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-email"><h2>Onboarding Email <code>OnboardingEmail</code></h2><img src="pairs/onboarding-email.png" alt="OnboardingEmail" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-hand"><h2>Onboarding Hand <code>OnboardingHand</code></h2><img src="pairs/onboarding-hand.png" alt="OnboardingHand" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-height"><h2>Onboarding Height <code>OnboardingHeight</code></h2><img src="pairs/onboarding-height.png" alt="OnboardingHeight" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-name"><h2>Onboarding Name <code>OnboardingName</code></h2><img src="pairs/onboarding-name.png" alt="OnboardingName" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-onboarding-confirmation"><h2>Onboarding Onboarding Confirmation <code>OnboardingOnboardingConfirmation</code></h2><img src="pairs/onboarding-onboarding-confirmation.png" alt="OnboardingOnboardingConfirmation" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-position"><h2>Onboarding Position <code>OnboardingPosition</code></h2><img src="pairs/onboarding-position.png" alt="OnboardingPosition" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-sport"><h2>Onboarding Sport <code>OnboardingSport</code></h2><img src="pairs/onboarding-sport.png" alt="OnboardingSport" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-weight"><h2>Onboarding Weight <code>OnboardingWeight</code></h2><img src="pairs/onboarding-weight.png" alt="OnboardingWeight" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="add-session-to-compare"><h2>Add Session To Compare <code>AddSessionToCompare</code></h2><img src="pairs/add-session-to-compare.png" alt="AddSessionToCompare" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="compare-team-user-sessions"><h2>Compare Team User Sessions <code>CompareTeamUserSessions</code></h2><img src="pairs/compare-team-user-sessions.png" alt="CompareTeamUserSessions" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="compare-team-user-sessions-detail"><h2>Compare Team User Sessions Detail <code>CompareTeamUserSessionsDetail</code></h2><img src="pairs/compare-team-user-sessions-detail.png" alt="CompareTeamUserSessionsDetail" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding"><h2>Onboarding <code>Onboarding</code></h2><img src="pairs/onboarding.png" alt="Onboarding" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="select-user-session"><h2>Select User Session <code>SelectUserSession</code></h2><img src="pairs/select-user-session.png" alt="SelectUserSession" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="team-home"><h2>Team Home <code>TeamHome</code></h2><img src="pairs/team-home.png" alt="TeamHome" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="team-list"><h2>Team List <code>TeamList</code></h2><img src="pairs/team-list.png" alt="TeamList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="team-settings"><h2>Team Settings <code>TeamSettings</code></h2><img src="pairs/team-settings.png" alt="TeamSettings" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="team-user"><h2>Team User <code>TeamUser</code></h2><img src="pairs/team-user.png" alt="TeamUser" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="user-analysis-details"><h2>User Analysis Details <code>UserAnalysisDetails</code></h2><img src="pairs/user-analysis-details.png" alt="UserAnalysisDetails" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="add-group-template"><h2>Add Group Template <code>AddGroupTemplate</code></h2><img src="pairs/add-group-template.png" alt="AddGroupTemplate" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="add-program-template"><h2>Add Program Template <code>AddProgramTemplate</code></h2><img src="pairs/add-program-template.png" alt="AddProgramTemplate" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="add-step-template"><h2>Add Step Template <code>AddStepTemplate</code></h2><img src="pairs/add-step-template.png" alt="AddStepTemplate" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="add-team-user"><h2>Add Team User <code>AddTeamUser</code></h2><img src="pairs/add-team-user.png" alt="AddTeamUser" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="column-management"><h2>Column Management <code>ColumnManagement</code></h2><img src="pairs/column-management.png" alt="ColumnManagement" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="create-team-session-template"><h2>Create Team Session Template <code>CreateTeamSessionTemplate</code></h2><img src="pairs/create-team-session-template.png" alt="CreateTeamSessionTemplate" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="edit-group-template"><h2>Edit Group Template <code>EditGroupTemplate</code></h2><img src="pairs/edit-group-template.png" alt="EditGroupTemplate" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="edit-program-template"><h2>Edit Program Template <code>EditProgramTemplate</code></h2><img src="pairs/edit-program-template.png" alt="EditProgramTemplate" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="edit-team-protocol-session"><h2>Edit Team Protocol Session <code>EditTeamProtocolSession</code></h2><img src="pairs/edit-team-protocol-session.png" alt="EditTeamProtocolSession" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="edit-team-session-template"><h2>Edit Team Session Template <code>EditTeamSessionTemplate</code></h2><img src="pairs/edit-team-session-template.png" alt="EditTeamSessionTemplate" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="group-template-list"><h2>Group Template List <code>GroupTemplateList</code></h2><img src="pairs/group-template-list.png" alt="GroupTemplateList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="onboarding-preference"><h2>Onboarding Preference <code>OnboardingPreference</code></h2><img src="pairs/onboarding-preference.png" alt="OnboardingPreference" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="program-template-list"><h2>Program Template List <code>ProgramTemplateList</code></h2><img src="pairs/program-template-list.png" alt="ProgramTemplateList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="step-template-list"><h2>Step Template List <code>StepTemplateList</code></h2><img src="pairs/step-template-list.png" alt="StepTemplateList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="team-session-template-list"><h2>Team Session Template List <code>TeamSessionTemplateList</code></h2><img src="pairs/team-session-template-list.png" alt="TeamSessionTemplateList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="team-session-template-steps-list"><h2>Team Session Template Steps List <code>TeamSessionTemplateStepsList</code></h2><img src="pairs/team-session-template-steps-list.png" alt="TeamSessionTemplateStepsList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="team-settings-home"><h2>Team Settings Home <code>TeamSettingsHome</code></h2><img src="pairs/team-settings-home.png" alt="TeamSettingsHome" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="team-user-details"><h2>Team User Details <code>TeamUserDetails</code></h2><img src="pairs/team-user-details.png" alt="TeamUserDetails" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="team-user-list"><h2>Team User List <code>TeamUserList</code></h2><img src="pairs/team-user-list.png" alt="TeamUserList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="add-group"><h2>Add Group <code>AddGroup</code></h2><img src="pairs/add-group.png" alt="AddGroup" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="add-program"><h2>Add Program <code>AddProgram</code></h2><img src="pairs/add-program.png" alt="AddProgram" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="add-step"><h2>Add Step <code>AddStep</code></h2><img src="pairs/add-step.png" alt="AddStep" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="assessment"><h2>Assessment <code>Assessment</code></h2><img src="pairs/assessment.png" alt="Assessment" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="compare-session"><h2>Compare Session <code>CompareSession</code></h2><img src="pairs/compare-session.png" alt="CompareSession" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="create-program-choice"><h2>Create Program Choice <code>CreateProgramChoice</code></h2><img src="pairs/create-program-choice.png" alt="CreateProgramChoice" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="create-protocol-session"><h2>Create Protocol Session <code>CreateProtocolSession</code></h2><img src="pairs/create-protocol-session.png" alt="CreateProtocolSession" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="edit-group"><h2>Edit Group <code>EditGroup</code></h2><img src="pairs/edit-group.png" alt="EditGroup" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="edit-program"><h2>Edit Program <code>EditProgram</code></h2><img src="pairs/edit-program.png" alt="EditProgram" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="edit-protocol-session"><h2>Edit Protocol Session <code>EditProtocolSession</code></h2><img src="pairs/edit-protocol-session.png" alt="EditProtocolSession" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="exercise"><h2>Exercise <code>Exercise</code></h2><img src="pairs/exercise.png" alt="Exercise" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="group-list"><h2>Group List <code>GroupList</code></h2><img src="pairs/group-list.png" alt="GroupList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="group-results"><h2>Group Results <code>GroupResults</code></h2><img src="pairs/group-results.png" alt="GroupResults" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="historical"><h2>Historical <code>Historical</code></h2><img src="pairs/historical.png" alt="Historical" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="home"><h2>Home <code>Home</code></h2><img src="pairs/home.png" alt="Home" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="home-start"><h2>Home Start <code>HomeStart</code></h2><img src="pairs/home-start.png" alt="HomeStart" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="notes-list"><h2>Notes List <code>NotesList</code></h2><img src="pairs/notes-list.png" alt="NotesList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="program-list"><h2>Program List <code>ProgramList</code></h2><img src="pairs/program-list.png" alt="ProgramList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="protocol-preview"><h2>Protocol Preview <code>ProtocolPreview</code></h2><img src="pairs/protocol-preview.png" alt="ProtocolPreview" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="run-group"><h2>Run Group <code>RunGroup</code></h2><img src="pairs/run-group.png" alt="RunGroup" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="select-program-template"><h2>Select Program Template <code>SelectProgramTemplate</code></h2><img src="pairs/select-program-template.png" alt="SelectProgramTemplate" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="session-data"><h2>Session Data <code>SessionData</code></h2><img src="pairs/session-data.png" alt="SessionData" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="session-history"><h2>Session History <code>SessionHistory</code></h2><img src="pairs/session-history.png" alt="SessionHistory" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="sign-waiver"><h2>Sign Waiver <code>SignWaiver</code></h2><img src="pairs/sign-waiver.png" alt="SignWaiver" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="step-details"><h2>Step Details <code>StepDetails</code></h2><img src="pairs/step-details.png" alt="StepDetails" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="step-list"><h2>Step List <code>StepList</code></h2><img src="pairs/step-list.png" alt="StepList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="step-result"><h2>Step Result <code>StepResult</code></h2><img src="pairs/step-result.png" alt="StepResult" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="use-program-template"><h2>Use Program Template <code>UseProgramTemplate</code></h2><img src="pairs/use-program-template.png" alt="UseProgramTemplate" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="user-profile"><h2>User Profile <code>UserProfile</code></h2><img src="pairs/user-profile.png" alt="UserProfile" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="user-team-list"><h2>User Team List <code>UserTeamList</code></h2><img src="pairs/user-team-list.png" alt="UserTeamList" loading="lazy" style="max-width:100%;border:1px solid #ccc" /></section>
+<section id="warmup"><h2>Warmup <code>Warmup</code></h2><p>iOS — · HTML ✓</p></section>
+<section id="warmup-type"><h2>Warmup Type <code>WarmupType</code></h2><p>iOS — · HTML ✓</p></section></body></html>

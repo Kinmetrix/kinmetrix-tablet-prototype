@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/OnboardingPreferenceScreen.tsx -->
+<!-- route: OnboardingPreference -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,8 +15,14 @@
         <h1>Onboarding settings: Varsity football</h1>
         <p class="enriched-meta">Toggles persist per field; first and last name always required on create.</p>
       </header>
-      <main class="app__content wire-center">
-        <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%" aria-label="New user fields">
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="team-settings.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Onboarding settings: Varsity football</p>
+          <div class="wire-toolbar__right"></div>
+        </div>
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%" aria-label="New user fields">
           <h2 style="margin: 0 0 0.25rem; text-align: center">New user fields</h2>
           <p class="enriched-meta" style="text-align: center; margin-bottom: 1rem">
             First and last name are required when creating a new user. Other fields are optional.
@@ -64,6 +70,8 @@
             </li>
           </ul>
         </section>
+        </div>
+
         <nav class="flow-nav" aria-label="Onboarding preference flows" style="max-width: 480px; width: 100%">
           <h2>Related onboarding screens</h2>
           <ul>

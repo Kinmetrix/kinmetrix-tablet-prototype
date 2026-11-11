@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/TeamMembersScreen.tsx (route TeamHome) -->
+<!-- route: TeamHome -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,45 +15,87 @@
         <h1>Team members</h1>
         <p class="enriched-meta">Roster table with search, sort, and team switcher.</p>
       </header>
-      <main class="app__content wire-stack">
+      <main class="app__content">
         <div class="wire-toolbar">
-          <p class="wire-toolbar__title">Demo Varsity ▾</p>
-          <a class="wire-btn" href="team-settings.html">Team settings</a>
+          <div class="wire-toolbar__left">
+            <a class="wire-btn wire-btn--ghost" href="team-settings.html">⚙ Settings</a>
+          </div>
+          <div class="wire-toolbar__title">
+            <a class="team-switcher" href="team-list.html">
+              <span class="team-switcher__mark">D</span>
+              Demo ▾
+            </a>
+          </div>
+          <div class="wire-toolbar__right">
+            <a class="wire-btn wire-btn--ghost" href="compare-team-user-sessions.html">Compare</a>
+            <a class="wire-btn wire-btn--header" href="onboarding.html">New User</a>
+          </div>
         </div>
-        <div class="wire-field" style="max-width: none">
-          <label for="search">Search members</label>
-          <input id="search" type="search" placeholder="Search by name" value="" />
-        </div>
-        <table class="wire-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Position</th>
-              <th>Last session</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><a href="team-user.html">Alex Morgan</a></td>
-              <td>Forward</td>
-              <td>Nov 8, 2026</td>
-            </tr>
-            <tr>
-              <td><a href="team-user.html">Jordan Lee</a></td>
-              <td>Guard</td>
-              <td>Nov 7, 2026</td>
-            </tr>
-            <tr>
-              <td><a href="team-user.html">Sam Patel</a></td>
-              <td>Center</td>
-              <td>Nov 5, 2026</td>
-            </tr>
-          </tbody>
-        </table>
+        <section class="results-panel" aria-label="Team members" style="flex: 1; min-height: 0; padding: 0; overflow: hidden">
+          <div class="filter-bar" style="padding: 0.55rem 0.85rem 0.25rem">
+            <label class="filter-bar__search" style="border: 0; padding: 0.2rem 0">
+              <span aria-hidden="true">⌕</span>
+              <input id="search" type="search" placeholder="Search..." aria-label="Search members" value="" />
+            </label>
+          </div>
+          <table class="wire-table wire-table--roster" aria-label="Team members">
+            <thead>
+              <tr>
+                <th>Name <span class="enriched-meta">▲ ▾</span></th>
+                <th style="text-align: center"># Activities <span class="enriched-meta">⇅</span></th>
+                <th style="text-align: center">Stable Weight <span class="enriched-meta">⇅</span></th>
+                <th style="text-align: center">Stability <span class="enriched-meta">⇅</span></th>
+                <th style="text-align: center">Last Activity <span class="enriched-meta">⇅</span></th>
+                <th style="text-align: center">Created <span class="enriched-meta">⇅</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <a href="team-user.html" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit">
+                    <span
+                      class="proto-avatar proto-avatar--fixture"
+                      data-default-avatar="Angele Test"
+                      data-avatar-size="36"
+                      style="width: 36px; height: 36px"
+                    ></span>
+                    <strong>Angele Test</strong>
+                  </a>
+                </td>
+                <td style="text-align: center">119</td>
+                <td style="text-align: center">4.64 LB</td>
+                <td style="text-align: center">97%</td>
+                <td style="text-align: center">Sep 3, 2026</td>
+                <td style="text-align: center">Aug 15, 2025</td>
+              </tr>
+              <tr>
+                <td>
+                  <a href="team-user.html" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit">
+                    <span
+                      class="proto-avatar"
+                      style="width: 36px; height: 36px; background: #2aa56a; color: #fff; font-size: 0.7rem; font-weight: 700; align-items: center; justify-content: center"
+                      >TU</span
+                    >
+                    <strong>Test User</strong>
+                  </a>
+                </td>
+                <td style="text-align: center">50</td>
+                <td style="text-align: center">5.36 LB</td>
+                <td style="text-align: center">92%</td>
+                <td style="text-align: center">Sep 18, 2026</td>
+                <td style="text-align: center">May 8, 2026</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="results-hint">That's everything! ✨<br />2 records shown</p>
+        </section>
+        <a class="fab-chat" href="feedback.html" aria-label="Feedback">💬</a>
         <nav class="flow-nav" aria-label="Team flows">
           <h2>Team flows</h2>
           <ul>
-            <li><a class="wire-btn wire-btn--primary" href="add-team-user.html">Add member</a></li>
+            <li><a class="wire-btn wire-btn--primary" href="onboarding.html">New User</a></li>
+            <li><a class="wire-btn" href="compare-team-user-sessions.html">Compare</a></li>
+            <li><a class="wire-btn" href="team-settings.html">Settings</a></li>
             <li><a class="wire-btn" href="team-list.html">Switch team</a></li>
             <li><a class="wire-btn" href="user-team-list.html">User team list</a></li>
           </ul>

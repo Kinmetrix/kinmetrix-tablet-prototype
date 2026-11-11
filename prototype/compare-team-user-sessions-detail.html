@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/CompareTeamUserSessionsDetailScreen.tsx -->
+<!-- route: CompareTeamUserSessionsDetail -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,56 +15,54 @@
         <h1>Compare Sessions</h1>
         <p class="enriched-meta">RadialMultiChart + session legend. Metric toggle, add/remove sessions, pick alternate analysis.</p>
       </header>
-      <main class="app__content wire-stack">
+      <main class="app__content">
         <div class="wire-toolbar">
-          <button class="wire-btn" type="button">Peak Force ▾</button>
-          <p class="wire-toolbar__title">Overlay · 2 athletes</p>
-          <a class="wire-btn wire-btn--primary" href="add-session-to-compare.html">Add Session to Compare</a>
-        </div>
-        <div class="wire-split" style="min-height: 420px; grid-template-columns: 1.2fr 0.8fr">
-          <div class="wire-pane-fill wire-center" aria-label="Radial multi chart">
-            <div class="proto-chart" data-chart="radial-multi" data-chart-label="radial-multi label"></div>
-            <p class="enriched-meta">Peak force or stability per direction. Flip 180° control in RN.</p>
-            <div
-              style="
-                width: 280px;
-                height: 280px;
-                border: 2px dashed #999;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 0.85rem;
-                color: #666;
-              "
-            >
-              Multi radar placeholder
-            </div>
-            <button class="wire-btn wire-btn--ghost" type="button">Flip chart</button>
+          <div class="wire-toolbar__left">
+            <a class="wire-toolbar-back" href="compare-team-user-sessions.html">&lt; Back</a>
           </div>
-          <aside class="wire-card" style="padding: 0.75rem" aria-label="Compared sessions">
-            <h2 style="margin: 0 0 0.75rem; font-size: 1rem">Sessions</h2>
+          <p class="wire-toolbar__title">Compare Sessions</p>
+          <div class="wire-toolbar__right">
+            <button class="wire-btn wire-btn--ghost" type="button">Peak Force ▾</button>
+            <a class="wire-btn wire-btn--header" href="add-session-to-compare.html">Add Session to Compare</a>
+          </div>
+        </div>
+        <div class="results-split results-split--plain" style="grid-template-columns: minmax(0, 1fr) 280px; padding: 0; gap: 0">
+          <div class="wire-center" style="position: relative; min-height: 0; padding: 0.5rem">
+            <button
+              class="wire-btn wire-btn--ghost"
+              type="button"
+              aria-label="Flip chart 180 degrees"
+              style="position: absolute; top: 0.5rem; right: 0.5rem"
+            >
+              ↻
+            </button>
+            <div
+              class="proto-chart"
+              data-chart="radial-body"
+              data-chart-label="Compared sessions overlay"
+              style="max-width: 560px"
+            ></div>
+          </div>
+          <aside class="results-panel results-panel--muted" aria-label="Compared sessions">
+            <h2 class="results-panel__title" style="font-size: 1rem; margin-bottom: 0.75rem">Sessions</h2>
             <div class="wire-stack" style="gap: 0.5rem">
-              <a
-                href="select-user-session.html"
-                class="wire-card"
-                style="padding: 0.5rem 0.65rem; display: block; text-decoration: none; color: inherit; border-left: 4px solid #06c"
-              >
-                <p style="margin: 0; font-weight: bold">Alex Morgan</p>
-                <p class="enriched-meta" style="margin: 0.15rem 0 0">Regular Exercise</p>
-                <p class="enriched-meta" style="margin: 0">Nov 8, 2026 2:14 PM</p>
+              <a class="session-card" href="select-user-session.html" style="flex-direction: row; align-items: center; gap: 0.65rem; padding: 0.65rem 0.75rem">
+                <span class="rep-list__swatch" style="background: #c62828"></span>
+                <span>
+                  <p class="session-card__force" style="text-align: left">Angele Scott</p>
+                  <p class="session-card__meta" style="text-align: left">Assessment</p>
+                  <p class="session-card__meta" style="text-align: left">Sep 3, 2025 1:23:08 pm</p>
+                </span>
               </a>
-              <a
-                href="select-user-session.html"
-                class="wire-card"
-                style="padding: 0.5rem 0.65rem; display: block; text-decoration: none; color: inherit; border-left: 4px solid #393"
-              >
-                <p style="margin: 0; font-weight: bold">Jordan Lee</p>
-                <p class="enriched-meta" style="margin: 0.15rem 0 0">Assessment</p>
-                <p class="enriched-meta" style="margin: 0">Nov 7, 2026 10:02 AM</p>
+              <a class="session-card" href="select-user-session.html" style="flex-direction: row; align-items: center; gap: 0.65rem; padding: 0.65rem 0.75rem">
+                <span class="rep-list__swatch" style="background: #2bb673"></span>
+                <span>
+                  <p class="session-card__force" style="text-align: left">Abigail Baker</p>
+                  <p class="session-card__meta" style="text-align: left">Assessment</p>
+                  <p class="session-card__meta" style="text-align: left">Sep 10, 2025 12:22:16 pm</p>
+                </span>
               </a>
             </div>
-            <p class="enriched-meta" style="margin-top: 0.75rem">Remove available when more than two sessions selected.</p>
           </aside>
         </div>
         <nav class="flow-nav" aria-label="Compare detail flows">

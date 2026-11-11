@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/UserAnalysisDetailsScreen.tsx -->
+<!-- route: UserAnalysisDetails -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,69 +15,119 @@
         <h1>Session Details</h1>
         <p class="enriched-meta">UserAnalysisDetailsView: radial chart, direction grid, symmetry, notes, download report.</p>
       </header>
-      <main class="app__content wire-stack">
+      <main class="app__content">
         <div class="wire-toolbar">
-          <span></span>
-          <p class="wire-toolbar__title">Nov 8, 2026 · Regular exercise</p>
-          <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Alex Morgan" data-avatar-size="48" style="width: 36px; height: 36px; font-size: 0.5rem" aria-label="Reviewer"></span>
-        </div>
-        <div class="wire-split" style="min-height: 380px">
-          <div class="wire-split__main wire-pane-fill" aria-label="Radial chart and widgets">
-            <div class="wire-center" style="min-height: 220px">
-              <div
-                class="proto-chart proto-chart--radial"
-                data-chart="radial"
-                data-chart-label="Session radial"
-                style="width: 200px; max-width: 200px"
-              ></div>
-            </div>
-            <p class="enriched-meta" style="text-align: center">
-              Peak force / stability toggles · symmetry highlights · flip 180°
-            </p>
-            <div class="wire-stack" style="gap: 0.5rem; max-width: 520px; margin: 0.5rem auto 0">
-              <p><strong>142 N</strong> avg peak · <strong>94%</strong> stability · <strong>7/8</strong> symmetry</p>
-              <button class="wire-btn wire-btn--ghost" type="button">Notes</button>
-              <button class="wire-btn wire-btn--ghost" type="button">Download report</button>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="team-user.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Session Details</p>
+          <div class="wire-toolbar__right">
+            <div class="wire-toolbar__profile">
+              <span>Test User</span>
+              <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Test User" data-avatar-size="28"></span>
             </div>
           </div>
-          <aside class="wire-split__aside" style="overflow: auto">
+        </div>
+        <div class="results-split" aria-label="Session analysis">
+          <section class="results-panel">
+            <div class="results-panel__head">
+              <div>
+                <h2 class="results-panel__title">September 18, 2026</h2>
+                <p class="results-panel__subtitle">Session Details</p>
+              </div>
+              <div class="results-panel__actions">
+                <button class="wire-btn wire-btn--ghost" type="button">+ Add Note</button>
+                <button class="wire-btn wire-btn--ghost" type="button" aria-label="Download">↓</button>
+                <button class="wire-btn wire-btn--ghost" type="button" aria-label="More">⋮</button>
+              </div>
+            </div>
+            <div class="results-metrics">
+              <div>
+                <p class="results-metric__label">Avg Peak Force</p>
+                <p class="results-metric__value">5.4 LB</p>
+              </div>
+              <div>
+                <p class="results-metric__label">Stability</p>
+                <p class="results-metric__value">92%</p>
+              </div>
+              <a href="session-history.html" style="text-decoration: none; color: inherit">
+                <p class="results-metric__label">History &gt;</p>
+                <div
+                  class="proto-chart hist-spark"
+                  data-chart="bar"
+                  data-chart-label="Recent avg peak force"
+                ></div>
+              </a>
+            </div>
             <table class="wire-table" aria-label="Directions">
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th style="text-align: center">Pos</th>
-                  <th style="text-align: center">Peak</th>
-                  <th style="text-align: center">Stability</th>
+                  <th>Position</th>
+                  <th>Avg Peak Force</th>
+                  <th>Stability</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><a href="session-data.html">Flexion</a></td>
-                  <td style="text-align: center">0°</td>
-                  <td style="text-align: center">142 N</td>
-                  <td style="text-align: center">96%</td>
+                  <td><a href="session-data.html">Forward Flexion</a></td>
+                  <td><span class="angle-mark">0°</span></td>
+                  <td>5.05 LB</td>
+                  <td>92%</td>
                 </tr>
                 <tr>
-                  <td><a href="session-data.html">Right forward</a></td>
-                  <td style="text-align: center">45°</td>
-                  <td style="text-align: center">138 N</td>
-                  <td style="text-align: center">94%</td>
+                  <td><a href="session-data.html">Right Flexion</a></td>
+                  <td><span class="angle-mark">90°</span></td>
+                  <td>4.50 LB</td>
+                  <td>92%</td>
                 </tr>
                 <tr>
-                  <td><a href="session-data.html">Right</a></td>
-                  <td style="text-align: center">90°</td>
-                  <td style="text-align: center">135 N</td>
-                  <td style="text-align: center">92%</td>
+                  <td><a href="session-data.html">Rear Extension</a></td>
+                  <td><span class="angle-mark">180°</span></td>
+                  <td>6.36 LB</td>
+                  <td>91%</td>
                 </tr>
                 <tr>
-                  <td><a href="session-data.html">Back right</a></td>
-                  <td style="text-align: center">135°</td>
-                  <td style="text-align: center">130 N</td>
-                  <td style="text-align: center">91%</td>
+                  <td><a href="session-data.html">Left Flexion</a></td>
+                  <td><span class="angle-mark">270°</span></td>
+                  <td>5.54 LB</td>
+                  <td>91%</td>
                 </tr>
               </tbody>
             </table>
-          </aside>
+            <p class="results-hint">Tap a row to view repetition data for that direction</p>
+          </section>
+          <section class="results-panel">
+            <div class="results-panel__head">
+              <p class="results-hint" style="margin: 0">Tap or drag chart to interact</p>
+              <button class="wire-btn wire-btn--ghost" type="button" aria-label="Rotate chart">↻</button>
+            </div>
+            <div
+              class="proto-chart"
+              data-chart="radial-body"
+              data-chart-label="Avg peak force by direction"
+            ></div>
+            <div class="legend-pills">
+              <span class="legend-pill legend-pill--on">Avg Peak Force</span>
+              <span class="legend-pill">Stability</span>
+            </div>
+            <div class="sym-list" aria-label="Symmetry">
+              <div class="sym-list__head">
+                <h3>Symmetry</h3>
+                <span class="enriched-meta">Score: 1/2</span>
+              </div>
+              <div class="sym-row">
+                <span><span class="sym-dot" style="background: #e8a317"></span>Flexion ⇄ Extension 0°/180°</span>
+                <strong style="color: #c97800">80%</strong>
+              </div>
+              <div class="sym-row">
+                <span><span class="sym-dot" style="background: #2bb673"></span>Left Lateral ⇄ Right Lateral 270°/90°</span>
+                <strong style="color: #1f9d55">81%</strong>
+              </div>
+              <div class="sym-row">
+                <span><span class="sym-dot" style="background: #2bb673"></span>Front-Back ⇄ Left-Right Ratio</span>
+                <strong style="color: #1f9d55">1.1:1</strong>
+              </div>
+            </div>
+          </section>
         </div>
         <nav class="flow-nav" aria-label="Analysis detail flows">
           <h2>Drill-down</h2>

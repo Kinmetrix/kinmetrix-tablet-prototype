@@ -1,47 +1,42 @@
 <!DOCTYPE html>
-<!-- source: src/screens/AddGroupScreen.tsx -->
+<!-- route: AddGroup -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Add new group · Kinmetrix prototype</title>
+    <title>Add New Group · Kinmetrix prototype</title>
     <link rel="stylesheet" href="kin-prototype.css" />
   </head>
   <body data-route="AddGroup" data-enriched="true">
     <div class="device-frame">
       <header class="screen-header">
-        <a class="back-link" href="program-list.html">Back</a>
+        <a class="back-link" href="group-list.html">Back</a>
         <p class="route-chip">AddGroup <span class="stack-tag">user</span></p>
-        <h1>Add new group</h1>
+        <h1>Add New Group</h1>
         <p class="enriched-meta">Creates group for active program; success replaces to Step list.</p>
       </header>
-      <main class="app__content wire-center">
-        <div class="wire-toolbar" style="max-width: 500px; width: 100%; margin-bottom: 0.5rem">
-          <span></span>
-          <p class="wire-toolbar__title">Add new group</p>
-          <a class="wire-btn wire-btn--primary" href="step-list.html">Create group</a>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="group-list.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Add New Group</p>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--header" href="step-list.html">Create Group</a></div>
         </div>
-        <section class="wire-card wire-form-card" aria-label="New group form">
-          <h2 style="margin: 0 0 0.75rem">Create new group</h2>
-          <form class="wire-stack" action="step-list.html" method="get">
-            <div class="wire-field">
-              <label for="group-name">Name</label>
-              <input id="group-name" name="name" type="text" placeholder="Enter group name" value="" />
-            </div>
-            <div class="wire-field">
-              <label for="group-desc">Description</label>
-              <textarea
-                id="group-desc"
-                name="description"
-                rows="4"
-                placeholder="Enter group description"
-                style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
-              ></textarea>
-            </div>
-            <button class="wire-btn wire-btn--primary" type="submit">Create group</button>
-          </form>
-        </section>
-        <nav class="flow-nav" aria-label="Group flows" style="max-width: 500px; width: 100%">
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" aria-label="New group form">
+            <h2 style="margin: 0 0 0.75rem">Create New Group</h2>
+            <form class="wire-stack" action="step-list.html" method="get">
+              <div class="wire-field">
+                <label for="group-name">Name</label>
+                <input id="group-name" name="name" type="text" placeholder="Enter group name" value="" />
+              </div>
+              <div class="wire-field">
+                <label for="group-desc">Description</label>
+                <input id="group-desc" name="description" type="text" placeholder="Enter group description" value="" />
+              </div>
+            </form>
+          </section>
+        </div>
+        <nav class="flow-nav" aria-label="Group flows">
           <h2>Next</h2>
           <ul>
             <li><a class="wire-btn" href="step-list.html">Step list</a></li>

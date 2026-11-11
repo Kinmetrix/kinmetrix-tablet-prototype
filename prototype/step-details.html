@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/features/session-details/screens/StepDetailsScreen.tsx -->
+<!-- route: StepDetails -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -17,63 +17,105 @@
           SessionDataView when sessions exist. CardButton properties open EditStepPopovers when editable.
         </p>
       </header>
-      <main class="app__content wire-stack">
-        <section class="wire-pane-fill" aria-label="Session data chart">
-          <p><strong>Isometric · 45°</strong></p>
-          <p class="enriched-meta">Stability 91% · Avg peak 41 N · Target 40 N</p>
-          <div class="proto-chart" data-chart="line" data-chart-label="Force curve"></div>
-        </section>
-        <table class="wire-table" aria-label="Step sessions">
-          <thead>
-            <tr>
-              <th>Rep</th>
-              <th>Peak (N)</th>
-              <th>Completed</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>40</td>
-              <td>Nov 8, 2026</td>
-              <td><button class="wire-btn wire-btn--ghost" type="button">Delete</button></td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>42</td>
-              <td>Nov 8, 2026</td>
-              <td><button class="wire-btn wire-btn--ghost" type="button">Delete</button></td>
-            </tr>
-          </tbody>
-        </table>
-        <section class="wire-card" aria-label="Step properties">
-          <h2>Step Properties</h2>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem">
-            <button class="wire-list-row" type="button" style="text-align: left">
-              <strong>Mode</strong>
-              <span class="enriched-meta" style="display: block">Isometric</span>
-            </button>
-            <button class="wire-list-row" type="button" style="text-align: left">
-              <strong>Duration</strong>
-              <span class="enriched-meta" style="display: block">10s</span>
-            </button>
-            <button class="wire-list-row" type="button" style="text-align: left">
-              <strong>Tilt</strong>
-              <span class="enriched-meta" style="display: block">15°</span>
-            </button>
-            <button class="wire-list-row" type="button" style="text-align: left">
-              <strong>Target Weight</strong>
-              <span class="enriched-meta" style="display: block">40 N</span>
-            </button>
-            <button class="wire-list-row" type="button" style="text-align: left">
-              <strong>Rotation</strong>
-              <span class="enriched-meta" style="display: block">45°</span>
-            </button>
-            <button class="wire-list-row" type="button" style="text-align: left">
-              <strong>Repetitions</strong>
-              <span class="enriched-meta" style="display: block">5</span>
-            </button>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="step-list.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Step Details</p>
+          <div class="wire-toolbar__right"></div>
+        </div>
+        <div class="session-split session-split--with-props" aria-label="Session data chart">
+          <section class="results-panel">
+            <h2 class="results-panel__title">0° Isometric Forward Flexion</h2>
+            <div class="metric-pills">
+              <div class="metric-pill">
+                <p class="metric-pill__label">Avg Peak Force</p>
+                <p class="metric-pill__value">5.3 KG</p>
+              </div>
+              <div class="metric-pill">
+                <p class="metric-pill__label">Stability</p>
+                <p class="metric-pill__value">89%</p>
+              </div>
+            </div>
+            <div class="proto-chart" data-chart="force-multi" data-chart-label="Force curve, five reps"></div>
+          </section>
+          <aside class="results-panel results-panel--muted" aria-label="All reps">
+            <div class="results-panel__head">
+              <div>
+                <p class="results-panel__title" style="font-size: 0.95rem">All reps</p>
+                <p class="results-panel__subtitle">5 of 5 shown</p>
+              </div>
+            </div>
+            <div class="rep-list">
+              <label class="rep-list__item">
+                <input type="checkbox" checked aria-label="Show Rep 1" />
+                <span class="rep-list__swatch" style="background: #1f9d55"></span>
+                <span class="rep-list__copy">
+                  <strong>Rep 1</strong>
+                  <span class="enriched-meta">6.3 kg peak · 93% stable</span>
+                </span>
+              </label>
+              <label class="rep-list__item">
+                <input type="checkbox" checked aria-label="Show Rep 2" />
+                <span class="rep-list__swatch" style="background: #e5484d"></span>
+                <span class="rep-list__copy">
+                  <strong>Rep 2</strong>
+                  <span class="enriched-meta">5.9 kg peak · 90% stable</span>
+                </span>
+              </label>
+              <label class="rep-list__item">
+                <input type="checkbox" checked aria-label="Show Rep 3" />
+                <span class="rep-list__swatch" style="background: #d4a017"></span>
+                <span class="rep-list__copy">
+                  <strong>Rep 3</strong>
+                  <span class="enriched-meta">5.5 kg peak · 93% stable</span>
+                </span>
+              </label>
+              <label class="rep-list__item">
+                <input type="checkbox" checked aria-label="Show Rep 4" />
+                <span class="rep-list__swatch" style="background: #3b82f6"></span>
+                <span class="rep-list__copy">
+                  <strong>Rep 4</strong>
+                  <span class="enriched-meta">4.9 kg peak · 78% stable</span>
+                </span>
+              </label>
+              <label class="rep-list__item">
+                <input type="checkbox" checked aria-label="Show Rep 5" />
+                <span class="rep-list__swatch" style="background: #7c5cbf"></span>
+                <span class="rep-list__copy">
+                  <strong>Rep 5</strong>
+                  <span class="enriched-meta">4.1 kg peak · 94% stable</span>
+                </span>
+              </label>
+            </div>
+          </aside>
+        </div>
+        <section class="results-panel" aria-label="Step properties">
+          <h2 class="results-panel__title">Step Properties</h2>
+          <div class="prop-grid" style="margin-top: 0.65rem">
+            <div class="prop-card">
+              <p class="prop-card__label">Mode</p>
+              <p class="prop-card__value">Isometric</p>
+            </div>
+            <div class="prop-card">
+              <p class="prop-card__label">Duration</p>
+              <p class="prop-card__value">5s</p>
+            </div>
+            <div class="prop-card">
+              <p class="prop-card__label">Tilt</p>
+              <p class="prop-card__value">0°</p>
+            </div>
+            <div class="prop-card">
+              <p class="prop-card__label">Target Weight</p>
+              <p class="prop-card__value">3.0 KG</p>
+            </div>
+            <div class="prop-card">
+              <p class="prop-card__label">Rotation</p>
+              <p class="prop-card__value">0°</p>
+            </div>
+            <div class="prop-card">
+              <p class="prop-card__label">Repetitions</p>
+              <p class="prop-card__value">5</p>
+            </div>
           </div>
         </section>
         <nav class="flow-nav" aria-label="Step details flows">

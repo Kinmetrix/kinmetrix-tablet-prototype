@@ -1,62 +1,90 @@
 <!DOCTYPE html>
-<!-- source: src/screens/SelectUserSessionScreen.tsx -->
+<!-- route: SelectUserSession -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Select User Session · Kinmetrix prototype</title>
     <link rel="stylesheet" href="kin-prototype.css" />
+    <style>
+      .wire-toggle[aria-pressed='false'] {
+        background: #ccc;
+      }
+      .wire-toggle[aria-pressed='false']::after {
+        right: auto;
+        left: 0.15rem;
+      }
+      .session-card[type='button'] {
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
+        align-items: center;
+      }
+      .session-card .proto-chart__img {
+        max-height: 200px;
+      }
+    </style>
   </head>
   <body data-route="SelectUserSession" data-enriched="true">
     <div class="device-frame">
       <header class="screen-header">
         <a class="back-link" href="compare-team-user-sessions-detail.html">Back</a>
         <p class="route-chip">SelectUserSession <span class="stack-tag">team</span></p>
-        <h1>Select Session — Alex Morgan</h1>
+        <h1>Select Session - Abigail Baker</h1>
         <p class="enriched-meta">Grid of past analyses for one team user. Confirm updates compare slot.</p>
       </header>
-      <main class="app__content wire-stack">
-        <div class="wire-toolbar">
-          <label class="enriched-meta" style="display: flex; align-items: center; gap: 0.35rem">
-            Normalized
-            <input type="checkbox" checked aria-label="Normalized scale" />
-          </label>
-          <p class="wire-toolbar__title">Alex Morgan · all sessions</p>
-          <span></span>
+      <main class="app__content" style="overflow: hidden; padding-bottom: 0">
+        <div class="wire-toolbar" style="margin-bottom: 0">
+          <div class="wire-toolbar__left">
+            <a class="wire-toolbar-back" href="compare-team-user-sessions-detail.html">&lt; Back</a>
+          </div>
+          <p class="wire-toolbar__title">Select Session - Abigail Baker</p>
+          <div class="wire-toolbar__right">
+            <label class="wire-toolbar__toggle">
+              Normalized
+              <button class="wire-toggle" type="button" aria-pressed="false" aria-label="Normalized"></button>
+            </label>
+          </div>
         </div>
-        <div
-          style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; padding: 0.5rem 0"
-          aria-label="User analysis sessions"
-        >
-          <button
-            type="button"
-            class="wire-card"
-            style="padding: 0.75rem; border: 2px solid #333; text-align: left; cursor: pointer; width: 100%"
+        <div class="session-grid" style="flex: 1; min-height: 0; overflow: auto; align-content: start" aria-label="User analysis sessions">
+          <button type="button" class="session-card session-card--selected" aria-pressed="true">
+            <span aria-hidden="true" style="position: absolute; top: 0.45rem; right: 0.55rem; color: #c62828; font-size: 1.05rem">✓</span>
+            <span class="session-card__badge">Assessment</span>
+            <div class="proto-chart proto-chart--radial" data-chart="radial-body" data-chart-label="Selected session radial"></div>
+            <p class="session-card__meta">Sep 10, 2026 12:22:16 pm</p>
+            <p class="session-card__force">Avg Peak Force: 7.5 kg</p>
+          </button>
+          <button type="button" class="session-card" aria-pressed="false">
+            <span class="session-card__badge">Assessment</span>
+            <div class="proto-chart proto-chart--radial" data-chart="radial-body" data-chart-label="Session radial"></div>
+            <p class="session-card__meta">Sep 10, 2026 11:59:17 am</p>
+            <p class="session-card__force">Avg Peak Force: 8.3 kg</p>
+          </button>
+          <button type="button" class="session-card" aria-pressed="false">
+            <span class="session-card__badge">Assessment</span>
+            <div class="proto-chart proto-chart--radial" data-chart="radial-body" data-chart-label="Session radial"></div>
+            <p class="session-card__meta">Sep 10, 2026 11:27:06 am</p>
+            <p class="session-card__force">Avg Peak Force: 7.9 kg</p>
+          </button>
+          <button type="button" class="session-card" aria-pressed="false">
+            <span class="session-card__badge">Assessment</span>
+            <div class="proto-chart proto-chart--radial" data-chart="radial" data-chart-label="Session radial"></div>
+            <p class="session-card__meta">Sep 10, 2026 11:20:49 am</p>
+            <p class="session-card__force">Avg Peak Force: 5.7 kg</p>
+          </button>
+        </div>
+        <footer class="screen-footer" style="position: relative; margin-left: -1.25rem; margin-right: -1.25rem; width: calc(100% + 2.5rem); flex-shrink: 0; justify-content: flex-start">
+          <p style="margin: 0">1-4 of 4 results</p>
+          <a
+            class="wire-btn wire-btn--header"
+            href="compare-team-user-sessions-detail.html"
+            style="position: absolute; left: 50%; transform: translateX(-50%)"
           >
-            <p class="enriched-meta" style="margin: 0">Regular</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">142 N avg</p>
-            <p class="enriched-meta" style="margin: 0">Nov 8, 2026 · selected ✓</p>
-          </button>
-          <button type="button" class="wire-card" style="padding: 0.75rem; text-align: left; cursor: pointer; width: 100%">
-            <p class="enriched-meta" style="margin: 0">Assessment</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">138 N avg</p>
-            <p class="enriched-meta" style="margin: 0">Nov 6, 2026</p>
-          </button>
-          <button type="button" class="wire-card" style="padding: 0.75rem; text-align: left; cursor: pointer; width: 100%">
-            <p class="enriched-meta" style="margin: 0">Regular</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">131 N avg</p>
-            <p class="enriched-meta" style="margin: 0">Nov 4, 2026</p>
-          </button>
-          <button type="button" class="wire-card" style="padding: 0.75rem; text-align: left; cursor: pointer; width: 100%">
-            <p class="enriched-meta" style="margin: 0">Performance</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">145 N avg</p>
-            <p class="enriched-meta" style="margin: 0">Oct 28, 2026</p>
-          </button>
-        </div>
-        <div class="wire-toolbar" style="border-top: 1px solid #ddd; padding-top: 0.75rem">
-          <p class="enriched-meta">8 results · page 1</p>
-          <a class="wire-btn wire-btn--primary" href="compare-team-user-sessions-detail.html">Select This Analysis</a>
-        </div>
+            Select This Analysis
+          </a>
+        </footer>
         <nav class="flow-nav" aria-label="Select session flows">
           <h2>Related</h2>
           <ul>

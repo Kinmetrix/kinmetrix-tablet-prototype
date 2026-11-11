@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Capture root-stack RN screens reachable from Login without auth.
- * Requires Kinmetrix IPad booted, agent-device, dev build (debug menu on logo tap).
+ * Requires Kinmetrix IPad booted, agent-device, dev build (debug menu on version tap).
  */
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
@@ -26,28 +26,41 @@ function ad(...args) {
   run('agent-device', args);
 }
 
-run('agent-device', ['open', bundle, '--device', device, '--foreground', '--relaunch']);
-await sleep(3000);
+try {
+  run('agent-device', ['open', bundle, '--device', device, '--foreground', '--relaunch']);
+  await sleep(3000);
+} catch {
+  console.warn('agent-device open failed (device in use?). Navigate to Login manually, then continuing.');
+  await sleep(500);
+}
 snap('login');
 
-ad('press', '590', '780', '--settle');
+ad('snapshot', '-i');
+ad('find', 'Get Started', 'press');
 await sleep(1200);
+ad('wait', 'text', 'Log in to Kinmetrix');
 snap('password-login');
 
-ad('press', '60', '50', '--settle');
-await sleep(600);
-ad('press', '590', '450', '--settle');
-await sleep(400);
-ad('press', '90', '180', '--settle');
+ad('find', 'Back', 'press', '--first');
 await sleep(800);
+ad('snapshot', '-i');
+ad('find', 'v1.5.0', 'press');
+await sleep(600);
+ad('snapshot', '-i');
+ad('find', 'Settings', 'press', '--first');
+await sleep(1200);
+ad('wait', 'text', 'Use Dark Theme');
 snap('settings');
 
-ad('press', '60', '50', '--settle');
-await sleep(600);
-ad('press', '590', '450', '--settle');
-await sleep(400);
-ad('press', '90', '260', '--settle');
+ad('find', 'Back', 'press', '--first');
 await sleep(800);
+ad('snapshot', '-i');
+ad('find', 'v1.5.0', 'press');
+await sleep(600);
+ad('snapshot', '-i');
+ad('find', 'Debug Device', 'press');
+await sleep(1200);
+ad('wait', 'text', 'Connected Device');
 snap('device-control');
 
-console.log('Done. Verify PNGs; coords may need tuning per build.');
+console.log('Done. Verify PNGs with Read before trusting stitch.');

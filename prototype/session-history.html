@@ -1,11 +1,23 @@
 <!DOCTYPE html>
-<!-- source: src/screens/SessionHistoryScreen.tsx -->
+<!-- route: SessionHistory -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Session History · Kinmetrix prototype</title>
     <link rel="stylesheet" href="kin-prototype.css" />
+    <style>
+      .wire-toggle[aria-pressed='false'] {
+        background: #ccc;
+      }
+      .wire-toggle[aria-pressed='false']::after {
+        right: auto;
+        left: 0.15rem;
+      }
+      .session-card .proto-chart__img {
+        max-height: 168px;
+      }
+    </style>
   </head>
   <body data-route="SessionHistory" data-enriched="true">
     <div class="device-frame">
@@ -17,51 +29,153 @@
           4-column AnalysisItem grid. Normalized toggle, type filter bar, compare 2+, bulk delete popover.
         </p>
       </header>
-      <main class="app__content wire-stack">
-        <div class="wire-toolbar">
-          <label class="enriched-meta" style="display: flex; align-items: center; gap: 0.35rem">
-            Normalized
-            <input type="checkbox" checked aria-label="Normalized scale" />
-          </label>
-          <p class="wire-toolbar__title">Alex Morgan's Session History</p>
-          <a class="wire-btn wire-btn--ghost" href="historical.html">View Chart</a>
+      <main class="app__content" style="overflow: hidden; padding-bottom: 0">
+        <div class="wire-toolbar" style="margin-bottom: 0">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="home.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Test User's Session History</p>
+          <div class="wire-toolbar__right">
+            <label class="wire-toolbar__toggle">
+              Normalized
+              <button class="wire-toggle" type="button" aria-pressed="false" aria-label="Normalized"></button>
+            </label>
+            <a class="wire-btn wire-btn--ghost" href="historical.html">View Chart</a>
+          </div>
         </div>
-        <div class="wire-toolbar" style="gap: 0.5rem; flex-wrap: wrap">
-          <button class="wire-btn wire-btn--ghost" type="button">All</button>
-          <button class="wire-btn wire-btn--ghost" type="button">Regular</button>
-          <button class="wire-btn wire-btn--ghost" type="button">Assessment</button>
-          <button class="wire-btn wire-btn--ghost" type="button">Performance</button>
+        <div class="filter-bar" style="justify-content: center" role="tablist" aria-label="Analysis type">
+          <div style="display: flex; gap: 0.2rem; background: #ececee; border-radius: 10px; padding: 0.2rem">
+            <button class="filter-chip" type="button" role="tab" aria-selected="true" style="background: #fff; border-color: transparent">
+              All
+            </button>
+            <button class="filter-chip" type="button" role="tab" aria-selected="false" style="background: transparent; border-color: transparent; color: #888">
+              <span
+                style="display: inline-block; width: 0.45rem; height: 0.45rem; margin-right: 0.3rem; border: 1.5px solid #3db8e0; background: #3db8e044; transform: rotate(45deg); vertical-align: 0.1rem"
+              ></span>
+              Assessment
+            </button>
+            <button class="filter-chip" type="button" role="tab" aria-selected="false" style="background: transparent; border-color: transparent; color: #888">
+              <span
+                style="display: inline-block; width: 0.45rem; height: 0.45rem; margin-right: 0.3rem; border: 1.5px solid #9b6dd4; background: #9b6dd444; transform: rotate(45deg); vertical-align: 0.1rem"
+              ></span>
+              Program
+            </button>
+            <button class="filter-chip" type="button" role="tab" aria-selected="false" style="background: transparent; border-color: transparent; color: #888">
+              <span
+                style="display: inline-block; width: 0.45rem; height: 0.45rem; margin-right: 0.3rem; border: 1.5px solid #3dbe8c; background: #3dbe8c44; transform: rotate(45deg); vertical-align: 0.1rem"
+              ></span>
+              Session
+            </button>
+          </div>
         </div>
-        <div
-          style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; padding: 0.5rem 0"
-          aria-label="Session cards"
-        >
-          <a class="wire-card" href="user-analysis-details.html" style="padding: 0.75rem; text-decoration: none; color: inherit">
-            <p class="enriched-meta" style="margin: 0">Nov 8, 2026</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">142 N</p>
-            <p class="enriched-meta" style="margin: 0">Regular</p>
-          </a>
-          <a class="wire-card" href="user-analysis-details.html" style="padding: 0.75rem; text-decoration: none; color: inherit">
-            <p class="enriched-meta" style="margin: 0">Nov 6, 2026</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">138 N</p>
-            <p class="enriched-meta" style="margin: 0">Assessment</p>
-          </a>
-          <label class="wire-card" style="padding: 0.75rem; border: 2px solid #333">
-            <input type="checkbox" checked aria-label="Select Nov 4 session" />
-            <p class="enriched-meta" style="margin: 0.25rem 0 0">Nov 4, 2026</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">131 N</p>
-          </label>
-          <label class="wire-card" style="padding: 0.75rem; border: 2px solid #333">
-            <input type="checkbox" checked aria-label="Select Nov 2 session" />
-            <p class="enriched-meta" style="margin: 0.25rem 0 0">Nov 2, 2026</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">129 N</p>
-          </label>
+        <div class="session-grid" style="flex: 1; min-height: 0; overflow: auto; align-content: start" aria-label="Session cards">
+          <article class="session-card" style="align-items: center; text-align: center">
+            <div class="session-card__top" style="width: 100%">
+              <input type="checkbox" aria-label="Select Fri Sep 18 1:12am session" style="width: 1.15rem; height: 1.15rem" />
+              <span class="session-card__badge">3 reps</span>
+            </div>
+            <a href="user-analysis-details.html" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 0.3rem">
+              <div class="proto-chart proto-chart--radial" data-chart="radial" data-chart-label="Assessment radial"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 5.4 lb</p>
+              <p class="session-card__meta">Fri Sep 18 1:12am</p>
+            </a>
+          </article>
+          <article class="session-card" style="align-items: center; text-align: center">
+            <div class="session-card__top" style="width: 100%">
+              <input type="checkbox" aria-label="Select Fri Sep 18 1:06am session" style="width: 1.15rem; height: 1.15rem" />
+              <span class="session-card__badge">3 reps</span>
+            </div>
+            <a href="user-analysis-details.html" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 0.3rem">
+              <div class="proto-chart proto-chart--radial" data-chart="radial" data-chart-label="Assessment radial"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 6.3 lb</p>
+              <p class="session-card__meta">Fri Sep 18 1:06am</p>
+            </a>
+          </article>
+          <article class="session-card" style="align-items: center; text-align: center">
+            <div class="session-card__top" style="width: 100%">
+              <input type="checkbox" aria-label="Select Fri Sep 18 1:04am session" style="width: 1.15rem; height: 1.15rem" />
+              <span class="session-card__badge">3 reps</span>
+            </div>
+            <a href="user-analysis-details.html" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 0.3rem">
+              <div class="proto-chart proto-chart--radial" data-chart="radial" data-chart-label="Assessment radial"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 5.8 lb</p>
+              <p class="session-card__meta">Fri Sep 18 1:04am</p>
+            </a>
+          </article>
+          <article class="session-card" style="align-items: center; text-align: center">
+            <div class="session-card__top" style="width: 100%">
+              <input type="checkbox" aria-label="Select Fri Sep 18 12:47am session" style="width: 1.15rem; height: 1.15rem" />
+              <span class="session-card__badge">3 reps</span>
+            </div>
+            <a href="user-analysis-details.html" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 0.3rem">
+              <div class="proto-chart proto-chart--radial" data-chart="radial" data-chart-label="Assessment radial"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 4.9 lb</p>
+              <p class="session-card__meta">Fri Sep 18 12:47am</p>
+            </a>
+          </article>
+          <article class="session-card" style="align-items: center; text-align: center">
+            <div class="session-card__top" style="width: 100%">
+              <input type="checkbox" aria-label="Select Wed Sep 16 5:47pm session" style="width: 1.15rem; height: 1.15rem" />
+              <span class="session-card__badge">2 reps</span>
+            </div>
+            <a href="user-analysis-details.html" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 0.3rem">
+              <div class="proto-chart proto-chart--radial" data-chart="radial-body" data-chart-label="Assessment radial body"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 21.2 lb</p>
+              <p class="session-card__meta">Wed Sep 16 5:47pm</p>
+            </a>
+          </article>
+          <article class="session-card" style="align-items: center; text-align: center">
+            <div class="session-card__top" style="width: 100%">
+              <input type="checkbox" aria-label="Select Wed Sep 16 4:02pm session" style="width: 1.15rem; height: 1.15rem" />
+              <span class="session-card__badge">1-2 reps</span>
+            </div>
+            <a href="user-analysis-details.html" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 0.3rem">
+              <div class="proto-chart proto-chart--radial" data-chart="radial" data-chart-label="Session radial"></div>
+              <span class="session-card__badge">Session</span>
+              <p class="session-card__force">Avg Peak Force: 10.5 lb</p>
+              <p class="session-card__meta">Wed Sep 16 4:02pm</p>
+            </a>
+          </article>
+          <article class="session-card" style="align-items: center; text-align: center">
+            <div class="session-card__top" style="width: 100%">
+              <input type="checkbox" aria-label="Select Wed Sep 16 3:18pm session" style="width: 1.15rem; height: 1.15rem" />
+              <span class="session-card__badge">2 reps</span>
+            </div>
+            <a href="user-analysis-details.html" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 0.3rem">
+              <div class="proto-chart proto-chart--radial" data-chart="radial-body" data-chart-label="Assessment radial body"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 21.0 lb</p>
+              <p class="session-card__meta">Wed Sep 16 3:18pm</p>
+            </a>
+          </article>
+          <article class="session-card" style="align-items: center; text-align: center">
+            <div class="session-card__top" style="width: 100%">
+              <input type="checkbox" aria-label="Select Wed Sep 16 10:05am session" style="width: 1.15rem; height: 1.15rem" />
+              <span class="session-card__badge">1 rep</span>
+            </div>
+            <a href="user-analysis-details.html" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 0.3rem">
+              <div class="proto-chart proto-chart--radial" data-chart="radial" data-chart-label="Session radial"></div>
+              <span class="session-card__badge">Session</span>
+              <p class="session-card__force">Avg Peak Force: 5.2 lb</p>
+              <p class="session-card__meta">Wed Sep 16 10:05am</p>
+            </a>
+          </article>
         </div>
-        <div class="wire-toolbar" style="border-top: 1px solid #ddd; padding-top: 0.75rem">
-          <p class="enriched-meta">12 results · page 1</p>
-          <a class="wire-btn" href="compare-session.html">Compare 2 sessions</a>
-          <button class="wire-btn wire-btn--ghost" type="button">Delete</button>
-        </div>
+        <footer class="screen-footer" style="margin-left: -1.25rem; margin-right: -1.25rem; width: calc(100% + 2.5rem); flex-shrink: 0">
+          <p style="margin: 0">1-12 of 50 results</p>
+          <nav aria-label="Pagination" style="display: flex; align-items: center; gap: 0.25rem">
+            <button class="wire-btn wire-btn--ghost" type="button" disabled aria-label="Previous page">&lt;</button>
+            <button class="wire-btn" type="button" aria-current="page" style="background: #ececee; min-width: 2rem; padding: 0.35rem 0.55rem">1</button>
+            <button class="wire-btn wire-btn--ghost" type="button" style="min-width: 2rem; padding: 0.35rem 0.55rem">2</button>
+            <button class="wire-btn wire-btn--ghost" type="button" style="min-width: 2rem; padding: 0.35rem 0.55rem">3</button>
+            <button class="wire-btn wire-btn--ghost" type="button" style="min-width: 2rem; padding: 0.35rem 0.55rem">4</button>
+            <button class="wire-btn wire-btn--ghost" type="button" style="min-width: 2rem; padding: 0.35rem 0.55rem">5</button>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Next page">&gt;</button>
+          </nav>
+        </footer>
         <nav class="flow-nav" aria-label="Session history flows">
           <h2>Drill-down</h2>
           <ul>

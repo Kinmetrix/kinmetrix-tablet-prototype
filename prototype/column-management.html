@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/ColumnManagementScreen.tsx -->
+<!-- route: ColumnManagement -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -12,61 +12,59 @@
       <header class="screen-header">
         <a class="back-link" href="team-user-list.html">Back</a>
         <p class="route-chip">ColumnManagement <span class="stack-tag">team-settings</span></p>
-        <h1>Manage columns</h1>
+        <h1>Manage Columns</h1>
         <p class="enriched-meta">Toggle visibility syncs in background; create and edit use popovers in RN.</p>
       </header>
       <main class="app__content wire-stack">
         <div class="wire-toolbar">
-          <span></span>
-          <p class="wire-toolbar__title">Manage columns</p>
-          <button class="wire-btn wire-btn--primary" type="button">Create column</button>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="team-user-list.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Manage Columns</p>
+          <div class="wire-toolbar__right">
+            <button class="wire-btn wire-btn--header" type="button">+ Create Column</button>
+          </div>
         </div>
-        <section aria-label="Team columns intro">
-          <h2 style="margin: 0 0 0.35rem">Team columns</h2>
-          <p class="enriched-meta">
-            Manage custom columns for organizing team members. You can show or hide columns, edit their names and options,
-            or delete them.
-          </p>
+        <section class="col-section" aria-label="Team columns">
+          <header>
+            <h2>Team Columns</h2>
+            <p>
+              Manage custom columns for organizing team members. You can show/hide columns, edit their names and
+              options, or delete them entirely.
+            </p>
+          </header>
+          <article class="col-card">
+            <div class="col-card__body">
+              <h3 class="col-card__title">Gender</h3>
+              <div class="col-card__tags">
+                <span class="col-tag">Male</span>
+                <span class="col-tag">Female</span>
+                <span class="col-tag">Prefer not to say</span>
+              </div>
+            </div>
+            <div class="col-card__actions">
+              <button class="col-card__vis" type="button" aria-label="Hide column">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+              <button class="wire-btn" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+                Edit
+              </button>
+              <button class="wire-btn wire-btn--danger" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M3 6h18" />
+                  <path d="M8 6V4h8v2" />
+                  <path d="M19 6l-1 14H6L5 6" />
+                </svg>
+                Delete
+              </button>
+            </div>
+          </article>
         </section>
-        <table class="wire-table">
-          <thead>
-            <tr>
-              <th>Visible</th>
-              <th>Column</th>
-              <th>Options</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><input type="checkbox" checked aria-label="Show position column" /></td>
-              <td>Position</td>
-              <td>Forward, Guard, Center</td>
-              <td>
-                <button class="wire-btn" type="button">Edit</button>
-                <button class="wire-btn wire-btn--ghost" type="button">Delete</button>
-              </td>
-            </tr>
-            <tr>
-              <td><input type="checkbox" checked aria-label="Show skill column" /></td>
-              <td>Skill level</td>
-              <td>Varsity, JV, Development</td>
-              <td>
-                <button class="wire-btn" type="button">Edit</button>
-                <button class="wire-btn wire-btn--ghost" type="button">Delete</button>
-              </td>
-            </tr>
-            <tr>
-              <td><input type="checkbox" aria-label="Show injury column" /></td>
-              <td>Injury status</td>
-              <td>Clear, Limited, Out</td>
-              <td>
-                <button class="wire-btn" type="button">Edit</button>
-                <button class="wire-btn wire-btn--ghost" type="button">Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
         <nav class="flow-nav" aria-label="Column management flows">
           <h2>Flows</h2>
           <ul>

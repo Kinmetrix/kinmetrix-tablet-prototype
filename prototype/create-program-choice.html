@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/CreateProgramChoiceScreen.tsx -->
+<!-- route: CreateProgramChoice -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,8 +15,14 @@
         <h1>Create new program</h1>
         <p class="enriched-meta">Chooses blank AddProgram or SelectProgramTemplate path.</p>
       </header>
-      <main class="app__content wire-center">
-        <section class="wire-card wire-form-card" aria-label="How to start">
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="program-list.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Create new program</p>
+          <div class="wire-toolbar__right"></div>
+        </div>
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" aria-label="How to start">
           <h2 style="margin: 0 0 0.25rem; text-align: center">How would you like to start?</h2>
           <p class="enriched-meta" style="text-align: center">
             Start from a blank program or use a saved template.
@@ -54,6 +60,8 @@
             </a>
           </div>
         </section>
+        </div>
+
         <nav class="flow-nav" aria-label="Create program flows" style="max-width: 500px; width: 100%">
           <h2>Cancel</h2>
           <ul>

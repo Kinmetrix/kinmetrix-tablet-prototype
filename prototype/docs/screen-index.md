@@ -1,29 +1,21 @@
 # Screen index
 
-Generated from KinmetrixApp navigators. Routes in `prototype/.screenignore` are omitted from the HTML mirror.
+Active mirror routes from `prototype/screens.json` (excluding `.screenignore`).
 
-Regenerate:
+Refresh this table:
 
 ```bash
 node scripts/build-screen-manifest.mjs
-node scripts/generate-html-stubs.mjs
 ```
 
 | Route | Stack | HTML | Title |
 | --- | --- | --- | --- |
 | DeviceCalibration | app | `device-calibration.html` | Device Calibration |
-| DeviceControlScreen | app | `device-control.html` | Device Control |
-| DeviceList | app | `device-list.html` | Device List |
-| DeviceModify | app | `device-modify.html` | Device Modify |
 | Feedback | app | `feedback.html` | Feedback |
 | Loading | app | `loading.html` | Loading |
 | Login | app | `login.html` | Login |
 | PasswordLogin | app | `password-login.html` | Password Login |
-| PasswordReset | app | `password-reset.html` | Password Reset |
-| SetPassword | app | `set-password.html` | Set Password |
 | Settings | app | `settings.html` | Settings |
-| TeamView | app | `team-view.html` | Team View |
-| UserView | app | `user-view.html` | User View |
 | OnboardingCompetitionLevel | onboarding-step | `onboarding-competition-level.html` | Onboarding Competition Level |
 | OnboardingCurrentTeam | onboarding-step | `onboarding-current-team.html` | Onboarding Current Team |
 | OnboardingDateOfBirth | onboarding-step | `onboarding-date-of-birth.html` | Onboarding Date Of Birth |
@@ -53,7 +45,6 @@ node scripts/generate-html-stubs.mjs
 | CreateTeamSessionTemplate | team-settings | `create-team-session-template.html` | Create Team Session Template |
 | EditGroupTemplate | team-settings | `edit-group-template.html` | Edit Group Template |
 | EditProgramTemplate | team-settings | `edit-program-template.html` | Edit Program Template |
-| EditStepTemplate | team-settings | `edit-step-template.html` | Edit Step Template |
 | EditTeamProtocolSession | team-settings | `edit-team-protocol-session.html` | Edit Team Protocol Session |
 | EditTeamSessionTemplate | team-settings | `edit-team-session-template.html` | Edit Team Session Template |
 | GroupTemplateList | team-settings | `group-template-list.html` | Group Template List |
@@ -69,16 +60,13 @@ node scripts/generate-html-stubs.mjs
 | AddProgram | user | `add-program.html` | Add Program |
 | AddStep | user | `add-step.html` | Add Step |
 | Assessment | user | `assessment.html` | Assessment |
-| AssessmentSessionHistory | user | `assessment-session-history.html` | Assessment Session History |
 | CompareSession | user | `compare-session.html` | Compare Session |
 | CreateProgramChoice | user | `create-program-choice.html` | Create Program Choice |
 | CreateProtocolSession | user | `create-protocol-session.html` | Create Protocol Session |
-| DeviceControl | user | `device-control.html` | Device Control |
 | EditGroup | user | `edit-group.html` | Edit Group |
 | EditProgram | user | `edit-program.html` | Edit Program |
 | EditProtocolSession | user | `edit-protocol-session.html` | Edit Protocol Session |
 | Exercise | user | `exercise.html` | Exercise |
-| GroupData | user | `group-data.html` | Group Data |
 | GroupList | user | `group-list.html` | Group List |
 | GroupResults | user | `group-results.html` | Group Results |
 | Historical | user | `historical.html` | Historical |
@@ -87,10 +75,8 @@ node scripts/generate-html-stubs.mjs
 | NotesList | user | `notes-list.html` | Notes List |
 | ProgramList | user | `program-list.html` | Program List |
 | ProtocolPreview | user | `protocol-preview.html` | Protocol Preview |
-| RecentData | user | `recent-data.html` | Recent Data |
 | RunGroup | user | `run-group.html` | Run Group |
 | SelectProgramTemplate | user | `select-program-template.html` | Select Program Template |
-| SelectTemplate | user | `select-template.html` | Select Template |
 | SessionData | user | `session-data.html` | Session Data |
 | SessionHistory | user | `session-history.html` | Session History |
 | SignWaiver | user | `sign-waiver.html` | Sign Waiver |

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/CreateProtocolSessionScreen.tsx -->
+<!-- route: CreateProtocolSession -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,39 +15,106 @@
         <h1>Configure assessments</h1>
         <p class="enriched-meta">Creates protocol session + assessment batch; replaces to Assessment on submit.</p>
       </header>
-      <main class="app__content wire-center">
-        <section class="wire-card wire-form-card" aria-label="Assessment parameters" style="max-width: 500px">
-          <h2 style="margin: 0 0 0.25rem; text-align: center">Configure your assessments</h2>
-          <p class="enriched-meta" style="text-align: center">
-            Set assessment parameters before starting. These can be changed later.
-          </p>
-          <div class="wire-stack" style="margin-top: 1.25rem; max-width: 390px; width: 100%; margin-inline: auto">
-            <button class="wire-kv-row" type="button">
-              <span>Mode</span>
-              <strong>Isokinetic</strong>
+      <main class="app__content app__content--muted">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="home-start.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Configure Assessments</p>
+          <div class="wire-toolbar__right"></div>
+        </div>
+        <section class="assess-card" aria-label="Assessment parameters">
+          <h2>Configure Your Assessments</h2>
+          <p>Set your assessment parameters before starting the assessment. This can be changed later.</p>
+          <div class="assess-row">
+            <span class="assess-row__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M4 12a8 8 0 0 1 13.5-5.8M20 12a8 8 0 0 1-13.5 5.8" />
+                <path d="M17 4v4h4M7 20v-4H3" />
+              </svg>
+            </span>
+            <div class="assess-row__body">
+              <p class="assess-row__label">Mode</p>
+              <p class="assess-row__value">Isometric</p>
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Edit mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <path d="M4 20l4.5-1L19 8.5 15.5 5 5 15.5 4 20z" />
+                <path d="M13.5 7l3.5 3.5" />
+              </svg>
             </button>
-            <button class="wire-kv-row" type="button">
-              <span>Tilt</span>
-              <strong>1° – 30°</strong>
-            </button>
-            <button class="wire-kv-row" type="button">
-              <span>Target weight</span>
-              <strong>2 N</strong>
-            </button>
-            <button class="wire-kv-row" type="button">
-              <span>Repetitions</span>
-              <strong>2</strong>
-            </button>
-            <button class="wire-kv-row" type="button">
-              <span>Directions</span>
-              <strong>8</strong>
-            </button>
-            <a class="wire-btn wire-btn--primary" href="assessment.html" style="text-align: center; width: 100%">
-              Start assessment
-            </a>
           </div>
+          <div class="assess-row">
+            <span class="assess-row__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M5 19h14M5 19V5" />
+                <path d="M5 19c4 0 8-6 14-12" />
+              </svg>
+            </span>
+            <div class="assess-row__body">
+              <p class="assess-row__label">Tilt</p>
+              <p class="assess-row__value">5°</p>
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Edit tilt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <path d="M4 20l4.5-1L19 8.5 15.5 5 5 15.5 4 20z" />
+                <path d="M13.5 7l3.5 3.5" />
+              </svg>
+            </button>
+          </div>
+          <div class="assess-row">
+            <span class="assess-row__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9.5 5h5a1.5 1.5 0 0 1 0 3h-5a1.5 1.5 0 0 1 0-3zM8 9h8l2 2.5V18a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-6.5L8 9z" />
+              </svg>
+            </span>
+            <div class="assess-row__body">
+              <p class="assess-row__label">Target weight</p>
+              <p class="assess-row__value">1.00 KG</p>
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Edit target weight">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <path d="M4 20l4.5-1L19 8.5 15.5 5 5 15.5 4 20z" />
+                <path d="M13.5 7l3.5 3.5" />
+              </svg>
+            </button>
+          </div>
+          <div class="assess-row">
+            <span class="assess-row__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M7 7h11M18 7l-3-3M18 7l-3 3M17 17H6M6 17l3-3M6 17l3 3" />
+              </svg>
+            </span>
+            <div class="assess-row__body">
+              <p class="assess-row__label">Repetitions</p>
+              <p class="assess-row__value">2</p>
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Edit repetitions">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <path d="M4 20l4.5-1L19 8.5 15.5 5 5 15.5 4 20z" />
+                <path d="M13.5 7l3.5 3.5" />
+              </svg>
+            </button>
+          </div>
+          <div class="assess-row">
+            <span class="assess-row__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 12V4m0 8 7 4m-7-4-7 4" />
+                <path d="M12 4l-2 2M12 4l2 2M19 16l-2.2-.3M19 16l-.3 2.2M5 16l2.2-.3M5 16l.3 2.2" />
+              </svg>
+            </span>
+            <div class="assess-row__body">
+              <p class="assess-row__label">Directions</p>
+              <p class="assess-row__value">4</p>
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Edit directions">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <path d="M4 20l4.5-1L19 8.5 15.5 5 5 15.5 4 20z" />
+                <path d="M13.5 7l3.5 3.5" />
+              </svg>
+            </button>
+          </div>
+          <a class="wire-btn wire-btn--primary" href="assessment.html">Start Assessment</a>
         </section>
-        <nav class="flow-nav" aria-label="Protocol session flows" style="max-width: 500px; width: 100%">
+        <nav class="flow-nav" aria-label="Protocol session flows">
           <h2>Related</h2>
           <ul>
             <li><a class="wire-btn wire-btn--primary" href="assessment.html">Assessment</a></li>

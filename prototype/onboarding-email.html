@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/onboarding/EmailScreen.tsx -->
+<!-- route: OnboardingEmail -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,12 +15,14 @@
         <h1>Email</h1>
         <p class="enriched-meta">“Add Later” secondary action on this step in the app.</p>
       </header>
-      <main class="app__content wire-center">
-        <div class="wire-toolbar" style="max-width: 480px; width: 100%">
-          <a class="wire-btn wire-btn--ghost" href="onboarding.html">✕</a>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="onboarding-competition-level.html">&lt; Back</a></div>
           <p class="wire-toolbar__title">Step 10 of 11 · Email</p>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--ghost" href="onboarding.html">✕</a></div>
         </div>
-        <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
           <h2 style="margin: 0 0 1rem; text-align: center">What's your email?</h2>
           <div class="wire-field">
             <label for="ob-email">Email</label>
@@ -31,6 +33,8 @@
             <a class="wire-btn wire-btn--ghost" href="onboarding-onboarding-confirmation.html">Add later</a>
           </p>
         </section>
+        </div>
+
         <nav class="flow-nav" aria-label="Onboarding email flows" style="max-width: 480px; width: 100%">
           <ul>
             <li><a class="wire-btn wire-btn--ghost" href="onboarding-competition-level.html">Previous</a></li>

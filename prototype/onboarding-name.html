@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/onboarding/NameScreen.tsx -->
+<!-- route: OnboardingName -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,12 +15,14 @@
         <h1>Name</h1>
         <p class="enriched-meta">Photo picker optional; first and last name required.</p>
       </header>
-      <main class="app__content wire-center">
-        <div class="wire-toolbar" style="max-width: 480px; width: 100%">
-          <a class="wire-btn wire-btn--ghost" href="onboarding.html" aria-label="Close">✕</a>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="onboarding.html">&lt; Back</a></div>
           <p class="wire-toolbar__title">Step 1 of 11 · Name</p>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--ghost" href="onboarding.html">✕</a></div>
         </div>
-        <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" style="max-width: 480px; width: 100%">
           <h2 style="margin: 0 0 1rem; text-align: center">What's your name?</h2>
           <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-bottom: 1rem">
             <span
@@ -41,6 +43,8 @@
           </div>
           <a class="wire-btn wire-btn--primary" href="onboarding-height.html" style="width: 100%; margin-top: 1rem; text-align: center">Next</a>
         </section>
+        </div>
+
         <nav class="flow-nav" aria-label="Onboarding name flows" style="max-width: 480px; width: 100%">
           <h2>Wizard</h2>
           <ul>

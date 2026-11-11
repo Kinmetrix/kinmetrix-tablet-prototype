@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/features/session-details/screens/SessionDataScreen.tsx -->
+<!-- route: SessionData -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -10,63 +10,85 @@
   <body data-route="SessionData" data-enriched="true">
     <div class="device-frame">
       <header class="screen-header">
-        <a class="back-link" href="session-history.html">Back</a>
+        <a class="back-link" href="home.html">Back</a>
         <p class="route-chip">SessionData <span class="stack-tag">user</span></p>
-        <h1>Session data</h1>
-        <p class="enriched-meta">SessionDataView list with angle pager and delete actions.</p>
+        <h1>Isokinetic Forward Flexion</h1>
+        <p class="enriched-meta">SessionDataView with angle pager. Row press from Home or GroupResults.</p>
       </header>
-      <main class="app__content wire-stack">
+      <main class="app__content">
         <div class="wire-toolbar">
-          <button class="wire-btn wire-btn--ghost" type="button" aria-label="Previous angle">←</button>
-          <div style="text-align: center">
-            <p class="wire-toolbar__title">Isometric · Flexion</p>
-            <button class="wire-btn wire-btn--ghost" type="button">0° ▾</button>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="home.html">&lt; Back</a></div>
+          <div class="wire-toolbar__title pager-title">
+            <a class="wire-btn wire-btn--ghost" href="session-data.html" aria-label="Previous angle">←</a>
+            <span>0° Isokinetic Forward Flexion</span>
+            <a class="wire-btn wire-btn--ghost" href="session-data.html" aria-label="Next angle">→</a>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.5rem">
-            <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Alex Morgan" data-avatar-size="48" style="width: 36px; height: 36px; font-size: 0.5rem"></span>
-            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Next angle">→</button>
+          <div class="wire-toolbar__right">
+            <div class="wire-toolbar__profile">
+              <span>Test User</span>
+              <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Test User" data-avatar-size="28"></span>
+            </div>
           </div>
         </div>
-        <aside class="enriched-meta" style="display: flex; gap: 1.5rem; flex-wrap: wrap">
-          <span>Avg peak: <strong>142 N</strong></span>
-          <span>Stability: <strong>94%</strong></span>
-          <span>Target: <strong>40 N</strong></span>
-        </aside>
-        <table class="wire-table" aria-label="Recorded sessions">
-          <thead>
-            <tr>
-              <th>Rep</th>
-              <th>Peak (N)</th>
-              <th>Completed</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>138</td>
-              <td>Nov 8, 2026</td>
-              <td><button class="wire-btn wire-btn--ghost" type="button">Delete</button></td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>145</td>
-              <td>Nov 8, 2026</td>
-              <td><button class="wire-btn wire-btn--ghost" type="button">Delete</button></td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>141</td>
-              <td>Nov 8, 2026</td>
-              <td><button class="wire-btn wire-btn--ghost" type="button">Delete</button></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="session-split" aria-label="Repetition force chart">
+          <section class="results-panel">
+            <div class="metric-pills">
+              <div class="metric-pill">
+                <p class="metric-pill__label">Avg Peak Force</p>
+                <p class="metric-pill__value">5.1 LB</p>
+              </div>
+              <div class="metric-pill">
+                <p class="metric-pill__label">Stability</p>
+                <p class="metric-pill__value">92%</p>
+              </div>
+            </div>
+            <div
+              class="proto-chart"
+              data-chart="force-multi"
+              data-chart-label="Force curve, three reps, target 4.4 lb"
+            ></div>
+          </section>
+          <aside class="results-panel results-panel--muted" aria-label="All reps">
+            <div class="results-panel__head">
+              <div>
+                <p class="results-panel__title" style="font-size: 0.95rem">All reps</p>
+                <p class="results-panel__subtitle">3 of 3 shown</p>
+              </div>
+            </div>
+            <div class="rep-list">
+              <label class="rep-list__item">
+                <input type="checkbox" checked aria-label="Show Rep 1" />
+                <span class="rep-list__swatch" style="background: #1f9d55"></span>
+                <span class="rep-list__copy">
+                  <strong>Rep 1</strong>
+                  <span class="enriched-meta">4.5 lb peak · 93% stable</span>
+                </span>
+              </label>
+              <label class="rep-list__item">
+                <input type="checkbox" checked aria-label="Show Rep 2" />
+                <span class="rep-list__swatch" style="background: #e5484d"></span>
+                <span class="rep-list__copy">
+                  <strong>Rep 2</strong>
+                  <span class="enriched-meta">6.1 lb peak · 92% stable</span>
+                </span>
+              </label>
+              <label class="rep-list__item">
+                <input type="checkbox" checked aria-label="Show Rep 3" />
+                <span class="rep-list__swatch" style="background: #d4a017"></span>
+                <span class="rep-list__copy">
+                  <strong>Rep 3</strong>
+                  <span class="enriched-meta">4.5 lb peak · 92% stable</span>
+                </span>
+              </label>
+            </div>
+          </aside>
+        </div>
         <nav class="flow-nav" aria-label="Session data flows">
-          <h2>Angles &amp; history</h2>
+          <h2>Angles and history</h2>
           <ul>
-            <li><a class="wire-btn" href="session-history.html">Session history</a></li>
-            <li><a class="wire-btn wire-btn--ghost" href="home.html">Home table link</a></li>
+            <li><a class="wire-btn" href="home.html">Home</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="session-history.html">Session history</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="group-results.html">Group results</a></li>
           </ul>
         </nav>
       </main>

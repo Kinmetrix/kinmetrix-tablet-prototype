@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/GroupListScreen.tsx -->
+<!-- route: GroupList -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -17,15 +17,15 @@
       </header>
       <main class="app__content wire-stack">
         <div class="wire-toolbar">
-          <span></span>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="program-list.html">&lt; Back</a></div>
           <p class="wire-toolbar__title">Groups</p>
-          <a class="wire-btn wire-btn--primary" href="add-group.html">Add group</a>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--add" href="add-group.html">+ Add Group</a></div>
         </div>
-        <table class="wire-table" aria-label="Groups in program">
+        <table class="wire-table wire-table--sheet" aria-label="Groups in program">
           <thead>
             <tr>
               <th>Name</th>
-              <th style="text-align: center">Completed at</th>
+              <th style="text-align: center">Completed At</th>
               <th style="text-align: center">Steps</th>
               <th></th>
             </tr>
@@ -33,30 +33,30 @@
           <tbody>
             <tr>
               <td>
-                <a href="step-list.html"><strong>Warm-up block</strong></a>
-                <br /><span class="enriched-meta">Light isometrics before main sets</span>
+                <span class="row-handle" aria-hidden="true">☰</span>
+                <a href="step-list.html">Warm-up block</a>
               </td>
-              <td style="text-align: center">—</td>
-              <td style="text-align: center"><span class="enriched-meta">2 / 8</span></td>
-              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+              <td style="text-align: center">--</td>
+              <td style="text-align: center">2 / 8</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋮</button></td>
             </tr>
             <tr>
               <td>
-                <a href="step-list.html"><strong>Main isokinetic</strong></a>
-                <br /><span class="enriched-meta">Eight directions</span>
+                <span class="row-handle" aria-hidden="true">○</span>
+                <a href="step-list.html">Main isokinetic</a>
               </td>
               <td style="text-align: center">Nov 7, 2026</td>
-              <td style="text-align: center"><span class="enriched-meta">8 / 8</span></td>
-              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+              <td style="text-align: center">8 / 8</td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋮</button></td>
             </tr>
             <tr>
               <td>
-                <a href="step-list.html"><strong>Cool-down</strong></a>
-                <br /><span class="enriched-meta">Not started</span>
+                <span class="row-handle" aria-hidden="true">○</span>
+                <a href="step-list.html">Cool-down</a>
               </td>
-              <td style="text-align: center">—</td>
+              <td style="text-align: center">--</td>
               <td style="text-align: center">4</td>
-              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋮</button></td>
             </tr>
           </tbody>
         </table>

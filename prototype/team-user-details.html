@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/TeamUserDetailsScreen.tsx -->
+<!-- route: TeamUserDetails -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,8 +15,14 @@
         <h1>Alex Morgan's details</h1>
         <p class="enriched-meta">Operator toggles and remove user; Save in header when dirty.</p>
       </header>
-      <main class="app__content wire-center">
-        <section class="wire-card wire-form-card" style="max-width: 420px; width: 100%" aria-label="Team user settings">
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="team-user-list.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Alex Morgan's details</p>
+          <div class="wire-toolbar__right"></div>
+        </div>
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" style="max-width: 420px; width: 100%" aria-label="Team user settings">
           <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem">
             <span
               class="proto-avatar proto-avatar--fixture"
@@ -43,6 +49,8 @@
           </div>
           <button class="wire-btn wire-btn--primary" type="button" style="margin-top: 1rem; width: 100%">Save</button>
         </section>
+        </div>
+
         <nav class="flow-nav" aria-label="Team user details flows" style="max-width: 420px; width: 100%">
           <h2>Related</h2>
           <ul>

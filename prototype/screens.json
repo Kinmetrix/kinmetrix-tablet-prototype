@@ -1,6 +1,5 @@
 {
-  "generatedAt": "2026-11-10T18:20:26.735Z",
-  "kinmetrixAppRoot": "/Users/angelescott/Desktop/Kinmetrix/kinmetrix-clients/apps/KinmetrixApp",
+  "generatedAt": "2026-11-11T01:30:56.793Z",
   "screens": [
     {
       "route": "DeviceCalibration",
@@ -8,8 +7,7 @@
       "slug": "device-calibration",
       "html": "device-calibration.html",
       "title": "Device Calibration",
-      "links": [],
-      "sourceFile": "src/screens/DeviceCalibrationScreen.tsx"
+      "links": []
     },
     {
       "route": "DeviceControlScreen",
@@ -17,8 +15,7 @@
       "slug": "device-control",
       "html": "device-control.html",
       "title": "Device Control",
-      "links": [],
-      "sourceFile": "src/screens/DeviceControlScreen.tsx"
+      "links": []
     },
     {
       "route": "DeviceList",
@@ -26,8 +23,7 @@
       "slug": "device-list",
       "html": "device-list.html",
       "title": "Device List",
-      "links": [],
-      "sourceFile": "src/screens/DeviceListScreen.tsx"
+      "links": []
     },
     {
       "route": "DeviceModify",
@@ -35,8 +31,7 @@
       "slug": "device-modify",
       "html": "device-modify.html",
       "title": "Device Modify",
-      "links": [],
-      "sourceFile": "src/screens/DeviceModifyScreen.tsx"
+      "links": []
     },
     {
       "route": "Feedback",
@@ -44,8 +39,7 @@
       "slug": "feedback",
       "html": "feedback.html",
       "title": "Feedback",
-      "links": [],
-      "sourceFile": "src/features/feedback/FeedbackScreen.tsx"
+      "links": []
     },
     {
       "route": "Loading",
@@ -53,8 +47,7 @@
       "slug": "loading",
       "html": "loading.html",
       "title": "Loading",
-      "links": [],
-      "sourceFile": "src/screens/LoadingScreen.tsx"
+      "links": []
     },
     {
       "route": "Login",
@@ -62,8 +55,7 @@
       "slug": "login",
       "html": "login.html",
       "title": "Login",
-      "links": [],
-      "sourceFile": "src/features/auth/LoginScreen.tsx"
+      "links": []
     },
     {
       "route": "PasswordLogin",
@@ -71,8 +63,7 @@
       "slug": "password-login",
       "html": "password-login.html",
       "title": "Password Login",
-      "links": [],
-      "sourceFile": "src/features/auth/PasswordLoginScreen.tsx"
+      "links": []
     },
     {
       "route": "PasswordReset",
@@ -80,8 +71,7 @@
       "slug": "password-reset",
       "html": "password-reset.html",
       "title": "Password Reset",
-      "links": [],
-      "sourceFile": "src/features/auth/PasswordResetScreen.tsx"
+      "links": []
     },
     {
       "route": "Sandbox",
@@ -89,8 +79,7 @@
       "slug": "sandbox",
       "html": "sandbox.html",
       "title": "Sandbox",
-      "links": [],
-      "sourceFile": "src/screens/SandboxScreen.tsx"
+      "links": []
     },
     {
       "route": "SetPassword",
@@ -98,8 +87,7 @@
       "slug": "set-password",
       "html": "set-password.html",
       "title": "Set Password",
-      "links": [],
-      "sourceFile": "src/features/auth/SetPasswordScreen.tsx"
+      "links": []
     },
     {
       "route": "Settings",
@@ -107,8 +95,7 @@
       "slug": "settings",
       "html": "settings.html",
       "title": "Settings",
-      "links": [],
-      "sourceFile": "src/screens/SettingsScreen.tsx"
+      "links": []
     },
     {
       "route": "TeamView",
@@ -118,8 +105,7 @@
       "title": "Team View",
       "links": [
         "team-home.html"
-      ],
-      "sourceFile": "src/navigation/TeamNavigator.tsx"
+      ]
     },
     {
       "route": "UserView",
@@ -129,8 +115,7 @@
       "title": "User View",
       "links": [
         "home.html"
-      ],
-      "sourceFile": "src/navigation/UserNavigator.tsx"
+      ]
     },
     {
       "route": "OnboardingCompetitionLevel",
@@ -138,8 +123,7 @@
       "slug": "onboarding-competition-level",
       "html": "onboarding-competition-level.html",
       "title": "Onboarding Competition Level",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/CompetitionLevelScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingCurrentTeam",
@@ -147,8 +131,7 @@
       "slug": "onboarding-current-team",
       "html": "onboarding-current-team.html",
       "title": "Onboarding Current Team",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/CurrentTeamScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingDateOfBirth",
@@ -156,8 +139,7 @@
       "slug": "onboarding-date-of-birth",
       "html": "onboarding-date-of-birth.html",
       "title": "Onboarding Date Of Birth",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/DateOfBirthScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingEmail",
@@ -165,8 +147,7 @@
       "slug": "onboarding-email",
       "html": "onboarding-email.html",
       "title": "Onboarding Email",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/EmailScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingHand",
@@ -174,8 +155,7 @@
       "slug": "onboarding-hand",
       "html": "onboarding-hand.html",
       "title": "Onboarding Hand",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/HandScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingHeight",
@@ -183,8 +163,7 @@
       "slug": "onboarding-height",
       "html": "onboarding-height.html",
       "title": "Onboarding Height",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/HeightScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingName",
@@ -192,8 +171,7 @@
       "slug": "onboarding-name",
       "html": "onboarding-name.html",
       "title": "Onboarding Name",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/NameScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingOnboardingConfirmation",
@@ -201,8 +179,7 @@
       "slug": "onboarding-onboarding-confirmation",
       "html": "onboarding-onboarding-confirmation.html",
       "title": "Onboarding Onboarding Confirmation",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/OnboardingConfirmationScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingPosition",
@@ -210,8 +187,7 @@
       "slug": "onboarding-position",
       "html": "onboarding-position.html",
       "title": "Onboarding Position",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/PositionScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingSport",
@@ -219,8 +195,7 @@
       "slug": "onboarding-sport",
       "html": "onboarding-sport.html",
       "title": "Onboarding Sport",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/SportScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingWeight",
@@ -228,8 +203,7 @@
       "slug": "onboarding-weight",
       "html": "onboarding-weight.html",
       "title": "Onboarding Weight",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/WeightScreen.tsx"
+      "links": []
     },
     {
       "route": "AddSessionToCompare",
@@ -237,8 +211,7 @@
       "slug": "add-session-to-compare",
       "html": "add-session-to-compare.html",
       "title": "Add Session To Compare",
-      "links": [],
-      "sourceFile": "src/screens/AddSessionToCompareScreen.tsx"
+      "links": []
     },
     {
       "route": "CompareTeamUserSessions",
@@ -246,8 +219,7 @@
       "slug": "compare-team-user-sessions",
       "html": "compare-team-user-sessions.html",
       "title": "Compare Team User Sessions",
-      "links": [],
-      "sourceFile": "src/screens/CompareTeamUserSessionsScreen.tsx"
+      "links": []
     },
     {
       "route": "CompareTeamUserSessionsDetail",
@@ -255,8 +227,7 @@
       "slug": "compare-team-user-sessions-detail",
       "html": "compare-team-user-sessions-detail.html",
       "title": "Compare Team User Sessions Detail",
-      "links": [],
-      "sourceFile": "src/screens/CompareTeamUserSessionsDetailScreen.tsx"
+      "links": []
     },
     {
       "route": "Onboarding",
@@ -264,8 +235,7 @@
       "slug": "onboarding",
       "html": "onboarding.html",
       "title": "Onboarding",
-      "links": [],
-      "sourceFile": "src/screens/onboarding/OnboardingScreen.tsx"
+      "links": []
     },
     {
       "route": "SelectUserSession",
@@ -273,8 +243,7 @@
       "slug": "select-user-session",
       "html": "select-user-session.html",
       "title": "Select User Session",
-      "links": [],
-      "sourceFile": "src/screens/SelectUserSessionScreen.tsx"
+      "links": []
     },
     {
       "route": "TeamHome",
@@ -284,8 +253,7 @@
       "title": "Team Home",
       "links": [
         "home.html"
-      ],
-      "sourceFile": "src/screens/TeamMembersScreen.tsx"
+      ]
     },
     {
       "route": "TeamList",
@@ -293,8 +261,7 @@
       "slug": "team-list",
       "html": "team-list.html",
       "title": "Team List",
-      "links": [],
-      "sourceFile": "src/screens/UserTeamListScreen.tsx"
+      "links": []
     },
     {
       "route": "TeamSettings",
@@ -304,8 +271,7 @@
       "title": "Team Settings",
       "links": [
         "team-settings-home.html"
-      ],
-      "sourceFile": "src/screens/TeamSettingsScreen.tsx"
+      ]
     },
     {
       "route": "TeamUser",
@@ -315,8 +281,7 @@
       "title": "Team User",
       "links": [
         "home.html"
-      ],
-      "sourceFile": "src/screens/TeamUserNavigatorScreen.tsx"
+      ]
     },
     {
       "route": "UserAnalysisDetails",
@@ -324,8 +289,7 @@
       "slug": "user-analysis-details",
       "html": "user-analysis-details.html",
       "title": "User Analysis Details",
-      "links": [],
-      "sourceFile": "src/screens/UserAnalysisDetailsScreen.tsx"
+      "links": []
     },
     {
       "route": "AddGroupTemplate",
@@ -333,8 +297,7 @@
       "slug": "add-group-template",
       "html": "add-group-template.html",
       "title": "Add Group Template",
-      "links": [],
-      "sourceFile": "src/screens/AddGroupTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "AddProgramTemplate",
@@ -342,8 +305,7 @@
       "slug": "add-program-template",
       "html": "add-program-template.html",
       "title": "Add Program Template",
-      "links": [],
-      "sourceFile": "src/screens/AddProgramTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "AddStepTemplate",
@@ -351,8 +313,7 @@
       "slug": "add-step-template",
       "html": "add-step-template.html",
       "title": "Add Step Template",
-      "links": [],
-      "sourceFile": "src/screens/AddStepTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "AddTeamUser",
@@ -360,8 +321,7 @@
       "slug": "add-team-user",
       "html": "add-team-user.html",
       "title": "Add Team User",
-      "links": [],
-      "sourceFile": "src/screens/AddTeamUserScreen.tsx"
+      "links": []
     },
     {
       "route": "ColumnManagement",
@@ -369,8 +329,7 @@
       "slug": "column-management",
       "html": "column-management.html",
       "title": "Column Management",
-      "links": [],
-      "sourceFile": "src/screens/ColumnManagementScreen.tsx"
+      "links": []
     },
     {
       "route": "CreateTeamSessionTemplate",
@@ -378,8 +337,7 @@
       "slug": "create-team-session-template",
       "html": "create-team-session-template.html",
       "title": "Create Team Session Template",
-      "links": [],
-      "sourceFile": "src/screens/CreateTeamSessionTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "EditGroupTemplate",
@@ -387,8 +345,7 @@
       "slug": "edit-group-template",
       "html": "edit-group-template.html",
       "title": "Edit Group Template",
-      "links": [],
-      "sourceFile": "src/screens/EditGroupTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "EditProgramTemplate",
@@ -396,8 +353,7 @@
       "slug": "edit-program-template",
       "html": "edit-program-template.html",
       "title": "Edit Program Template",
-      "links": [],
-      "sourceFile": "src/screens/EditProgramTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "EditStepTemplate",
@@ -405,8 +361,7 @@
       "slug": "edit-step-template",
       "html": "edit-step-template.html",
       "title": "Edit Step Template",
-      "links": [],
-      "sourceFile": "src/screens/EditStepTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "EditTeamProtocolSession",
@@ -414,8 +369,7 @@
       "slug": "edit-team-protocol-session",
       "html": "edit-team-protocol-session.html",
       "title": "Edit Team Protocol Session",
-      "links": [],
-      "sourceFile": "src/screens/EditTeamProtocolSessionScreen.tsx"
+      "links": []
     },
     {
       "route": "EditTeamSessionTemplate",
@@ -423,8 +377,7 @@
       "slug": "edit-team-session-template",
       "html": "edit-team-session-template.html",
       "title": "Edit Team Session Template",
-      "links": [],
-      "sourceFile": "src/screens/EditTeamSessionTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "GroupTemplateList",
@@ -432,8 +385,7 @@
       "slug": "group-template-list",
       "html": "group-template-list.html",
       "title": "Group Template List",
-      "links": [],
-      "sourceFile": "src/screens/GroupTemplateListScreen.tsx"
+      "links": []
     },
     {
       "route": "OnboardingPreference",
@@ -441,8 +393,7 @@
       "slug": "onboarding-preference",
       "html": "onboarding-preference.html",
       "title": "Onboarding Preference",
-      "links": [],
-      "sourceFile": "src/screens/OnboardingPreferenceScreen.tsx"
+      "links": []
     },
     {
       "route": "ProgramTemplateList",
@@ -450,8 +401,7 @@
       "slug": "program-template-list",
       "html": "program-template-list.html",
       "title": "Program Template List",
-      "links": [],
-      "sourceFile": "src/screens/ProgramTemplateListScreen.tsx"
+      "links": []
     },
     {
       "route": "StepTemplateList",
@@ -459,8 +409,7 @@
       "slug": "step-template-list",
       "html": "step-template-list.html",
       "title": "Step Template List",
-      "links": [],
-      "sourceFile": "src/screens/StepTemplateListScreen.tsx"
+      "links": []
     },
     {
       "route": "TeamSessionTemplateList",
@@ -468,8 +417,7 @@
       "slug": "team-session-template-list",
       "html": "team-session-template-list.html",
       "title": "Team Session Template List",
-      "links": [],
-      "sourceFile": "src/screens/TeamSessionTemplateListScreen.tsx"
+      "links": []
     },
     {
       "route": "TeamSessionTemplateStepsList",
@@ -477,8 +425,7 @@
       "slug": "team-session-template-steps-list",
       "html": "team-session-template-steps-list.html",
       "title": "Team Session Template Steps List",
-      "links": [],
-      "sourceFile": "src/screens/TeamSessionTemplateStepsListScreen.tsx"
+      "links": []
     },
     {
       "route": "TeamSettingsHome",
@@ -486,8 +433,7 @@
       "slug": "team-settings-home",
       "html": "team-settings-home.html",
       "title": "Team Settings Home",
-      "links": [],
-      "sourceFile": "src/screens/TeamSettingsScreen.tsx"
+      "links": []
     },
     {
       "route": "TeamUserDetails",
@@ -495,8 +441,7 @@
       "slug": "team-user-details",
       "html": "team-user-details.html",
       "title": "Team User Details",
-      "links": [],
-      "sourceFile": "src/screens/TeamUserDetailsScreen.tsx"
+      "links": []
     },
     {
       "route": "TeamUserList",
@@ -504,8 +449,7 @@
       "slug": "team-user-list",
       "html": "team-user-list.html",
       "title": "Team User List",
-      "links": [],
-      "sourceFile": "src/screens/TeamUserListScreen.tsx"
+      "links": []
     },
     {
       "route": "AddGroup",
@@ -513,8 +457,7 @@
       "slug": "add-group",
       "html": "add-group.html",
       "title": "Add Group",
-      "links": [],
-      "sourceFile": "src/screens/AddGroupScreen.tsx"
+      "links": []
     },
     {
       "route": "AddProgram",
@@ -522,8 +465,7 @@
       "slug": "add-program",
       "html": "add-program.html",
       "title": "Add Program",
-      "links": [],
-      "sourceFile": "src/screens/AddProgramScreen.tsx"
+      "links": []
     },
     {
       "route": "AddStep",
@@ -531,8 +473,7 @@
       "slug": "add-step",
       "html": "add-step.html",
       "title": "Add Step",
-      "links": [],
-      "sourceFile": "src/screens/AddStepScreen.tsx"
+      "links": []
     },
     {
       "route": "Assessment",
@@ -540,8 +481,7 @@
       "slug": "assessment",
       "html": "assessment.html",
       "title": "Assessment",
-      "links": [],
-      "sourceFile": "src/screens/AssessmentScreen.tsx"
+      "links": []
     },
     {
       "route": "AssessmentSessionHistory",
@@ -549,8 +489,7 @@
       "slug": "assessment-session-history",
       "html": "assessment-session-history.html",
       "title": "Assessment Session History",
-      "links": [],
-      "sourceFile": "src/screens/AssessmentSessionHistoryScreen.tsx"
+      "links": []
     },
     {
       "route": "CompareSession",
@@ -558,8 +497,7 @@
       "slug": "compare-session",
       "html": "compare-session.html",
       "title": "Compare Session",
-      "links": [],
-      "sourceFile": "src/screens/CompareSessionScreen.tsx"
+      "links": []
     },
     {
       "route": "CreateProgramChoice",
@@ -567,8 +505,7 @@
       "slug": "create-program-choice",
       "html": "create-program-choice.html",
       "title": "Create Program Choice",
-      "links": [],
-      "sourceFile": "src/screens/CreateProgramChoiceScreen.tsx"
+      "links": []
     },
     {
       "route": "CreateProtocolSession",
@@ -576,8 +513,7 @@
       "slug": "create-protocol-session",
       "html": "create-protocol-session.html",
       "title": "Create Protocol Session",
-      "links": [],
-      "sourceFile": "src/screens/CreateProtocolSessionScreen.tsx"
+      "links": []
     },
     {
       "route": "DeviceControl",
@@ -585,8 +521,7 @@
       "slug": "device-control",
       "html": "device-control.html",
       "title": "Device Control",
-      "links": [],
-      "sourceFile": "src/screens/DeviceControlScreen.tsx"
+      "links": []
     },
     {
       "route": "EditGroup",
@@ -594,8 +529,7 @@
       "slug": "edit-group",
       "html": "edit-group.html",
       "title": "Edit Group",
-      "links": [],
-      "sourceFile": "src/screens/EditGroupScreen.tsx"
+      "links": []
     },
     {
       "route": "EditProgram",
@@ -603,8 +537,7 @@
       "slug": "edit-program",
       "html": "edit-program.html",
       "title": "Edit Program",
-      "links": [],
-      "sourceFile": "src/screens/EditProgramScreen.tsx"
+      "links": []
     },
     {
       "route": "EditProtocolSession",
@@ -612,8 +545,7 @@
       "slug": "edit-protocol-session",
       "html": "edit-protocol-session.html",
       "title": "Edit Protocol Session",
-      "links": [],
-      "sourceFile": "src/screens/EditProtocolSessionScreen.tsx"
+      "links": []
     },
     {
       "route": "Exercise",
@@ -621,8 +553,7 @@
       "slug": "exercise",
       "html": "exercise.html",
       "title": "Exercise",
-      "links": [],
-      "sourceFile": "src/screens/ExerciseScreen.tsx"
+      "links": []
     },
     {
       "route": "GroupData",
@@ -630,8 +561,7 @@
       "slug": "group-data",
       "html": "group-data.html",
       "title": "Group Data",
-      "links": [],
-      "sourceFile": "src/screens/GroupDataScreen.tsx"
+      "links": []
     },
     {
       "route": "GroupList",
@@ -639,8 +569,7 @@
       "slug": "group-list",
       "html": "group-list.html",
       "title": "Group List",
-      "links": [],
-      "sourceFile": "src/screens/GroupListScreen.tsx"
+      "links": []
     },
     {
       "route": "GroupResults",
@@ -648,8 +577,7 @@
       "slug": "group-results",
       "html": "group-results.html",
       "title": "Group Results",
-      "links": [],
-      "sourceFile": "src/screens/GroupResultsScreen.tsx"
+      "links": []
     },
     {
       "route": "Historical",
@@ -657,8 +585,7 @@
       "slug": "historical",
       "html": "historical.html",
       "title": "Historical",
-      "links": [],
-      "sourceFile": "src/screens/HistoricalScreen.tsx"
+      "links": []
     },
     {
       "route": "Home",
@@ -670,8 +597,7 @@
         "home-start.html",
         "program-list.html",
         "device-control.html"
-      ],
-      "sourceFile": "src/screens/home/HomeScreen.tsx"
+      ]
     },
     {
       "route": "HomeStart",
@@ -683,8 +609,7 @@
         "assessment.html",
         "warmup-type.html",
         "program-list.html"
-      ],
-      "sourceFile": "src/screens/home/HomeStartScreen.tsx"
+      ]
     },
     {
       "route": "NotesList",
@@ -692,8 +617,7 @@
       "slug": "notes-list",
       "html": "notes-list.html",
       "title": "Notes List",
-      "links": [],
-      "sourceFile": "src/screens/NotesListScreen.tsx"
+      "links": []
     },
     {
       "route": "ProgramList",
@@ -701,8 +625,7 @@
       "slug": "program-list",
       "html": "program-list.html",
       "title": "Program List",
-      "links": [],
-      "sourceFile": "src/screens/ProgramListScreen.tsx"
+      "links": []
     },
     {
       "route": "ProtocolPreview",
@@ -710,8 +633,7 @@
       "slug": "protocol-preview",
       "html": "protocol-preview.html",
       "title": "Protocol Preview",
-      "links": [],
-      "sourceFile": "src/screens/ProtocolPreviewScreen.tsx"
+      "links": []
     },
     {
       "route": "RecentData",
@@ -719,8 +641,7 @@
       "slug": "recent-data",
       "html": "recent-data.html",
       "title": "Recent Data",
-      "links": [],
-      "sourceFile": "src/screens/RecentDataScreen.tsx"
+      "links": []
     },
     {
       "route": "RunGroup",
@@ -728,8 +649,7 @@
       "slug": "run-group",
       "html": "run-group.html",
       "title": "Run Group",
-      "links": [],
-      "sourceFile": "src/screens/RunGroupScreen.tsx"
+      "links": []
     },
     {
       "route": "SelectProgramTemplate",
@@ -737,8 +657,7 @@
       "slug": "select-program-template",
       "html": "select-program-template.html",
       "title": "Select Program Template",
-      "links": [],
-      "sourceFile": "src/screens/SelectProgramTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "SelectTemplate",
@@ -746,8 +665,7 @@
       "slug": "select-template",
       "html": "select-template.html",
       "title": "Select Template",
-      "links": [],
-      "sourceFile": "src/screens/SelectTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "SessionData",
@@ -755,8 +673,7 @@
       "slug": "session-data",
       "html": "session-data.html",
       "title": "Session Data",
-      "links": [],
-      "sourceFile": "src/features/session-details/screens/SessionDataScreen.tsx"
+      "links": []
     },
     {
       "route": "SessionHistory",
@@ -764,8 +681,7 @@
       "slug": "session-history",
       "html": "session-history.html",
       "title": "Session History",
-      "links": [],
-      "sourceFile": "src/screens/SessionHistoryScreen.tsx"
+      "links": []
     },
     {
       "route": "SignWaiver",
@@ -773,8 +689,7 @@
       "slug": "sign-waiver",
       "html": "sign-waiver.html",
       "title": "Sign Waiver",
-      "links": [],
-      "sourceFile": "src/screens/SignWaiverScreen.tsx"
+      "links": []
     },
     {
       "route": "StepDetails",
@@ -782,8 +697,7 @@
       "slug": "step-details",
       "html": "step-details.html",
       "title": "Step Details",
-      "links": [],
-      "sourceFile": "src/features/session-details/screens/StepDetailsScreen.tsx"
+      "links": []
     },
     {
       "route": "StepList",
@@ -791,8 +705,7 @@
       "slug": "step-list",
       "html": "step-list.html",
       "title": "Step List",
-      "links": [],
-      "sourceFile": "src/screens/StepListScreen.tsx"
+      "links": []
     },
     {
       "route": "StepResult",
@@ -800,8 +713,7 @@
       "slug": "step-result",
       "html": "step-result.html",
       "title": "Step Result",
-      "links": [],
-      "sourceFile": "src/screens/StepResultScreen.tsx"
+      "links": []
     },
     {
       "route": "UseProgramTemplate",
@@ -809,8 +721,7 @@
       "slug": "use-program-template",
       "html": "use-program-template.html",
       "title": "Use Program Template",
-      "links": [],
-      "sourceFile": "src/screens/UseProgramTemplateScreen.tsx"
+      "links": []
     },
     {
       "route": "UserProfile",
@@ -818,8 +729,7 @@
       "slug": "user-profile",
       "html": "user-profile.html",
       "title": "User Profile",
-      "links": [],
-      "sourceFile": "src/screens/UserProfileScreen.tsx"
+      "links": []
     },
     {
       "route": "UserTeamList",
@@ -827,8 +737,7 @@
       "slug": "user-team-list",
       "html": "user-team-list.html",
       "title": "User Team List",
-      "links": [],
-      "sourceFile": "src/screens/UserTeamListScreen.tsx"
+      "links": []
     },
     {
       "route": "Warmup",
@@ -836,8 +745,7 @@
       "slug": "warmup",
       "html": "warmup.html",
       "title": "Warmup",
-      "links": [],
-      "sourceFile": "src/screens/WarmupScreen.tsx"
+      "links": []
     },
     {
       "route": "WarmupType",
@@ -845,8 +753,9 @@
       "slug": "warmup-type",
       "html": "warmup-type.html",
       "title": "Warmup Type",
-      "links": [],
-      "sourceFile": "src/screens/WarmupTypeScreen.tsx"
+      "links": []
     }
-  ]
+  ],
+  "frozen": true,
+  "note": "In-repo source of truth. Edit this file to add/rename routes; do not regenerate from an external app."
 }

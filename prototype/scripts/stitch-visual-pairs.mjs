@@ -11,7 +11,12 @@ const prototypeRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)),
 const rnDir = path.join(prototypeRoot, 'visual-compare', 'rn');
 const htmlDir = path.join(prototypeRoot, 'visual-compare', 'html');
 const pairsDir = path.join(prototypeRoot, 'visual-compare', 'pairs');
-const { height: TARGET_HEIGHT } = loadTabletViewport();
+const device = JSON.parse(
+  fs.readFileSync(path.join(prototypeRoot, 'visual-compare', 'device.json'), 'utf8')
+);
+const TILE_W = Number(device.pixelWidth) || loadTabletViewport().width * 2;
+const TILE_H = Number(device.pixelHeight) || loadTabletViewport().height * 2;
+const GAP = 4;
 
 const screens = loadMirrorScreens(prototypeRoot);
 
@@ -21,6 +26,18 @@ const seenSlug = new Set();
 let stitched = 0;
 let missingRn = [];
 let missingHtml = [];
+
+async function toTile(inputPath, background) {
+  return sharp(inputPath)
+    .resize({
+      width: TILE_W,
+      height: TILE_H,
+      fit: 'contain',
+      background,
+    })
+    .png()
+    .toBuffer();
+}
 
 for (const screen of screens) {
   if (seenSlug.has(screen.slug)) continue;
@@ -38,27 +55,22 @@ for (const screen of screens) {
     continue;
   }
 
-  const rn = sharp(rnPath);
-  const html = sharp(htmlPath);
-  const [rnMeta, htmlMeta] = await Promise.all([rn.metadata(), html.metadata()]);
-  const height = Math.max(rnMeta.height || 0, htmlMeta.height || 0, TARGET_HEIGHT);
-
-  const rnBuf = await rn.resize({ height, fit: 'contain', background: '#111' }).png().toBuffer();
-  const htmlBuf = await html.resize({ height, fit: 'contain', background: '#e8e8ed' }).png().toBuffer();
-  const rnW = (await sharp(rnBuf).metadata()).width;
-  const htmlW = (await sharp(htmlBuf).metadata()).width;
+  const [rnBuf, htmlBuf] = await Promise.all([
+    toTile(rnPath, '#111'),
+    toTile(htmlPath, '#e8e8ed'),
+  ]);
 
   const composite = await sharp({
     create: {
-      width: rnW + htmlW + 4,
-      height,
+      width: TILE_W * 2 + GAP,
+      height: TILE_H,
       channels: 3,
       background: '#333',
     },
   })
     .composite([
       { input: rnBuf, left: 0, top: 0 },
-      { input: htmlBuf, left: rnW + 4, top: 0 },
+      { input: htmlBuf, left: TILE_W + GAP, top: 0 },
     ])
     .png()
     .toBuffer();
@@ -67,6 +79,6 @@ for (const screen of screens) {
   stitched += 1;
 }
 
-console.log(`Stitched ${stitched} pairs to ${pairsDir}`);
+console.log(`Stitched ${stitched} pairs (${TILE_W}×${TILE_H} tiles) to ${pairsDir}`);
 if (missingRn.length) console.log(`Missing RN (${missingRn.length}):`, missingRn.slice(0, 8).join(', '), missingRn.length > 8 ? '…' : '');
 if (missingHtml.length) console.log(`Missing HTML (${missingHtml.length}):`, missingHtml.slice(0, 8).join(', '), missingHtml.length > 8 ? '…' : '');

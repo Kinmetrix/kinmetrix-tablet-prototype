@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/TeamUserListScreen.tsx -->
+<!-- route: TeamUserList -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -17,14 +17,9 @@
       </header>
       <main class="app__content wire-stack">
         <div class="wire-toolbar">
-          <input
-            type="search"
-            placeholder="Search members…"
-            style="flex: 2; font: inherit; padding: 0.35rem 0.5rem; border: 1px solid #999; border-radius: 4px"
-            aria-label="Search users"
-          />
-          <a class="wire-btn" href="column-management.html">Edit columns</a>
-          <a class="wire-btn wire-btn--primary" href="onboarding.html">New user</a>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="team-settings-home.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Manage users</p>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--ghost" href="column-management.html">Edit columns</a></div>
         </div>
         <table class="wire-table" aria-label="Team members">
           <thead>

@@ -2,14 +2,9 @@
 
 | Path | Use |
 | --- | --- |
-| `kinmetrix-logo.svg` | Mark (from KinmetrixApp `src/res`) |
+| `kinmetrix-logo.svg` | Mark |
 | `kinmetrix-logo-full.png` | Full wordmark on login and marketing surfaces |
 | `default-profile.svg` | Default profile photo when no user image |
 | `charts/*.svg` | Placeholder charts mounted via `[data-chart]` in `shared.js` |
 
-Copy logos again after KinmetrixApp rebrand:
-
-```bash
-cp ../kinmetrix-clients/apps/KinmetrixApp/src/res/kinmetrix-logo*.png assets/
-cp ../kinmetrix-clients/apps/KinmetrixApp/src/res/kinmetrix-logo.svg assets/
-```
+Brand art is vendored in this folder. Replace files here when the product mark changes; do not pull from an external app checkout.

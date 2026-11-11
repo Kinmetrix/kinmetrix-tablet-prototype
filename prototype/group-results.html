@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- source: src/screens/GroupResultsScreen.tsx -->
+<!-- route: GroupResults -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Warm-up block results · Kinmetrix prototype</title>
+    <title>Real group Results · Kinmetrix prototype</title>
     <link rel="stylesheet" href="kin-prototype.css" />
   </head>
   <body data-route="GroupResults" data-enriched="true">
@@ -12,49 +12,141 @@
       <header class="screen-header">
         <a class="back-link" href="step-list.html">Back</a>
         <p class="route-chip">GroupResults <span class="stack-tag">user</span></p>
-        <h1>Warm-up block results</h1>
+        <h1>Real group Results</h1>
         <p class="enriched-meta">
-          UserAnalysisDetailsView. Params: group or assessmentBatchId. Row press → SessionData. Empty state when no
-          analysis.
+          UserAnalysisDetailsView. Params: group or assessmentBatchId. Row press opens SessionData.
         </p>
       </header>
-      <main class="app__content wire-stack">
+      <main class="app__content">
         <div class="wire-toolbar">
-          <span></span>
-          <p class="wire-toolbar__title">Nov 8, 2026</p>
-          <span class="enriched-meta">Warm-up block</span>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="step-list.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Real group Results</p>
+          <div class="wire-toolbar__right"></div>
         </div>
-        <table class="wire-table" aria-label="Analysis by direction">
-          <thead>
-            <tr>
-              <th>Direction</th>
-              <th style="text-align: center">Peak force</th>
-              <th style="text-align: center">Stability</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><a href="session-data.html">0°</a></td>
-              <td style="text-align: center">38 N</td>
-              <td style="text-align: center">92%</td>
-            </tr>
-            <tr>
-              <td><a href="session-data.html">45°</a></td>
-              <td style="text-align: center">41 N</td>
-              <td style="text-align: center">89%</td>
-            </tr>
-            <tr>
-              <td><a href="session-data.html">90°</a></td>
-              <td style="text-align: center">36 N</td>
-              <td style="text-align: center">91%</td>
-            </tr>
-            <tr>
-              <td><a href="session-data.html">135°</a></td>
-              <td style="text-align: center">40 N</td>
-              <td style="text-align: center">88%</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="results-split" aria-label="Group analysis">
+          <section class="results-panel">
+            <div class="results-panel__head">
+              <div>
+                <h2 class="results-panel__title">April 14, 2026</h2>
+                <p class="results-panel__subtitle">Real group</p>
+              </div>
+              <div class="results-panel__actions">
+                <button class="wire-btn wire-btn--ghost" type="button">+ Add Note</button>
+                <button class="wire-btn wire-btn--ghost" type="button" aria-label="Download">↓</button>
+                <button class="wire-btn wire-btn--ghost" type="button" aria-label="More">⋮</button>
+              </div>
+            </div>
+            <div class="results-metrics">
+              <div>
+                <p class="results-metric__label">Avg Peak Force</p>
+                <p class="results-metric__value">5.6 KG</p>
+              </div>
+              <div>
+                <p class="results-metric__label">Stability</p>
+                <p class="results-metric__value">88%</p>
+              </div>
+            </div>
+            <table class="wire-table" aria-label="Analysis by direction">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Position</th>
+                  <th style="text-align: center">Avg Peak Force</th>
+                  <th style="text-align: center">Stability</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="session-data.html">Forward Flexion</a></td>
+                  <td>
+                    <span class="rep-list__swatch" style="background: #c62828; border-radius: 50%; display: inline-block; vertical-align: middle"></span>
+                    0°
+                  </td>
+                  <td style="text-align: center">4.58 KG</td>
+                  <td style="text-align: center">85%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Right Flexion</a></td>
+                  <td>
+                    <span class="rep-list__swatch" style="background: #c62828; border-radius: 50%; display: inline-block; vertical-align: middle"></span>
+                    90°
+                  </td>
+                  <td style="text-align: center">5.25 KG</td>
+                  <td style="text-align: center">85%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Rear Extension</a></td>
+                  <td>
+                    <span class="rep-list__swatch" style="background: #c62828; border-radius: 50%; display: inline-block; vertical-align: middle"></span>
+                    180°
+                  </td>
+                  <td style="text-align: center">7.27 KG</td>
+                  <td style="text-align: center">90%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Left Flexion</a></td>
+                  <td>
+                    <span class="rep-list__swatch" style="background: #c62828; border-radius: 50%; display: inline-block; vertical-align: middle"></span>
+                    270°
+                  </td>
+                  <td style="text-align: center">5.35 KG</td>
+                  <td style="text-align: center">90%</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="results-hint">Tap a row to view repetition data for that direction</p>
+          </section>
+          <section class="results-panel" aria-label="Radial chart and symmetry">
+            <p class="results-hint" style="margin-top: 0">Tap or drag chart to interact</p>
+            <button
+              class="wire-btn wire-btn--ghost"
+              type="button"
+              aria-label="Flip chart 180 degrees"
+              style="float: right"
+            >
+              ↻
+            </button>
+            <div
+              class="proto-chart"
+              data-chart="radial-body"
+              data-chart-label="Real group directional force"
+              style="clear: both"
+            ></div>
+            <div class="metric-pills" style="justify-content: center">
+              <button class="metric-pill" type="button">
+                <span class="rep-list__swatch" style="background: #7b5ea7; display: inline-block; vertical-align: middle"></span>
+                Avg Peak Force
+              </button>
+              <button class="metric-pill" type="button">
+                <span class="rep-list__swatch" style="background: #ddd; display: inline-block; vertical-align: middle"></span>
+                Stability
+              </button>
+            </div>
+            <div class="results-panel" aria-label="Symmetry">
+              <div class="results-panel__head">
+                <h2 class="results-panel__title" style="font-size: 0.95rem">Symmetry</h2>
+                <p class="session-card__meta">Score: 1 / 2</p>
+              </div>
+              <div class="rep-list">
+                <div class="rep-list__item">
+                  <span class="rep-list__swatch" style="background: #c62828; border-radius: 50%"></span>
+                  <span style="flex: 1">Flexion ⇄ Extension 0°/180°</span>
+                  <strong style="color: #c62828">63%</strong>
+                </div>
+                <div class="rep-list__item">
+                  <span class="rep-list__swatch" style="background: #2bb673; border-radius: 50%"></span>
+                  <span style="flex: 1">Left Lateral ⇄ Right Lateral 270°/90°</span>
+                  <strong style="color: #2bb673">98%</strong>
+                </div>
+                <div class="rep-list__item">
+                  <span class="rep-list__swatch" style="background: #2bb673; border-radius: 50%"></span>
+                  <span style="flex: 1">Front-Back ⇄ Left-Right Ratio</span>
+                  <strong>1.1:1</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
         <nav class="flow-nav" aria-label="Group results flows">
           <h2>Related</h2>
           <ul>

@@ -6,11 +6,11 @@
     <title>Kinmetrix tablet prototype</title>
     <link rel="stylesheet" href="kin-prototype.css" />
   </head>
-  <body>
-    <div class="device-frame">
+  <body data-index="true">
+    <div class="device-frame device-frame--index">
       <header class="screen-header">
         <h1>Kinmetrix HTML mirror</h1>
-        <p class="stub-note">91 screens from KinmetrixApp navigators. No login gate.</p>
+        <p class="stub-note">78 screens in this prototype. No login gate.</p>
         <p class="quick-start">
           <a href="home.html">Member home</a>
           ·
@@ -18,125 +18,3564 @@
           ·
           <a href="login.html">Login</a>
         </p>
+        <p class="enriched-meta">Hover a thumbnail to peek. Click to open full preview (Esc or X to close).</p>
       </header>
       <main class="app__content index-directory">
       <section class="stack-section">
         <h2>app</h2>
-        <ul class="screen-directory">
-          <li><a href="device-calibration.html"><code>DeviceCalibration</code> — Device Calibration</a></li>
-          <li><a href="device-control.html"><code>DeviceControlScreen</code> — Device Control</a></li>
-          <li><a href="device-list.html"><code>DeviceList</code> — Device List</a></li>
-          <li><a href="device-modify.html"><code>DeviceModify</code> — Device Modify</a></li>
-          <li><a href="feedback.html"><code>Feedback</code> — Feedback</a></li>
-          <li><a href="loading.html"><code>Loading</code> — Loading</a></li>
-          <li><a href="login.html"><code>Login</code> — Login</a></li>
-          <li><a href="password-login.html"><code>PasswordLogin</code> — Password Login</a></li>
-          <li><a href="password-reset.html"><code>PasswordReset</code> — Password Reset</a></li>
-          <li><a href="set-password.html"><code>SetPassword</code> — Set Password</a></li>
-          <li><a href="settings.html"><code>Settings</code> — Settings</a></li>
-          <li><a href="team-view.html"><code>TeamView</code> — Team View</a></li>
-          <li><a href="user-view.html"><code>UserView</code> — User View</a></li>
-        </ul>
+        <div class="index-table-wrap">
+          <table class="index-screen-table">
+            <thead>
+              <tr>
+                <th scope="col">Screen</th>
+                <th scope="col">iOS</th>
+                <th scope="col">HTML</th>
+                <th scope="col">Pair</th>
+              </tr>
+            </thead>
+            <tbody>
+          <tr
+            data-slug="device-calibration"
+            data-title="Device Calibration"
+            data-rn="visual-compare/rn/device-calibration.png"
+            data-html-shot="visual-compare/html/device-calibration.png"
+            data-pair="visual-compare/pairs/device-calibration.png"
+          >
+            <th scope="row"><a href="device-calibration.html">Device Calibration</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/device-calibration.png"
+                data-preview-kind="iOS"
+                data-preview-slug="device-calibration"
+                aria-label="device-calibration iOS preview"
+              >
+                <img src="visual-compare/rn/device-calibration.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/device-calibration.png"
+                data-preview-kind="HTML"
+                data-preview-slug="device-calibration"
+                aria-label="device-calibration HTML preview"
+              >
+                <img src="visual-compare/html/device-calibration.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/device-calibration.png"
+                data-preview-kind="Pair"
+                data-preview-slug="device-calibration"
+                aria-label="device-calibration Pair preview"
+              >
+                <img src="visual-compare/pairs/device-calibration.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="feedback"
+            data-title="Feedback"
+            data-rn="visual-compare/rn/feedback.png"
+            data-html-shot="visual-compare/html/feedback.png"
+            data-pair="visual-compare/pairs/feedback.png"
+          >
+            <th scope="row"><a href="feedback.html">Feedback</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/feedback.png"
+                data-preview-kind="iOS"
+                data-preview-slug="feedback"
+                aria-label="feedback iOS preview"
+              >
+                <img src="visual-compare/rn/feedback.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/feedback.png"
+                data-preview-kind="HTML"
+                data-preview-slug="feedback"
+                aria-label="feedback HTML preview"
+              >
+                <img src="visual-compare/html/feedback.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/feedback.png"
+                data-preview-kind="Pair"
+                data-preview-slug="feedback"
+                aria-label="feedback Pair preview"
+              >
+                <img src="visual-compare/pairs/feedback.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="loading"
+            data-title="Loading"
+            data-rn="visual-compare/rn/loading.png"
+            data-html-shot="visual-compare/html/loading.png"
+            data-pair="visual-compare/pairs/loading.png"
+          >
+            <th scope="row"><a href="loading.html">Loading</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/loading.png"
+                data-preview-kind="iOS"
+                data-preview-slug="loading"
+                aria-label="loading iOS preview"
+              >
+                <img src="visual-compare/rn/loading.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/loading.png"
+                data-preview-kind="HTML"
+                data-preview-slug="loading"
+                aria-label="loading HTML preview"
+              >
+                <img src="visual-compare/html/loading.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/loading.png"
+                data-preview-kind="Pair"
+                data-preview-slug="loading"
+                aria-label="loading Pair preview"
+              >
+                <img src="visual-compare/pairs/loading.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="login"
+            data-title="Login"
+            data-rn="visual-compare/rn/login.png"
+            data-html-shot="visual-compare/html/login.png"
+            data-pair="visual-compare/pairs/login.png"
+          >
+            <th scope="row"><a href="login.html">Login</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/login.png"
+                data-preview-kind="iOS"
+                data-preview-slug="login"
+                aria-label="login iOS preview"
+              >
+                <img src="visual-compare/rn/login.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/login.png"
+                data-preview-kind="HTML"
+                data-preview-slug="login"
+                aria-label="login HTML preview"
+              >
+                <img src="visual-compare/html/login.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/login.png"
+                data-preview-kind="Pair"
+                data-preview-slug="login"
+                aria-label="login Pair preview"
+              >
+                <img src="visual-compare/pairs/login.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="password-login"
+            data-title="Password Login"
+            data-rn="visual-compare/rn/password-login.png"
+            data-html-shot="visual-compare/html/password-login.png"
+            data-pair="visual-compare/pairs/password-login.png"
+          >
+            <th scope="row"><a href="password-login.html">Password Login</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/password-login.png"
+                data-preview-kind="iOS"
+                data-preview-slug="password-login"
+                aria-label="password-login iOS preview"
+              >
+                <img src="visual-compare/rn/password-login.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/password-login.png"
+                data-preview-kind="HTML"
+                data-preview-slug="password-login"
+                aria-label="password-login HTML preview"
+              >
+                <img src="visual-compare/html/password-login.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/password-login.png"
+                data-preview-kind="Pair"
+                data-preview-slug="password-login"
+                aria-label="password-login Pair preview"
+              >
+                <img src="visual-compare/pairs/password-login.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="settings"
+            data-title="Settings"
+            data-rn="visual-compare/rn/settings.png"
+            data-html-shot="visual-compare/html/settings.png"
+            data-pair="visual-compare/pairs/settings.png"
+          >
+            <th scope="row"><a href="settings.html">Settings</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/settings.png"
+                data-preview-kind="iOS"
+                data-preview-slug="settings"
+                aria-label="settings iOS preview"
+              >
+                <img src="visual-compare/rn/settings.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/settings.png"
+                data-preview-kind="HTML"
+                data-preview-slug="settings"
+                aria-label="settings HTML preview"
+              >
+                <img src="visual-compare/html/settings.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/settings.png"
+                data-preview-kind="Pair"
+                data-preview-slug="settings"
+                aria-label="settings Pair preview"
+              >
+                <img src="visual-compare/pairs/settings.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
       <section class="stack-section">
         <h2>onboarding-step</h2>
-        <ul class="screen-directory">
-          <li><a href="onboarding-competition-level.html"><code>OnboardingCompetitionLevel</code> — Onboarding Competition Level</a></li>
-          <li><a href="onboarding-current-team.html"><code>OnboardingCurrentTeam</code> — Onboarding Current Team</a></li>
-          <li><a href="onboarding-date-of-birth.html"><code>OnboardingDateOfBirth</code> — Onboarding Date Of Birth</a></li>
-          <li><a href="onboarding-email.html"><code>OnboardingEmail</code> — Onboarding Email</a></li>
-          <li><a href="onboarding-hand.html"><code>OnboardingHand</code> — Onboarding Hand</a></li>
-          <li><a href="onboarding-height.html"><code>OnboardingHeight</code> — Onboarding Height</a></li>
-          <li><a href="onboarding-name.html"><code>OnboardingName</code> — Onboarding Name</a></li>
-          <li><a href="onboarding-onboarding-confirmation.html"><code>OnboardingOnboardingConfirmation</code> — Onboarding Onboarding Confirmation</a></li>
-          <li><a href="onboarding-position.html"><code>OnboardingPosition</code> — Onboarding Position</a></li>
-          <li><a href="onboarding-sport.html"><code>OnboardingSport</code> — Onboarding Sport</a></li>
-          <li><a href="onboarding-weight.html"><code>OnboardingWeight</code> — Onboarding Weight</a></li>
-        </ul>
+        <div class="index-table-wrap">
+          <table class="index-screen-table">
+            <thead>
+              <tr>
+                <th scope="col">Screen</th>
+                <th scope="col">iOS</th>
+                <th scope="col">HTML</th>
+                <th scope="col">Pair</th>
+              </tr>
+            </thead>
+            <tbody>
+          <tr
+            data-slug="onboarding-competition-level"
+            data-title="Onboarding Competition Level"
+            data-rn="visual-compare/rn/onboarding-competition-level.png"
+            data-html-shot="visual-compare/html/onboarding-competition-level.png"
+            data-pair="visual-compare/pairs/onboarding-competition-level.png"
+          >
+            <th scope="row"><a href="onboarding-competition-level.html">Onboarding Competition Level</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-competition-level.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-competition-level"
+                aria-label="onboarding-competition-level iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-competition-level.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-competition-level.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-competition-level"
+                aria-label="onboarding-competition-level HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-competition-level.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-competition-level.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-competition-level"
+                aria-label="onboarding-competition-level Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-competition-level.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-current-team"
+            data-title="Onboarding Current Team"
+            data-rn="visual-compare/rn/onboarding-current-team.png"
+            data-html-shot="visual-compare/html/onboarding-current-team.png"
+            data-pair="visual-compare/pairs/onboarding-current-team.png"
+          >
+            <th scope="row"><a href="onboarding-current-team.html">Onboarding Current Team</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-current-team.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-current-team"
+                aria-label="onboarding-current-team iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-current-team.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-current-team.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-current-team"
+                aria-label="onboarding-current-team HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-current-team.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-current-team.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-current-team"
+                aria-label="onboarding-current-team Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-current-team.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-date-of-birth"
+            data-title="Onboarding Date Of Birth"
+            data-rn="visual-compare/rn/onboarding-date-of-birth.png"
+            data-html-shot="visual-compare/html/onboarding-date-of-birth.png"
+            data-pair="visual-compare/pairs/onboarding-date-of-birth.png"
+          >
+            <th scope="row"><a href="onboarding-date-of-birth.html">Onboarding Date Of Birth</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-date-of-birth.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-date-of-birth"
+                aria-label="onboarding-date-of-birth iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-date-of-birth.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-date-of-birth.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-date-of-birth"
+                aria-label="onboarding-date-of-birth HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-date-of-birth.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-date-of-birth.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-date-of-birth"
+                aria-label="onboarding-date-of-birth Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-date-of-birth.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-email"
+            data-title="Onboarding Email"
+            data-rn="visual-compare/rn/onboarding-email.png"
+            data-html-shot="visual-compare/html/onboarding-email.png"
+            data-pair="visual-compare/pairs/onboarding-email.png"
+          >
+            <th scope="row"><a href="onboarding-email.html">Onboarding Email</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-email.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-email"
+                aria-label="onboarding-email iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-email.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-email.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-email"
+                aria-label="onboarding-email HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-email.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-email.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-email"
+                aria-label="onboarding-email Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-email.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-hand"
+            data-title="Onboarding Hand"
+            data-rn="visual-compare/rn/onboarding-hand.png"
+            data-html-shot="visual-compare/html/onboarding-hand.png"
+            data-pair="visual-compare/pairs/onboarding-hand.png"
+          >
+            <th scope="row"><a href="onboarding-hand.html">Onboarding Hand</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-hand.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-hand"
+                aria-label="onboarding-hand iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-hand.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-hand.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-hand"
+                aria-label="onboarding-hand HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-hand.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-hand.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-hand"
+                aria-label="onboarding-hand Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-hand.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-height"
+            data-title="Onboarding Height"
+            data-rn="visual-compare/rn/onboarding-height.png"
+            data-html-shot="visual-compare/html/onboarding-height.png"
+            data-pair="visual-compare/pairs/onboarding-height.png"
+          >
+            <th scope="row"><a href="onboarding-height.html">Onboarding Height</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-height.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-height"
+                aria-label="onboarding-height iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-height.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-height.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-height"
+                aria-label="onboarding-height HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-height.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-height.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-height"
+                aria-label="onboarding-height Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-height.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-name"
+            data-title="Onboarding Name"
+            data-rn="visual-compare/rn/onboarding-name.png"
+            data-html-shot="visual-compare/html/onboarding-name.png"
+            data-pair="visual-compare/pairs/onboarding-name.png"
+          >
+            <th scope="row"><a href="onboarding-name.html">Onboarding Name</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-name.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-name"
+                aria-label="onboarding-name iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-name.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-name.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-name"
+                aria-label="onboarding-name HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-name.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-name.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-name"
+                aria-label="onboarding-name Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-name.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-onboarding-confirmation"
+            data-title="Onboarding Onboarding Confirmation"
+            data-rn="visual-compare/rn/onboarding-onboarding-confirmation.png"
+            data-html-shot="visual-compare/html/onboarding-onboarding-confirmation.png"
+            data-pair="visual-compare/pairs/onboarding-onboarding-confirmation.png"
+          >
+            <th scope="row"><a href="onboarding-onboarding-confirmation.html">Onboarding Onboarding Confirmation</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-onboarding-confirmation.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-onboarding-confirmation"
+                aria-label="onboarding-onboarding-confirmation iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-onboarding-confirmation.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-onboarding-confirmation.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-onboarding-confirmation"
+                aria-label="onboarding-onboarding-confirmation HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-onboarding-confirmation.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-onboarding-confirmation.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-onboarding-confirmation"
+                aria-label="onboarding-onboarding-confirmation Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-onboarding-confirmation.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-position"
+            data-title="Onboarding Position"
+            data-rn="visual-compare/rn/onboarding-position.png"
+            data-html-shot="visual-compare/html/onboarding-position.png"
+            data-pair="visual-compare/pairs/onboarding-position.png"
+          >
+            <th scope="row"><a href="onboarding-position.html">Onboarding Position</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-position.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-position"
+                aria-label="onboarding-position iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-position.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-position.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-position"
+                aria-label="onboarding-position HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-position.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-position.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-position"
+                aria-label="onboarding-position Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-position.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-sport"
+            data-title="Onboarding Sport"
+            data-rn="visual-compare/rn/onboarding-sport.png"
+            data-html-shot="visual-compare/html/onboarding-sport.png"
+            data-pair="visual-compare/pairs/onboarding-sport.png"
+          >
+            <th scope="row"><a href="onboarding-sport.html">Onboarding Sport</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-sport.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-sport"
+                aria-label="onboarding-sport iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-sport.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-sport.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-sport"
+                aria-label="onboarding-sport HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-sport.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-sport.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-sport"
+                aria-label="onboarding-sport Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-sport.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-weight"
+            data-title="Onboarding Weight"
+            data-rn="visual-compare/rn/onboarding-weight.png"
+            data-html-shot="visual-compare/html/onboarding-weight.png"
+            data-pair="visual-compare/pairs/onboarding-weight.png"
+          >
+            <th scope="row"><a href="onboarding-weight.html">Onboarding Weight</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-weight.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-weight"
+                aria-label="onboarding-weight iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-weight.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-weight.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-weight"
+                aria-label="onboarding-weight HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-weight.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-weight.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-weight"
+                aria-label="onboarding-weight Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-weight.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
       <section class="stack-section">
         <h2>team</h2>
-        <ul class="screen-directory">
-          <li><a href="add-session-to-compare.html"><code>AddSessionToCompare</code> — Add Session To Compare</a></li>
-          <li><a href="compare-team-user-sessions.html"><code>CompareTeamUserSessions</code> — Compare Team User Sessions</a></li>
-          <li><a href="compare-team-user-sessions-detail.html"><code>CompareTeamUserSessionsDetail</code> — Compare Team User Sessions Detail</a></li>
-          <li><a href="onboarding.html"><code>Onboarding</code> — Onboarding</a></li>
-          <li><a href="select-user-session.html"><code>SelectUserSession</code> — Select User Session</a></li>
-          <li><a href="team-home.html"><code>TeamHome</code> — Team Home</a></li>
-          <li><a href="team-list.html"><code>TeamList</code> — Team List</a></li>
-          <li><a href="team-settings.html"><code>TeamSettings</code> — Team Settings</a></li>
-          <li><a href="team-user.html"><code>TeamUser</code> — Team User</a></li>
-          <li><a href="user-analysis-details.html"><code>UserAnalysisDetails</code> — User Analysis Details</a></li>
-        </ul>
+        <div class="index-table-wrap">
+          <table class="index-screen-table">
+            <thead>
+              <tr>
+                <th scope="col">Screen</th>
+                <th scope="col">iOS</th>
+                <th scope="col">HTML</th>
+                <th scope="col">Pair</th>
+              </tr>
+            </thead>
+            <tbody>
+          <tr
+            data-slug="add-session-to-compare"
+            data-title="Add Session To Compare"
+            data-rn="visual-compare/rn/add-session-to-compare.png"
+            data-html-shot="visual-compare/html/add-session-to-compare.png"
+            data-pair="visual-compare/pairs/add-session-to-compare.png"
+          >
+            <th scope="row"><a href="add-session-to-compare.html">Add Session To Compare</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/add-session-to-compare.png"
+                data-preview-kind="iOS"
+                data-preview-slug="add-session-to-compare"
+                aria-label="add-session-to-compare iOS preview"
+              >
+                <img src="visual-compare/rn/add-session-to-compare.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/add-session-to-compare.png"
+                data-preview-kind="HTML"
+                data-preview-slug="add-session-to-compare"
+                aria-label="add-session-to-compare HTML preview"
+              >
+                <img src="visual-compare/html/add-session-to-compare.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/add-session-to-compare.png"
+                data-preview-kind="Pair"
+                data-preview-slug="add-session-to-compare"
+                aria-label="add-session-to-compare Pair preview"
+              >
+                <img src="visual-compare/pairs/add-session-to-compare.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="compare-team-user-sessions"
+            data-title="Compare Team User Sessions"
+            data-rn="visual-compare/rn/compare-team-user-sessions.png"
+            data-html-shot="visual-compare/html/compare-team-user-sessions.png"
+            data-pair="visual-compare/pairs/compare-team-user-sessions.png"
+          >
+            <th scope="row"><a href="compare-team-user-sessions.html">Compare Team User Sessions</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/compare-team-user-sessions.png"
+                data-preview-kind="iOS"
+                data-preview-slug="compare-team-user-sessions"
+                aria-label="compare-team-user-sessions iOS preview"
+              >
+                <img src="visual-compare/rn/compare-team-user-sessions.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/compare-team-user-sessions.png"
+                data-preview-kind="HTML"
+                data-preview-slug="compare-team-user-sessions"
+                aria-label="compare-team-user-sessions HTML preview"
+              >
+                <img src="visual-compare/html/compare-team-user-sessions.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/compare-team-user-sessions.png"
+                data-preview-kind="Pair"
+                data-preview-slug="compare-team-user-sessions"
+                aria-label="compare-team-user-sessions Pair preview"
+              >
+                <img src="visual-compare/pairs/compare-team-user-sessions.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="compare-team-user-sessions-detail"
+            data-title="Compare Team User Sessions Detail"
+            data-rn="visual-compare/rn/compare-team-user-sessions-detail.png"
+            data-html-shot="visual-compare/html/compare-team-user-sessions-detail.png"
+            data-pair="visual-compare/pairs/compare-team-user-sessions-detail.png"
+          >
+            <th scope="row"><a href="compare-team-user-sessions-detail.html">Compare Team User Sessions Detail</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/compare-team-user-sessions-detail.png"
+                data-preview-kind="iOS"
+                data-preview-slug="compare-team-user-sessions-detail"
+                aria-label="compare-team-user-sessions-detail iOS preview"
+              >
+                <img src="visual-compare/rn/compare-team-user-sessions-detail.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/compare-team-user-sessions-detail.png"
+                data-preview-kind="HTML"
+                data-preview-slug="compare-team-user-sessions-detail"
+                aria-label="compare-team-user-sessions-detail HTML preview"
+              >
+                <img src="visual-compare/html/compare-team-user-sessions-detail.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/compare-team-user-sessions-detail.png"
+                data-preview-kind="Pair"
+                data-preview-slug="compare-team-user-sessions-detail"
+                aria-label="compare-team-user-sessions-detail Pair preview"
+              >
+                <img src="visual-compare/pairs/compare-team-user-sessions-detail.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding"
+            data-title="Onboarding"
+            data-rn="visual-compare/rn/onboarding.png"
+            data-html-shot="visual-compare/html/onboarding.png"
+            data-pair="visual-compare/pairs/onboarding.png"
+          >
+            <th scope="row"><a href="onboarding.html">Onboarding</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding"
+                aria-label="onboarding iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding"
+                aria-label="onboarding HTML preview"
+              >
+                <img src="visual-compare/html/onboarding.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding"
+                aria-label="onboarding Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="select-user-session"
+            data-title="Select User Session"
+            data-rn="visual-compare/rn/select-user-session.png"
+            data-html-shot="visual-compare/html/select-user-session.png"
+            data-pair="visual-compare/pairs/select-user-session.png"
+          >
+            <th scope="row"><a href="select-user-session.html">Select User Session</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/select-user-session.png"
+                data-preview-kind="iOS"
+                data-preview-slug="select-user-session"
+                aria-label="select-user-session iOS preview"
+              >
+                <img src="visual-compare/rn/select-user-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/select-user-session.png"
+                data-preview-kind="HTML"
+                data-preview-slug="select-user-session"
+                aria-label="select-user-session HTML preview"
+              >
+                <img src="visual-compare/html/select-user-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/select-user-session.png"
+                data-preview-kind="Pair"
+                data-preview-slug="select-user-session"
+                aria-label="select-user-session Pair preview"
+              >
+                <img src="visual-compare/pairs/select-user-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="team-home"
+            data-title="Team Home"
+            data-rn="visual-compare/rn/team-home.png"
+            data-html-shot="visual-compare/html/team-home.png"
+            data-pair="visual-compare/pairs/team-home.png"
+          >
+            <th scope="row"><a href="team-home.html">Team Home</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/team-home.png"
+                data-preview-kind="iOS"
+                data-preview-slug="team-home"
+                aria-label="team-home iOS preview"
+              >
+                <img src="visual-compare/rn/team-home.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/team-home.png"
+                data-preview-kind="HTML"
+                data-preview-slug="team-home"
+                aria-label="team-home HTML preview"
+              >
+                <img src="visual-compare/html/team-home.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/team-home.png"
+                data-preview-kind="Pair"
+                data-preview-slug="team-home"
+                aria-label="team-home Pair preview"
+              >
+                <img src="visual-compare/pairs/team-home.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="team-list"
+            data-title="Team List"
+            data-rn="visual-compare/rn/team-list.png"
+            data-html-shot="visual-compare/html/team-list.png"
+            data-pair="visual-compare/pairs/team-list.png"
+          >
+            <th scope="row"><a href="team-list.html">Team List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/team-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="team-list"
+                aria-label="team-list iOS preview"
+              >
+                <img src="visual-compare/rn/team-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/team-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="team-list"
+                aria-label="team-list HTML preview"
+              >
+                <img src="visual-compare/html/team-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/team-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="team-list"
+                aria-label="team-list Pair preview"
+              >
+                <img src="visual-compare/pairs/team-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="team-settings"
+            data-title="Team Settings"
+            data-rn="visual-compare/rn/team-settings.png"
+            data-html-shot="visual-compare/html/team-settings.png"
+            data-pair="visual-compare/pairs/team-settings.png"
+          >
+            <th scope="row"><a href="team-settings.html">Team Settings</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/team-settings.png"
+                data-preview-kind="iOS"
+                data-preview-slug="team-settings"
+                aria-label="team-settings iOS preview"
+              >
+                <img src="visual-compare/rn/team-settings.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/team-settings.png"
+                data-preview-kind="HTML"
+                data-preview-slug="team-settings"
+                aria-label="team-settings HTML preview"
+              >
+                <img src="visual-compare/html/team-settings.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/team-settings.png"
+                data-preview-kind="Pair"
+                data-preview-slug="team-settings"
+                aria-label="team-settings Pair preview"
+              >
+                <img src="visual-compare/pairs/team-settings.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="team-user"
+            data-title="Team User"
+            data-rn="visual-compare/rn/team-user.png"
+            data-html-shot="visual-compare/html/team-user.png"
+            data-pair="visual-compare/pairs/team-user.png"
+          >
+            <th scope="row"><a href="team-user.html">Team User</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/team-user.png"
+                data-preview-kind="iOS"
+                data-preview-slug="team-user"
+                aria-label="team-user iOS preview"
+              >
+                <img src="visual-compare/rn/team-user.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/team-user.png"
+                data-preview-kind="HTML"
+                data-preview-slug="team-user"
+                aria-label="team-user HTML preview"
+              >
+                <img src="visual-compare/html/team-user.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/team-user.png"
+                data-preview-kind="Pair"
+                data-preview-slug="team-user"
+                aria-label="team-user Pair preview"
+              >
+                <img src="visual-compare/pairs/team-user.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="user-analysis-details"
+            data-title="User Analysis Details"
+            data-rn="visual-compare/rn/user-analysis-details.png"
+            data-html-shot="visual-compare/html/user-analysis-details.png"
+            data-pair="visual-compare/pairs/user-analysis-details.png"
+          >
+            <th scope="row"><a href="user-analysis-details.html">User Analysis Details</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/user-analysis-details.png"
+                data-preview-kind="iOS"
+                data-preview-slug="user-analysis-details"
+                aria-label="user-analysis-details iOS preview"
+              >
+                <img src="visual-compare/rn/user-analysis-details.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/user-analysis-details.png"
+                data-preview-kind="HTML"
+                data-preview-slug="user-analysis-details"
+                aria-label="user-analysis-details HTML preview"
+              >
+                <img src="visual-compare/html/user-analysis-details.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/user-analysis-details.png"
+                data-preview-kind="Pair"
+                data-preview-slug="user-analysis-details"
+                aria-label="user-analysis-details Pair preview"
+              >
+                <img src="visual-compare/pairs/user-analysis-details.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
       <section class="stack-section">
         <h2>team-settings</h2>
-        <ul class="screen-directory">
-          <li><a href="add-group-template.html"><code>AddGroupTemplate</code> — Add Group Template</a></li>
-          <li><a href="add-program-template.html"><code>AddProgramTemplate</code> — Add Program Template</a></li>
-          <li><a href="add-step-template.html"><code>AddStepTemplate</code> — Add Step Template</a></li>
-          <li><a href="add-team-user.html"><code>AddTeamUser</code> — Add Team User</a></li>
-          <li><a href="column-management.html"><code>ColumnManagement</code> — Column Management</a></li>
-          <li><a href="create-team-session-template.html"><code>CreateTeamSessionTemplate</code> — Create Team Session Template</a></li>
-          <li><a href="edit-group-template.html"><code>EditGroupTemplate</code> — Edit Group Template</a></li>
-          <li><a href="edit-program-template.html"><code>EditProgramTemplate</code> — Edit Program Template</a></li>
-          <li><a href="edit-step-template.html"><code>EditStepTemplate</code> — Edit Step Template</a></li>
-          <li><a href="edit-team-protocol-session.html"><code>EditTeamProtocolSession</code> — Edit Team Protocol Session</a></li>
-          <li><a href="edit-team-session-template.html"><code>EditTeamSessionTemplate</code> — Edit Team Session Template</a></li>
-          <li><a href="group-template-list.html"><code>GroupTemplateList</code> — Group Template List</a></li>
-          <li><a href="onboarding-preference.html"><code>OnboardingPreference</code> — Onboarding Preference</a></li>
-          <li><a href="program-template-list.html"><code>ProgramTemplateList</code> — Program Template List</a></li>
-          <li><a href="step-template-list.html"><code>StepTemplateList</code> — Step Template List</a></li>
-          <li><a href="team-session-template-list.html"><code>TeamSessionTemplateList</code> — Team Session Template List</a></li>
-          <li><a href="team-session-template-steps-list.html"><code>TeamSessionTemplateStepsList</code> — Team Session Template Steps List</a></li>
-          <li><a href="team-settings-home.html"><code>TeamSettingsHome</code> — Team Settings Home</a></li>
-          <li><a href="team-user-details.html"><code>TeamUserDetails</code> — Team User Details</a></li>
-          <li><a href="team-user-list.html"><code>TeamUserList</code> — Team User List</a></li>
-        </ul>
+        <div class="index-table-wrap">
+          <table class="index-screen-table">
+            <thead>
+              <tr>
+                <th scope="col">Screen</th>
+                <th scope="col">iOS</th>
+                <th scope="col">HTML</th>
+                <th scope="col">Pair</th>
+              </tr>
+            </thead>
+            <tbody>
+          <tr
+            data-slug="add-group-template"
+            data-title="Add Group Template"
+            data-rn="visual-compare/rn/add-group-template.png"
+            data-html-shot="visual-compare/html/add-group-template.png"
+            data-pair="visual-compare/pairs/add-group-template.png"
+          >
+            <th scope="row"><a href="add-group-template.html">Add Group Template</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/add-group-template.png"
+                data-preview-kind="iOS"
+                data-preview-slug="add-group-template"
+                aria-label="add-group-template iOS preview"
+              >
+                <img src="visual-compare/rn/add-group-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/add-group-template.png"
+                data-preview-kind="HTML"
+                data-preview-slug="add-group-template"
+                aria-label="add-group-template HTML preview"
+              >
+                <img src="visual-compare/html/add-group-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/add-group-template.png"
+                data-preview-kind="Pair"
+                data-preview-slug="add-group-template"
+                aria-label="add-group-template Pair preview"
+              >
+                <img src="visual-compare/pairs/add-group-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="add-program-template"
+            data-title="Add Program Template"
+            data-rn="visual-compare/rn/add-program-template.png"
+            data-html-shot="visual-compare/html/add-program-template.png"
+            data-pair="visual-compare/pairs/add-program-template.png"
+          >
+            <th scope="row"><a href="add-program-template.html">Add Program Template</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/add-program-template.png"
+                data-preview-kind="iOS"
+                data-preview-slug="add-program-template"
+                aria-label="add-program-template iOS preview"
+              >
+                <img src="visual-compare/rn/add-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/add-program-template.png"
+                data-preview-kind="HTML"
+                data-preview-slug="add-program-template"
+                aria-label="add-program-template HTML preview"
+              >
+                <img src="visual-compare/html/add-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/add-program-template.png"
+                data-preview-kind="Pair"
+                data-preview-slug="add-program-template"
+                aria-label="add-program-template Pair preview"
+              >
+                <img src="visual-compare/pairs/add-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="add-step-template"
+            data-title="Add Step Template"
+            data-rn="visual-compare/rn/add-step-template.png"
+            data-html-shot="visual-compare/html/add-step-template.png"
+            data-pair="visual-compare/pairs/add-step-template.png"
+          >
+            <th scope="row"><a href="add-step-template.html">Add Step Template</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/add-step-template.png"
+                data-preview-kind="iOS"
+                data-preview-slug="add-step-template"
+                aria-label="add-step-template iOS preview"
+              >
+                <img src="visual-compare/rn/add-step-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/add-step-template.png"
+                data-preview-kind="HTML"
+                data-preview-slug="add-step-template"
+                aria-label="add-step-template HTML preview"
+              >
+                <img src="visual-compare/html/add-step-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/add-step-template.png"
+                data-preview-kind="Pair"
+                data-preview-slug="add-step-template"
+                aria-label="add-step-template Pair preview"
+              >
+                <img src="visual-compare/pairs/add-step-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="add-team-user"
+            data-title="Add Team User"
+            data-rn="visual-compare/rn/add-team-user.png"
+            data-html-shot="visual-compare/html/add-team-user.png"
+            data-pair="visual-compare/pairs/add-team-user.png"
+          >
+            <th scope="row"><a href="add-team-user.html">Add Team User</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/add-team-user.png"
+                data-preview-kind="iOS"
+                data-preview-slug="add-team-user"
+                aria-label="add-team-user iOS preview"
+              >
+                <img src="visual-compare/rn/add-team-user.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/add-team-user.png"
+                data-preview-kind="HTML"
+                data-preview-slug="add-team-user"
+                aria-label="add-team-user HTML preview"
+              >
+                <img src="visual-compare/html/add-team-user.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/add-team-user.png"
+                data-preview-kind="Pair"
+                data-preview-slug="add-team-user"
+                aria-label="add-team-user Pair preview"
+              >
+                <img src="visual-compare/pairs/add-team-user.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="column-management"
+            data-title="Column Management"
+            data-rn="visual-compare/rn/column-management.png"
+            data-html-shot="visual-compare/html/column-management.png"
+            data-pair="visual-compare/pairs/column-management.png"
+          >
+            <th scope="row"><a href="column-management.html">Column Management</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/column-management.png"
+                data-preview-kind="iOS"
+                data-preview-slug="column-management"
+                aria-label="column-management iOS preview"
+              >
+                <img src="visual-compare/rn/column-management.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/column-management.png"
+                data-preview-kind="HTML"
+                data-preview-slug="column-management"
+                aria-label="column-management HTML preview"
+              >
+                <img src="visual-compare/html/column-management.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/column-management.png"
+                data-preview-kind="Pair"
+                data-preview-slug="column-management"
+                aria-label="column-management Pair preview"
+              >
+                <img src="visual-compare/pairs/column-management.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="create-team-session-template"
+            data-title="Create Team Session Template"
+            data-rn="visual-compare/rn/create-team-session-template.png"
+            data-html-shot="visual-compare/html/create-team-session-template.png"
+            data-pair="visual-compare/pairs/create-team-session-template.png"
+          >
+            <th scope="row"><a href="create-team-session-template.html">Create Team Session Template</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/create-team-session-template.png"
+                data-preview-kind="iOS"
+                data-preview-slug="create-team-session-template"
+                aria-label="create-team-session-template iOS preview"
+              >
+                <img src="visual-compare/rn/create-team-session-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/create-team-session-template.png"
+                data-preview-kind="HTML"
+                data-preview-slug="create-team-session-template"
+                aria-label="create-team-session-template HTML preview"
+              >
+                <img src="visual-compare/html/create-team-session-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/create-team-session-template.png"
+                data-preview-kind="Pair"
+                data-preview-slug="create-team-session-template"
+                aria-label="create-team-session-template Pair preview"
+              >
+                <img src="visual-compare/pairs/create-team-session-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="edit-group-template"
+            data-title="Edit Group Template"
+            data-rn="visual-compare/rn/edit-group-template.png"
+            data-html-shot="visual-compare/html/edit-group-template.png"
+            data-pair="visual-compare/pairs/edit-group-template.png"
+          >
+            <th scope="row"><a href="edit-group-template.html">Edit Group Template</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/edit-group-template.png"
+                data-preview-kind="iOS"
+                data-preview-slug="edit-group-template"
+                aria-label="edit-group-template iOS preview"
+              >
+                <img src="visual-compare/rn/edit-group-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/edit-group-template.png"
+                data-preview-kind="HTML"
+                data-preview-slug="edit-group-template"
+                aria-label="edit-group-template HTML preview"
+              >
+                <img src="visual-compare/html/edit-group-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/edit-group-template.png"
+                data-preview-kind="Pair"
+                data-preview-slug="edit-group-template"
+                aria-label="edit-group-template Pair preview"
+              >
+                <img src="visual-compare/pairs/edit-group-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="edit-program-template"
+            data-title="Edit Program Template"
+            data-rn="visual-compare/rn/edit-program-template.png"
+            data-html-shot="visual-compare/html/edit-program-template.png"
+            data-pair="visual-compare/pairs/edit-program-template.png"
+          >
+            <th scope="row"><a href="edit-program-template.html">Edit Program Template</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/edit-program-template.png"
+                data-preview-kind="iOS"
+                data-preview-slug="edit-program-template"
+                aria-label="edit-program-template iOS preview"
+              >
+                <img src="visual-compare/rn/edit-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/edit-program-template.png"
+                data-preview-kind="HTML"
+                data-preview-slug="edit-program-template"
+                aria-label="edit-program-template HTML preview"
+              >
+                <img src="visual-compare/html/edit-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/edit-program-template.png"
+                data-preview-kind="Pair"
+                data-preview-slug="edit-program-template"
+                aria-label="edit-program-template Pair preview"
+              >
+                <img src="visual-compare/pairs/edit-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="edit-team-protocol-session"
+            data-title="Edit Team Protocol Session"
+            data-rn="visual-compare/rn/edit-team-protocol-session.png"
+            data-html-shot="visual-compare/html/edit-team-protocol-session.png"
+            data-pair="visual-compare/pairs/edit-team-protocol-session.png"
+          >
+            <th scope="row"><a href="edit-team-protocol-session.html">Edit Team Protocol Session</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/edit-team-protocol-session.png"
+                data-preview-kind="iOS"
+                data-preview-slug="edit-team-protocol-session"
+                aria-label="edit-team-protocol-session iOS preview"
+              >
+                <img src="visual-compare/rn/edit-team-protocol-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/edit-team-protocol-session.png"
+                data-preview-kind="HTML"
+                data-preview-slug="edit-team-protocol-session"
+                aria-label="edit-team-protocol-session HTML preview"
+              >
+                <img src="visual-compare/html/edit-team-protocol-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/edit-team-protocol-session.png"
+                data-preview-kind="Pair"
+                data-preview-slug="edit-team-protocol-session"
+                aria-label="edit-team-protocol-session Pair preview"
+              >
+                <img src="visual-compare/pairs/edit-team-protocol-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="edit-team-session-template"
+            data-title="Edit Team Session Template"
+            data-rn="visual-compare/rn/edit-team-session-template.png"
+            data-html-shot="visual-compare/html/edit-team-session-template.png"
+            data-pair="visual-compare/pairs/edit-team-session-template.png"
+          >
+            <th scope="row"><a href="edit-team-session-template.html">Edit Team Session Template</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/edit-team-session-template.png"
+                data-preview-kind="iOS"
+                data-preview-slug="edit-team-session-template"
+                aria-label="edit-team-session-template iOS preview"
+              >
+                <img src="visual-compare/rn/edit-team-session-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/edit-team-session-template.png"
+                data-preview-kind="HTML"
+                data-preview-slug="edit-team-session-template"
+                aria-label="edit-team-session-template HTML preview"
+              >
+                <img src="visual-compare/html/edit-team-session-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/edit-team-session-template.png"
+                data-preview-kind="Pair"
+                data-preview-slug="edit-team-session-template"
+                aria-label="edit-team-session-template Pair preview"
+              >
+                <img src="visual-compare/pairs/edit-team-session-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="group-template-list"
+            data-title="Group Template List"
+            data-rn="visual-compare/rn/group-template-list.png"
+            data-html-shot="visual-compare/html/group-template-list.png"
+            data-pair="visual-compare/pairs/group-template-list.png"
+          >
+            <th scope="row"><a href="group-template-list.html">Group Template List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/group-template-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="group-template-list"
+                aria-label="group-template-list iOS preview"
+              >
+                <img src="visual-compare/rn/group-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/group-template-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="group-template-list"
+                aria-label="group-template-list HTML preview"
+              >
+                <img src="visual-compare/html/group-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/group-template-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="group-template-list"
+                aria-label="group-template-list Pair preview"
+              >
+                <img src="visual-compare/pairs/group-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="onboarding-preference"
+            data-title="Onboarding Preference"
+            data-rn="visual-compare/rn/onboarding-preference.png"
+            data-html-shot="visual-compare/html/onboarding-preference.png"
+            data-pair="visual-compare/pairs/onboarding-preference.png"
+          >
+            <th scope="row"><a href="onboarding-preference.html">Onboarding Preference</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/onboarding-preference.png"
+                data-preview-kind="iOS"
+                data-preview-slug="onboarding-preference"
+                aria-label="onboarding-preference iOS preview"
+              >
+                <img src="visual-compare/rn/onboarding-preference.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/onboarding-preference.png"
+                data-preview-kind="HTML"
+                data-preview-slug="onboarding-preference"
+                aria-label="onboarding-preference HTML preview"
+              >
+                <img src="visual-compare/html/onboarding-preference.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/onboarding-preference.png"
+                data-preview-kind="Pair"
+                data-preview-slug="onboarding-preference"
+                aria-label="onboarding-preference Pair preview"
+              >
+                <img src="visual-compare/pairs/onboarding-preference.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="program-template-list"
+            data-title="Program Template List"
+            data-rn="visual-compare/rn/program-template-list.png"
+            data-html-shot="visual-compare/html/program-template-list.png"
+            data-pair="visual-compare/pairs/program-template-list.png"
+          >
+            <th scope="row"><a href="program-template-list.html">Program Template List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/program-template-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="program-template-list"
+                aria-label="program-template-list iOS preview"
+              >
+                <img src="visual-compare/rn/program-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/program-template-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="program-template-list"
+                aria-label="program-template-list HTML preview"
+              >
+                <img src="visual-compare/html/program-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/program-template-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="program-template-list"
+                aria-label="program-template-list Pair preview"
+              >
+                <img src="visual-compare/pairs/program-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="step-template-list"
+            data-title="Step Template List"
+            data-rn="visual-compare/rn/step-template-list.png"
+            data-html-shot="visual-compare/html/step-template-list.png"
+            data-pair="visual-compare/pairs/step-template-list.png"
+          >
+            <th scope="row"><a href="step-template-list.html">Step Template List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/step-template-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="step-template-list"
+                aria-label="step-template-list iOS preview"
+              >
+                <img src="visual-compare/rn/step-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/step-template-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="step-template-list"
+                aria-label="step-template-list HTML preview"
+              >
+                <img src="visual-compare/html/step-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/step-template-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="step-template-list"
+                aria-label="step-template-list Pair preview"
+              >
+                <img src="visual-compare/pairs/step-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="team-session-template-list"
+            data-title="Team Session Template List"
+            data-rn="visual-compare/rn/team-session-template-list.png"
+            data-html-shot="visual-compare/html/team-session-template-list.png"
+            data-pair="visual-compare/pairs/team-session-template-list.png"
+          >
+            <th scope="row"><a href="team-session-template-list.html">Team Session Template List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/team-session-template-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="team-session-template-list"
+                aria-label="team-session-template-list iOS preview"
+              >
+                <img src="visual-compare/rn/team-session-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/team-session-template-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="team-session-template-list"
+                aria-label="team-session-template-list HTML preview"
+              >
+                <img src="visual-compare/html/team-session-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/team-session-template-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="team-session-template-list"
+                aria-label="team-session-template-list Pair preview"
+              >
+                <img src="visual-compare/pairs/team-session-template-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="team-session-template-steps-list"
+            data-title="Team Session Template Steps List"
+            data-rn="visual-compare/rn/team-session-template-steps-list.png"
+            data-html-shot="visual-compare/html/team-session-template-steps-list.png"
+            data-pair="visual-compare/pairs/team-session-template-steps-list.png"
+          >
+            <th scope="row"><a href="team-session-template-steps-list.html">Team Session Template Steps List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/team-session-template-steps-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="team-session-template-steps-list"
+                aria-label="team-session-template-steps-list iOS preview"
+              >
+                <img src="visual-compare/rn/team-session-template-steps-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/team-session-template-steps-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="team-session-template-steps-list"
+                aria-label="team-session-template-steps-list HTML preview"
+              >
+                <img src="visual-compare/html/team-session-template-steps-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/team-session-template-steps-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="team-session-template-steps-list"
+                aria-label="team-session-template-steps-list Pair preview"
+              >
+                <img src="visual-compare/pairs/team-session-template-steps-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="team-settings-home"
+            data-title="Team Settings Home"
+            data-rn="visual-compare/rn/team-settings-home.png"
+            data-html-shot="visual-compare/html/team-settings-home.png"
+            data-pair="visual-compare/pairs/team-settings-home.png"
+          >
+            <th scope="row"><a href="team-settings-home.html">Team Settings Home</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/team-settings-home.png"
+                data-preview-kind="iOS"
+                data-preview-slug="team-settings-home"
+                aria-label="team-settings-home iOS preview"
+              >
+                <img src="visual-compare/rn/team-settings-home.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/team-settings-home.png"
+                data-preview-kind="HTML"
+                data-preview-slug="team-settings-home"
+                aria-label="team-settings-home HTML preview"
+              >
+                <img src="visual-compare/html/team-settings-home.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/team-settings-home.png"
+                data-preview-kind="Pair"
+                data-preview-slug="team-settings-home"
+                aria-label="team-settings-home Pair preview"
+              >
+                <img src="visual-compare/pairs/team-settings-home.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="team-user-details"
+            data-title="Team User Details"
+            data-rn="visual-compare/rn/team-user-details.png"
+            data-html-shot="visual-compare/html/team-user-details.png"
+            data-pair="visual-compare/pairs/team-user-details.png"
+          >
+            <th scope="row"><a href="team-user-details.html">Team User Details</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/team-user-details.png"
+                data-preview-kind="iOS"
+                data-preview-slug="team-user-details"
+                aria-label="team-user-details iOS preview"
+              >
+                <img src="visual-compare/rn/team-user-details.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/team-user-details.png"
+                data-preview-kind="HTML"
+                data-preview-slug="team-user-details"
+                aria-label="team-user-details HTML preview"
+              >
+                <img src="visual-compare/html/team-user-details.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/team-user-details.png"
+                data-preview-kind="Pair"
+                data-preview-slug="team-user-details"
+                aria-label="team-user-details Pair preview"
+              >
+                <img src="visual-compare/pairs/team-user-details.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="team-user-list"
+            data-title="Team User List"
+            data-rn="visual-compare/rn/team-user-list.png"
+            data-html-shot="visual-compare/html/team-user-list.png"
+            data-pair="visual-compare/pairs/team-user-list.png"
+          >
+            <th scope="row"><a href="team-user-list.html">Team User List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/team-user-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="team-user-list"
+                aria-label="team-user-list iOS preview"
+              >
+                <img src="visual-compare/rn/team-user-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/team-user-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="team-user-list"
+                aria-label="team-user-list HTML preview"
+              >
+                <img src="visual-compare/html/team-user-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/team-user-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="team-user-list"
+                aria-label="team-user-list Pair preview"
+              >
+                <img src="visual-compare/pairs/team-user-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
       <section class="stack-section">
         <h2>user</h2>
-        <ul class="screen-directory">
-          <li><a href="add-group.html"><code>AddGroup</code> — Add Group</a></li>
-          <li><a href="add-program.html"><code>AddProgram</code> — Add Program</a></li>
-          <li><a href="add-step.html"><code>AddStep</code> — Add Step</a></li>
-          <li><a href="assessment.html"><code>Assessment</code> — Assessment</a></li>
-          <li><a href="assessment-session-history.html"><code>AssessmentSessionHistory</code> — Assessment Session History</a></li>
-          <li><a href="compare-session.html"><code>CompareSession</code> — Compare Session</a></li>
-          <li><a href="create-program-choice.html"><code>CreateProgramChoice</code> — Create Program Choice</a></li>
-          <li><a href="create-protocol-session.html"><code>CreateProtocolSession</code> — Create Protocol Session</a></li>
-          <li><a href="device-control.html"><code>DeviceControl</code> — Device Control</a></li>
-          <li><a href="edit-group.html"><code>EditGroup</code> — Edit Group</a></li>
-          <li><a href="edit-program.html"><code>EditProgram</code> — Edit Program</a></li>
-          <li><a href="edit-protocol-session.html"><code>EditProtocolSession</code> — Edit Protocol Session</a></li>
-          <li><a href="exercise.html"><code>Exercise</code> — Exercise</a></li>
-          <li><a href="group-data.html"><code>GroupData</code> — Group Data</a></li>
-          <li><a href="group-list.html"><code>GroupList</code> — Group List</a></li>
-          <li><a href="group-results.html"><code>GroupResults</code> — Group Results</a></li>
-          <li><a href="historical.html"><code>Historical</code> — Historical</a></li>
-          <li><a href="home.html"><code>Home</code> — Home</a></li>
-          <li><a href="home-start.html"><code>HomeStart</code> — Home Start</a></li>
-          <li><a href="notes-list.html"><code>NotesList</code> — Notes List</a></li>
-          <li><a href="program-list.html"><code>ProgramList</code> — Program List</a></li>
-          <li><a href="protocol-preview.html"><code>ProtocolPreview</code> — Protocol Preview</a></li>
-          <li><a href="recent-data.html"><code>RecentData</code> — Recent Data</a></li>
-          <li><a href="run-group.html"><code>RunGroup</code> — Run Group</a></li>
-          <li><a href="select-program-template.html"><code>SelectProgramTemplate</code> — Select Program Template</a></li>
-          <li><a href="select-template.html"><code>SelectTemplate</code> — Select Template</a></li>
-          <li><a href="session-data.html"><code>SessionData</code> — Session Data</a></li>
-          <li><a href="session-history.html"><code>SessionHistory</code> — Session History</a></li>
-          <li><a href="sign-waiver.html"><code>SignWaiver</code> — Sign Waiver</a></li>
-          <li><a href="step-details.html"><code>StepDetails</code> — Step Details</a></li>
-          <li><a href="step-list.html"><code>StepList</code> — Step List</a></li>
-          <li><a href="step-result.html"><code>StepResult</code> — Step Result</a></li>
-          <li><a href="use-program-template.html"><code>UseProgramTemplate</code> — Use Program Template</a></li>
-          <li><a href="user-profile.html"><code>UserProfile</code> — User Profile</a></li>
-          <li><a href="user-team-list.html"><code>UserTeamList</code> — User Team List</a></li>
-          <li><a href="warmup.html"><code>Warmup</code> — Warmup</a></li>
-          <li><a href="warmup-type.html"><code>WarmupType</code> — Warmup Type</a></li>
-        </ul>
+        <div class="index-table-wrap">
+          <table class="index-screen-table">
+            <thead>
+              <tr>
+                <th scope="col">Screen</th>
+                <th scope="col">iOS</th>
+                <th scope="col">HTML</th>
+                <th scope="col">Pair</th>
+              </tr>
+            </thead>
+            <tbody>
+          <tr
+            data-slug="add-group"
+            data-title="Add Group"
+            data-rn="visual-compare/rn/add-group.png"
+            data-html-shot="visual-compare/html/add-group.png"
+            data-pair="visual-compare/pairs/add-group.png"
+          >
+            <th scope="row"><a href="add-group.html">Add Group</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/add-group.png"
+                data-preview-kind="iOS"
+                data-preview-slug="add-group"
+                aria-label="add-group iOS preview"
+              >
+                <img src="visual-compare/rn/add-group.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/add-group.png"
+                data-preview-kind="HTML"
+                data-preview-slug="add-group"
+                aria-label="add-group HTML preview"
+              >
+                <img src="visual-compare/html/add-group.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/add-group.png"
+                data-preview-kind="Pair"
+                data-preview-slug="add-group"
+                aria-label="add-group Pair preview"
+              >
+                <img src="visual-compare/pairs/add-group.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="add-program"
+            data-title="Add Program"
+            data-rn="visual-compare/rn/add-program.png"
+            data-html-shot="visual-compare/html/add-program.png"
+            data-pair="visual-compare/pairs/add-program.png"
+          >
+            <th scope="row"><a href="add-program.html">Add Program</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/add-program.png"
+                data-preview-kind="iOS"
+                data-preview-slug="add-program"
+                aria-label="add-program iOS preview"
+              >
+                <img src="visual-compare/rn/add-program.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/add-program.png"
+                data-preview-kind="HTML"
+                data-preview-slug="add-program"
+                aria-label="add-program HTML preview"
+              >
+                <img src="visual-compare/html/add-program.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/add-program.png"
+                data-preview-kind="Pair"
+                data-preview-slug="add-program"
+                aria-label="add-program Pair preview"
+              >
+                <img src="visual-compare/pairs/add-program.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="add-step"
+            data-title="Add Step"
+            data-rn="visual-compare/rn/add-step.png"
+            data-html-shot="visual-compare/html/add-step.png"
+            data-pair="visual-compare/pairs/add-step.png"
+          >
+            <th scope="row"><a href="add-step.html">Add Step</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/add-step.png"
+                data-preview-kind="iOS"
+                data-preview-slug="add-step"
+                aria-label="add-step iOS preview"
+              >
+                <img src="visual-compare/rn/add-step.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/add-step.png"
+                data-preview-kind="HTML"
+                data-preview-slug="add-step"
+                aria-label="add-step HTML preview"
+              >
+                <img src="visual-compare/html/add-step.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/add-step.png"
+                data-preview-kind="Pair"
+                data-preview-slug="add-step"
+                aria-label="add-step Pair preview"
+              >
+                <img src="visual-compare/pairs/add-step.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="assessment"
+            data-title="Assessment"
+            data-rn="visual-compare/rn/assessment.png"
+            data-html-shot="visual-compare/html/assessment.png"
+            data-pair="visual-compare/pairs/assessment.png"
+          >
+            <th scope="row"><a href="assessment.html">Assessment</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/assessment.png"
+                data-preview-kind="iOS"
+                data-preview-slug="assessment"
+                aria-label="assessment iOS preview"
+              >
+                <img src="visual-compare/rn/assessment.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/assessment.png"
+                data-preview-kind="HTML"
+                data-preview-slug="assessment"
+                aria-label="assessment HTML preview"
+              >
+                <img src="visual-compare/html/assessment.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/assessment.png"
+                data-preview-kind="Pair"
+                data-preview-slug="assessment"
+                aria-label="assessment Pair preview"
+              >
+                <img src="visual-compare/pairs/assessment.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="compare-session"
+            data-title="Compare Session"
+            data-rn="visual-compare/rn/compare-session.png"
+            data-html-shot="visual-compare/html/compare-session.png"
+            data-pair="visual-compare/pairs/compare-session.png"
+          >
+            <th scope="row"><a href="compare-session.html">Compare Session</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/compare-session.png"
+                data-preview-kind="iOS"
+                data-preview-slug="compare-session"
+                aria-label="compare-session iOS preview"
+              >
+                <img src="visual-compare/rn/compare-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/compare-session.png"
+                data-preview-kind="HTML"
+                data-preview-slug="compare-session"
+                aria-label="compare-session HTML preview"
+              >
+                <img src="visual-compare/html/compare-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/compare-session.png"
+                data-preview-kind="Pair"
+                data-preview-slug="compare-session"
+                aria-label="compare-session Pair preview"
+              >
+                <img src="visual-compare/pairs/compare-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="create-program-choice"
+            data-title="Create Program Choice"
+            data-rn="visual-compare/rn/create-program-choice.png"
+            data-html-shot="visual-compare/html/create-program-choice.png"
+            data-pair="visual-compare/pairs/create-program-choice.png"
+          >
+            <th scope="row"><a href="create-program-choice.html">Create Program Choice</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/create-program-choice.png"
+                data-preview-kind="iOS"
+                data-preview-slug="create-program-choice"
+                aria-label="create-program-choice iOS preview"
+              >
+                <img src="visual-compare/rn/create-program-choice.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/create-program-choice.png"
+                data-preview-kind="HTML"
+                data-preview-slug="create-program-choice"
+                aria-label="create-program-choice HTML preview"
+              >
+                <img src="visual-compare/html/create-program-choice.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/create-program-choice.png"
+                data-preview-kind="Pair"
+                data-preview-slug="create-program-choice"
+                aria-label="create-program-choice Pair preview"
+              >
+                <img src="visual-compare/pairs/create-program-choice.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="create-protocol-session"
+            data-title="Create Protocol Session"
+            data-rn="visual-compare/rn/create-protocol-session.png"
+            data-html-shot="visual-compare/html/create-protocol-session.png"
+            data-pair="visual-compare/pairs/create-protocol-session.png"
+          >
+            <th scope="row"><a href="create-protocol-session.html">Create Protocol Session</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/create-protocol-session.png"
+                data-preview-kind="iOS"
+                data-preview-slug="create-protocol-session"
+                aria-label="create-protocol-session iOS preview"
+              >
+                <img src="visual-compare/rn/create-protocol-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/create-protocol-session.png"
+                data-preview-kind="HTML"
+                data-preview-slug="create-protocol-session"
+                aria-label="create-protocol-session HTML preview"
+              >
+                <img src="visual-compare/html/create-protocol-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/create-protocol-session.png"
+                data-preview-kind="Pair"
+                data-preview-slug="create-protocol-session"
+                aria-label="create-protocol-session Pair preview"
+              >
+                <img src="visual-compare/pairs/create-protocol-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="edit-group"
+            data-title="Edit Group"
+            data-rn="visual-compare/rn/edit-group.png"
+            data-html-shot="visual-compare/html/edit-group.png"
+            data-pair="visual-compare/pairs/edit-group.png"
+          >
+            <th scope="row"><a href="edit-group.html">Edit Group</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/edit-group.png"
+                data-preview-kind="iOS"
+                data-preview-slug="edit-group"
+                aria-label="edit-group iOS preview"
+              >
+                <img src="visual-compare/rn/edit-group.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/edit-group.png"
+                data-preview-kind="HTML"
+                data-preview-slug="edit-group"
+                aria-label="edit-group HTML preview"
+              >
+                <img src="visual-compare/html/edit-group.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/edit-group.png"
+                data-preview-kind="Pair"
+                data-preview-slug="edit-group"
+                aria-label="edit-group Pair preview"
+              >
+                <img src="visual-compare/pairs/edit-group.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="edit-program"
+            data-title="Edit Program"
+            data-rn="visual-compare/rn/edit-program.png"
+            data-html-shot="visual-compare/html/edit-program.png"
+            data-pair="visual-compare/pairs/edit-program.png"
+          >
+            <th scope="row"><a href="edit-program.html">Edit Program</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/edit-program.png"
+                data-preview-kind="iOS"
+                data-preview-slug="edit-program"
+                aria-label="edit-program iOS preview"
+              >
+                <img src="visual-compare/rn/edit-program.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/edit-program.png"
+                data-preview-kind="HTML"
+                data-preview-slug="edit-program"
+                aria-label="edit-program HTML preview"
+              >
+                <img src="visual-compare/html/edit-program.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/edit-program.png"
+                data-preview-kind="Pair"
+                data-preview-slug="edit-program"
+                aria-label="edit-program Pair preview"
+              >
+                <img src="visual-compare/pairs/edit-program.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="edit-protocol-session"
+            data-title="Edit Protocol Session"
+            data-rn="visual-compare/rn/edit-protocol-session.png"
+            data-html-shot="visual-compare/html/edit-protocol-session.png"
+            data-pair="visual-compare/pairs/edit-protocol-session.png"
+          >
+            <th scope="row"><a href="edit-protocol-session.html">Edit Protocol Session</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/edit-protocol-session.png"
+                data-preview-kind="iOS"
+                data-preview-slug="edit-protocol-session"
+                aria-label="edit-protocol-session iOS preview"
+              >
+                <img src="visual-compare/rn/edit-protocol-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/edit-protocol-session.png"
+                data-preview-kind="HTML"
+                data-preview-slug="edit-protocol-session"
+                aria-label="edit-protocol-session HTML preview"
+              >
+                <img src="visual-compare/html/edit-protocol-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/edit-protocol-session.png"
+                data-preview-kind="Pair"
+                data-preview-slug="edit-protocol-session"
+                aria-label="edit-protocol-session Pair preview"
+              >
+                <img src="visual-compare/pairs/edit-protocol-session.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="exercise"
+            data-title="Exercise"
+            data-rn="visual-compare/rn/exercise.png"
+            data-html-shot="visual-compare/html/exercise.png"
+            data-pair="visual-compare/pairs/exercise.png"
+          >
+            <th scope="row"><a href="exercise.html">Exercise</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/exercise.png"
+                data-preview-kind="iOS"
+                data-preview-slug="exercise"
+                aria-label="exercise iOS preview"
+              >
+                <img src="visual-compare/rn/exercise.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/exercise.png"
+                data-preview-kind="HTML"
+                data-preview-slug="exercise"
+                aria-label="exercise HTML preview"
+              >
+                <img src="visual-compare/html/exercise.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/exercise.png"
+                data-preview-kind="Pair"
+                data-preview-slug="exercise"
+                aria-label="exercise Pair preview"
+              >
+                <img src="visual-compare/pairs/exercise.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="group-list"
+            data-title="Group List"
+            data-rn="visual-compare/rn/group-list.png"
+            data-html-shot="visual-compare/html/group-list.png"
+            data-pair="visual-compare/pairs/group-list.png"
+          >
+            <th scope="row"><a href="group-list.html">Group List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/group-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="group-list"
+                aria-label="group-list iOS preview"
+              >
+                <img src="visual-compare/rn/group-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/group-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="group-list"
+                aria-label="group-list HTML preview"
+              >
+                <img src="visual-compare/html/group-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/group-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="group-list"
+                aria-label="group-list Pair preview"
+              >
+                <img src="visual-compare/pairs/group-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="group-results"
+            data-title="Group Results"
+            data-rn="visual-compare/rn/group-results.png"
+            data-html-shot="visual-compare/html/group-results.png"
+            data-pair="visual-compare/pairs/group-results.png"
+          >
+            <th scope="row"><a href="group-results.html">Group Results</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/group-results.png"
+                data-preview-kind="iOS"
+                data-preview-slug="group-results"
+                aria-label="group-results iOS preview"
+              >
+                <img src="visual-compare/rn/group-results.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/group-results.png"
+                data-preview-kind="HTML"
+                data-preview-slug="group-results"
+                aria-label="group-results HTML preview"
+              >
+                <img src="visual-compare/html/group-results.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/group-results.png"
+                data-preview-kind="Pair"
+                data-preview-slug="group-results"
+                aria-label="group-results Pair preview"
+              >
+                <img src="visual-compare/pairs/group-results.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="historical"
+            data-title="Historical"
+            data-rn="visual-compare/rn/historical.png"
+            data-html-shot="visual-compare/html/historical.png"
+            data-pair="visual-compare/pairs/historical.png"
+          >
+            <th scope="row"><a href="historical.html">Historical</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/historical.png"
+                data-preview-kind="iOS"
+                data-preview-slug="historical"
+                aria-label="historical iOS preview"
+              >
+                <img src="visual-compare/rn/historical.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/historical.png"
+                data-preview-kind="HTML"
+                data-preview-slug="historical"
+                aria-label="historical HTML preview"
+              >
+                <img src="visual-compare/html/historical.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/historical.png"
+                data-preview-kind="Pair"
+                data-preview-slug="historical"
+                aria-label="historical Pair preview"
+              >
+                <img src="visual-compare/pairs/historical.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="home"
+            data-title="Home"
+            data-rn="visual-compare/rn/home.png"
+            data-html-shot="visual-compare/html/home.png"
+            data-pair="visual-compare/pairs/home.png"
+          >
+            <th scope="row"><a href="home.html">Home</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/home.png"
+                data-preview-kind="iOS"
+                data-preview-slug="home"
+                aria-label="home iOS preview"
+              >
+                <img src="visual-compare/rn/home.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/home.png"
+                data-preview-kind="HTML"
+                data-preview-slug="home"
+                aria-label="home HTML preview"
+              >
+                <img src="visual-compare/html/home.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/home.png"
+                data-preview-kind="Pair"
+                data-preview-slug="home"
+                aria-label="home Pair preview"
+              >
+                <img src="visual-compare/pairs/home.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="home-start"
+            data-title="Home Start"
+            data-rn="visual-compare/rn/home-start.png"
+            data-html-shot="visual-compare/html/home-start.png"
+            data-pair="visual-compare/pairs/home-start.png"
+          >
+            <th scope="row"><a href="home-start.html">Home Start</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/home-start.png"
+                data-preview-kind="iOS"
+                data-preview-slug="home-start"
+                aria-label="home-start iOS preview"
+              >
+                <img src="visual-compare/rn/home-start.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/home-start.png"
+                data-preview-kind="HTML"
+                data-preview-slug="home-start"
+                aria-label="home-start HTML preview"
+              >
+                <img src="visual-compare/html/home-start.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/home-start.png"
+                data-preview-kind="Pair"
+                data-preview-slug="home-start"
+                aria-label="home-start Pair preview"
+              >
+                <img src="visual-compare/pairs/home-start.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="notes-list"
+            data-title="Notes List"
+            data-rn="visual-compare/rn/notes-list.png"
+            data-html-shot="visual-compare/html/notes-list.png"
+            data-pair="visual-compare/pairs/notes-list.png"
+          >
+            <th scope="row"><a href="notes-list.html">Notes List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/notes-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="notes-list"
+                aria-label="notes-list iOS preview"
+              >
+                <img src="visual-compare/rn/notes-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/notes-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="notes-list"
+                aria-label="notes-list HTML preview"
+              >
+                <img src="visual-compare/html/notes-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/notes-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="notes-list"
+                aria-label="notes-list Pair preview"
+              >
+                <img src="visual-compare/pairs/notes-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="program-list"
+            data-title="Program List"
+            data-rn="visual-compare/rn/program-list.png"
+            data-html-shot="visual-compare/html/program-list.png"
+            data-pair="visual-compare/pairs/program-list.png"
+          >
+            <th scope="row"><a href="program-list.html">Program List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/program-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="program-list"
+                aria-label="program-list iOS preview"
+              >
+                <img src="visual-compare/rn/program-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/program-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="program-list"
+                aria-label="program-list HTML preview"
+              >
+                <img src="visual-compare/html/program-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/program-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="program-list"
+                aria-label="program-list Pair preview"
+              >
+                <img src="visual-compare/pairs/program-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="protocol-preview"
+            data-title="Protocol Preview"
+            data-rn="visual-compare/rn/protocol-preview.png"
+            data-html-shot="visual-compare/html/protocol-preview.png"
+            data-pair="visual-compare/pairs/protocol-preview.png"
+          >
+            <th scope="row"><a href="protocol-preview.html">Protocol Preview</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/protocol-preview.png"
+                data-preview-kind="iOS"
+                data-preview-slug="protocol-preview"
+                aria-label="protocol-preview iOS preview"
+              >
+                <img src="visual-compare/rn/protocol-preview.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/protocol-preview.png"
+                data-preview-kind="HTML"
+                data-preview-slug="protocol-preview"
+                aria-label="protocol-preview HTML preview"
+              >
+                <img src="visual-compare/html/protocol-preview.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/protocol-preview.png"
+                data-preview-kind="Pair"
+                data-preview-slug="protocol-preview"
+                aria-label="protocol-preview Pair preview"
+              >
+                <img src="visual-compare/pairs/protocol-preview.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="run-group"
+            data-title="Run Group"
+            data-rn="visual-compare/rn/run-group.png"
+            data-html-shot="visual-compare/html/run-group.png"
+            data-pair=""
+          >
+            <th scope="row"><a href="run-group.html">Run Group</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/run-group.png"
+                data-preview-kind="iOS"
+                data-preview-slug="run-group"
+                aria-label="run-group iOS preview"
+              >
+                <img src="visual-compare/rn/run-group.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/run-group.png"
+                data-preview-kind="HTML"
+                data-preview-slug="run-group"
+                aria-label="run-group HTML preview"
+              >
+                <img src="visual-compare/html/run-group.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot index-shot--missing"><span class="index-shot__missing">Missing</span></td>
+          </tr>
+          <tr
+            data-slug="select-program-template"
+            data-title="Select Program Template"
+            data-rn="visual-compare/rn/select-program-template.png"
+            data-html-shot="visual-compare/html/select-program-template.png"
+            data-pair="visual-compare/pairs/select-program-template.png"
+          >
+            <th scope="row"><a href="select-program-template.html">Select Program Template</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/select-program-template.png"
+                data-preview-kind="iOS"
+                data-preview-slug="select-program-template"
+                aria-label="select-program-template iOS preview"
+              >
+                <img src="visual-compare/rn/select-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/select-program-template.png"
+                data-preview-kind="HTML"
+                data-preview-slug="select-program-template"
+                aria-label="select-program-template HTML preview"
+              >
+                <img src="visual-compare/html/select-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/select-program-template.png"
+                data-preview-kind="Pair"
+                data-preview-slug="select-program-template"
+                aria-label="select-program-template Pair preview"
+              >
+                <img src="visual-compare/pairs/select-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="session-data"
+            data-title="Session Data"
+            data-rn="visual-compare/rn/session-data.png"
+            data-html-shot="visual-compare/html/session-data.png"
+            data-pair="visual-compare/pairs/session-data.png"
+          >
+            <th scope="row"><a href="session-data.html">Session Data</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/session-data.png"
+                data-preview-kind="iOS"
+                data-preview-slug="session-data"
+                aria-label="session-data iOS preview"
+              >
+                <img src="visual-compare/rn/session-data.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/session-data.png"
+                data-preview-kind="HTML"
+                data-preview-slug="session-data"
+                aria-label="session-data HTML preview"
+              >
+                <img src="visual-compare/html/session-data.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/session-data.png"
+                data-preview-kind="Pair"
+                data-preview-slug="session-data"
+                aria-label="session-data Pair preview"
+              >
+                <img src="visual-compare/pairs/session-data.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="session-history"
+            data-title="Session History"
+            data-rn="visual-compare/rn/session-history.png"
+            data-html-shot="visual-compare/html/session-history.png"
+            data-pair="visual-compare/pairs/session-history.png"
+          >
+            <th scope="row"><a href="session-history.html">Session History</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/session-history.png"
+                data-preview-kind="iOS"
+                data-preview-slug="session-history"
+                aria-label="session-history iOS preview"
+              >
+                <img src="visual-compare/rn/session-history.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/session-history.png"
+                data-preview-kind="HTML"
+                data-preview-slug="session-history"
+                aria-label="session-history HTML preview"
+              >
+                <img src="visual-compare/html/session-history.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/session-history.png"
+                data-preview-kind="Pair"
+                data-preview-slug="session-history"
+                aria-label="session-history Pair preview"
+              >
+                <img src="visual-compare/pairs/session-history.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="sign-waiver"
+            data-title="Sign Waiver"
+            data-rn="visual-compare/rn/sign-waiver.png"
+            data-html-shot="visual-compare/html/sign-waiver.png"
+            data-pair="visual-compare/pairs/sign-waiver.png"
+          >
+            <th scope="row"><a href="sign-waiver.html">Sign Waiver</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/sign-waiver.png"
+                data-preview-kind="iOS"
+                data-preview-slug="sign-waiver"
+                aria-label="sign-waiver iOS preview"
+              >
+                <img src="visual-compare/rn/sign-waiver.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/sign-waiver.png"
+                data-preview-kind="HTML"
+                data-preview-slug="sign-waiver"
+                aria-label="sign-waiver HTML preview"
+              >
+                <img src="visual-compare/html/sign-waiver.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/sign-waiver.png"
+                data-preview-kind="Pair"
+                data-preview-slug="sign-waiver"
+                aria-label="sign-waiver Pair preview"
+              >
+                <img src="visual-compare/pairs/sign-waiver.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="step-details"
+            data-title="Step Details"
+            data-rn="visual-compare/rn/step-details.png"
+            data-html-shot="visual-compare/html/step-details.png"
+            data-pair="visual-compare/pairs/step-details.png"
+          >
+            <th scope="row"><a href="step-details.html">Step Details</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/step-details.png"
+                data-preview-kind="iOS"
+                data-preview-slug="step-details"
+                aria-label="step-details iOS preview"
+              >
+                <img src="visual-compare/rn/step-details.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/step-details.png"
+                data-preview-kind="HTML"
+                data-preview-slug="step-details"
+                aria-label="step-details HTML preview"
+              >
+                <img src="visual-compare/html/step-details.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/step-details.png"
+                data-preview-kind="Pair"
+                data-preview-slug="step-details"
+                aria-label="step-details Pair preview"
+              >
+                <img src="visual-compare/pairs/step-details.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="step-list"
+            data-title="Step List"
+            data-rn="visual-compare/rn/step-list.png"
+            data-html-shot="visual-compare/html/step-list.png"
+            data-pair="visual-compare/pairs/step-list.png"
+          >
+            <th scope="row"><a href="step-list.html">Step List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/step-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="step-list"
+                aria-label="step-list iOS preview"
+              >
+                <img src="visual-compare/rn/step-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/step-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="step-list"
+                aria-label="step-list HTML preview"
+              >
+                <img src="visual-compare/html/step-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/step-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="step-list"
+                aria-label="step-list Pair preview"
+              >
+                <img src="visual-compare/pairs/step-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="step-result"
+            data-title="Step Result"
+            data-rn="visual-compare/rn/step-result.png"
+            data-html-shot="visual-compare/html/step-result.png"
+            data-pair="visual-compare/pairs/step-result.png"
+          >
+            <th scope="row"><a href="step-result.html">Step Result</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/step-result.png"
+                data-preview-kind="iOS"
+                data-preview-slug="step-result"
+                aria-label="step-result iOS preview"
+              >
+                <img src="visual-compare/rn/step-result.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/step-result.png"
+                data-preview-kind="HTML"
+                data-preview-slug="step-result"
+                aria-label="step-result HTML preview"
+              >
+                <img src="visual-compare/html/step-result.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/step-result.png"
+                data-preview-kind="Pair"
+                data-preview-slug="step-result"
+                aria-label="step-result Pair preview"
+              >
+                <img src="visual-compare/pairs/step-result.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="use-program-template"
+            data-title="Use Program Template"
+            data-rn="visual-compare/rn/use-program-template.png"
+            data-html-shot="visual-compare/html/use-program-template.png"
+            data-pair="visual-compare/pairs/use-program-template.png"
+          >
+            <th scope="row"><a href="use-program-template.html">Use Program Template</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/use-program-template.png"
+                data-preview-kind="iOS"
+                data-preview-slug="use-program-template"
+                aria-label="use-program-template iOS preview"
+              >
+                <img src="visual-compare/rn/use-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/use-program-template.png"
+                data-preview-kind="HTML"
+                data-preview-slug="use-program-template"
+                aria-label="use-program-template HTML preview"
+              >
+                <img src="visual-compare/html/use-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/use-program-template.png"
+                data-preview-kind="Pair"
+                data-preview-slug="use-program-template"
+                aria-label="use-program-template Pair preview"
+              >
+                <img src="visual-compare/pairs/use-program-template.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="user-profile"
+            data-title="User Profile"
+            data-rn="visual-compare/rn/user-profile.png"
+            data-html-shot="visual-compare/html/user-profile.png"
+            data-pair="visual-compare/pairs/user-profile.png"
+          >
+            <th scope="row"><a href="user-profile.html">User Profile</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/user-profile.png"
+                data-preview-kind="iOS"
+                data-preview-slug="user-profile"
+                aria-label="user-profile iOS preview"
+              >
+                <img src="visual-compare/rn/user-profile.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/user-profile.png"
+                data-preview-kind="HTML"
+                data-preview-slug="user-profile"
+                aria-label="user-profile HTML preview"
+              >
+                <img src="visual-compare/html/user-profile.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/user-profile.png"
+                data-preview-kind="Pair"
+                data-preview-slug="user-profile"
+                aria-label="user-profile Pair preview"
+              >
+                <img src="visual-compare/pairs/user-profile.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="user-team-list"
+            data-title="User Team List"
+            data-rn="visual-compare/rn/user-team-list.png"
+            data-html-shot="visual-compare/html/user-team-list.png"
+            data-pair="visual-compare/pairs/user-team-list.png"
+          >
+            <th scope="row"><a href="user-team-list.html">User Team List</a></th>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/rn/user-team-list.png"
+                data-preview-kind="iOS"
+                data-preview-slug="user-team-list"
+                aria-label="user-team-list iOS preview"
+              >
+                <img src="visual-compare/rn/user-team-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/user-team-list.png"
+                data-preview-kind="HTML"
+                data-preview-slug="user-team-list"
+                aria-label="user-team-list HTML preview"
+              >
+                <img src="visual-compare/html/user-team-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/pairs/user-team-list.png"
+                data-preview-kind="Pair"
+                data-preview-slug="user-team-list"
+                aria-label="user-team-list Pair preview"
+              >
+                <img src="visual-compare/pairs/user-team-list.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+          </tr>
+          <tr
+            data-slug="warmup"
+            data-title="Warmup"
+            data-rn=""
+            data-html-shot="visual-compare/html/warmup.png"
+            data-pair=""
+          >
+            <th scope="row"><a href="warmup.html">Warmup</a></th>
+            <td class="index-shot index-shot--missing"><span class="index-shot__missing">Missing</span></td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/warmup.png"
+                data-preview-kind="HTML"
+                data-preview-slug="warmup"
+                aria-label="warmup HTML preview"
+              >
+                <img src="visual-compare/html/warmup.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot index-shot--missing"><span class="index-shot__missing">Missing</span></td>
+          </tr>
+          <tr
+            data-slug="warmup-type"
+            data-title="Warmup Type"
+            data-rn=""
+            data-html-shot="visual-compare/html/warmup-type.png"
+            data-pair=""
+          >
+            <th scope="row"><a href="warmup-type.html">Warmup Type</a></th>
+            <td class="index-shot index-shot--missing"><span class="index-shot__missing">Missing</span></td>
+            <td class="index-shot">
+              <button
+                type="button"
+                class="index-thumb"
+                data-preview-src="visual-compare/html/warmup-type.png"
+                data-preview-kind="HTML"
+                data-preview-slug="warmup-type"
+                aria-label="warmup-type HTML preview"
+              >
+                <img src="visual-compare/html/warmup-type.png" alt="" loading="lazy" width="96" height="67" />
+              </button>
+            </td>
+            <td class="index-shot index-shot--missing"><span class="index-shot__missing">Missing</span></td>
+          </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
       </main>
+    </div>
+    <div id="index-peek" class="index-peek" hidden>
+      <p class="index-peek__label"></p>
+      <img class="index-peek__img" alt="" />
+    </div>
+    <div id="index-lightbox" class="index-lightbox" hidden>
+      <div class="index-lightbox__panel" role="dialog" aria-modal="true" aria-labelledby="index-lightbox-title">
+        <div class="index-lightbox__head">
+          <h2 id="index-lightbox-title" class="index-lightbox__title"></h2>
+          <button type="button" class="index-lightbox__close" aria-label="Close preview">X</button>
+        </div>
+        <div class="index-lightbox__tabs" role="tablist"></div>
+        <img class="index-lightbox__img" alt="" />
+      </div>
     </div>
     <script src="shared.js"></script>
   </body>

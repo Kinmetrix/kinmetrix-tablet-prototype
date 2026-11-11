@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/TeamUserNavigatorScreen.tsx -->
+<!-- route: TeamUser -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -12,47 +12,135 @@
       <header class="screen-header">
         <a class="back-link" href="team-home.html">Back</a>
         <p class="route-chip">TeamUser <span class="stack-tag">team</span></p>
-        <h1>Alex Morgan</h1>
-        <p class="enriched-meta">Proxy login wrapper. Hosts UserNavigator for a roster member.</p>
-      </header>
-      <main class="app__content wire-stack">
-        <div class="wire-center" style="min-height: 200px">
-          <p class="enriched-meta">While auth runs, RN shows KinmetrixLogoLoaderScreen.</p>
-          <p><strong>Loading member session…</strong></p>
-        </div>
-        <p>
-          Coaches open this route from the team roster. On success the nested member stack lands on Home (or a deep
-          link such as analysis details).
+        <h1>Test User</h1>
+        <p class="enriched-meta">
+          Proxy login wrapper. After login the nested UserNavigator lands on Home (HomeAnalysisView). Loader and
+          archived-member error live in Debug related links.
         </p>
-        <section class="wire-card" aria-label="Error state (fixture)">
-          <h2>Archived member</h2>
-          <p class="enriched-meta">Shown when proxy login returns 403.</p>
-          <p>This user is archived and cannot be accessed.</p>
-          <a class="wire-btn wire-btn--ghost" href="team-home.html">Go back</a>
-        </section>
-        <div class="wire-card-grid">
-          <article class="wire-card">
-            <h3>Member home</h3>
-            <p>Default stack entry after proxy login.</p>
-            <a class="wire-btn wire-btn--primary" href="home.html">Home</a>
-          </article>
-          <article class="wire-card">
-            <h3>Start hub</h3>
-            <p>Assessment, program, or session entry.</p>
-            <a class="wire-btn" href="home-start.html">Home start</a>
-          </article>
-          <article class="wire-card">
-            <h3>Member details</h3>
-            <p>Team settings roster drill-down.</p>
-            <a class="wire-btn" href="team-user-details.html">Team user details</a>
-          </article>
+      </header>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="team-home.html">&lt; Back</a></div>
+          <div class="wire-toolbar__title">
+            <div class="wire-toolbar__profile">
+              <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Test User" data-avatar-size="28"></span>
+              <span>Test User ▾</span>
+            </div>
+          </div>
+          <div class="wire-toolbar__right">
+            <a class="wire-btn wire-btn--primary" href="home-start.html">▶ Start</a>
+          </div>
         </div>
+        <div class="results-split" aria-label="Member analysis">
+          <section class="results-panel">
+            <div class="results-panel__head">
+              <div>
+                <h2 class="results-panel__title">September 18, 2026</h2>
+                <p class="results-panel__subtitle">Standard Program</p>
+              </div>
+              <div class="results-panel__actions">
+                <button class="wire-btn wire-btn--ghost" type="button">+ Add Note</button>
+                <button class="wire-btn wire-btn--ghost" type="button" aria-label="Download">↓</button>
+                <button class="wire-btn wire-btn--ghost" type="button" aria-label="More">⋮</button>
+              </div>
+            </div>
+            <div class="results-metrics">
+              <div>
+                <p class="results-metric__label">Avg Peak Force</p>
+                <p class="results-metric__value">5.4 LB</p>
+              </div>
+              <div>
+                <p class="results-metric__label">Stability</p>
+                <p class="results-metric__value">92%</p>
+              </div>
+              <a href="session-history.html" style="text-decoration: none; color: inherit">
+                <p class="results-metric__label">History &gt;</p>
+                <div
+                  class="proto-chart hist-spark"
+                  data-chart="bar"
+                  data-chart-label="Recent avg peak force"
+                ></div>
+              </a>
+            </div>
+            <table class="wire-table" aria-label="Directions">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Position</th>
+                  <th>Avg Peak Force</th>
+                  <th>Stability</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="session-data.html">Forward Flexion</a></td>
+                  <td><span class="angle-mark">0°</span></td>
+                  <td>5.05 LB</td>
+                  <td>92%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Right Flexion</a></td>
+                  <td><span class="angle-mark">90°</span></td>
+                  <td>4.50 LB</td>
+                  <td>92%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Rear Extension</a></td>
+                  <td><span class="angle-mark">180°</span></td>
+                  <td>6.36 LB</td>
+                  <td>91%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Left Flexion</a></td>
+                  <td><span class="angle-mark">270°</span></td>
+                  <td>5.54 LB</td>
+                  <td>91%</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="results-hint">Tap a row to view repetition data for that direction</p>
+          </section>
+          <section class="results-panel">
+            <p class="results-hint">Tap or drag chart to interact</p>
+            <div
+              class="proto-chart"
+              data-chart="radial-body"
+              data-chart-label="Avg peak force by direction"
+            ></div>
+            <div class="legend-pills">
+              <span class="legend-pill legend-pill--on">Avg Peak Force</span>
+              <span class="legend-pill">Stability</span>
+            </div>
+            <div class="sym-list" aria-label="Symmetry">
+              <div class="sym-list__head">
+                <h3>Symmetry</h3>
+                <span class="enriched-meta">Score: 1/2</span>
+              </div>
+              <div class="sym-row">
+                <span><span class="sym-dot" style="background: #e8a317"></span>Flexion ⇄ Extension 0°/180°</span>
+                <strong style="color: #c97800">80%</strong>
+              </div>
+              <div class="sym-row">
+                <span><span class="sym-dot" style="background: #2bb673"></span>Left Lateral ⇄ Right Lateral 270°/90°</span>
+                <strong style="color: #1f9d55">81%</strong>
+              </div>
+              <div class="sym-row">
+                <span><span class="sym-dot" style="background: #2bb673"></span>Front-Back ⇄ Left-Right Ratio</span>
+                <strong style="color: #1f9d55">1.1:1</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+        <a class="fab-chat" href="feedback.html" aria-label="Feedback">💬</a>
         <nav class="flow-nav" aria-label="Team user flows">
           <h2>Nested member routes</h2>
           <ul>
-            <li><a class="wire-btn" href="program-list.html">Programs</a></li>
-            <li><a class="wire-btn" href="user-profile.html">Profile</a></li>
-            <li><a class="wire-btn wire-btn--ghost" href="team-settings.html">Team settings (from member)</a></li>
+            <li><a class="wire-btn" href="home.html">Member home</a></li>
+            <li><a class="wire-btn" href="home-start.html">Home start</a></li>
+            <li><a class="wire-btn" href="team-user-details.html">Team user details</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="program-list.html">Programs</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="user-profile.html">Profile</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="team-home.html">Archived member / go back</a></li>
           </ul>
         </nav>
       </main>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/CompareSessionScreen.tsx -->
+<!-- route: CompareSession -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -12,70 +12,58 @@
       <header class="screen-header">
         <a class="back-link" href="session-history.html">Back</a>
         <p class="route-chip">CompareSession <span class="stack-tag">user</span></p>
-        <h1>Compare sessions</h1>
-        <p class="enriched-meta">Multi-select data grid + RadialMultiChart. Plot by weight or stability.</p>
+        <h1>Compare Angele Scott's Sessions</h1>
+        <p class="enriched-meta">Multi-select data grid + RadialMultiChart overlay. Plot by weight or stability.</p>
       </header>
-      <main class="app__content wire-stack">
+      <main class="app__content">
         <div class="wire-toolbar">
-          <span></span>
-          <p class="wire-toolbar__title">Compare Alex Morgan's sessions</p>
-          <button class="wire-btn wire-btn--ghost" type="button">Plot by: Weight ▾</button>
-        </div>
-        <div class="wire-split" style="min-height: 420px; grid-template-columns: 1.1fr 1fr">
-          <div style="padding: 0.5rem; overflow: auto">
-            <table class="wire-table" aria-label="Sessions to compare">
-              <thead>
-                <tr>
-                  <th>Created</th>
-                  <th style="text-align: center">Stable weight</th>
-                  <th style="text-align: center">Stability</th>
-                  <th style="text-align: center">Symmetry</th>
-                  <th style="width: 2rem"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><input type="checkbox" checked aria-label="Select session" /> Nov 6, 2026</td>
-                  <td style="text-align: center">142 N</td>
-                  <td style="text-align: center">94%</td>
-                  <td style="text-align: center">8/8</td>
-                  <td><span style="display: inline-block; width: 12px; height: 12px; background: #06c; border-radius: 2px"></span></td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" checked aria-label="Select session" /> Oct 28, 2026</td>
-                  <td style="text-align: center">135 N</td>
-                  <td style="text-align: center">91%</td>
-                  <td style="text-align: center">7/8</td>
-                  <td><span style="display: inline-block; width: 12px; height: 12px; background: #393; border-radius: 2px"></span></td>
-                </tr>
-                <tr>
-                  <td><input type="checkbox" aria-label="Select session" /> Oct 12, 2026</td>
-                  <td style="text-align: center">128 N</td>
-                  <td style="text-align: center">88%</td>
-                  <td style="text-align: center">7/8</td>
-                  <td><span style="display: inline-block; width: 12px; height: 12px; background: #c33; border-radius: 2px"></span></td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="session-history.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Compare Angele Scott's Sessions</p>
+          <div class="wire-toolbar__right">
+            <button class="wire-btn wire-btn--ghost" type="button">Plot by: Weight ▾</button>
           </div>
-          <div class="wire-pane-fill" style="min-height: 380px">
-            <div class="proto-chart" data-chart="radial-multi" data-chart-label="radial-multi label"></div>
-            <p class="enriched-meta">Overlaid polar plots per selected session.</p>
+        </div>
+        <div class="results-split results-split--plain" aria-label="Session overlay">
+          <table class="wire-table" aria-label="Sessions to compare">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Created At</th>
+                <th style="text-align: center">Stable Weight</th>
+                <th style="text-align: center">Stability</th>
+                <th style="text-align: center">Symmetry</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" checked aria-label="Select Jun 11 session 3.77 KG" /></td>
+                <td>Jun 11, 2026</td>
+                <td style="text-align: center">3.77 KG</td>
+                <td style="text-align: center">91%</td>
+                <td style="text-align: center">1/2</td>
+                <td style="text-align: center">
+                  <span class="rep-list__swatch" style="background: #2b7cff; border-radius: 50%"></span>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" checked aria-label="Select Jun 11 session 4.61 KG" /></td>
+                <td>Jun 11, 2026</td>
+                <td style="text-align: center">4.61 KG</td>
+                <td style="text-align: center">86%</td>
+                <td style="text-align: center">1/2</td>
+                <td style="text-align: center">
+                  <span class="rep-list__swatch" style="background: #2bb673; border-radius: 50%"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="wire-center">
             <div
-              style="
-                width: 200px;
-                height: 200px;
-                border: 2px dashed #999;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 0.85rem;
-                color: #666;
-              "
-            >
-              Radar placeholder
-            </div>
+              class="proto-chart"
+              data-chart="radial-body"
+              data-chart-label="Angele Scott session overlay"
+            ></div>
           </div>
         </div>
         <nav class="flow-nav" aria-label="Compare flows">

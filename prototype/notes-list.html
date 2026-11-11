@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/NotesListScreen.tsx -->
+<!-- route: NotesList -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -16,6 +16,11 @@
         <p class="enriched-meta">Paginated grid. Row → UserAnalysisDetails for linked analysis.</p>
       </header>
       <main class="app__content wire-stack">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="user-profile.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Alex Morgan's notes</p>
+          <div class="wire-toolbar__right"></div>
+        </div>
         <table class="wire-table" aria-label="User notes">
           <thead>
             <tr>

@@ -1,73 +1,101 @@
 <!DOCTYPE html>
-<!-- source: src/screens/RunGroupScreen.tsx -->
+<!-- route: RunGroup -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Run Group · Kinmetrix prototype</title>
+    <title>Session · Kinmetrix prototype</title>
     <link rel="stylesheet" href="kin-prototype.css" />
   </head>
   <body data-route="RunGroup" data-enriched="true">
     <div class="device-frame">
       <header class="screen-header">
-        <a class="back-link" href="step-list.html">Back</a>
+        <a class="back-link" href="protocol-preview.html">Back</a>
         <p class="route-chip">RunGroup <span class="stack-tag">user</span></p>
-        <h1>Run Group</h1>
-        <p class="enriched-meta">SafeRunDeviceView over group steps. On finish → GroupResults unless force_back.</p>
+        <h1>Session</h1>
+        <p class="enriched-meta">SafeRunDeviceView after Protocol Preview Start. Session badge, practice-rep toggle.</p>
       </header>
-      <main class="app__content wire-stack">
+      <main class="app__content" style="display: flex; flex-direction: column; min-height: 0; background: #fff">
         <div class="wire-toolbar">
-          <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Alex Morgan" data-avatar-size="40" style="width: 40px; height: 40px; font-size: 0.55rem" style="width:40px;height:40px"></span>
-          <p class="wire-toolbar__title">Warm-up block</p>
-          <a class="wire-btn wire-btn--ghost" href="step-list.html">Leave</a>
+          <div class="wire-toolbar__left">
+            <div class="wire-toolbar__profile" style="flex-direction: column; align-items: flex-start; gap: 0.1rem">
+              <span style="display: inline-flex; align-items: center; gap: 0.45rem">
+                <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Angele Scott" data-avatar-size="28"></span>
+                <span>Angele Scott</span>
+              </span>
+              <span class="enriched-meta" style="margin-left: 2.1rem">Test</span>
+            </div>
+          </div>
+          <p class="wire-toolbar__title">
+            <span class="session-card__badge" style="border: 1px solid #2aa56a; color: #1a5f3a; background: #eaf7ef">● Session</span>
+          </p>
+          <div class="wire-toolbar__right">
+            <a class="wire-btn" href="home.html">✕ Quit</a>
+          </div>
         </div>
-        <section class="wire-card" aria-label="Device run placeholder">
-          <h2>Device run</h2>
-          <p>
-            Steps from the group rotate through rotator angles with isometric or isokinetic mode from each step record.
-            Rep completion updates step_sessions and may open SessionData for history edits.
-          </p>
-          <p class="enriched-meta">
-            Placeholder: BLE device UI, rep counter, and force charts live in RunDeviceView — not reproduced here.
-          </p>
-          <div class="wire-center" style="min-height: 200px; border: 2px dashed #999; border-radius: 8px">
-            <p><strong>Step 2 of 5</strong> · Rotation 45°</p>
-            <p>4 reps remaining · Target 35 N · 10s hold</p>
-            <button class="wire-btn wire-btn--primary" type="button">Start rep (noop)</button>
+        <section
+          style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 1rem"
+          aria-label="Begin session"
+        >
+          <button
+            class="wire-btn wire-btn--primary"
+            type="button"
+            style="min-width: 16rem; background: #111; border-color: #111; padding: 0.85rem 1.5rem; font-size: 1.05rem"
+          >
+            ▶ Begin
+          </button>
+          <div style="width: min(420px, 100%); border: 1px dashed #bbb; border-radius: 10px; padding: 0.85rem 1rem; background: #fafafa">
+            <label class="wire-toolbar__toggle" for="practice-rep-session">
+              <button class="wire-toggle" type="button" id="practice-rep-session" aria-pressed="false" aria-label="Include practice rep" style="background: #ccc"></button>
+              <span>Include practice rep?</span>
+            </label>
+            <p class="enriched-meta" style="margin: 0.45rem 0 0">
+              Adds one practice rep at every direction before the real reps start. Practice reps are not included in your
+              session data. Skip if you're an ARC pro.
+            </p>
+          </div>
+          <p class="enriched-meta" style="margin: 0">Connected: KMA-Device · 1.0.0-simulate</p>
+        </section>
+        <section class="exercise-dash" aria-label="Step parameters">
+          <div class="prop-card">
+            <p class="prop-card__label">Duration</p>
+            <p class="prop-card__value">10s</p>
+          </div>
+          <div class="prop-card">
+            <p class="prop-card__label">Tilt</p>
+            <p class="prop-card__value">5° - 35°</p>
+          </div>
+          <div class="prop-card" style="grid-row: span 3; align-items: center; justify-content: center">
+            <div class="orient-ring" aria-label="Direction orientation">
+              <span class="orient-ring__node" style="top: 8%; left: 50%; transform: translateX(-50%)"></span>
+              <span class="orient-ring__node" style="top: 50%; right: 8%; transform: translateY(-50%)"></span>
+              <span
+                class="orient-ring__node orient-ring__node--active"
+                style="bottom: 8%; left: 50%; transform: translateX(-50%); width: 1.4rem; height: 1.4rem; display: grid; place-items: center; color: #fff; font-size: 0.65rem; font-weight: 700"
+                >10</span
+              >
+              <span class="orient-ring__node" style="top: 50%; left: 8%; transform: translateY(-50%); background: #111"></span>
+            </div>
+          </div>
+          <div class="prop-card">
+            <p class="prop-card__label">Target weight</p>
+            <p class="prop-card__value">2.01 KG</p>
+          </div>
+          <div class="prop-card">
+            <p class="prop-card__label">Repetitions</p>
+            <p class="prop-card__value">0 / 10</p>
+          </div>
+          <div class="prop-card">
+            <p class="prop-card__label">Mode</p>
+            <p class="prop-card__value">Isokinetic</p>
           </div>
         </section>
-        <table class="wire-table" aria-label="Group steps">
-          <thead>
-            <tr>
-              <th>Angle</th>
-              <th>Type</th>
-              <th>Reps left</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><a href="session-data.html">0°</a></td>
-              <td>Isometric</td>
-              <td>0</td>
-            </tr>
-            <tr>
-              <td>45°</td>
-              <td>Isometric</td>
-              <td>4</td>
-            </tr>
-            <tr>
-              <td>90°</td>
-              <td>Isokinetic</td>
-              <td>5</td>
-            </tr>
-          </tbody>
-        </table>
-        <nav class="flow-nav" aria-label="Run group outcomes">
-          <h2>When finished</h2>
+        <nav class="flow-nav" aria-label="Run group flows">
+          <h2>Related</h2>
           <ul>
-            <li><a class="wire-btn wire-btn--primary" href="group-results.html">Group results</a></li>
-            <li><a class="wire-btn wire-btn--ghost" href="session-data.html">Session data (history)</a></li>
-            <li><a class="wire-btn wire-btn--ghost" href="step-list.html">Step list</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="protocol-preview.html">Protocol preview</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="assessment.html">Assessment (same chrome)</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="home.html">Home</a></li>
           </ul>
         </nav>
       </main>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/SettingsScreen.tsx -->
+<!-- route: Settings -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,7 +15,14 @@
         <h1>Settings</h1>
         <p class="enriched-meta">AsyncStorage toggles for theme, status bar, analytics, debug overlay.</p>
       </header>
-      <main class="app__content wire-stack" style="max-width: 480px">
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"></div>
+          <p class="wire-toolbar__title">Settings</p>
+          <div class="wire-toolbar__right"></div>
+        </div>
+        <div class="wire-center">
+          <div class="wire-stack" style="max-width: 480px; margin: 0 auto">
         <section class="wire-card" aria-label="App settings">
           <div class="wire-field" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid #ddd">
             <label for="set-theme">Use dark theme</label>
@@ -39,6 +46,8 @@
             <li><a class="wire-btn wire-btn--ghost" href="device-control.html">Device control</a></li>
           </ul>
         </nav>
+        </div>
+        </div>
       </main>
     </div>
     <script src="shared.js"></script>

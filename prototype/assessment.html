@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/AssessmentScreen.tsx -->
+<!-- route: Assessment -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -10,64 +10,92 @@
   <body data-route="Assessment" data-enriched="true">
     <div class="device-frame">
       <header class="screen-header">
-        <a class="back-link" href="home-start.html">Back</a>
+        <a class="back-link" href="edit-protocol-session.html">Back</a>
         <p class="route-chip">Assessment <span class="stack-tag">user</span></p>
         <h1>Assessment</h1>
-        <p class="enriched-meta">SafeRunDeviceView + protocol batch angles. Hardware capture not stubbed.</p>
+        <p class="enriched-meta">
+          SafeRunDeviceView device run. Settings live on EditProtocolSession (New Assessment). Recapture RN from this
+          route, not the settings card.
+        </p>
       </header>
-      <main class="app__content wire-stack">
+      <main class="app__content" style="display: flex; flex-direction: column; min-height: 0; background: #fff">
         <div class="wire-toolbar">
-          <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Alex Morgan" data-avatar-size="40" style="width: 40px; height: 40px; font-size: 0.55rem" style="width:40px;height:40px"></span>
-          <p class="wire-toolbar__title">Alex Morgan</p>
-          <a class="wire-btn wire-btn--ghost" href="home.html">Leave</a>
+          <div class="wire-toolbar__left">
+            <div class="wire-toolbar__profile">
+              <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Test User" data-avatar-size="28"></span>
+              <span>Test User</span>
+            </div>
+          </div>
+          <p class="wire-toolbar__title">
+            <span class="session-card__badge" style="border: 1px solid #7eb6ff; color: #007aff; background: #eef6ff">● Assessment</span>
+          </p>
+          <div class="wire-toolbar__right">
+            <a class="wire-btn" href="home.html">✕ Quit</a>
+          </div>
         </div>
-        <section class="wire-card" aria-label="Device run placeholder">
-          <h2>Device run</h2>
-          <p>
-            Live assessment steps rotate through protocol angles (flexion, rotation, and related tilts).
-            Repetitions, arc limits, and isometric/isokinetic mode come from the active assessment batch.
-          </p>
-          <p class="enriched-meta">
-            Placeholder: BLE device UI, rep counter, and force charts live in RunDeviceView — not reproduced here.
-          </p>
-          <div class="wire-center" style="min-height: 200px; border: 2px dashed #999; border-radius: 8px">
-            <p><strong>Step 1 of 8</strong> · Rotation 90°</p>
-            <p>3 reps remaining · Target 40 N</p>
-            <button class="wire-btn wire-btn--primary" type="button">Start rep (noop)</button>
+        <section
+          style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 1rem"
+          aria-label="Begin assessment"
+        >
+          <button class="wire-btn wire-btn--primary" type="button" style="min-width: 16rem; background: #111; border-color: #111; padding: 0.85rem 1.5rem; font-size: 1.05rem">
+            ▶ Begin
+          </button>
+          <div style="width: min(420px, 100%); border: 1px dashed #bbb; border-radius: 10px; padding: 0.85rem 1rem; background: #fafafa">
+            <label class="wire-toolbar__toggle" for="practice-rep-assess">
+              <button class="wire-toggle" type="button" id="practice-rep-assess" aria-pressed="false" aria-label="Include practice rep" style="background: #ccc"></button>
+              <span>Include practice rep?</span>
+            </label>
+            <p class="enriched-meta" style="margin: 0.45rem 0 0">
+              Adds one practice rep at every direction before the real reps start. Practice reps are not included in your
+              session data.
+            </p>
+          </div>
+          <p class="enriched-meta" style="margin: 0">Connected KMx Device: KMx-001000</p>
+        </section>
+        <section class="exercise-dash" aria-label="Step parameters">
+          <div class="prop-card">
+            <p class="prop-card__label">Duration</p>
+            <p class="prop-card__value">5s</p>
+          </div>
+          <div class="prop-card">
+            <p class="prop-card__label">Tilt</p>
+            <p class="prop-card__value">5° - 35°</p>
+          </div>
+          <div class="prop-card" style="grid-row: span 3; align-items: center; justify-content: center">
+            <div class="orient-ring" aria-label="Direction orientation">
+              <span class="orient-ring__node" style="top: 8%; left: 50%; transform: translateX(-50%)"></span>
+              <span class="orient-ring__node" style="top: 50%; right: 8%; transform: translateY(-50%)"></span>
+              <span
+                class="orient-ring__node orient-ring__node--active"
+                style="bottom: 8%; left: 50%; transform: translateX(-50%); width: 1.4rem; height: 1.4rem; display: grid; place-items: center; color: #fff; font-size: 0.7rem; font-weight: 700"
+                >3</span
+              >
+              <span class="orient-ring__node" style="top: 50%; left: 8%; transform: translateY(-50%); background: #111"></span>
+            </div>
+          </div>
+          <div class="prop-card">
+            <p class="prop-card__label">Target weight</p>
+            <p class="prop-card__value">12.0 KG</p>
+          </div>
+          <div class="prop-card">
+            <p class="prop-card__label">Rotation</p>
+            <p class="prop-card__value">180°</p>
+          </div>
+          <div class="prop-card">
+            <p class="prop-card__label">Repetitions</p>
+            <p class="prop-card__value">0 / 2</p>
+          </div>
+          <div class="prop-card">
+            <p class="prop-card__label">Mode</p>
+            <p class="prop-card__value">Isokinetic</p>
           </div>
         </section>
-        <table class="wire-table" aria-label="Assessment steps">
-          <thead>
-            <tr>
-              <th>Angle</th>
-              <th>Type</th>
-              <th>Reps left</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>90° (RF)</td>
-              <td>Isometric</td>
-              <td>3</td>
-            </tr>
-            <tr>
-              <td>45° (RDF)</td>
-              <td>Isometric</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td>0° (FF)</td>
-              <td>Isometric</td>
-              <td>5</td>
-            </tr>
-          </tbody>
-        </table>
         <nav class="flow-nav" aria-label="Assessment outcomes">
           <h2>When finished</h2>
           <ul>
             <li><a class="wire-btn wire-btn--primary" href="group-results.html">Group results</a></li>
+            <li><a class="wire-btn" href="edit-protocol-session.html">New Assessment settings</a></li>
             <li><a class="wire-btn wire-btn--ghost" href="home.html">Return home</a></li>
-            <li><a class="wire-btn wire-btn--ghost" href="device-control.html">Device control</a></li>
           </ul>
         </nav>
       </main>

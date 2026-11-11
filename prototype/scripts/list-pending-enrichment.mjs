@@ -95,7 +95,6 @@ const batch = pending.slice(0, limit);
 const payload = {
   pendingTotal: pending.length,
   total: manifest.screens.length,
-  kinmetrixAppRoot: manifest.kinmetrixAppRoot,
   batch,
 };
 
@@ -103,7 +102,6 @@ if (asJson) console.log(JSON.stringify(payload, null, 2));
 else {
   console.log(`${pending.length} pending (showing ${batch.length})`);
   for (const s of batch) {
-    const src = s.sourceFile ? ` ← ${s.sourceFile}` : '';
-    console.log(`- ${s.html} (${s.route})${src}`);
+    console.log(`- ${s.html} (${s.route})`);
   }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/SignWaiverScreen.tsx -->
+<!-- route: SignWaiver -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -10,46 +10,84 @@
   <body data-route="SignWaiver" data-enriched="true">
     <div class="device-frame">
       <header class="screen-header">
-        <a class="back-link" href="home.html">Back</a>
+        <a class="back-link" href="home-waiver.html">Back</a>
         <p class="route-chip">SignWaiver <span class="stack-tag">user</span></p>
         <h1>Waiver</h1>
-        <p class="enriched-meta">PDF viewer + signature popover. Upload not stubbed.</p>
+        <p class="enriched-meta">PDF terms (react-native-pdf) + Sign opens SignatureCapture popover. Upload stubbed.</p>
       </header>
-      <main class="app__content wire-stack" style="min-height: 560px">
+      <main class="app__content" style="display: flex; flex-direction: column; position: relative">
         <div class="wire-toolbar">
-          <span></span>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="home-waiver.html">&lt; Back</a></div>
           <p class="wire-toolbar__title">Waiver</p>
-          <button class="wire-btn wire-btn--primary" type="button">Sign</button>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--ghost" href="home-waiver.html">Back</a></div>
         </div>
-        <section class="wire-pane-fill" aria-label="Waiver PDF">
-          <p><strong>waiver-dec17-2024.pdf</strong></p>
-          <p class="enriched-meta">RN uses react-native-pdf at scale 1.5. Legal text not reproduced in HTML.</p>
-          <p>Placeholder PDF page 1 of 3</p>
-        </section>
-        <section class="wire-card" aria-label="Signature popover (fixture)">
-          <h2>Sign above</h2>
-          <div
-            class="wire-pane-fill"
-            style="min-height: 160px; border-style: solid; background: #fff"
-            aria-label="Signature pad"
-          >
-            <p class="enriched-meta">SignatureCapture canvas</p>
+        <div class="wire-center">
+          <article class="wire-doc" aria-label="Kinmetrix terms and liability waiver">
+          <h2>KINMETRIX TERMS AND CONDITIONS and LIABILITY WAIVER</h2>
+          <h2>YOUR USE OF KINMETRIX'S PRODUCTS.</h2>
+          <p>
+            Your use of Kinmetrix products and platforms is subject to these Terms of Service
+            (collectively, the “Agreement”). By continuing, you acknowledge that you have read and
+            agree to the Agreement.
+          </p>
+          <p>
+            Embedded Software is licensed, not sold. Kinmetrix and its licensors retain all
+            intellectual property rights. You may not reverse engineer, decompile, or create
+            derivative works except where applicable law prohibits that restriction. The license is
+            non-exclusive and limited to use with authorized Kinmetrix hardware and services.
+          </p>
+          <h2>THIRD PARTY SOFTWARE AND APPLICATIONS.</h2>
+          <p>
+            The product may include or interoperate with third-party software and applications.
+            Those components are subject to their own license terms. Kinmetrix is not responsible
+            for third-party content or services accessed through the product.
+          </p>
+        </article>
+        <div
+          class="wire-popover-backdrop"
+          id="sign-popover"
+          hidden
+          role="dialog"
+          aria-modal="true"
+          aria-label="Signature"
+        >
+          <div class="wire-popover">
+            <div class="wire-popover__pad" aria-label="Signature pad"></div>
+            <div class="wire-popover__bar">
+              <p>Sign Above</p>
+              <button class="wire-btn" type="button" id="clear-sign">Clear</button>
+              <a class="wire-btn wire-btn--primary" href="home.html">Save</a>
+            </div>
           </div>
-          <div class="flow-nav" style="border: none; margin: 0.75rem 0 0; padding: 0">
-            <ul>
-              <li><button class="wire-btn" type="button">Clear</button></li>
-              <li><button class="wire-btn wire-btn--primary" type="button">Save</button></li>
-            </ul>
-          </div>
-        </section>
+        </div>
+        </div>
+
         <nav class="flow-nav" aria-label="Waiver flows">
-          <h2>After signing</h2>
+          <h2>Waiver flow</h2>
           <ul>
-            <li><a class="wire-btn wire-btn--primary" href="home.html">Return to home</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="home-waiver.html">← Home (waiver required)</a></li>
+            <li><button class="wire-btn" type="button" id="open-sign-flow">Signature popover</button></li>
+            <li><a class="wire-btn" href="home.html">After save → Home</a></li>
           </ul>
         </nav>
       </main>
     </div>
     <script src="shared.js"></script>
+    <script>
+      (function () {
+        var pop = document.getElementById('sign-popover');
+        function openSign() {
+          pop.hidden = false;
+        }
+        function closeSign(ev) {
+          if (ev.target === pop) pop.hidden = true;
+        }
+        document.getElementById('open-sign').addEventListener('click', openSign);
+        document.getElementById('open-sign-flow').addEventListener('click', openSign);
+        pop.addEventListener('click', closeSign);
+        document.getElementById('clear-sign').addEventListener('click', function () {});
+        if (new URLSearchParams(location.search).get('sign') === '1') openSign();
+      })();
+    </script>
   </body>
 </html>

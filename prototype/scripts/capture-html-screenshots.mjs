@@ -18,7 +18,10 @@ const seenHtml = new Set();
 fs.mkdirSync(outDir, { recursive: true });
 
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: WIDTH, height: HEIGHT } });
+// Pad the browser chrome so a fixed 1180×820 device-frame fits without scroll chrome.
+const page = await browser.newPage({
+  viewport: { width: WIDTH + 48, height: HEIGHT + 48 },
+});
 
 let captured = 0;
 for (const screen of screens) {
@@ -29,21 +32,38 @@ for (const screen of screens) {
   await page.evaluate(() => {
     if (window.KinPrototype?.mountDebugChrome) window.KinPrototype.mountDebugChrome();
     if (window.KinPrototype?.setDebugOpen) window.KinPrototype.setDebugOpen(false);
+    if (window.KinPrototype?.setCompareOpen) window.KinPrototype.setCompareOpen(false);
     if (window.KinPrototype?.mountCharts) window.KinPrototype.mountCharts();
     if (window.KinPrototype?.mountAvatars) window.KinPrototype.mountAvatars();
     document.body.classList.add('proto-capture');
   });
   await page.waitForTimeout(150);
   const file = path.join(outDir, screen.slug + '.png');
-  const main = page.locator('.device-frame .app__content').first();
-  const hasMain = await main.count();
-  if (hasMain) {
-    await main.screenshot({ path: file });
+  const frame = page.locator('.device-frame').first();
+  if ((await frame.count()) > 0) {
+    const box = await frame.boundingBox();
+    if (!box) {
+      throw new Error(`No bounding box for .device-frame on ${screen.html}`);
+    }
+    // Clip to the tablet canvas. Element screenshots of .app__content follow scrollHeight
+    // and produce tall portrait tiles on long screens (e.g. device-control).
+    await page.screenshot({
+      path: file,
+      clip: {
+        x: box.x,
+        y: box.y,
+        width: WIDTH,
+        height: HEIGHT,
+      },
+    });
   } else {
-    await page.screenshot({ path: file, fullPage: false });
+    await page.screenshot({
+      path: file,
+      clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT },
+    });
   }
   captured += 1;
 }
 
 await browser.close();
-console.log(`Wrote ${captured} HTML screenshots to ${outDir}`);
+console.log(`Wrote ${captured} HTML screenshots (${WIDTH}×${HEIGHT}) to ${outDir}`);

@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
 import { loadMirrorManifest } from './lib/load-screens.mjs';
 
@@ -32,4 +33,13 @@ if (pending.length > 0) {
   console.log('pending:', pending.map((s) => s.html).join(', '));
   process.exit(1);
 }
+
+const toolbarCheck = spawnSync(process.execPath, [path.join(prototypeRoot, 'scripts/check-kmscreen-toolbar.mjs')], {
+  cwd: prototypeRoot,
+  encoding: 'utf8',
+});
+if (toolbarCheck.stdout) process.stdout.write(toolbarCheck.stdout);
+if (toolbarCheck.stderr) process.stderr.write(toolbarCheck.stderr);
+if (toolbarCheck.status !== 0) process.exit(toolbarCheck.status || 1);
+
 process.exit(0);

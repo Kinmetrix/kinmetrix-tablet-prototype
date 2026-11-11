@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/AddSessionToCompareScreen.tsx -->
+<!-- route: AddSessionToCompare -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,51 +15,116 @@
         <h1>Add Session To Compare</h1>
         <p class="enriched-meta">4-column AnalysisItem grid. Multi-select then Compare N returns to detail view.</p>
       </header>
-      <main class="app__content wire-stack">
+      <main class="app__content">
         <div class="wire-toolbar">
-          <label class="enriched-meta" style="display: flex; align-items: center; gap: 0.35rem">
-            Normalized
-            <input type="checkbox" checked aria-label="Normalized scale" />
-          </label>
-          <p class="wire-toolbar__title">Team users with analysis</p>
-          <span></span>
+          <div class="wire-toolbar__left">
+            <a class="wire-toolbar-back" href="compare-team-user-sessions-detail.html">&lt; Back</a>
+          </div>
+          <p class="wire-toolbar__title">Add Session To Compare</p>
+          <div class="wire-toolbar__right">
+            <label class="wire-toolbar__toggle">
+              <span>Normalized</span>
+              <button class="wire-toggle" type="button" aria-pressed="false" aria-label="Normalized"></button>
+            </label>
+          </div>
         </div>
-        <div class="wire-toolbar" style="gap: 0.5rem; flex-wrap: wrap">
-          <button class="wire-btn wire-btn--ghost" type="button">All</button>
-          <button class="wire-btn wire-btn--ghost" type="button">Assessment</button>
-          <button class="wire-btn wire-btn--ghost" type="button">Regular</button>
-          <button class="wire-btn wire-btn--ghost" type="button">Performance</button>
+        <div class="filter-bar" style="justify-content: center">
+          <div class="filter-chip-group" role="tablist" aria-label="Session type">
+            <button class="filter-chip filter-chip--active" type="button">All</button>
+            <button class="filter-chip" type="button">◇ Assessment</button>
+            <button class="filter-chip" type="button">◇ Program</button>
+            <button class="filter-chip" type="button">◇ Session</button>
+          </div>
         </div>
-        <div
-          style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; padding: 0.5rem 0"
-          aria-label="Team user session cards"
-        >
-          <label class="wire-card" style="padding: 0.75rem; border: 2px solid #333">
-            <input type="checkbox" checked aria-label="Select Jordan Lee" />
-            <p class="enriched-meta" style="margin: 0.25rem 0 0">Jordan Lee</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">136 N</p>
-            <p class="enriched-meta" style="margin: 0">Regular</p>
-          </label>
-          <label class="wire-card" style="padding: 0.75rem; border: 2px solid #333">
-            <input type="checkbox" checked aria-label="Select Sam Patel" />
-            <p class="enriched-meta" style="margin: 0.25rem 0 0">Sam Patel</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">128 N</p>
-            <p class="enriched-meta" style="margin: 0">Assessment</p>
-          </label>
-          <a class="wire-card" href="user-analysis-details.html" style="padding: 0.75rem; text-decoration: none; color: inherit">
-            <p class="enriched-meta" style="margin: 0">Riley Chen</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">119 N</p>
-            <p class="enriched-meta" style="margin: 0">Light</p>
-          </a>
-          <a class="wire-card" href="user-analysis-details.html" style="padding: 0.75rem; text-decoration: none; color: inherit">
-            <p class="enriched-meta" style="margin: 0">Casey Drew</p>
-            <p style="margin: 0.25rem 0 0; font-weight: bold">141 N</p>
-            <p class="enriched-meta" style="margin: 0">Performance</p>
-          </a>
+        <div class="session-grid" aria-label="Team user session cards">
+          <article class="session-card">
+            <input class="session-card__check" type="checkbox" checked aria-label="Select Abigail Baker" />
+            <a class="session-card__link" href="user-analysis-details.html">
+              <div class="session-card__top">
+                <span class="session-card__check-slot"></span>
+                <p class="session-card__name">Abigail Baker</p>
+                <span class="session-card__badge">1 rep</span>
+              </div>
+              <div class="proto-chart" data-chart="radial" data-chart-label="Abigail Baker peak force"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 7.5 kg</p>
+              <p class="session-card__meta">Thu Sep 10 12:22pm</p>
+            </a>
+          </article>
+          <article class="session-card">
+            <input class="session-card__check" type="checkbox" checked aria-label="Select Angele Scott" />
+            <a class="session-card__link" href="user-analysis-details.html">
+              <div class="session-card__top">
+                <span class="session-card__check-slot"></span>
+                <p class="session-card__name">Angele Scott</p>
+                <span class="session-card__badge">1-2 reps</span>
+              </div>
+              <div class="proto-chart" data-chart="radial" data-chart-label="Angele Scott peak force"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 2.1 kg</p>
+              <p class="session-card__meta">Thu Sep 3 1:23pm</p>
+            </a>
+          </article>
+          <article class="session-card">
+            <input class="session-card__check" type="checkbox" aria-label="Select Christopher Jonathan" />
+            <a class="session-card__link" href="user-analysis-details.html">
+              <div class="session-card__top">
+                <span class="session-card__check-slot"></span>
+                <p class="session-card__name">Christopher Jonathan</p>
+                <span class="session-card__badge">1 rep</span>
+              </div>
+              <div class="proto-chart" data-chart="radial" data-chart-label="Christopher Jonathan peak force"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 2.1 kg</p>
+              <p class="session-card__meta">Tue Feb 10 11:49am</p>
+            </a>
+          </article>
+          <article class="session-card">
+            <input class="session-card__check" type="checkbox" aria-label="Select Ella Parker" />
+            <a class="session-card__link" href="user-analysis-details.html">
+              <div class="session-card__top">
+                <span class="session-card__check-slot"></span>
+                <p class="session-card__name">Ella Parker</p>
+                <span class="session-card__badge">2 reps</span>
+              </div>
+              <div class="proto-chart" data-chart="radial" data-chart-label="Ella Parker peak force"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 12.1 kg</p>
+              <p class="session-card__meta">Sat Jan 31 4:18am</p>
+            </a>
+          </article>
+          <article class="session-card">
+            <input class="session-card__check" type="checkbox" aria-label="Select Lily Jenkins" />
+            <a class="session-card__link" href="user-analysis-details.html">
+              <div class="session-card__top">
+                <span class="session-card__check-slot"></span>
+                <p class="session-card__name">Lily Jenkins</p>
+                <span class="session-card__badge">1 rep</span>
+              </div>
+              <div class="proto-chart" data-chart="radial" data-chart-label="Lily Jenkins peak force"></div>
+              <span class="session-card__badge">Assessment</span>
+              <p class="session-card__force">Avg Peak Force: 2.8 kg</p>
+              <p class="session-card__meta">Fri Mar 14 9:04am</p>
+            </a>
+          </article>
+          <article class="session-card">
+            <input class="session-card__check" type="checkbox" aria-label="Select Marvin Smith" />
+            <a class="session-card__link" href="user-analysis-details.html">
+              <div class="session-card__top">
+                <span class="session-card__check-slot"></span>
+                <p class="session-card__name">Marvin Smith</p>
+                <span class="session-card__badge">1 rep</span>
+              </div>
+              <div class="proto-chart" data-chart="radial" data-chart-label="Marvin Smith peak force"></div>
+              <span class="session-card__badge">Session</span>
+              <p class="session-card__force">Avg Peak Force: 3.7 kg</p>
+              <p class="session-card__meta">Mon Apr 21 3:12pm</p>
+            </a>
+          </article>
         </div>
-        <div class="wire-toolbar" style="border-top: 1px solid #ddd; padding-top: 0.75rem">
-          <p class="enriched-meta">24 results · page 1 of 2</p>
-          <a class="wire-btn wire-btn--primary" href="compare-team-user-sessions-detail.html">Compare 4 sessions</a>
+        <div class="screen-footer">
+          <span>1–6 of 6 results</span>
+          <a class="wire-btn wire-btn--header" href="compare-team-user-sessions-detail.html">Compare 2 sessions</a>
         </div>
         <nav class="flow-nav" aria-label="Add to compare flows">
           <h2>Related</h2>

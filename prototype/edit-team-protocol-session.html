@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/EditTeamProtocolSessionScreen.tsx -->
+<!-- route: EditTeamProtocolSession -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,38 +15,53 @@
         <h1>Team assessment settings</h1>
         <p class="enriched-meta">CardButtons open EditStepPopovers; Save Team Settings updates all member assessments.</p>
       </header>
-      <main class="app__content wire-center">
-        <section class="wire-card wire-form-card" style="max-width: 520px; width: 100%" aria-label="Team assessment configuration">
-          <h2 style="margin: 0 0 0.25rem; text-align: center">Configure team assessment settings</h2>
-          <p class="enriched-meta" style="text-align: center; margin-bottom: 1rem">
-            These settings will be applied to all team members' assessments.
-          </p>
-          <div class="wire-stack" style="gap: 0.75rem">
-            <button class="wire-kv-row" type="button">
-              <span>Mode</span>
-              <strong>Isometric</strong>
-            </button>
-            <button class="wire-kv-row" type="button">
-              <span>Tilt</span>
-              <strong>1°</strong>
-            </button>
-            <button class="wire-kv-row" type="button">
-              <span>Target weight</span>
-              <strong>2 N</strong>
-            </button>
-            <button class="wire-kv-row" type="button">
-              <span>Repetitions</span>
-              <strong>2</strong>
-            </button>
-            <button class="wire-kv-row" type="button">
-              <span>Directions</span>
-              <strong>8</strong>
-            </button>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="team-settings.html">&lt; Back</a></div>
+          <p class="wire-toolbar__title">Team assessment settings</p>
+          <div class="wire-toolbar__right"></div>
+        </div>
+        <section class="assess-card" aria-label="Team assessment configuration">
+          <h2>Configure Team Assessment Settings</h2>
+          <p>These settings will be applied to all team members' assessments.</p>
+          <div class="assess-row">
+            <div class="assess-row__body">
+              <p class="assess-row__label">Mode</p>
+              <p class="assess-row__value">Isometric</p>
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Edit mode">✎</button>
           </div>
-          <p style="margin-top: 1.25rem">
-            <a class="wire-btn wire-btn--primary" href="team-settings.html" style="width: 100%; text-align: center; display: block">Save team settings</a>
-          </p>
+          <div class="assess-row">
+            <div class="assess-row__body">
+              <p class="assess-row__label">Tilt</p>
+              <p class="assess-row__value">5°</p>
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Edit tilt">✎</button>
+          </div>
+          <div class="assess-row">
+            <div class="assess-row__body">
+              <p class="assess-row__label">Target Weight</p>
+              <p class="assess-row__value">1.00 KG</p>
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Edit target weight">✎</button>
+          </div>
+          <div class="assess-row">
+            <div class="assess-row__body">
+              <p class="assess-row__label">Repetitions</p>
+              <p class="assess-row__value">2</p>
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Edit repetitions">✎</button>
+          </div>
+          <div class="assess-row">
+            <div class="assess-row__body">
+              <p class="assess-row__label">Directions</p>
+              <p class="assess-row__value">4</p>
+            </div>
+            <button class="wire-btn wire-btn--ghost" type="button" aria-label="Edit directions">✎</button>
+          </div>
+          <a class="wire-btn wire-btn--primary" href="team-settings.html">Save Team Settings</a>
         </section>
+
         <nav class="flow-nav" aria-label="Team protocol flows" style="max-width: 520px; width: 100%">
           <h2>Related</h2>
           <ul>

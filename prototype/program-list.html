@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/ProgramListScreen.tsx -->
+<!-- route: ProgramList -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -17,11 +17,11 @@
       </header>
       <main class="app__content wire-stack">
         <div class="wire-toolbar">
-          <span></span>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="home-start.html">&lt; Back</a></div>
           <p class="wire-toolbar__title">Programs</p>
-          <a class="wire-btn wire-btn--primary" href="create-program-choice.html">Create New</a>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--add" href="create-program-choice.html">+ Create New</a></div>
         </div>
-        <table class="wire-table">
+        <table class="wire-table wire-table--sheet" aria-label="Programs">
           <thead>
             <tr>
               <th>Name</th>
@@ -33,30 +33,30 @@
           <tbody>
             <tr>
               <td>
-                <a href="group-list.html"><strong>Neck strength — week 4</strong></a>
-                <br /><span class="enriched-meta">Return-to-play protocol</span>
+                <span class="row-handle" aria-hidden="true">☰</span>
+                <a href="group-list.html">Neck strength - week 4</a>
               </td>
-              <td style="text-align: center">—</td>
+              <td style="text-align: center">--</td>
               <td style="text-align: center">Nov 6, 2026</td>
-              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋮</button></td>
             </tr>
             <tr>
               <td>
-                <a href="group-list.html"><strong>Maintenance block A</strong></a>
-                <br /><span class="enriched-meta">2 groups · in progress</span>
+                <span class="row-handle" aria-hidden="true">○</span>
+                <a href="group-list.html">Maintenance block A</a>
               </td>
-              <td style="text-align: center">—</td>
+              <td style="text-align: center">--</td>
               <td style="text-align: center">Oct 28, 2026</td>
-              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋮</button></td>
             </tr>
             <tr>
               <td>
-                <a href="group-list.html"><strong>Baseline assessment cycle</strong></a>
-                <br /><span class="enriched-meta">Completed</span>
+                <span class="row-handle" aria-hidden="true">○</span>
+                <a href="group-list.html">Baseline assessment cycle</a>
               </td>
               <td style="text-align: center">Sep 12, 2026</td>
               <td style="text-align: center">Sep 12, 2026</td>
-              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋯</button></td>
+              <td><button class="wire-btn wire-btn--ghost" type="button" aria-label="More actions">⋮</button></td>
             </tr>
           </tbody>
         </table>

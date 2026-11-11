@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!-- route: Home (waiver variant) -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Home · Waiver required · Kinmetrix prototype</title>
+    <link rel="stylesheet" href="kin-prototype.css" />
+  </head>
+  <body data-route="Home" data-enriched="true">
+    <div class="device-frame">
+      <header class="screen-header">
+        <a class="back-link" href="home.html">Back</a>
+        <p class="route-chip">Home <span class="stack-tag">user</span></p>
+        <h1>Home (waiver required)</h1>
+        <p class="enriched-meta">HomeScreen when teamUser.requires_waiver and signed_waiver_at is null. Sign Waiver → SignWaiver.</p>
+      </header>
+      <main class="app__content" style="display: flex; flex-direction: column">
+        <div class="wire-toolbar">
+          <a class="wire-btn wire-btn--ghost" href="user-team-list.html">Back</a>
+          <p class="wire-toolbar__title">Visual Compare ▾</p>
+          <span class="wire-btn wire-btn--primary" aria-disabled="true">Start</span>
+        </div>
+        <section class="wire-home-state" aria-label="Waiver required">
+          <img class="wire-home-state__art" src="assets/home-waiver.svg" alt="" width="200" height="200" />
+          <h2 class="wire-home-state__title">Waiver required</h2>
+          <p class="wire-home-state__subtitle">
+            Your team requires a signed waiver before you can use assessments and programs.
+          </p>
+          <a class="wire-btn wire-btn--primary" href="sign-waiver.html">Sign Waiver</a>
+        </section>
+        <nav class="flow-nav" aria-label="Waiver flow">
+          <h2>Waiver flow</h2>
+          <ul>
+            <li><a class="wire-btn wire-btn--primary" href="sign-waiver.html">1 → Terms (SignWaiver)</a></li>
+            <li><a class="wire-btn" href="sign-waiver.html?sign=1">2 → Signature popover</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="home.html">Home with session data</a></li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="shared.js"></script>
+  </body>
+</html>

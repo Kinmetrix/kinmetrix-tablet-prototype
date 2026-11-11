@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" role="img" aria-label="Historical force, stability, and symmetry">
+  <defs>
+    <pattern id="grid" width="40" height="28" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V28" fill="none" stroke="#e6eaf0" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <!-- Avg Peak Force -->
+  <g>
+    <text x="8" y="18" font-family="system-ui,sans-serif" font-size="11" fill="#666">Avg Peak Force</text>
+    <text x="8" y="36" font-family="system-ui,sans-serif" font-size="9" fill="#999">12.0 KG</text>
+    <text x="8" y="118" font-family="system-ui,sans-serif" font-size="9" fill="#999">0.00 KG</text>
+    <rect x="56" y="24" width="640" height="100" fill="url(#grid)" stroke="#d8dee8"/>
+    <polyline fill="none" stroke="#d32f2f" stroke-width="2"
+      points="80,95 160,88 240,92 320,85 400,90 480,82 560,78 640,30"/>
+    <g fill="#d32f2f">
+      <polygon points="80,95 76,101 84,101"/>
+      <polygon points="160,88 156,94 164,94"/>
+      <polygon points="240,92 236,98 244,98"/>
+      <polygon points="320,85 316,91 324,91"/>
+      <polygon points="400,90 396,96 404,96"/>
+      <polygon points="480,82 476,88 484,88"/>
+      <polygon points="560,78 556,84 564,84"/>
+      <polygon points="640,30 636,36 644,36"/>
+    </g>
+    <line x1="640" y1="24" x2="640" y2="396" stroke="#9aa3b2" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <rect x="652" y="18" width="52" height="20" rx="4" fill="#d32f2f"/>
+    <text x="678" y="32" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#fff">12.0 KG</text>
+  </g>
+  <!-- Stability -->
+  <g transform="translate(0 138)">
+    <text x="8" y="18" font-family="system-ui,sans-serif" font-size="11" fill="#666">Stability</text>
+    <text x="8" y="36" font-family="system-ui,sans-serif" font-size="9" fill="#999">100%</text>
+    <text x="8" y="118" font-family="system-ui,sans-serif" font-size="9" fill="#999">0%</text>
+    <rect x="56" y="24" width="640" height="100" fill="url(#grid)" stroke="#d8dee8"/>
+    <polyline fill="none" stroke="#2e7d32" stroke-width="2"
+      points="80,34 160,36 240,32 320,35 400,33 480,34 560,32 640,33"/>
+    <g fill="#2e7d32">
+      <polygon points="80,34 76,40 84,40"/>
+      <polygon points="160,36 156,42 164,42"/>
+      <polygon points="240,32 236,38 244,38"/>
+      <polygon points="320,35 316,41 324,41"/>
+      <polygon points="400,33 396,39 404,39"/>
+      <polygon points="480,34 476,40 484,40"/>
+      <polygon points="560,32 556,38 564,38"/>
+      <polygon points="640,33 636,39 644,39"/>
+    </g>
+    <rect x="658" y="22" width="40" height="20" rx="4" fill="#2e7d32"/>
+    <text x="678" y="36" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#fff">99%</text>
+  </g>
+  <!-- Symmetry -->
+  <g transform="translate(0 276)">
+    <text x="8" y="18" font-family="system-ui,sans-serif" font-size="11" fill="#666">Symmetry</text>
+    <text x="8" y="36" font-family="system-ui,sans-serif" font-size="9" fill="#999">80%</text>
+    <text x="8" y="118" font-family="system-ui,sans-serif" font-size="9" fill="#999">0%</text>
+    <rect x="56" y="24" width="640" height="100" fill="url(#grid)" stroke="#d8dee8"/>
+    <polyline fill="none" stroke="#ef6c00" stroke-width="2"
+      points="80,70 160,55 240,62 320,48 400,58 480,52 560,60 640,72"/>
+    <g fill="#ef6c00">
+      <polygon points="80,70 76,76 84,76"/>
+      <polygon points="160,55 156,61 164,61"/>
+      <polygon points="240,62 236,68 244,68"/>
+      <polygon points="320,48 316,54 324,54"/>
+      <polygon points="400,58 396,64 404,64"/>
+      <polygon points="480,52 476,58 484,58"/>
+      <polygon points="560,60 556,66 564,66"/>
+      <polygon points="640,72 636,78 644,78"/>
+    </g>
+    <rect x="658" y="62" width="40" height="20" rx="4" fill="#ef6c00"/>
+    <text x="678" y="76" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#fff">56%</text>
+    <text x="640" y="138" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#666">Jan 31, 2026</text>
+  </g>
+</svg>

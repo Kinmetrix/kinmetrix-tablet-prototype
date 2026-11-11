@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/AddProgramScreen.tsx -->
+<!-- route: AddProgram -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,13 +15,14 @@
         <h1>Create program</h1>
         <p class="enriched-meta">Header Create Program submits form; success pops to Program list.</p>
       </header>
-      <main class="app__content wire-center">
-        <div class="wire-toolbar" style="max-width: 500px; width: 100%; margin-bottom: 0.5rem">
-          <span></span>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="program-list.html">&lt; Back</a></div>
           <p class="wire-toolbar__title">Create program</p>
-          <a class="wire-btn wire-btn--primary" href="program-list.html">Create program</a>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--header" href="program-list.html">Create program</a></div>
         </div>
-        <section class="wire-card wire-form-card" aria-label="New program form">
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" aria-label="New program form">
           <h2 style="margin: 0 0 0.25rem">Create program</h2>
           <p class="enriched-meta">Enter the name and description for your program.</p>
           <form class="wire-stack" action="program-list.html" method="get" style="margin-top: 1rem">
@@ -39,9 +40,10 @@
                 style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
               ></textarea>
             </div>
-            <button class="wire-btn wire-btn--primary" type="submit">Create program</button>
-          </form>
+</form>
         </section>
+        </div>
+
         <nav class="flow-nav" aria-label="Program flows" style="max-width: 500px; width: 100%">
           <h2>Cancel</h2>
           <ul>

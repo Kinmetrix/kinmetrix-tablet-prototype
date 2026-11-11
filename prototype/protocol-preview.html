@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/ProtocolPreviewScreen.tsx -->
+<!-- route: ProtocolPreview -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -14,23 +14,41 @@
         <p class="route-chip">ProtocolPreview <span class="stack-tag">user</span></p>
         <h1>Your exercise plan</h1>
         <p class="enriched-meta">
-          Wizard (ProtocolCreatorForm) then exercise list. Settings chips + multi-select step grid. Start → RunGroup.
-          Alternate title: Protocol Preview.
+          Smart Session: wizard (intensity → mode → positions) then this exercise list. Start → RunGroup.
         </p>
       </header>
       <main class="app__content wire-stack">
         <div class="wire-toolbar">
-          <button class="wire-btn wire-btn--ghost" type="button">Reset</button>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="home-start.html">&lt; Back</a></div>
           <p class="wire-toolbar__title">Your exercise plan</p>
-          <a class="wire-btn wire-btn--primary" href="run-group.html">Start ▶</a>
+          <div class="wire-toolbar__right">
+            <a class="wire-btn wire-btn--primary" href="run-group.html">Start ▶</a>
+          </div>
         </div>
-        <div class="enriched-meta" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-bottom: 0.5rem">
-          <button class="wire-btn wire-btn--ghost" type="button">Template: Light ▾</button>
-          <button class="wire-btn wire-btn--ghost" type="button">Mode: Isokinetic ▾</button>
-          <button class="wire-btn wire-btn--ghost" type="button"># of positions: 8 ▾</button>
-          <button class="wire-btn wire-btn--ghost" type="button">Tilts: User tilts</button>
+        <div class="filter-bar filter-bar--fields" aria-label="Plan settings">
+          <button class="prop-card" type="button">
+            <span>
+              <p class="prop-card__label">Template</p>
+              <p class="prop-card__value">Light · 100% · 10 reps</p>
+            </span>
+            <span aria-hidden="true">▾</span>
+          </button>
+          <button class="prop-card" type="button">
+            <span>
+              <p class="prop-card__label">Mode</p>
+              <p class="prop-card__value">Isokinetic</p>
+            </span>
+            <span aria-hidden="true">▾</span>
+          </button>
+          <button class="prop-card" type="button">
+            <span>
+              <p class="prop-card__label"># of Positions</p>
+              <p class="prop-card__value">8 Positions</p>
+            </span>
+            <span aria-hidden="true">▾</span>
+          </button>
         </div>
-        <table class="wire-table" aria-label="Preview steps">
+        <table class="wire-table wire-table--sheet" aria-label="Preview steps">
           <thead>
             <tr>
               <th style="width: 2rem"><input type="checkbox" aria-label="Select all steps" /></th>
@@ -38,51 +56,82 @@
               <th style="text-align: center">Position</th>
               <th style="text-align: center">Weight</th>
               <th style="text-align: center">Reps</th>
-              <th style="text-align: center">Arc angle</th>
+              <th style="text-align: center">Arc Angle</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><input type="checkbox" checked aria-label="Select step" /></td>
-              <td>Anteflexion</td>
-              <td style="text-align: center">0°</td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">28 N</span></td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">2</span></td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">1° – 30°</span></td>
+              <td><input type="checkbox" aria-label="Select Right Flexion" /></td>
+              <td>Right Flexion</td>
+              <td style="text-align: center"><span class="angle-mark">90°</span></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">2.00 KG</u></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">10</u></td>
+              <td style="text-align: center">5° - 35°</td>
             </tr>
             <tr>
-              <td><input type="checkbox" aria-label="Select step" /></td>
-              <td>Left lateral</td>
-              <td style="text-align: center">45°</td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">30 N</span></td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">2</span></td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">1° – 30°</span></td>
+              <td><input type="checkbox" aria-label="Select Right Diagonal Flexion" /></td>
+              <td>Right Diagonal Flexion</td>
+              <td style="text-align: center"><span class="angle-mark">45°</span></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">2.00 KG</u></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">10</u></td>
+              <td style="text-align: center">5° - 35°</td>
             </tr>
             <tr>
-              <td><input type="checkbox" aria-label="Select step" /></td>
-              <td>Retroflexion</td>
-              <td style="text-align: center">90°</td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">32 N</span></td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">2</span></td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">1° – 30°</span></td>
+              <td><input type="checkbox" aria-label="Select Forward Flexion" /></td>
+              <td>Forward Flexion</td>
+              <td style="text-align: center"><span class="angle-mark">0°</span></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">2.01 KG</u></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">10</u></td>
+              <td style="text-align: center">5° - 35°</td>
             </tr>
             <tr>
-              <td><input type="checkbox" aria-label="Select step" /></td>
-              <td>Right lateral</td>
-              <td style="text-align: center">135°</td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">29 N</span></td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">2</span></td>
-              <td style="text-align: center"><span style="text-decoration: underline dotted">1° – 30°</span></td>
+              <td><input type="checkbox" aria-label="Select Left Diagonal Flexion" /></td>
+              <td>Left Diagonal Flexion</td>
+              <td style="text-align: center"><span class="angle-mark">315°</span></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">2.20 KG</u></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">10</u></td>
+              <td style="text-align: center">5° - 35°</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select Left Flexion" /></td>
+              <td>Left Flexion</td>
+              <td style="text-align: center"><span class="angle-mark">270°</span></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">2.40 KG</u></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">10</u></td>
+              <td style="text-align: center">5° - 35°</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select Left Diagonal Extension" /></td>
+              <td>Left Diagonal Extension</td>
+              <td style="text-align: center"><span class="angle-mark">225°</span></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">2.21 KG</u></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">10</u></td>
+              <td style="text-align: center">5° - 35°</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select Rear Extension" /></td>
+              <td>Rear Extension</td>
+              <td style="text-align: center"><span class="angle-mark">180°</span></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">2.01 KG</u></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">10</u></td>
+              <td style="text-align: center">5° - 35°</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select Right Diagonal Extension" /></td>
+              <td>Right Diagonal Extension</td>
+              <td style="text-align: center"><span class="angle-mark">135°</span></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">2.00 KG</u></td>
+              <td style="text-align: center"><u style="text-decoration-style: dashed">10</u></td>
+              <td style="text-align: center">5° - 35°</td>
             </tr>
           </tbody>
         </table>
-        <p class="enriched-meta">First visit shows ProtocolCreatorForm wizard (template vs intensity, mode, positions).</p>
         <nav class="flow-nav" aria-label="Protocol preview flows">
           <h2>Related</h2>
           <ul>
-            <li><a class="wire-btn wire-btn--primary" href="run-group.html">Run group</a></li>
-            <li><a class="wire-btn" href="edit-protocol-session.html">Edit protocol session</a></li>
-            <li><a class="wire-btn wire-btn--ghost" href="select-template.html">Select template</a></li>
+            <li><a class="wire-btn wire-btn--primary" href="run-group.html">Start session (RunGroup)</a></li>
+            <li><a class="wire-btn" href="home-start.html">Home start</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="edit-protocol-session.html">Edit protocol session</a></li>
           </ul>
         </nav>
       </main>

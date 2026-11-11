@@ -4,7 +4,13 @@
   "context": [
     "AGENTS.md",
     "prototype/docs/product.md",
-    "prototype/docs/reference-app.md"
+    "prototype/docs/glossary.md",
+    "prototype/docs/data-model.md",
+    "prototype/docs/journeys.md",
+    "prototype/docs/personas.md",
+    "prototype/docs/placeholders.md",
+    "prototype/docs/screen-inventory.md"
+
   ],
   "codeRoots": ["<app>/src/", "<app>/tests/"],
   "verify": {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/EditProgramTemplateScreen.tsx -->
+<!-- route: EditProgramTemplate -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -15,13 +15,14 @@
         <h1>Edit program template</h1>
         <p class="enriched-meta">Header Save Changes updates program template; success goes back.</p>
       </header>
-      <main class="app__content wire-center">
-        <div class="wire-toolbar" style="max-width: 520px; width: 100%; margin-bottom: 0.5rem">
-          <span></span>
+      <main class="app__content">
+        <div class="wire-toolbar">
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="program-template-list.html">&lt; Back</a></div>
           <p class="wire-toolbar__title">Edit program template</p>
-          <a class="wire-btn wire-btn--primary" href="program-template-list.html">Save changes</a>
+          <div class="wire-toolbar__right"><a class="wire-btn wire-btn--header" href="program-template-list.html">Save changes</a></div>
         </div>
-        <section class="wire-card wire-form-card" aria-label="Edit program template form">
+        <div class="wire-center">
+          <section class="wire-card wire-form-card" aria-label="Edit program template form">
           <h2 style="margin: 0 0 0.75rem; text-align: center">Edit program template</h2>
           <form class="wire-stack" action="program-template-list.html" method="get" style="max-width: 390px; margin-inline: auto">
             <div class="wire-field">
@@ -44,9 +45,10 @@
                 style="width: 100%; font: inherit; padding: 0.4rem 0.5rem; border: 1px solid #999; border-radius: 4px"
               >Team-wide template for weekly cervical loading</textarea>
             </div>
-            <button class="wire-btn wire-btn--primary" type="submit">Save changes</button>
-          </form>
+</form>
         </section>
+        </div>
+
         <nav class="flow-nav" aria-label="Edit program template flows" style="max-width: 520px; width: 100%">
           <h2>Cancel</h2>
           <ul>

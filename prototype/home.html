@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- source: src/screens/home/HomeScreen.tsx -->
+<!-- route: Home -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -12,44 +12,138 @@
       <header class="screen-header">
         <a class="back-link" href="index.html">All screens</a>
         <p class="route-chip">Home <span class="stack-tag">user</span></p>
+        <h1>Home</h1>
+        <p class="enriched-meta">
+          HomeAnalysisView when latest session exists. Proxy header shows Back. Empty and waiver states are separate
+          pages.
+        </p>
       </header>
       <main class="app__content">
         <div class="wire-toolbar">
-          <a class="wire-btn wire-btn--ghost" href="login.html">Logout</a>
-          <p class="wire-toolbar__title">Alex Morgan ▾</p>
-          <a class="wire-btn wire-btn--primary" href="home-start.html">Start</a>
+          <div class="wire-toolbar__left"><a class="wire-toolbar-back" href="team-home.html">&lt; Back</a></div>
+          <div class="wire-toolbar__title">
+            <div class="wire-toolbar__profile">
+              <span class="proto-avatar proto-avatar--fixture" data-default-avatar="Test User" data-avatar-size="28"></span>
+              <span>Test User ▾</span>
+            </div>
+          </div>
+          <div class="wire-toolbar__right">
+            <a class="wire-btn wire-btn--primary" href="home-start.html">▶ Start</a>
+          </div>
         </div>
-        <section aria-label="Latest analysis">
-          <h2>Latest session</h2>
-          <table class="wire-table">
-            <thead>
-              <tr>
-                <th>Direction</th>
-                <th>Peak (N)</th>
-                <th>Stability</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><a href="session-data.html">Flexion</a></td>
-                <td>142</td>
-                <td>Stable</td>
-              </tr>
-              <tr>
-                <td><a href="session-data.html">Extension</a></td>
-                <td>138</td>
-                <td>Stable</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="enriched-meta">Shows analysis table when data exists. Empty and waiver states exist in RN.</p>
-        </section>
+        <div class="results-split" aria-label="Latest analysis">
+          <section class="results-panel">
+            <div class="results-panel__head">
+              <div>
+                <h2 class="results-panel__title">September 18, 2026</h2>
+                <p class="results-panel__subtitle">Standard Program</p>
+              </div>
+              <div class="results-panel__actions">
+                <button class="wire-btn wire-btn--ghost" type="button">+ Add Note</button>
+                <button class="wire-btn wire-btn--ghost" type="button" aria-label="Download">↓</button>
+                <button class="wire-btn wire-btn--ghost" type="button" aria-label="More">⋮</button>
+              </div>
+            </div>
+            <div class="results-metrics">
+              <div>
+                <p class="results-metric__label">Avg Peak Force</p>
+                <p class="results-metric__value">5.4 LB</p>
+              </div>
+              <div>
+                <p class="results-metric__label">Stability</p>
+                <p class="results-metric__value">92%</p>
+              </div>
+              <a href="session-history.html" style="text-decoration: none; color: inherit">
+                <p class="results-metric__label">History &gt;</p>
+                <div
+                  class="proto-chart hist-spark"
+                  data-chart="bar"
+                  data-chart-label="Recent avg peak force"
+                ></div>
+              </a>
+            </div>
+            <table class="wire-table" aria-label="Directions">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Position</th>
+                  <th>Avg Peak Force</th>
+                  <th>Stability</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="session-data.html">Forward Flexion</a></td>
+                  <td><span class="angle-mark">0°</span></td>
+                  <td>5.05 LB</td>
+                  <td>92%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Right Flexion</a></td>
+                  <td><span class="angle-mark">90°</span></td>
+                  <td>4.50 LB</td>
+                  <td>92%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Rear Extension</a></td>
+                  <td><span class="angle-mark">180°</span></td>
+                  <td>6.36 LB</td>
+                  <td>91%</td>
+                </tr>
+                <tr>
+                  <td><a href="session-data.html">Left Flexion</a></td>
+                  <td><span class="angle-mark">270°</span></td>
+                  <td>5.54 LB</td>
+                  <td>91%</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="results-hint">Tap a row to view repetition data for that direction</p>
+          </section>
+          <section class="results-panel">
+            <div class="results-panel__head">
+              <p class="results-hint" style="margin: 0">Tap or drag chart to interact</p>
+              <button class="wire-btn wire-btn--ghost" type="button" aria-label="Rotate chart">↻</button>
+            </div>
+            <div
+              class="proto-chart"
+              data-chart="radial-body"
+              data-chart-label="Avg peak force by direction"
+            ></div>
+            <div class="legend-pills">
+              <span class="legend-pill legend-pill--on">Avg Peak Force</span>
+              <span class="legend-pill">Stability</span>
+            </div>
+            <div class="sym-list" aria-label="Symmetry">
+              <div class="sym-list__head">
+                <h3>Symmetry</h3>
+                <span class="enriched-meta">Score: 1/2</span>
+              </div>
+              <div class="sym-row">
+                <span><span class="sym-dot" style="background: #e8a317"></span>Flexion ⇄ Extension 0°/180°</span>
+                <strong style="color: #c97800">80%</strong>
+              </div>
+              <div class="sym-row">
+                <span><span class="sym-dot" style="background: #2bb673"></span>Left Lateral ⇄ Right Lateral 270°/90°</span>
+                <strong style="color: #1f9d55">81%</strong>
+              </div>
+              <div class="sym-row">
+                <span><span class="sym-dot" style="background: #2bb673"></span>Front-Back ⇄ Left-Right Ratio</span>
+                <strong style="color: #1f9d55">1.1:1</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+        <a class="fab-chat" href="feedback.html" aria-label="Feedback">💬</a>
         <nav class="flow-nav" aria-label="States and actions">
           <h2>Other home paths</h2>
           <ul>
-            <li><a class="wire-btn" href="sign-waiver.html">Sign waiver state</a></li>
+            <li><a class="wire-btn" href="home-waiver.html">Waiver required state</a></li>
+            <li><a class="wire-btn" href="sign-waiver.html">Sign waiver (terms)</a></li>
             <li><a class="wire-btn" href="create-protocol-session.html">New assessment (no protocol)</a></li>
+            <li><a class="wire-btn" href="warmup-type.html">Warmup</a></li>
             <li><a class="wire-btn" href="feedback.html">Feedback</a></li>
+            <li><a class="wire-btn wire-btn--ghost" href="login.html">Logout</a></li>
           </ul>
         </nav>
       </main>

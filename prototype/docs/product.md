@@ -2,21 +2,18 @@
 
 ## Purpose
 
-Build a **static HTML walkthrough** of the shipping **KinmetrixApp** (React Native, clinic iPad) so the team can **re-evaluate screens, flows, and interface** without changing the native app.
+Static HTML walkthrough of the Kinmetrix **clinic shared iPad** (landscape station UI). Use it to re-evaluate screens, flows, and interface, and to propose new features — without a native app checkout.
 
-This repo is a sandbox. Output lives under `prototype/`. Do not edit KinmetrixApp from here.
-
-## Reference app
-
-Screen names, routes, and layout truth come from KinmetrixApp. Read paths and rules in **`reference-app.md`** before adding or changing HTML pages.
+This repo is the **portable source of truth** for exploration. Output lives under `prototype/`. Product vocabulary and object relationships live in **`glossary.md`** and **`data-model.md`**. Walkthrough paths: **`journeys.md`**. Who uses the station: **`personas.md`**. Intentional stubs: **`placeholders.md`**. Route inventory: **`screen-inventory.md`**.
 
 ## Deliverable
 
-- One HTML file per RN screen (or clear route), with links that mirror the app graph.
-- Labels and structure should follow the reference screen files. Copy can be simplified.
+- One HTML file per route (or clear screen), with links that mirror the product graph in `screens.json`.
+- Labels and structure should match existing enriched pages and visual-compare baselines where they exist. Copy can be simplified.
 - Rebuilt markup in `prototype/`. Visual system is **not locked** (neutral wireframe CSS is fine).
-- Route pages use a **Debug** toggle (`shared.js`) for index links, route chips, and flow-nav. Default view matches app layout for review and screenshots.
-- Brand and fixture art live under `prototype/assets/` (Kinmetrix logos from the RN app, `default-profile.svg`, chart SVGs). Pages use `shared.js` to mount `[data-chart]` and `[data-default-avatar]`.
+- Route pages use a **tiny fixed status bar** (~26px, `shared.js`): Index, slug, **Debug** (overlay drawer), **iOS** (side-by-side compare). It stays in the viewport without eating tablet space; the device canvas scales to fit under the bar.
+- App nav chrome (`KMScreen`-style: Back, title, header actions) belongs in `.wire-toolbar` in the default view. Debug `screen-header` is prototype-only and must not be the only place those controls live.
+- Brand and fixture art live under `prototype/assets/` (Kinmetrix logos, `default-profile.svg`, chart SVGs). Pages use `shared.js` to mount `[data-chart]` and `[data-default-avatar]`.
 
 ## Depth of behavior
 
@@ -27,7 +24,7 @@ Screen names, routes, and layout truth come from KinmetrixApp. Read paths and ru
 | Stub primary actions (next screen, toast, or noop) | Implement BLE, device firmware, or live exercise capture |
 | Optional login **screens** for layout | Login **gating** that blocks the rest of the prototype |
 
-Mark device, calibration, live run, and waiver flows with clear **placeholder** copy when the real app depends on hardware or backend.
+Mark device, calibration, live run, and waiver flows with clear **placeholder** copy when the flow depends on hardware or backend. Full list: **`placeholders.md`**.
 
 ## Entry
 
@@ -35,10 +32,12 @@ Mark device, calibration, live run, and waiver flows with clear **placeholder** 
 
 ## Tablet
 
-Clinic **shared iPad**, landscape station. Target logical canvas **1180×820** (Kinmetrix IPad sim, iPad 10th generation) inside the device frame in `kin-prototype.css`, same numbers in `visual-compare/device.json`. Touch-first. Avoid hover-only affordances.
+Clinic **shared iPad**, landscape station. Target logical canvas **1180×820** (iPad 10th generation) inside the device frame in `kin-prototype.css`, same numbers in `visual-compare/device.json`. Touch-first. Avoid hover-only affordances.
 
 ## Non-goals (for now)
 
-- Pixel parity with RN or `@kinmetrix/theme`
+- Full pixel parity with a shipping native theme package (neutral wireframe CSS is fine)
 - Choosing Web Awesome, design-interface tokens, or a full design system
-- Automated reverse runs against KinmetrixApp (it lives outside this git repo)
+- Requiring any sibling monorepo or native app checkout to use or extend this prototype
+
+**Exception:** visual-compare baselines and enrichment still use **KMScreen-style** header structure (Back / title / header actions) in `.wire-toolbar` when that screen has a header. That is layout chrome parity, not theme token parity.

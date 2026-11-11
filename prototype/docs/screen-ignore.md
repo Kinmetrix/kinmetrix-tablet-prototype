@@ -15,7 +15,7 @@ Ignored slugs are omitted everywhere the mirror is built or listed:
 - Not listed on `index.html`.
 - Skipped by coverage, layout-enrichment, pending-enrichment, and visual-compare scripts.
 
-`screens.json` still lists the full route set from KinmetrixApp when you regenerate the manifest; `.screenignore` only controls what the mirror ships.
+`screens.json` still lists the full route set; `.screenignore` only controls what the mirror ships.
 
 ## Commands
 
