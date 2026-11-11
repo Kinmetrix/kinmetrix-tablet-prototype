@@ -15,16 +15,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - name: Stage site root from prototype/
+        run: |
+          mkdir -p _site
+          rsync -a --delete \
+            --exclude 'node_modules' \
+            --exclude 'scripts' \
+            --exclude '_tmp*' \
+            --exclude 'package.json' \
+            --exclude 'yarn.lock' \
+            prototype/ _site/
+          touch _site/.nojekyll
+          test -f _site/index.html
+          ls -la _site | head -30
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: prototype
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@v4
