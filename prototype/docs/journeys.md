@@ -16,10 +16,11 @@ Compare path: `team-user.html` → `compare-team-user-sessions.html` → `compar
 
 ## 3. Member session day
 
-`home.html` → `home-start.html` → assessment or warmup / program
+`home.html` → `home-start.html` → assessment or program
 
 - Assessment: `assessment.html` → `create-protocol-session.html` / `protocol-preview.html` → placeholders for live run
 - Training: `program-list.html` → `group-list.html` → `run-group.html` → `exercise.html` (placeholder) → `group-results.html` / `session-history.html`
+- Warmup routes are not mirrored; links that would open Warmup / WarmupType go to `exercise.html` instead.
 
 ## 4. Programs and groups (edit)
 

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T01:30:56.793Z",
+  "generatedAt": "2026-11-11T02:08:45.682Z",
   "screens": [
     {
       "route": "DeviceCalibration",
@@ -607,7 +607,7 @@
       "title": "Home Start",
       "links": [
         "assessment.html",
-        "warmup-type.html",
+        "exercise.html",
         "program-list.html"
       ]
     },

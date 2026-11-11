@@ -86,5 +86,3 @@ node scripts/build-screen-manifest.mjs
 | UseProgramTemplate | user | `use-program-template.html` | Use Program Template |
 | UserProfile | user | `user-profile.html` | User Profile |
 | UserTeamList | user | `user-team-list.html` | User Team List |
-| Warmup | user | `warmup.html` | Warmup |
-| WarmupType | user | `warmup-type.html` | Warmup Type |

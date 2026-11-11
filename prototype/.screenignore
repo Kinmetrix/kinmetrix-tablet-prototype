@@ -16,3 +16,5 @@ assessment-session-history
 recent-data
 select-template
 device-control
+warmup
+warmup-type
