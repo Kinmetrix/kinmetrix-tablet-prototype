@@ -1,0 +1,37 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root=path.join(__dirname,'../dist'),context=vm.createContext({assert,console,structuredClone,URL,Blob,crypto:require('node:crypto').webcrypto,document:{addEventListener(){},querySelector(){return null},querySelectorAll(){return []},documentElement:{dataset:{}}},window:{addEventListener(){},scrollTo(){}},localStorage:{getItem(){return null}},matchMedia(){return {matches:false}},setTimeout(){},clearTimeout(){},setInterval(){},clearInterval(){}});
+for(const name of ['workspace','report','photos','profile','reps','setup','live-rules','export','directory','comparison','mode-experience','session-tools','person-programs','app']){let source=fs.readFileSync(path.join(root,name+'.js'),'utf8');if(name==='app')source=source.replace(/\nrender\(\);\s*$/,'\n');vm.runInContext(source,context,{filename:name+'.js'});}
+vm.runInContext(`
+render=()=>{};renderOverlay=()=>{};toast=()=>{};state.personId='alex';
+const fixed={positions:4,total:6,completed:2,load:{kind:'fixed',start:10}};
+assert.equal(resolveProgramTargets(fixed,'alex').targets[270],10);
+const inc={...fixed,load:{kind:'incremental',start:10,increase:10}};
+assert.equal(resolveProgramTargets(inc,'alex').targets[0],12.1);
+assert.equal(validProgramLoad({...programLoad(inc),start:40,increase:50},6),false);
+const dynamic={...fixed,load:{kind:'assessment',percent:60}};
+const result=resolveProgramTargets(dynamic,'alex');
+assert.equal(result.targets[0],11.9);assert.equal(result.targets[90],9.4);assert.ok(result.source);
+assert.equal(resolveProgramTargets(dynamic,'ella').targets[0],null);
+state.setup={type:'isokinetic',purpose:'training',positions:4,reps:1,weight:12};initializeProgramTargets(dynamic);setupModeDefaults();
+activateProgramTarget(90);assert.equal(state.setup.weight,9.4);assert.equal(state.setup.challenge,8.4);
+assert.ok(programTargetsValid());state.setup.positions=8;assert.equal(programTargetsValid(),false);
+const original=historyFixture('strength','9 Nov');state.history.push({...original,id:'new-strength',positions:4,completedAt:Date.UTC(2026,10,10),weight:10});
+const newer=resolveProgramTargets({...dynamic,positions:8},'alex');assert.equal(newer.source.id,'new-strength');assert.equal(newer.targets[45],null);
+const snap=structuredClone(result);state.history[0].weight=20;assert.equal(snap.targets[0],11.9);
+state.programs={alex:[{...inc,id:'test',completed:2}]};const cfg={programId:'test',programSession:3,programName:'test'};
+completedProgramSession({partial:true},cfg);assert.equal(memberPrograms()[0].completed,2);
+completedProgramSession({partial:false},cfg);assert.equal(memberPrograms()[0].completed,3);
+const pair={a:0,b:180,first:8,second:10};assert.equal(pairReferenceStatus(pair,{reference:'ufc-male',tolerance:10}).gap,0);
+assert.equal(pairReferenceStatus({...pair,first:10},{reference:'ufc-male',tolerance:10}).tone,'down');
+assert.equal(symmetryReference({a:225,b:45},{reference:'ufc-male'}),null);
+assert.equal(symmetryReference({a:270,b:90},{reference:'bilateral'}),1);
+assert.equal(pairReferenceStatus(pair,{reference:'none',tolerance:10}).tone,'neutral');
+const a={id:'one',personId:'alex',completedAt:Date.UTC(2026,10,12,14,30)},b={...a,id:'two',completedAt:a.completedAt+3600000};
+assert.notEqual(sessionStamp(a),sessionStamp(b));assert.match(sessionStamp(a),/12 Nov 2026/);
+saveSessionNote(a,'specific visit');assert.equal(sessionNote(a).text,'specific visit');assert.equal(sessionNote(b),undefined);assert.equal(sessionNote({...a,personId:'maya'}),undefined);
+state.result=original;reportState();assert.match(reportView(),/9 Nov 2026/);assert.match(reportView(),/session-note-top/);
+const actual={...original,id:'actual',fixture:false,positions:4,reps:1,repRecords:[{angle:0,value:10,seconds:6},{angle:90,value:8,seconds:6},{angle:180,value:9,seconds:6},{angle:270,value:8,seconds:6}]};delete actual.analysis;assert.equal(reportData(actual).directions[1].force,8);
+assert.match(reportPrintView(original),/kinmetrix-full.svg/);
+assert.match(historySelectionGrid([original]),/history-grid-card/);assert.match(historySelectionGrid([original]),/Select/);
+console.log('PASS — date/time identity, note isolation, grid, ratio references, progression math, assessment coverage, target activation and partial-session behavior.');
+`,context);

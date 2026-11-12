@@ -1,0 +1,18 @@
+/* Compact report header. The note becomes a button with a drop-down editor; spacing is tightened so the radial sits higher. */
+.note-action{position:relative;display:inline-flex}
+.note-action:empty{display:none}
+.note-action .session-note-top{border:0;margin:0;font-size:13px;grid-column:auto}
+.note-action .session-note-top summary{list-style:none;min-height:42px;padding:8px 13px;border:1px solid var(--line);border-radius:11px;background:var(--surface);gap:7px;font-size:13px;font-weight:570;color:var(--ink);white-space:nowrap}
+.note-action .session-note-top summary::-webkit-details-marker{display:none}
+.note-action .session-note-top summary strong{font-weight:570}
+.note-action .session-note-top summary>span{display:none}
+.note-action .session-note-top[open] summary{background:var(--soft)}
+.note-action .session-note-editor{position:absolute;right:0;top:calc(100% + 8px);z-index:30;width:min(420px,88vw);padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:0 14px 34px var(--shadow-color,rgba(0,0,0,.16));text-align:left}
+.note-action .session-note-editor textarea{width:100%;min-height:96px;font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);resize:vertical}
+.note-action .session-note-editor .button-row{margin-top:10px;justify-content:flex-end}
+.note-action .session-note-editor small{display:block;margin-top:8px;color:var(--muted)}
+.report-note-line{font-size:13px;color:var(--muted);margin:-2px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90ch}
+.report-note-line strong{color:var(--ink);font-weight:600;margin-right:6px}
+.report-screen .report-title-row,.mode-report .report-title-row{margin-bottom:8px;padding-bottom:0}
+@media(max-width:700px){.note-action .session-note-editor{right:auto;left:0}}
+@media print{.note-action,.report-note-line{display:none}}

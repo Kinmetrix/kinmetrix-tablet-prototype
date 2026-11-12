@@ -1,0 +1,31 @@
+/* One export entry; the report itself retains its working space. */
+.session-header{height:auto;min-height:56px;padding-top:8px;padding-bottom:8px}
+.export-dialog{max-width:480px}
+.export-dialog #export-context{font-size:13px;margin:-5px 0 22px;color:var(--muted)}
+.export-setting{min-width:0;border:0;padding:0;margin:0 0 22px}
+.export-setting legend{font-size:13px;font-weight:600;padding:0;margin-bottom:10px}
+.export-segmented{display:flex;gap:3px;padding:3px;background:var(--selected);border-radius:9px}
+.export-segmented label{flex:1;position:relative;min-width:0}
+.export-segmented input{position:absolute;opacity:0;width:1px;height:1px}
+.export-segmented span{display:flex;align-items:center;justify-content:center;min-height:40px;padding:8px 12px;font-size:13px;color:var(--muted);border-radius:6px;cursor:pointer;white-space:nowrap}
+.export-segmented input:checked+span{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px #00000014;font-weight:550}
+.export-segmented input:focus-visible+span{outline:2px solid var(--focus);outline-offset:2px}
+.export-setting:disabled .export-segmented{opacity:.45}
+.export-setting:disabled span{cursor:default}
+.export-orientation{display:flex;align-items:center;gap:20px}
+.export-orientation>.export-setting{flex:1;margin-bottom:20px}
+.export-orientation-preview{width:60px;height:76px;flex-shrink:0;margin-top:-12px}
+.export-orientation-preview text{fill:var(--muted);font-size:12px;font-family:inherit}
+.export-setting-help{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.4}
+.export-methods{margin-bottom:0}
+.export-method{display:flex;align-items:center;gap:12px;min-height:68px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
+.export-method>input{width:17px;height:17px;accent-color:var(--ink);flex-shrink:0}
+.export-method>.icon{width:21px;height:21px;flex-shrink:0;color:var(--muted)}
+.export-method>span{min-width:0}
+.export-method strong{display:block;font-size:14px;font-weight:550}
+.export-method small{display:block;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}
+.export-method.unavailable{cursor:default}
+.export-method.unavailable strong{color:var(--muted)}
+.export-footer{display:flex;justify-content:flex-end;gap:10px;padding-top:20px;border-top:1px solid var(--line);margin-top:4px}
+@media(max-width:600px){.export-dialog{padding:22px 20px}.export-orientation{gap:10px}.export-orientation-preview{width:45px}.export-segmented span{padding:8px 10px;font-size:12px}.export-footer .button{flex:1;white-space:nowrap;font-size:13px}}
+@media print{.export-dialog{display:none!important}.report-print-only .report-radial{break-inside:avoid}.report-print-only .print-export-settings{font-size:10px;color:#656565}}

@@ -1,0 +1,37 @@
+Built-in image_gen was used for all renders. Final live assets: dist/assets/renders/isokinetic-fixed-v1.png; isokinetic-parts-v1.png; isokinetic-poses-v1.png (lower-neck background patch). isokinetic-moving-v1.png is retained as an intermediate extraction.
+
+PROMPT 1 — isokineticRenderPrompt
+
+Use case: scientific-educational. Edit the supplied approved Kinmetrix render to create an ISOKINETIC demonstration, preserving the exact soft technical 3D style, smooth gender-neutral mannequin, materials, lighting, white background and locked side camera.
+
+Output exactly TWO equally sized square frames side-by-side in one wide 2:1 sprite sheet, with no borders, text, numbers or arrows. The machine's heavy outer support, overhead housing, the CENTRAL HOLDER under that housing, chair and mannequin torso must remain PIXEL-ALIGNED and completely stationary in both frames.
+
+LEFT FRAME: Use the supplied RIGHT-hand pose as the starting pose: upper forehead in contact with the black sensor pad, slight forward nod. Keep a natural head and neck, same mannequin.
+
+RIGHT FRAME: The mannequin performs about 18 degrees more FORWARD FLEXION from the left pose: head tips forward/down, chin comes closer to chest, forehead moves LEFT and DOWN in the image. The forehead STAYS IN CONTACT with the same pad throughout. The pad and handle are rigidly attached to the FRONT END of the steel circular arc and travel WITH THAT ARC. The arc is a stiff curved rail, not a bending spring. It SLIDES through the STATIONARY central top holder along its own circular curvature, like a curved rail feeding through a fixed guide. Thus the left/front arc end and its sensor travel down and forward, while the opposite rear arc end rises upward. Bolt holes and markings on the arc move through the holder. The central holder does NOT tip or travel, the overhead housing does NOT rotate, and the heavy rear column does NOT move. The circular shape/radius and length of the metal arc stay identical. The change is the arc's angular position within its fixed guide, NOT rotation of the complete overhead machine.
+
+Maintain identical head-to-pad contact and believable neck articulation. Torso and shoulders stay fixed; only head/upper neck and arc/sensor move. Crop/frame exactly as the reference (waist-up side view facing LEFT). Keep all moving parts visible in each frame with white breathing room. No alternate machine, extra braces, neck harness, face mask, cartoon joints, glow, speed lines, writing or UI. Preserve the already-approved appearance; change only the mechanism and head pose necessary for this isokinetic movement.
+
+---
+
+PROMPT 2 — isokineticLayerPrompt
+
+Use case: precise-object-edit. Create a transparent animation layer from the LEFT SQUARE of the supplied two-frame Kinmetrix rendering. Output one SQUARE transparent PNG. Preserve the left square's exact object scale, location and camera; the original square canvas is 887 by 887, so objects must keep the same proportional coordinates within your output square. Do NOT center or enlarge the extracted parts.
+
+KEEP ONLY: (1) the complete curved metal rail/arc with its front handle and black forehead sensor pad, and (2) the mannequin's head and upper neck, still in forehead contact with that sensor. Keep exactly their existing relative positions and identical soft gray technical rendering. The retained arc and head should occupy their original upper/middle canvas, with generous transparent space above, below, and to the right.
+
+REMOVE to genuine transparency: the heavy outer support/column, all upper housing and central rectangular guide/holder, the red/gray top button, the chair, torso, shoulders, arms and lower neck. End the neck at roughly 67% of the original frame height with a smooth natural edge; no shoulders. Retain the whole head and ears, nose, jaw, upper neck. Retain the arc from its front left end/handle to its rear right end.
+
+CRITICAL: where the rectangular central holder previously hid the arc, reconstruct the missing curved metal segment so the rail is ONE COMPLETE UNBROKEN rigid CIRCULAR ARC. Same curvature, width, metal finish, and bolt/slot details as the visible arc. The arc must NOT have a gap or a remaining rectangle at its top. The head must keep contact with the pad. No disconnected extra parts, no other person, no new geometry, no frame labels, no text, no arrows, no floor or white background. Matte antialiased alpha edges. This layer will rotate as one piece behind a separate fixed holder.
+
+---
+
+PROMPT 3 — isokineticBasePrompt
+
+Use case: precise-object-edit. Create the STATIONARY BACKGROUND LAYER for a rendered Kinmetrix animation. Edit ONLY the LEFT SQUARE of the supplied two-frame image. Output one square, identical proportional framing to the original 887x887 left square, same soft gray 3D technical illustration, white background. Keep the entire heavy outer frame, overhead housing, top button, rectangular central arc holder, base, chair, mannequin shoulders, chest and arms EXACTLY in their original places and scale. Remove the WHOLE curved metal arc rail (including the sensor and handle) and remove the mannequin's entire head and upper neck down to its junction with the shoulders at about y=620 of the original 887px square. Fill removed regions with the same plain white backdrop. Preserve the lower neck root within the shoulders so a separate head/neck layer can overlap it. DO NOT move or enlarge the remaining elements. The central holder is now empty; keep its front face and rectangular shape as-is. This is a clean animation plate, not an anatomical illustration: no cut surfaces, no visible wounds, no red, no exposed anatomy, no extra machinery, no text, no arrows. White background, not transparent. Keep everything pixel-aligned to the source left square.
+
+---
+
+PROMPT 4 — isokineticSplitPrompt
+
+Use case: precise-object-edit. Split this transparent square render into TWO SEPARATE ANIMATION LAYERS in one transparent 2:1 wide sprite atlas, two equally sized square tiles. LEFT TILE: keep ONLY the complete metal arc, handle and black sensor pad, REMOVE the head and neck to transparency. RIGHT TILE: keep ONLY the entire mannequin head and upper neck, REMOVE every machine part including every pixel of the black forehead pad to transparency. In BOTH tiles preserve the EXACT original square canvas proportions and object positions, dimensions, lighting, materials and anatomy from the reference. Do not recenter, do not enlarge, do not deform anything. When the right tile is placed directly over the left tile it should recreate the supplied image with forehead contact. Arc is one smooth RIGID circular rail of constant curvature. Keep its full geometry unchanged. Both tiles have the original ample transparent margins. Clean true alpha edges, no white backdrop, no text, no shadows outside the extracted objects, no other objects. This is surgical layer extraction, not redesign.

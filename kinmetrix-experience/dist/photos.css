@@ -1,0 +1,32 @@
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.photo-capture{padding:0 0 20px;margin-bottom:20px;border-bottom:1px solid var(--line)}
+.photo-capture-row{display:flex;align-items:center;gap:20px}
+.photo-preview{width:100px;height:100px;flex:none;border:1px solid var(--line);border-radius:50%;background:var(--soft);color:var(--muted);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.photo-preview>.icon{width:30px;height:30px}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.photo-options{min-width:0;flex:1}
+.photo-options h3{font-size:14px;font-weight:600;margin:0 0 10px}
+.photo-options h3 span{font-size:12px;font-weight:400;color:var(--muted);margin-left:8px}
+.photo-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.photo-actions .button,.photo-actions .text-button{font-size:13px;min-height:44px;white-space:nowrap}
+.photo-help{font-size:12px;color:var(--muted);line-height:1.5;margin-top:8px}
+.photo-error{font-size:13px;color:var(--red);line-height:1.5;margin-top:12px}
+@media(max-width:600px){
+ .photo-capture-row{gap:14px;align-items:flex-start}
+ .photo-preview{width:76px;height:76px}
+ .photo-options h3 span{display:block;margin:4px 0 0}
+ .photo-actions{gap:0 12px}
+ .photo-actions .button{padding:8px 12px}
+}
+
+.photo-avatar-button{display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:transparent;cursor:zoom-in}
+.photo-avatar-button:hover{background:var(--soft)}
+.directory-identity{display:flex;align-items:center;gap:6px}
+.directory-identity>.avatar{margin:0 7px}
+.finder-person-open{display:flex;align-items:center;gap:16px;flex:1;min-width:0;min-height:56px;padding:0;border:0;background:transparent;text-align:left}
+.finder-person-open>.icon{width:18px;height:18px;color:var(--muted)}
+.dialog.photo-viewer{width:min(480px,calc(100vw - 28px));max-height:90dvh;padding:16px;border-radius:16px}
+.photo-viewer .dialog-header{gap:16px;margin-bottom:12px}
+.photo-viewer .dialog-header h2{font-size:20px}
+.photo-viewer .icon-button{flex:none;min-width:44px;min-height:44px}
+.profile-photo-large{display:block;width:100%;max-height:calc(90dvh - 104px);object-fit:contain;border-radius:10px}

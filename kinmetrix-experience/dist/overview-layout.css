@@ -1,0 +1,53 @@
+/* Member Overview: one title row, chart on the left, big numbers and one "worth a look" on the right. */
+.overview-latest-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0 14px;border-bottom:1px solid var(--line)}
+.overview-eyebrow{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 2px}
+.overview-latest-head h2{font-size:21px;font-weight:620;letter-spacing:-.02em;line-height:1.25}
+.overview-when{font-size:14px;color:var(--muted);margin-top:2px}
+.overview-latest-head .button{white-space:nowrap;flex:none;min-height:46px;font-size:14px;padding:10px 16px}
+.overview-latest-body{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:36px;align-items:start;padding-top:10px}
+.overview-latest .overview-radial{grid-area:auto;grid-column:1;grid-row:1;width:100%;max-width:none;justify-self:center}
+.overview-latest .overview-radial .report-radial{display:block;width:100%;height:auto;max-height:440px;max-width:520px;margin:0 auto}
+.overview-latest .overview-radial .radial-angle{font-size:16px}
+.overview-latest .overview-radial .chart-legend{justify-content:flex-start;font-size:13px;gap:18px;margin:4px 0 0}
+.overview-latest .overview-chart-hint{font-size:13px;margin-top:4px}
+.overview-side{grid-column:2;grid-row:1;min-width:0}
+.overview-stats .overview-measures{display:block;margin:0;font-variant-numeric:tabular-nums}
+.overview-stat{display:grid;grid-template-columns:1fr auto 20px;align-items:center;gap:2px 14px;width:100%;padding:13px 0 13px 2px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer;border-radius:0}
+.overview-stat:hover{background:var(--soft)}
+.overview-stat:focus-visible{outline:3px solid var(--focus);outline-offset:-3px;border-radius:8px}
+.overview-stat-go{grid-column:3;grid-row:1/span 2;color:var(--muted)}
+.overview-stat-label{grid-column:1;font-size:14px;color:var(--muted)}
+.overview-stat-value{grid-column:1;font-size:38px;font-weight:650;letter-spacing:-.03em;line-height:1.08;white-space:nowrap}
+.overview-stat-value small{font-size:17px;font-weight:500;color:var(--muted);letter-spacing:0;margin-left:2px}
+.overview-delta{grid-column:2;grid-row:1/span 2;text-align:right;font-size:14px;color:var(--muted);white-space:nowrap}
+.overview-delta b{display:block;font-size:16px;font-weight:620;color:var(--ink)}
+.overview-delta.up b{color:var(--change-up,#32684c)}
+.overview-delta.down b{color:var(--change-down,#a24646)}
+.overview-baseline{font-size:13px;color:var(--muted);margin-top:10px}
+.overview-latest .overview-direction{grid-area:auto;width:100%;max-width:none;justify-self:stretch;align-self:auto;border:0;padding:0;margin-top:16px}
+.overview-side.has-direction .overview-stats{display:none}
+.overview-side.has-direction .overview-direction{display:flex;flex-direction:column;margin-top:8px}
+.overview-side.has-direction .overview-rep-heading{order:-1;margin:0 0 6px!important;display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center}
+.overview-side.has-direction .overview-rep-heading .button{grid-column:2;grid-row:1/span 2;min-height:44px}
+.overview-side.has-direction .overview-rep-title h3{font-size:19px}
+.overview-look{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:14px 16px;border-radius:12px;background:var(--soft)}
+.overview-look-title{font-size:13px;font-weight:600;color:var(--signal);margin:0 0 2px}
+.overview-look p{font-size:15px;line-height:1.45;margin:0}
+.overview-look .button{min-height:44px;white-space:nowrap}
+.overview-latest .overview-rep-helper{padding:12px 0;max-width:none}
+.overview-latest .overview-rep-chart{width:100%;max-width:420px;margin:0}
+.overview-latest .overview-rep-chart+.overview-rep-heading{width:100%;max-width:420px;margin:10px 0 0}
+.overview-latest .session-note-top{grid-column:auto;border-bottom:0;margin:10px 0 0;font-size:14px}
+@media(max-width:1000px){
+ .overview-latest-body{gap:24px}
+ .overview-stat-value{font-size:32px}
+}
+@media(max-width:760px){
+ .overview-latest-head{align-items:flex-start;flex-direction:column;gap:12px}
+ .overview-latest-body{grid-template-columns:1fr;gap:8px}
+ .overview-latest .overview-radial,.overview-side{grid-column:1;grid-row:auto}
+ .overview-latest .overview-radial .report-radial{max-width:360px}
+ .overview-latest .overview-radial .chart-legend{justify-content:center}
+ .overview-stat-value{font-size:30px}
+ .overview-look{grid-template-columns:1fr}
+}
