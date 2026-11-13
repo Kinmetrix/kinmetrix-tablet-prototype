@@ -1,0 +1,20 @@
+---
+description: Conventional commits, branches, Linear linking
+alwaysApply: true
+---
+
+# Git conventions
+
+Read `docs/agents/git/conventions.md`.
+
+Do not commit on trunk (main).
+
+Subject: `type(scope): imperative summary` — no Linear id in subject.
+
+Branch: Linear copy-branch when the work ties to a Linear issue; else `type/scope-description`.
+
+Secondary Linear: `Fixes KMD-###` or `Refs KMD-###` in commit body and/or PR description.
+
+PR title = commit subject. Never `git commit --no-verify`.
+
+Preflight: `printf '%s' "<message>" | yarn commitlint`

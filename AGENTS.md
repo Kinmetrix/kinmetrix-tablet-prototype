@@ -36,3 +36,8 @@ Visual-compare baselines are archived under `prototype/visual-compare/`; see `pr
 ## Prove HTML behavior
 
 For user-path proof of the static prototype (not RN visual-compare), read and follow `.cursor/skills/verify-kinmetrix/SKILL.md`. Use its harness and `features/` map; do not drive a shared `yarn dev` instance you did not start.
+
+### Git conventions
+
+See `docs/agents/git/conventions.md`. Validate with `yarn commitlint` or `npm run commitlint`.
+
