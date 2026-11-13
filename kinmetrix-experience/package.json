@@ -1,0 +1,11 @@
+{
+  "name": "kinmetrix-experience",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "npx --yes serve -l 4173 dist",
+    "check:syntax": "node --check dist/app.js && node --check dist/report.js && node --check dist/profile.js && node --check dist/reps.js && node --check dist/directory.js && node --check dist/team-settings.js && node --check dist/team-overview.js && node --check dist/session-plan.js",
+    "check:review": "node review/session-tools-check.cjs && node review/mode-behavior-check.cjs && node review/person-programs-check.cjs && node review/team-workspace-check.cjs",
+    "check": "yarn check:syntax && yarn check:review"
+  }
+}

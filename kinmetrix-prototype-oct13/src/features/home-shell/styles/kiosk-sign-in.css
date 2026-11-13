@@ -1,0 +1,400 @@
+.kiosk {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  background: var(--white);
+  color: var(--ink);
+}
+
+.kiosk-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 28px 0;
+}
+
+.kiosk-header-trailing {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.kiosk-staff-wrap {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.kiosk-staff-label {
+  white-space: nowrap;
+}
+
+.kiosk-place {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.kiosk-crest {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  overflow: hidden;
+}
+
+.kiosk-crest img {
+  display: block;
+  width: 36px;
+  height: 36px;
+  transform: scale(2.15);
+  transform-origin: center;
+}
+
+button.icon-btn.kiosk-staff {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--sub);
+}
+
+button.icon-btn.kiosk-staff:active {
+  background: var(--control-active);
+  color: var(--ink);
+}
+
+.kiosk-staff svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.kiosk-intro {
+  padding: 4px 28px 12px;
+}
+
+.kiosk-intro h1 {
+  font-size: 36px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.kiosk-intro .typo-muted {
+  margin-top: 4px;
+}
+
+.kiosk-split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  min-height: 0;
+  border-top: 1px solid var(--line);
+}
+
+.kiosk-pass,
+.kiosk-desk {
+  min-width: 0;
+  min-height: 0;
+  padding: 20px 24px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.kiosk-desk {
+  border-left: 1px solid var(--line);
+  background: var(--white);
+}
+
+.kiosk-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kiosk-main {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kiosk-pass-stack {
+  align-items: center;
+  gap: 4px;
+}
+
+.kiosk-qr {
+  width: fit-content;
+  max-width: 100%;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kiosk-qr:active {
+  background: var(--control-active);
+}
+
+.kiosk-code {
+  display: block;
+  width: 220px;
+  height: auto;
+  shape-rendering: crispEdges;
+}
+
+.kiosk-wordmark {
+  display: block;
+  height: 44px;
+  width: auto;
+}
+
+.kiosk .field {
+  margin: 0;
+}
+
+.kiosk .field input,
+.kiosk-date input {
+  height: 56px;
+  min-height: 56px;
+  padding: 0 12px;
+  font-size: 20px;
+}
+
+.kiosk-date-label {
+  display: block;
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--ink);
+}
+
+.kiosk-date {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr);
+  width: 100%;
+  height: 56px;
+  border: 1px solid var(--line);
+  border-radius: var(--control-radius);
+  background: var(--white);
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 0 #1f23280a;
+}
+
+.kiosk-date input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+}
+
+.kiosk-date input + input {
+  border-left: 1px solid var(--line);
+}
+
+.kiosk-date input::placeholder {
+  color: var(--sub);
+}
+
+.kiosk-date input:focus-visible {
+  outline: none;
+}
+
+.kiosk-date:focus-within {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -1px;
+  border-color: var(--focus-ring);
+}
+
+.kiosk-band {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+button.btn.kiosk-action {
+  height: 56px;
+  min-height: 56px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.kiosk[hidden] {
+  display: none;
+}
+
+.kiosk-outcome {
+  flex: 1;
+  min-height: 0;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.kiosk-outcome-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 32px 40px;
+}
+
+.kiosk-sheet {
+  width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kiosk-sheet--confirm {
+  width: min(480px, 100%);
+  gap: 24px;
+}
+
+.kiosk-confirm-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.kiosk-confirm-head .kiosk-caption {
+  margin: 0;
+}
+
+.kiosk-sheet h1 {
+  font-size: 36px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.kiosk-identity-card {
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--canvas);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kiosk-identity-facts {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kiosk-identity-fact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.kiosk-identity-fact--primary dd {
+  font-size: 28px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.kiosk-identity-note {
+  margin: 0;
+  text-align: center;
+}
+
+.kiosk-confirm-actions {
+  margin-top: 4px;
+  gap: 10px;
+}
+
+.kiosk-caption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 -8px;
+}
+
+.kiosk-crest.is-compact,
+.kiosk-crest.is-compact img {
+  width: 28px;
+  height: 28px;
+}
+
+.kiosk-facts {
+  margin: 0;
+}
+
+.kiosk-facts div {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.kiosk-facts dt {
+  margin: 0;
+}
+
+.kiosk-facts dd {
+  margin: 0;
+}
+
+.kiosk-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kiosk-pin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kiosk-outcome .field {
+  margin: 0;
+}
+
+.kiosk-pin {
+  max-width: 160px;
+}
+
+.kiosk-outcome .field input {
+  height: 56px;
+  min-height: 56px;
+  padding: 0 12px;
+  font-size: 20px;
+}
+
+.kiosk-pin.is-invalid input {
+  border-color: var(--danger);
+}
+
+.kiosk-error {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--danger);
+}

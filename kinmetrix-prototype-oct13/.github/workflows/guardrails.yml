@@ -1,0 +1,22 @@
+name: guardrails
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  guardrails:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kinmetrix-prototype-oct13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: kinmetrix-prototype-oct13/yarn.lock
+      - run: corepack enable
+      - run: yarn install --immutable
+      - run: yarn guardrails

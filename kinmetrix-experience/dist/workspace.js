@@ -14,7 +14,7 @@ const modePurposeCopy={
 };
 
 function memberWorkspaceView(){
- const p=person(),continuing=activeProgram(),backLabel=state.memberOrigin==='roster'?'Back to roster':state.memberOrigin==='programs'?'Back to programs':'Find another person';
+ const p=person(),continuing=activeProgram(),backLabel=state.memberOrigin==='roster'?'Back to roster':state.memberOrigin==='programs'?'Back to templates':'Find another person';
  return `<div class="member-heading">${state.actor==='coach'?`<button class="icon-button member-find-another" data-action="show-roster" aria-label="${backLabel}" title="${backLabel}">${icon('back','icon-sm')}</button>`:''}${photoAvatar(p,'large')}<div class="member-identity"><h1>${escapeHTML(p.name)}</h1><p>${p.detail}${state.history.some(h=>h.personId===p.id)?' · Last visit Today':p.last?' · Last visit '+p.last:' · First visit'}</p></div>
  <div class="member-session-actions">${continuing&&state.tab!=='programs'?button(icon('play','icon-sm')+'<span>Continue program</span><span class="continue-session">'+(continuing.completed+1)+' / '+continuing.total+'</span>','continue-program','primary continue-program-button',`data-program-id="${continuing.id}" aria-label="Continue program, session ${continuing.completed+1} of ${continuing.total}"`):''}${button(icon('plus','icon-sm')+' New','new-session',continuing?'':'primary','aria-haspopup="dialog"')}</div></div>
  <nav class="member-tabs" aria-label="Member workspace">${['overview','history','programs','profile'].map(tab=>`<button class="member-tab ${state.tab===tab?'active':''}" data-action="member-tab" data-tab="${tab}" ${state.tab===tab?'aria-current="page"':''}>${tab[0].toUpperCase()+tab.slice(1)}</button>`).join('')}</nav>

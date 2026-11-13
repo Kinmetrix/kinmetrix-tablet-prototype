@@ -1,0 +1,149 @@
+/*
+  Button, IconButton, Link, UnderlineNav item, invisible icon help.
+  https://primer.style/product/components/button
+  https://primer.style/product/components/icon-button
+  https://primer.style/product/components/link
+  https://primer.style/product/components/underline-nav
+  Tablet default size is Primer large (40px).
+*/
+
+button.btn {
+  min-height: var(--control-height);
+  height: var(--control-height);
+  padding: 0 16px;
+  border-radius: var(--control-radius);
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  color: var(--control-fg);
+  background: var(--control-bg);
+  box-shadow: 0 1px 0 0 #1f23280a;
+}
+
+button.btn:active {
+  background: var(--control-active);
+}
+
+button.btn.outline {
+  color: var(--control-fg);
+  background: var(--control-bg);
+  border-color: var(--line);
+}
+
+button.btn.outline:active {
+  background: var(--control-active);
+}
+
+button.btn.primary {
+  color: var(--white);
+  background: var(--primary);
+  border-color: var(--primary);
+  box-shadow: none;
+}
+
+button.btn.primary:active {
+  background: var(--primary-active);
+  border-color: var(--primary-active);
+}
+
+button.btn.full {
+  width: 100%;
+}
+
+button.btn:focus-visible,
+button.icon-btn:focus-visible,
+button.text-link:focus-visible,
+button.nav-tab:focus-visible,
+button.metric-help:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+button.icon-btn {
+  width: var(--control-height);
+  height: var(--control-height);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: var(--control-radius);
+  border: 1px solid var(--line);
+  background: var(--control-bg);
+  color: var(--control-fg);
+  box-shadow: 0 1px 0 0 #1f23280a;
+}
+
+button.icon-btn:active {
+  background: var(--control-active);
+}
+
+button.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  min-height: var(--control-height);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+button.nav-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  min-height: var(--control-height);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--sub);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+button.nav-tab[aria-current='page'] {
+  color: var(--ink);
+}
+
+button.nav-tab[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 0;
+}
+
+button.metric-help {
+  width: var(--control-height);
+  height: var(--control-height);
+  margin: -8px 0;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: var(--control-radius);
+  border: 0;
+  background: transparent;
+  color: var(--sub);
+}
+
+button.metric-help .icon {
+  width: 16px;
+  height: 16px;
+}

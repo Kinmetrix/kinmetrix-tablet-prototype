@@ -1,17 +1,36 @@
 # Kinmetrix tablet prototypes
 
-Two independent explorations live in this repository:
+GitHub Pages serves a hub at the site root with four prototypes:
 
-- [`prototype/`](prototype/) — the existing engineering screen prototype. Its current GitHub Pages deployment is unchanged.
-- [`kinmetrix-experience/`](kinmetrix-experience/) — the interactive experience redesign, including clinician/member navigation, assessments, training, reports, history, and person-specific programs.
+- [`kinmetrix-experience/`](kinmetrix-experience/) — interactive landscape iPad exploration
+- [`kinmetrix-web-prototype/`](kinmetrix-web-prototype/) — phone-width member web app
+- [`kinmetrix-prototype-oct13/`](kinmetrix-prototype-oct13/) — React clinic tablet prototype
+- [`prototype/`](prototype/) — HTML screen inventory
 
-## Run the experience redesign
+The hub lives in [`site/index.html`](site/index.html). After deploy the cards open `/experience/`, `/web/`, `/oct13/`, and `/prototype/`.
+
+## Run locally
+
+Experience:
 
 ```sh
 cd kinmetrix-experience
-python3 -m http.server 4173 --directory dist
+yarn install
+yarn dev
 ```
 
-Open http://localhost:4173. No install or build step is required. See its [README](kinmetrix-experience/README.md) for flows and prototype limitations.
+Open http://localhost:4173.
+
+Web: open `kinmetrix-web-prototype/index.html` in a browser.
+
+Oct 13:
+
+```sh
+cd kinmetrix-prototype-oct13
+yarn install
+yarn dev
+```
+
+Open http://localhost:5173.
 
 All session measurements are synthetic. Device operation, authentication, and clinical settings are demonstrations; this is not a production application.

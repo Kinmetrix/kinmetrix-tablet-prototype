@@ -1,10 +1,11 @@
 /* Clinic navigation and plan management. All identities and plans are demo data. */
 function directoryUI(){
  state.directoryUI??={};
- return state.directoryUI[state.clinicianId]??={roster:{query:'',clinician:'all',status:'all',sort:'name',descending:false},programs:{tab:'templates',query:''}};
+ return state.directoryUI[state.clinicianId]??={roster:{query:'',clinician:'all',status:'all',sort:'name',descending:false},programs:{tab:'templates',query:'',library:null}};
 }
-function visitDirectory(page){
+function visitDirectory(page,keepLibrary=false){
  if(state.actor!=='coach'||!['roster','programs'].includes(page))return;
+ if(page==='programs'&&!keepLibrary)directoryUI().programs.library=null;
  state.nav=page;state.personId=null;state.pendingSetup=null;state.memberOrigin=page;render();window.scrollTo(0,0);
 }
 function openDirectoryPerson(id,origin='find',tab='overview'){
@@ -16,7 +17,7 @@ function openDirectoryPerson(id,origin='find',tab='overview'){
  render();window.scrollTo(0,0);return true;
 }
 function returnToDirectory(){
- if(['roster','programs'].includes(state.memberOrigin))visitDirectory(state.memberOrigin);else showPeopleFinder();
+ if(['roster','programs'].includes(state.memberOrigin))visitDirectory(state.memberOrigin,true);else showPeopleFinder();
 }
 const rosterColumnDefinitions=[
  {key:'sessions',label:'Sessions',width:80},{key:'force',label:'Avg peak force',width:126},{key:'stability',label:'Stability',width:92},{key:'visit',label:'Last activity',width:110},{key:'program',label:'Program',width:180},
@@ -86,7 +87,26 @@ function saveNewPerson(){
 function clinicProgramTemplates(){
  return state.programTemplates??=people.filter(p=>p.program).map(p=>({id:'template-'+p.id,name:p.detail,type:'strength',load:{kind:'incremental',start:p.target||12,increase:5,percent:60},total:6,positions:4,reps:3,example:true}));
 }
+function clinicSessionTemplates(){
+ return state.sessionTemplates??=[
+  {id:'light',name:'Light',detail:'50% · 10 reps',percent:50},
+  {id:'strength',name:'Strength',detail:'65% · 8 reps',percent:65},
+  {id:'performance',name:'Performance',detail:'75% · 4 reps',percent:75},
+  {id:'return-to-play',name:'Return to Play',detail:'40% · 12 reps',percent:40},
+  {id:'in-season',name:'In-Season Maintenance',detail:'55% · 10 reps',percent:55},
+  {id:'off-season',name:'Off-Season Build',detail:'70% · 6 reps',percent:70},
+  {id:'deload',name:'Deload',detail:'45% · 10 reps',percent:45}
+ ];
+}
+function clinicAssessmentTemplates(){
+ return sessionModeKeys('assessment').map(key=>({id:key,name:sessionModes[key].name,detail:sessionModes[key].short,description:sessionModes[key].description}));
+}
 function assignedPrograms(){if(state.actor!=='coach')return [];return visiblePeople().flatMap(p=>memberPrograms(p.id).map(program=>({p,program})));}
+const TEMPLATE_LIBRARIES=[
+ {id:'assessments',label:'Assessments',description:'Protocols the team runs from this workspace.'},
+ {id:'sessions',label:'Sessions',description:'Session setups shared across the roster.'},
+ {id:'programs',label:'Programs',description:'Multi-day plans assigned from this workspace.'}
+];
 function programFields(draft,prefix='plan',tracked=false){
  const field=name=>tracked?`data-program-field="${name}"`:'';
  return `<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><label>Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-form-grid"><label>Training mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('training').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label><label>Number of sessions<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n} sessions</option>`).join('')}</select></label><label>Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n} directions</option>`).join('')}</select></label><label>Reps per direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n} ${n===1?'rep':'reps'}</option>`).join('')}</select></label></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
@@ -94,7 +114,50 @@ function programFields(draft,prefix='plan',tracked=false){
 function programsPage(){
  if(state.actor!=='coach')return peopleView();
  const ui=directoryUI().programs;
- return `<main class="directory-page"><header class="directory-heading"><div><h1>Programs</h1><p>Reusable plans and the people following them.</p></div>${button(icon('plus','icon-sm')+' New program','new-template','primary')}</header><nav class="directory-tabs" aria-label="Program views">${[['templates','Templates'],['assigned','Assigned']].map(([key,label])=>`<button data-action="programs-tab" data-tab="${key}" ${ui.tab===key?'aria-current="page"':''}>${label}<span>${key==='templates'?clinicProgramTemplates().length:assignedPrograms().length}</span></button>`).join('')}</nav><div class="directory-toolbar program-toolbar">${directorySearch('programs-search','Search programs',ui.query,ui.tab==='templates'?'Search programs':'Search programs or people')}<p>${ui.tab==='templates'?'Assign a copy to a person.':'Assigned programs keep their own settings and progress.'}</p></div><div id="programs-results">${programsResults()}</div><p class="directory-footnote">${ui.tab==='templates'?'Example templates use the existing demo plans.':'Only members you can access are shown.'} Changes are saved in this demo only.</p></main>`;
+ if(ui.library==='assessments')return assessmentTemplatesPage();
+ if(ui.library==='sessions')return sessionTemplatesPage();
+ if(ui.library==='programs')return programLibraryPage();
+ return `<main class="directory-page settings-page">
+  <header class="directory-heading"><div><h1>Templates</h1><p>Assessments, sessions, and programs for this team.</p></div></header>
+  <nav class="settings-links" aria-label="Template libraries">
+   ${TEMPLATE_LIBRARIES.map(item=>`<button type="button" class="settings-link" data-action="templates-library" data-library="${item.id}">
+    <span><strong>${item.label}</strong><small>${item.description}</small></span>${icon('chevron')}
+   </button>`).join('')}
+  </nav>
+ </main>`;
+}
+function templatesBack(){
+ return `<button class="text-button settings-back" data-action="templates-home">${icon('back','icon-sm')} Templates</button>`;
+}
+function assessmentTemplatesPage(){
+ const rows=clinicAssessmentTemplates();
+ return `<main class="directory-page">
+  <header class="directory-heading"><div>${templatesBack()}<h1>Assessments</h1><p>Protocols the team runs from this workspace.</p></div></header>
+  <div class="directory-table-scroll" tabindex="0" role="region" aria-label="Assessment templates">
+   <table class="data-table directory-table"><caption class="sr-only">Assessment templates</caption>
+    <thead><tr><th scope="col">Assessment</th><th scope="col">Purpose</th></tr></thead>
+    <tbody>${rows.map(row=>`<tr><th scope="row"><strong>${escapeHTML(row.name)}</strong><small>${escapeHTML(row.detail)}</small></th><td>${escapeHTML(row.description)}</td></tr>`).join('')}</tbody>
+   </table>
+  </div>
+  <p class="directory-footnote">These are the assessment modes available at the station. Editing a protocol is not in this prototype.</p>
+ </main>`;
+}
+function sessionTemplatesPage(){
+ const rows=clinicSessionTemplates();
+ return `<main class="directory-page">
+  <header class="directory-heading"><div>${templatesBack()}<h1>Sessions</h1><p>Session setups shared across the roster.</p></div></header>
+  <div class="directory-table-scroll" tabindex="0" role="region" aria-label="Session templates">
+   <table class="data-table directory-table"><caption class="sr-only">Session templates</caption>
+    <thead><tr><th scope="col">Session</th><th scope="col">Load</th></tr></thead>
+    <tbody>${rows.map(row=>`<tr><th scope="row">${escapeHTML(row.name)}</th><td>${escapeHTML(row.detail)}</td></tr>`).join('')}</tbody>
+   </table>
+  </div>
+  <p class="directory-footnote">Session plan defaults in Settings use this list. New plans start from the selected template.</p>
+ </main>`;
+}
+function programLibraryPage(){
+ const ui=directoryUI().programs;
+ return `<main class="directory-page"><header class="directory-heading"><div>${templatesBack()}<h1>Programs</h1><p>Reusable plans and the people following them.</p></div>${button(icon('plus','icon-sm')+' New program','new-template','primary')}</header><nav class="directory-tabs" aria-label="Program views">${[['templates','Templates'],['assigned','Assigned']].map(([key,label])=>`<button data-action="programs-tab" data-tab="${key}" ${ui.tab===key?'aria-current="page"':''}>${label}<span>${key==='templates'?clinicProgramTemplates().length:assignedPrograms().length}</span></button>`).join('')}</nav><div class="directory-toolbar program-toolbar">${directorySearch('programs-search','Search programs',ui.query,ui.tab==='templates'?'Search programs':'Search programs or people')}<p>${ui.tab==='templates'?'Assign a copy to a person.':'Assigned programs keep their own settings and progress.'}</p></div><div id="programs-results">${programsResults()}</div><p class="directory-footnote">${ui.tab==='templates'?'Example templates use the existing demo plans.':'Only members you can access are shown.'} Changes are saved in this demo only.</p></main>`;
 }
 function programsResults(){
  const ui=directoryUI().programs,q=ui.query.trim().toLowerCase(),assigned=ui.tab==='assigned';
@@ -124,7 +187,7 @@ function assignProgramTemplate(){
  if(!template||!member){$('#assign-program-form').reportValidity();return;}
  if(memberPrograms(member.id).some(p=>p.templateId===template.id&&p.completed<p.total)){field.setCustomValidity('This person already has an active copy of this program.');field.reportValidity();return;}
  memberPrograms(member.id).unshift({id:'program-'+Date.now(),templateId:template.id,name:template.name,type:template.type,total:template.total,positions:template.positions,reps:template.reps,load:{...programLoad(template)},completed:0});
- state.overlay=null;directoryUI().programs={tab:'assigned',query:''};openDirectoryPerson(member.id,'programs');toast('Program assigned to '+member.name+'.');
+ state.overlay=null;Object.assign(directoryUI().programs,{tab:'assigned',query:'',library:'programs'});openDirectoryPerson(member.id,'programs');toast('Program assigned to '+member.name+'.');
 }
 const directoryActions={
  'add-person':()=>{if(state.actor!=='coach')return;openModal('add-person');$('#new-person-name')?.focus();},
@@ -135,8 +198,10 @@ const directoryActions={
  'open-roster-profile':el=>openDirectoryPerson(el.dataset.id,'roster','profile'),
  'sort-roster':el=>{const ui=directoryUI().roster,key=el.dataset.sort;if(key!=='name'&&!rosterColumnDefinitions.some(col=>col.key===key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-sort="${key}"]`)?.focus();},
  'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',clinician:'all',status:'all',sort:'name',descending:false});render();$('#directory-search')?.focus();},
- 'programs-tab':el=>{if(!['templates','assigned'].includes(el.dataset.tab))return;directoryUI().programs={tab:el.dataset.tab,query:''};render();$(`[data-tab="${el.dataset.tab}"]`)?.focus();},
- 'browse-templates':()=>{directoryUI().programs={tab:'templates',query:''};render();},
+ 'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;directoryUI().programs.library=el.dataset.library;render();},
+ 'templates-home':()=>{directoryUI().programs.library=null;render();$('[data-action="templates-library"]')?.focus();},
+ 'programs-tab':el=>{if(!['templates','assigned'].includes(el.dataset.tab))return;Object.assign(directoryUI().programs,{tab:el.dataset.tab,query:'',library:'programs'});render();$(`[data-tab="${el.dataset.tab}"]`)?.focus();},
+ 'browse-templates':()=>{Object.assign(directoryUI().programs,{tab:'templates',query:'',library:'programs'});render();},
  'clear-programs-search':()=>{directoryUI().programs.query='';render();$('#programs-search')?.focus();},
  'new-template':()=>{if(state.actor==='coach')openModal('program-editor');},
  'edit-template':el=>{if(state.actor==='coach'&&clinicProgramTemplates().some(p=>p.id===el.dataset.id))openModal('program-editor',{id:el.dataset.id});},

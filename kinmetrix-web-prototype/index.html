@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#151515">
+  <script>
+  (function () {
+    var key = 'kinmetrix-theme';
+    var theme = localStorage.getItem(key);
+    if (theme !== 'light' && theme !== 'dark') theme = 'dark';
+    document.documentElement.dataset.theme = theme;
+  })();
+  </script>
+  <meta name="description" content="Explore the Kinmetrix web app prototype (phone-width first): finished sessions, progress, profile setup and device sign-in. All data and interactions are simulated.">
+  <title>Kinmetrix · Interactive prototype</title>
+  <style>
+
+    /* App chrome reads kinmetrix-experience tokens via --km-* aliases on :root */
+    #kinmetrix-draft {
+      color: var(--km-ink);
+      font: 400 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      padding: 24px 12px 40px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #kinmetrix-draft * { box-sizing: border-box; }
+    #kinmetrix-draft button, #kinmetrix-draft input { font: inherit; }
+    #kinmetrix-draft button, #kinmetrix-draft a { -webkit-tap-highlight-color: transparent; }
+    #kinmetrix-draft h1, #kinmetrix-draft h2, #kinmetrix-draft h3, #kinmetrix-draft p { margin: 0; }
+    #kinmetrix-draft .km-frame { width: min(390px, 100%); margin: 0 auto 44px; break-after: page; }
+    #kinmetrix-draft .km-frame:last-of-type { margin-bottom: 0; }
+    #kinmetrix-draft .km-caption { margin: 0 3px 14px; display: flex; gap: 8px; align-items: flex-start; justify-content: space-between; }
+    #kinmetrix-draft .km-caption h2 { font-size: 15px; line-height: 1.4; font-weight: 500; letter-spacing: -.2px; }
+    #kinmetrix-draft .km-caption p { font-size: 12px; line-height: 1.5; color: var(--km-muted); margin-top: 3px; }
+    #kinmetrix-draft .km-tab-caption { font-size: 11px; line-height: 1.5; color: var(--km-muted); white-space: nowrap; padding-top: 2px; }
+    #kinmetrix-draft .km-phone { background: var(--km-paper); color: var(--km-ink); border: 1px solid var(--km-rule); border-radius: 28px; min-height: 844px; display: flex; flex-direction: column; overflow: hidden; }
+    #kinmetrix-draft .km-top { height: 74px; flex: 0 0 74px; padding: 22px 24px 14px; display: flex; align-items: center; justify-content: space-between; }
+    #kinmetrix-draft .km-brand { font-size: 17px; line-height: 1.4; font-weight: 500; letter-spacing: -.55px; }
+    #kinmetrix-draft .km-arc-entry { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--km-rule); border-radius: 9px; background: var(--km-paper); color: var(--km-ink); text-decoration: none; font-size: 14px; line-height: 1.4; }
+    #kinmetrix-draft .km-arc-entry svg { width: 20px; height: 20px; stroke-width: 1.6; }
+    #kinmetrix-draft .km-back { display: inline-flex; align-items: center; gap: 3px; min-height: 44px; margin-left: -7px; color: var(--km-ink); text-decoration: none; font-size: 14px; }
+    #kinmetrix-draft .km-back svg { width: 20px; height: 20px; stroke-width: 1.6; }
+    #kinmetrix-draft .km-main { padding: 12px 24px 28px; flex: 1; }
+    #kinmetrix-draft .km-main h1 { font-size: 28px; line-height: 1.25; letter-spacing: -.75px; font-weight: 400; }
+    #kinmetrix-draft .km-main h2 { font-size: 21px; line-height: 1.3; font-weight: 400; letter-spacing: -.4px; }
+    #kinmetrix-draft .km-headline { margin-bottom: 32px; }
+    #kinmetrix-draft .km-headline-home { max-width: 316px; }
+    #kinmetrix-draft .km-intro { font-size: 25px; line-height: 1.34; letter-spacing: -.55px; }
+    #kinmetrix-draft .km-subtle { color: var(--km-muted); font-size: 14px; line-height: 1.5; }
+    #kinmetrix-draft .km-tag { display: inline-flex; align-items: center; background: var(--km-tag); color: var(--km-ink); padding: 4px 8px; border-radius: 5px; font-size: 11px; line-height: 1.4; font-weight: 500; letter-spacing: .2px; white-space: nowrap; }
+    #kinmetrix-draft .km-session-card { border: 1px solid var(--km-rule); border-radius: 14px; padding: 20px 18px 18px; }
+    #kinmetrix-draft .km-card-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    #kinmetrix-draft .km-card-title h2 { font-size: 19px; font-weight: 500; line-height: 1.3; letter-spacing: -.3px; }
+    #kinmetrix-draft .km-card-date { font-size: 13px; color: var(--km-muted); margin-bottom: 3px; }
+    #kinmetrix-draft .km-card-place { font-size: 14px; color: var(--km-muted); }
+    #kinmetrix-draft .km-measures { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 9px; padding-top: 20px; margin-top: 20px; border-top: 1px solid var(--km-rule); }
+    #kinmetrix-draft .km-measure { min-width: 0; }
+    #kinmetrix-draft .km-measure dt { font-size: 12px; color: var(--km-muted); margin-bottom: 5px; min-height: 34px; }
+    #kinmetrix-draft .km-measure dd { margin: 0; font-size: 25px; line-height: 1.25; font-variant-numeric: tabular-nums; letter-spacing: -.6px; white-space: nowrap; }
+    #kinmetrix-draft .km-measure dd small { font-size: 14px; letter-spacing: 0; }
+    #kinmetrix-draft dl { margin-bottom: 0; }
+    #kinmetrix-draft .km-actions { display: grid; gap: 12px; margin-top: 28px; }
+    #kinmetrix-draft .km-button { width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; padding: 12px 14px; border: 1px solid var(--km-rule); border-radius: 9px; text-decoration: none; font-size: 15px; line-height: 1.4; font-weight: 500; background: var(--km-paper); color: var(--km-ink); }
+    #kinmetrix-draft .km-button-primary { background: var(--km-teal); color: var(--km-on-teal); border-color: var(--km-teal); }
+    #kinmetrix-draft .km-button-primary:hover { background: var(--km-action-hover); border-color: var(--km-action-hover); }
+    #kinmetrix-draft .km-text-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--km-ink); text-underline-offset: 4px; text-decoration-thickness: 1px; font-size: 14px; line-height: 1.4; }
+    #kinmetrix-draft .km-account-link { margin-top: 14px; text-align: center; }
+    #kinmetrix-draft .km-bottom { margin-top: auto; padding: 12px 18px 10px; border-top: 1px solid var(--km-rule); background: var(--km-paper); }
+    #kinmetrix-draft .km-tabs { display: grid; grid-template-columns: repeat(3, 1fr); }
+    #kinmetrix-draft .km-tab { color: var(--km-muted); display: flex; flex-direction: column; gap: 5px; align-items: center; justify-content: center; min-height: 48px; font-size: 11px; line-height: 1.3; text-decoration: none; }
+    #kinmetrix-draft .km-tab svg { width: 21px; height: 21px; stroke-width: 1.6; }
+    #kinmetrix-draft .km-tab[aria-current="page"] { color: var(--km-teal); font-weight: 500; }
+    #kinmetrix-draft .km-tab[aria-current="page"] svg { stroke-width: 2.2; }
+    #kinmetrix-draft .km-home-indicator { width: 104px; height: 4px; border-radius: 2px; margin: 16px auto 0; background: var(--km-ink); }
+    #kinmetrix-draft .km-session-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 13px; }
+    #kinmetrix-draft .km-session-meta { margin-bottom: 24px; }
+    #kinmetrix-draft .km-session-meta p + p { margin-top: 4px; }
+    #kinmetrix-draft .km-measure-panel { margin-bottom: 20px; }
+    #kinmetrix-draft .km-panel-label { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    #kinmetrix-draft .km-panel-label h2 { font-size: 14px; font-weight: 500; letter-spacing: 0; }
+    #kinmetrix-draft .km-measure-panel .km-measures { border-top: 0; padding-top: 0; margin-top: 20px; }
+    #kinmetrix-draft .km-measure-panel dd { font-size: 30px; }
+    #kinmetrix-draft .km-chart { margin: 0; padding-top: 20px; border-top: 1px solid var(--km-rule); }
+    #kinmetrix-draft .km-chart figcaption { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 16px; }
+    #kinmetrix-draft .km-chart-title { font-size: 14px; font-weight: 500; }
+    #kinmetrix-draft .km-chart svg { display: block; width: 100%; height: 210px; overflow: visible; }
+    #kinmetrix-draft .km-chart .km-chart-grid { stroke: var(--km-rule); stroke-width: 1; }
+    #kinmetrix-draft .km-chart text { fill: var(--km-muted); font-size: 11px; font-family: inherit; }
+    #kinmetrix-draft .km-chart .km-chart-line { fill: none; stroke: var(--km-signal); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    #kinmetrix-draft .km-chart .km-chart-dot { fill: var(--km-paper); stroke: var(--km-signal); stroke-width: 2; }
+    #kinmetrix-draft .km-chart .km-chart-value { fill: var(--km-ink); font-size: 12px; font-weight: 500; }
+    #kinmetrix-draft .km-chart .km-chart-sample { fill: var(--km-muted); font-size: 12px; }
+    #kinmetrix-draft .km-direction-chart svg { height: 284px; }
+    #kinmetrix-draft .km-chart .km-direction-fill { fill: var(--km-signal); fill-opacity: .12; }
+    #kinmetrix-draft .km-after-visit { margin-top: 16px; font-size: 14px; color: var(--km-muted); }
+    #kinmetrix-draft .km-section-top { margin-bottom: 32px; }
+    #kinmetrix-draft .km-section-top .km-subtle { margin-top: 10px; }
+    #kinmetrix-draft .km-locations { margin-top: 22px; }
+    #kinmetrix-draft .km-place { border-bottom: 1px solid var(--km-rule); }
+    #kinmetrix-draft .km-place:first-child { border-top: 1px solid var(--km-rule); }
+    #kinmetrix-draft .km-place-toggle { width: 100%; padding: 22px 0; display: flex; gap: 10px; justify-content: space-between; align-items: center; text-align: left; border: 0; color: var(--km-ink); background: var(--km-paper); }
+    #kinmetrix-draft .km-place-name { display: block; font-size: 15px; line-height: 1.4; font-weight: 500; }
+    #kinmetrix-draft .km-place-meta { display: block; font-size: 13px; line-height: 1.5; color: var(--km-muted); margin-top: 6px; }
+    #kinmetrix-draft .km-place-toggle svg { width: 18px; height: 18px; flex: 0 0 18px; color: var(--km-muted); }
+    #kinmetrix-draft .km-place-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+    #kinmetrix-draft .km-place-detail { padding: 0 0 24px; font-size: 14px; line-height: 1.55; }
+    #kinmetrix-draft .km-place-detail address { font-style: normal; margin: 0 0 18px; }
+    #kinmetrix-draft .km-detail-label { font-size: 12px; color: var(--km-muted); margin-bottom: 5px; }
+    #kinmetrix-draft .km-hours { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 13px; }
+    #kinmetrix-draft .km-notify { margin-top: 42px; }
+    #kinmetrix-draft .km-label { display: block; font-size: 14px; margin-bottom: 10px; }
+    #kinmetrix-draft .km-optional { font-size: 12px; color: var(--km-muted); display: block; margin-top: 4px; }
+    #kinmetrix-draft .km-input { width: 100%; height: 52px; padding: 12px 14px; border: 1px solid var(--km-rule); border-radius: 8px; color: var(--km-ink); background: var(--km-paper); font-size: 16px; line-height: 1.4; }
+    #kinmetrix-draft .km-input::placeholder { color: var(--km-muted); opacity: 1; }
+    #kinmetrix-draft .km-notify .km-button { margin-top: 20px; }
+    #kinmetrix-draft .km-skip { margin-top: 16px; }
+    #kinmetrix-draft .km-confirm { margin-top: 42px; padding-top: 22px; border-top: 1px solid var(--km-rule); }
+    #kinmetrix-draft .km-confirm p { font-size: 16px; line-height: 1.5; }
+    #kinmetrix-draft .km-confirm .km-subtle { margin-top: 9px; font-size: 13px; }
+    #kinmetrix-draft .km-confirm [data-email] { overflow-wrap: anywhere; }
+    #kinmetrix-draft .km-confirm .km-text-link { margin-top: 16px; }
+    #kinmetrix-draft .km-progress-intro { margin: 14px 0 48px; }
+    #kinmetrix-draft .km-profile-intro { margin: 14px 0 33px; }
+    #kinmetrix-draft .km-profile-links { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+    #kinmetrix-draft .km-profile-links .km-text-link { font-size: 15px; }
+    #kinmetrix-draft .km-signin { margin-top: 38px; }
+    #kinmetrix-draft .km-field + .km-field { margin-top: 25px; }
+    #kinmetrix-draft .km-signin .km-button { margin-top: 32px; }
+    #kinmetrix-draft .km-error { color: var(--km-error); font-size: 13px; margin-top: 10px; }
+    #kinmetrix-draft .km-frame-note { color: var(--km-muted); margin: 12px 3px 0; font-size: 12px; line-height: 1.5; }
+    #kinmetrix-draft .km-create-note { margin-top: 20px; font-size: 13px; color: var(--km-muted); }
+    #kinmetrix-draft .km-setup-intro { margin-top: 12px; color: var(--km-muted); font-size: 14px; }
+    #kinmetrix-draft .km-setup-form { margin-top: 24px; }
+    #kinmetrix-draft .km-setup-form .km-field + .km-field { margin-top: 18px; }
+    #kinmetrix-draft .km-field-help { font-size: 12px; line-height: 1.5; color: var(--km-muted); margin-top: 8px; }
+    #kinmetrix-draft .km-contact-choice { margin: 20px 0 8px; padding: 0; border: 0; min-width: 0; }
+    #kinmetrix-draft .km-contact-choice legend { font-size: 14px; padding: 0; margin-bottom: 8px; }
+    #kinmetrix-draft .km-radio-row { display: flex; align-items: center; gap: 28px; }
+    #kinmetrix-draft .km-radio { display: flex; gap: 9px; align-items: center; min-height: 44px; font-size: 14px; }
+    #kinmetrix-draft .km-radio input { width: 17px; height: 17px; margin: 0; accent-color: var(--km-focus); }
+    #kinmetrix-draft .km-setup-form .km-button { margin-top: 20px; }
+    #kinmetrix-draft .km-setup-form .km-field-help { margin-top: 6px; }
+    #kinmetrix-draft .km-setup-form .km-skip { margin-top: 12px; }
+    #kinmetrix-draft .km-verify-recipient { margin-top: 32px; padding: 20px 0; border-top: 1px solid var(--km-rule); border-bottom: 1px solid var(--km-rule); }
+    #kinmetrix-draft .km-verify-recipient p { margin-top: 12px; overflow-wrap: anywhere; }
+    #kinmetrix-draft .km-verify-form { margin-top: 30px; }
+    #kinmetrix-draft .km-code { letter-spacing: 5px; font-variant-numeric: tabular-nums; }
+    #kinmetrix-draft .km-verify-form .km-button { margin-top: 24px; }
+    #kinmetrix-draft .km-quiet-actions { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+    #kinmetrix-draft button.km-text-link { border: 0; padding: 0; background: none; text-decoration: underline; }
+    #kinmetrix-draft .km-saved-details { margin-top: 38px; padding-top: 20px; border-top: 1px solid var(--km-rule); }
+    #kinmetrix-draft .km-saved-list { margin: 22px 0 14px; }
+    #kinmetrix-draft .km-saved-list div { padding-bottom: 22px; }
+    #kinmetrix-draft .km-saved-list dt { font-size: 12px; color: var(--km-muted); margin-bottom: 6px; }
+    #kinmetrix-draft .km-saved-list dd { margin: 0; font-size: 16px; overflow-wrap: anywhere; }
+    #kinmetrix-draft .km-units { margin-top: 8px; }
+    #kinmetrix-draft .km-units .km-panel-label { margin-bottom: 12px; }
+    #kinmetrix-draft .km-unit-choice { display: flex; gap: 4px; padding: 4px; background: var(--km-soft); border-radius: 9px; }
+    #kinmetrix-draft .km-unit-choice button { flex: 1; min-height: 44px; border: 0; border-radius: 7px; background: transparent; color: var(--km-muted); font-size: 15px; font-weight: 500; }
+    #kinmetrix-draft .km-unit-choice button[aria-pressed="true"] { background: var(--km-paper); color: var(--km-ink); box-shadow: 0 0 0 1px var(--km-rule); }
+    #kinmetrix-draft .km-unit-choice button:active { background: var(--km-tag); }
+    #kinmetrix-draft .km-units .km-field-help { margin-top: 10px; }
+    #kinmetrix-draft .km-units + .km-text-link { display: inline-block; margin-top: 22px; }
+    #kinmetrix-draft .km-verified { display: block; font-size: 12px; color: var(--km-signal); margin-top: 5px; }
+    #kinmetrix-draft .km-pop-meta { margin: 8px 0 24px; font-size: 13px; color: var(--km-muted); }
+    #kinmetrix-draft .km-pop-actions { margin-top: 20px; }
+    #kinmetrix-draft .km-history { margin-top: 30px; }
+    #kinmetrix-draft .km-history h2 { font-size: 14px; font-weight: 500; margin-bottom: 12px; letter-spacing: 0; }
+    #kinmetrix-draft .km-history-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 16px 0; border-top: 1px solid var(--km-rule); color: var(--km-ink); text-decoration: none; min-height: 72px; }
+    #kinmetrix-draft .km-history-date { display: block; font-size: 14px; }
+    #kinmetrix-draft .km-history-place { display: block; color: var(--km-muted); font-size: 12px; margin-top: 4px; }
+    #kinmetrix-draft .km-mini-chart { padding-top: 14px; margin-top: 14px; }
+    #kinmetrix-draft .km-mini-chart:first-child { margin-top: 0; }
+    #kinmetrix-draft .km-mini-chart figcaption { margin-bottom: 8px; }
+    #kinmetrix-draft .km-mini-chart svg { height: 112px; }
+    #kinmetrix-draft .km-one-visit-intro { margin: 15px 0 34px; }
+    #kinmetrix-draft .km-arc-intro { margin-top: 14px; max-width: 290px; }
+    #kinmetrix-draft .km-arc-actions { margin-top: 48px; }
+    #kinmetrix-draft .km-scan-view { position: relative; margin-top: 28px; height: 304px; background: var(--km-soft); border-radius: 14px; display: grid; place-items: center; }
+    #kinmetrix-draft .km-scan-view > .km-tag { position: absolute; top: 16px; right: 16px; }
+    #kinmetrix-draft .km-scan-target { position: relative; width: 220px; height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+    #kinmetrix-draft .km-scan-corner { position: absolute; width: 28px; height: 28px; border-color: var(--km-signal); border-style: solid; border-width: 0; }
+    #kinmetrix-draft .km-scan-corner:nth-child(1) { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; }
+    #kinmetrix-draft .km-scan-corner:nth-child(2) { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; }
+    #kinmetrix-draft .km-scan-corner:nth-child(3) { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; }
+    #kinmetrix-draft .km-scan-corner:nth-child(4) { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; }
+    #kinmetrix-draft .km-qr { width: 144px; height: 144px; padding: 10px; background: var(--km-paper); color: var(--km-ink); }
+    #kinmetrix-draft .km-qr svg { display: block; width: 100%; height: 100%; }
+    #kinmetrix-draft .km-scan-code { font-size: 14px; letter-spacing: 3px; font-variant-numeric: tabular-nums; }
+    #kinmetrix-draft .km-scan-alternative { margin-top: 16px; text-align: center; }
+    #kinmetrix-draft .km-device { margin-top: 32px; padding: 20px; border: 1px solid var(--km-rule); border-radius: 14px; }
+    #kinmetrix-draft .km-device-name { margin-top: 22px; font-size: 17px; font-weight: 500; }
+    #kinmetrix-draft .km-device-number { margin-top: 6px; font-size: 14px; color: var(--km-muted); }
+    #kinmetrix-draft .km-match-code { margin-top: 22px; border-top: 1px solid var(--km-rule); padding-top: 18px; }
+    #kinmetrix-draft .km-match-code dt { font-size: 12px; color: var(--km-muted); margin-bottom: 8px; }
+    #kinmetrix-draft .km-match-code dd { margin: 0; font-size: 28px; line-height: 1.2; letter-spacing: 4px; font-variant-numeric: tabular-nums; }
+    #kinmetrix-draft .km-arc-help { margin-top: 20px; }
+    #kinmetrix-draft .km-status-mark { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--km-tag); color: var(--km-signal); margin-bottom: 22px; }
+    #kinmetrix-draft .km-status-mark svg { width: 22px; height: 22px; }
+    #kinmetrix-draft .km-arc-code-form { margin-top: 36px; }
+    #kinmetrix-draft .km-arc-code-form .km-button { margin-top: 28px; }
+    #kinmetrix-draft .km-preview-links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 4px 3px 0; }
+    #kinmetrix-draft .km-preview-links .km-text-link { font-size: 12px; color: var(--km-muted); }
+    #kinmetrix-draft [hidden] { display: none !important; }
+    @media (max-width: 370px) {
+      #kinmetrix-draft { padding: 18px 0 28px; }
+      #kinmetrix-draft .km-top { padding-left: 20px; padding-right: 20px; }
+      #kinmetrix-draft .km-main { padding-left: 20px; padding-right: 20px; }
+      #kinmetrix-draft .km-main h1 { font-size: 26px; }
+      #kinmetrix-draft .km-session-card { padding-left: 14px; padding-right: 14px; }
+      #kinmetrix-draft .km-measures { gap: 5px; }
+      #kinmetrix-draft .km-measure dd { font-size: 24px; }
+      #kinmetrix-draft .km-measure-panel dd { font-size: 28px; }
+      #kinmetrix-draft .km-caption { gap: 5px; }
+      #kinmetrix-draft .km-caption h2 { font-size: 14px; }
+    }
+    @media print {
+      @page { size: 480px 1010px; margin: 0; }
+      :root, :root[data-theme="dark"] {
+        color-scheme: light;
+        --page: #fff; --surface: #fff; --soft: #f2f2f2; --selected: #e9e9e9;
+        --ink: #202020; --muted: #656565; --line: #dcdcdc;
+        --action: #242424; --on-action: #fff; --signal: #2468ce; --focus: #2468ce;
+        --red: #ab3636;
+      }
+      #kinmetrix-draft { padding: 0; background: #fff !important; }
+      #kinmetrix-draft .km-frame { width: 390px; margin: 0 auto; padding-top: 26px; height: 1010px; break-after: page; }
+      #kinmetrix-draft .km-frame:last-of-type { break-after: auto; }
+      #kinmetrix-draft .km-phone { min-height: 844px; height: 844px; }
+      #kinmetrix-draft a { color: inherit; }
+    }
+  
+</style>
+  <style>
+/* Tokens aligned with kinmetrix-experience/dist/styles.css */
+:root {
+  color-scheme: light;
+  --page: #f6f6f6; --surface: #ffffff; --soft: #f2f2f2; --selected: #e9e9e9;
+  --ink: #202020; --muted: #656565; --subtle: #8a8a8a; --line: #dcdcdc;
+  --action: #242424; --action-hover: #414141; --on-action: #ffffff;
+  --signal: #2468ce; --signal-fill: #2468ce12; --focus: #2468ce;
+  --red: #ab3636; --red-bg: #fff0f0; --red-line: #e3bcbc;
+  --shadow-color: #00000018;
+  --km-paper: var(--surface); --km-ink: var(--ink); --km-muted: var(--muted);
+  --km-rule: var(--line); --km-soft: var(--soft); --km-tag: var(--selected);
+  --km-teal: var(--action); --km-on-teal: var(--on-action); --km-action-hover: var(--action-hover);
+  --km-signal: var(--signal); --km-focus: var(--focus);
+  --km-error: var(--red);
+  --stage: var(--page); --stage-ink: var(--ink); --stage-muted: var(--muted);
+  --stage-paper: var(--surface); --stage-rule: var(--line);
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #151515; --surface: #1c1c1c; --soft: #242424; --selected: #303030;
+  --ink: #f0f0f0; --muted: #aaaaaa; --subtle: #858585; --line: #393939;
+  --action: #ededed; --action-hover: #ffffff; --on-action: #181818;
+  --signal: #83b3ff; --signal-fill: #83b3ff16; --focus: #83b3ff;
+  --red: #ff9d9d; --red-bg: #3b2525; --red-line: #765050;
+  --shadow-color: #00000044;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--stage); color: var(--stage-ink); font: 400 14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; }
+button,select,input { font: inherit; }
+button,a,select { -webkit-tap-highlight-color: transparent; }
+button,a { touch-action: manipulation; }
+button,select,a { cursor: pointer; }
+a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+html, body { height: 100%; min-height: 100dvh; }
+body { background: var(--page); }
+#kinmetrix-draft { padding: 0 !important; min-height: 100dvh; width: 100%; max-width: 430px; margin: 0 auto; }
+#kinmetrix-draft .km-frame { margin: 0 !important; width: 100%; max-width: none; }
+#kinmetrix-draft .km-caption,#kinmetrix-draft .km-frame-note,#kinmetrix-draft .km-preview-links { display: none; }
+#kinmetrix-draft .km-phone {
+  min-height: 100dvh;
+  height: 100dvh;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+#kinmetrix-draft .km-main { overflow-y: auto; overscroll-behavior: contain; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--km-rule) transparent; }
+#kinmetrix-draft .km-bottom { flex: 0 0 auto; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+#kinmetrix-draft .km-top { flex-shrink: 0; padding-top: calc(22px + env(safe-area-inset-top, 0px)); }
+#kinmetrix-draft .km-main h1:focus { outline: none; }
+#kinmetrix-draft .km-home-indicator { display: none; }
+#kinmetrix-draft .km-button:active { transform: translateY(1px); }
+#kinmetrix-draft input { min-width: 0; }
+#kinmetrix-draft input[type=date] { appearance: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto !important; transition: none !important; } }
+
+</style>
+  
+  
+</head>
+<body>
+  <div id="kinmetrix-draft" >
+
+  <template id="km-home-card-template">
+    <article class="km-session-card" aria-label="Sample session">
+      <div class="km-card-title"><h2>Session</h2><span class="km-tag">Sample</span></div>
+      <p class="km-card-date">15 Oct 2026 · 10:24</p>
+      <p class="km-card-place">Harbour Movement Clinic</p>
+      <dl class="km-measures">
+        <div class="km-measure"><dt>Average peak<br>force</dt><dd>128 <small>N</small></dd></div>
+        <div class="km-measure"><dt>Stability</dt><dd>91<small>%</small></dd></div>
+        <div class="km-measure"><dt>Symmetry</dt><dd>96<small>%</small></dd></div>
+      </dl>
+    </article>
+  </template>
+
+  <template id="km-chart-template">
+    <figure class="km-chart" aria-label="Sample average peak force across three visits">
+      <figcaption><span class="km-chart-title">Average peak force</span><span class="km-tag">Sample</span></figcaption>
+      <svg role="img" data-chart-kind="trend" aria-label="Sample. Average peak force was 116 newtons on 1 October, 124 newtons on 8 October, and 128 newtons on 15 October 2026."></svg>
+    </figure>
+  </template>
+
+  <template id="km-direction-template">
+    <figure class="km-chart km-direction-chart" aria-label="Sample peak force in eight neck directions">
+      <figcaption><span class="km-chart-title">Peak force by direction</span><span class="km-tag">Sample</span></figcaption>
+      <svg role="img" data-chart-kind="directions" aria-label="Sample, viewed from above. Peak force in newtons: forward 104, forward-right 112, right 124, back-right 152, back 160, back-left 148, left 120, forward-left 104. Average peak force 128 newtons."></svg>
+    </figure>
+  </template>
+
+  <template id="km-nav-template">
+    <footer class="km-bottom">
+      <nav class="km-tabs" aria-label="Main navigation">
+        <a class="km-tab cursor-interaction" data-tab="Home" href="#km-first"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+        <a class="km-tab cursor-interaction" data-tab="Progress" href="#km-progress"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16v5"/><path d="M16 14v7"/><path d="M20 10v11"/><path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"/><path d="M4 18v3"/><path d="M8 14v7"/></svg><span>Progress</span></a>
+        <a class="km-tab cursor-interaction" data-tab="Profile" href="#km-profile"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg><span>Profile</span></a>
+      </nav>
+      <div class="km-home-indicator" aria-hidden="true"></div>
+    </footer>
+  </template>
+
+  <template id="km-home-arc-template">
+    <a class="km-arc-entry cursor-interaction" href="#km-arc-guest" data-arc-home="true" aria-label="Find a location or sign in on the device"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg><span class="sr-only">Find a location or sign in on the device</span></a>
+  </template>
+
+  <template id="km-locations-template">
+    <div class="km-panel-label"><h2>Nearby places</h2><span class="km-tag">Sample</span></div>
+    <div class="km-locations" aria-label="Sample places">
+      <article class="km-place">
+        <button class="km-place-toggle cursor-interaction" type="button" aria-expanded="false">
+          <span><span class="km-place-name">Harbour Movement Clinic</span><span class="km-place-meta">Harbourfront · 0.8 km</span></span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="km-place-detail" hidden>
+          <p class="km-detail-label">Address</p>
+          <address>128 Harbour Street<br>Toronto, ON</address>
+          <p class="km-detail-label">Hours</p>
+          <div class="km-hours"><span>Mon–Fri</span><span>7 am–7 pm</span><span>Sat</span><span>9 am–2 pm</span><span>Sun</span><span>Closed</span></div>
+        </div>
+      </article>
+      <article class="km-place">
+        <button class="km-place-toggle cursor-interaction" type="button" aria-expanded="false">
+          <span><span class="km-place-name">Westline Strength</span><span class="km-place-meta">King West · 1.6 km</span></span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="km-place-detail" hidden>
+          <p class="km-detail-label">Address</p><address>642 King Street West<br>Toronto, ON</address>
+          <p class="km-detail-label">Hours</p><div class="km-hours"><span>Mon–Fri</span><span>6 am–9 pm</span><span>Sat–Sun</span><span>8 am–5 pm</span></div>
+        </div>
+      </article>
+      <article class="km-place">
+        <button class="km-place-toggle cursor-interaction" type="button" aria-expanded="false">
+          <span><span class="km-place-name">Annex Movement Centre</span><span class="km-place-meta">The Annex · 4.2 km</span></span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="km-place-detail" hidden>
+          <p class="km-detail-label">Address</p><address>236 Bloor Street West<br>Toronto, ON</address>
+          <p class="km-detail-label">Hours</p><div class="km-hours"><span>Mon–Fri</span><span>8 am–6 pm</span><span>Sat–Sun</span><span>Closed</span></div>
+        </div>
+      </article>
+    </div>
+  </template>
+
+  <section id="km-arc-home" class="km-frame" data-auth-state="signed" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-signed-home" data-home-return="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><h1>Visit</h1><p class="km-intro km-arc-intro">Use your phone to sign in on the device.</p>
+        <div class="km-actions km-arc-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-arc-scan" data-arc-start="true">Sign in on the device</a><a class="km-button cursor-interaction" href="#km-nearby">Find a location</a></div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-arc-scan" class="km-frame" data-auth-state="signed" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-home" data-arc-home="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><h1>Scan the code</h1><p class="km-subtle km-arc-intro">Point your camera at the QR code on the device screen.</p>
+        <div class="km-scan-view" role="img" aria-label="Sample camera view of a temporary QR code on the device screen, with code 482716."><span class="km-tag">Sample</span><div class="km-scan-target"><span class="km-scan-corner"></span><span class="km-scan-corner"></span><span class="km-scan-corner"></span><span class="km-scan-corner"></span><div class="km-qr" data-sample-qr="true" aria-hidden="true"></div><span class="km-scan-code">482 716</span></div></div>
+        <div class="km-scan-alternative"><a class="km-text-link cursor-interaction" href="#km-arc-code">Enter code instead</a></div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-arc-confirm" class="km-frame" data-auth-state="signed" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-scan" data-arc-back="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><h1>Sign in on this device?</h1>
+        <section class="km-device" aria-label="Sample device sign-in request"><div class="km-panel-label"><h2>Location</h2><span class="km-tag">Sample</span></div><p class="km-device-name">Harbour Movement Clinic</p><dl class="km-match-code"><dt>Code on the screen</dt><dd>482 716</dd></dl></section>
+        <p class="km-subtle km-arc-help">Check that this code matches the device screen.</p>
+        <div class="km-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-arc-done">Confirm sign-in</a></div><div class="km-skip"><a class="km-text-link cursor-interaction" href="#km-arc-home" data-arc-home="true">Cancel</a></div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-arc-done" class="km-frame" data-auth-state="signed" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span></header>
+      <main class="km-main"><div class="km-status-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div><h1>You’re signed in.</h1><p class="km-intro km-arc-intro">Continue on the device.</p>
+        <section class="km-device" aria-label="Sample signed-in device"><div class="km-panel-label"><h2>Signed in at</h2><span class="km-tag">Sample</span></div><p class="km-device-name">Harbour Movement Clinic</p></section>
+        <div class="km-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-arc-home" data-arc-home="true">Done</a></div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-arc-code" class="km-frame" data-auth-state="signed" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-scan" data-arc-code-back="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><h1>Enter the code</h1><p class="km-subtle km-arc-intro">Use the 6-digit code on the device screen.</p>
+        <form class="km-arc-code-form" data-arc-code-form="true"><label class="km-label" for="km-arc-code-input">Screen code</label><input class="km-input km-code" id="km-arc-code-input" type="text" inputmode="numeric" autocomplete="off" maxlength="7" required aria-describedby="km-arc-code-error"><p class="km-error" id="km-arc-code-error" role="alert" hidden>That code doesn’t match. Check the device screen.</p><button class="km-button km-button-primary cursor-interaction" type="submit">Continue</button></form>
+        <div class="km-skip"><a class="km-text-link cursor-interaction" href="#km-arc-scan">Scan QR code instead</a></div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-arc-camera-off" class="km-frame" data-auth-state="signed" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-home" data-arc-home="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><h1>Enter the code</h1><p class="km-subtle km-arc-intro">The camera isn’t available. Enter the code shown on the device screen.</p><div class="km-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-arc-code">Enter code</a></div></main>
+    </div>
+  </section>
+
+  <section id="km-arc-expired" class="km-frame" data-auth-state="signed" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-home" data-arc-home="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><h1>That code has expired.</h1><p class="km-subtle km-arc-intro">Show a new code on the device, then scan again.</p><div class="km-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-arc-scan">Scan again</a></div><div class="km-skip"><a class="km-text-link cursor-interaction" href="#km-arc-code">Enter code instead</a></div></main>
+    </div>
+  </section>
+
+  <section id="km-arc-guest" class="km-frame" data-auth-state="guest" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-first" data-home-return="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><h1>Visit</h1><p class="km-intro km-arc-intro">Find a location or sign in on the device.</p><div class="km-actions km-arc-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-nearby">Find a location</a><a class="km-button cursor-interaction" href="#km-arc-signin" data-arc-start="true">Sign in on the device</a></div></main>
+    </div>
+  </section>
+
+  <section id="km-arc-signin" class="km-frame" data-auth-state="guest" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-guest" data-arc-home="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><h1>Sign in</h1><p class="km-subtle km-arc-intro">Sign in to your account to continue on the device.</p><form class="km-signin" data-arc-auth="signin"><div class="km-field"><label class="km-label" for="km-arc-email">Email</label><input class="km-input" id="km-arc-email" type="email" autocomplete="off" required></div><div class="km-field"><label class="km-label" for="km-arc-password">Password</label><input class="km-input" id="km-arc-password" type="password" autocomplete="off" required></div><button class="km-button km-button-primary cursor-interaction" type="submit">Sign in</button></form><div class="km-skip"><a class="km-text-link cursor-interaction" href="#km-arc-create">Create account</a></div></main>
+    </div>
+  </section>
+
+  <section id="km-arc-create" class="km-frame" data-auth-state="guest" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-signin"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><h1>Create account</h1><p class="km-subtle km-arc-intro">Use this account to sign in on the device.</p><form class="km-signin" data-arc-auth="create"><div class="km-field"><label class="km-label" for="km-arc-new-email">Email</label><input class="km-input" id="km-arc-new-email" type="email" autocomplete="off" required></div><div class="km-field"><label class="km-label" for="km-arc-new-password">Password</label><input class="km-input" id="km-arc-new-password" type="password" autocomplete="off" required></div><button class="km-button km-button-primary cursor-interaction" type="submit">Create account</button></form></main>
+    </div>
+  </section>
+
+  <section id="km-home-one" class="km-frame" data-populated="one" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span><span data-template="km-home-arc-template"></span></header>
+      <main class="km-main"><h1>Sessions</h1><p class="km-pop-meta">1 visit</p><div data-template="km-home-card-template"></div><div class="km-pop-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-saved-session" data-session="latest">View session</a></div></main>
+    </div>
+  </section>
+
+  <section id="km-home-history" class="km-frame" data-populated="history" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span><span data-template="km-home-arc-template"></span></header>
+      <main class="km-main">
+        <h1>Sessions</h1><p class="km-pop-meta">3 visits</p><div data-template="km-home-card-template"></div><div class="km-pop-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-saved-session" data-session="latest">View session</a></div>
+        <section class="km-history"><h2>Earlier visits</h2>
+          <a class="km-history-row cursor-interaction" href="#km-saved-session" data-session="middle"><span><span class="km-history-date">8 Oct 2026</span><span class="km-history-place">Harbour Movement Clinic</span></span><span class="km-tag">Sample</span></a>
+          <a class="km-history-row cursor-interaction" href="#km-saved-session" data-session="first"><span><span class="km-history-date">1 Oct 2026</span><span class="km-history-place">Harbour Movement Clinic</span></span><span class="km-tag">Sample</span></a>
+        </section>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-saved-session" class="km-frame" data-populated="history" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-home-history" data-record-back="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a><span class="km-tag">Sample</span></header>
+      <main class="km-main">
+        <div class="km-session-heading"><h1>Session</h1></div>
+        <div class="km-session-meta"><p class="km-subtle" data-saved-date="true">15 Oct 2026 · 10:24</p><p class="km-subtle">Harbour Movement Clinic</p></div>
+        <section class="km-measure-panel" aria-label="Sample session measures"><div class="km-panel-label"><h2>Session measures</h2><span class="km-tag">Sample</span></div>
+          <dl class="km-measures"><div class="km-measure"><dt>Average peak<br>force</dt><dd><span data-saved-force="true">128</span> <small>N</small></dd></div><div class="km-measure"><dt>Stability</dt><dd><span data-saved-stability="true">91</span><small>%</small></dd></div><div class="km-measure"><dt>Symmetry</dt><dd><span data-saved-symmetry="true">96</span><small>%</small></dd></div></dl>
+        </section>
+        <div data-template="km-direction-template"></div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-progress-one" class="km-frame" data-populated="one" hidden>
+    <div class="km-phone" data-selected-tab="Progress">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span></header>
+      <main class="km-main"><h1>Progress</h1><p class="km-intro km-one-visit-intro">A trend starts at your second visit.</p>
+        <figure class="km-chart"><figcaption><span class="km-chart-title">Average peak force</span><span class="km-tag">Sample</span></figcaption><svg data-chart-kind="single" role="img" aria-label="Sample. One visit on 15 October 2026 with average peak force of 128 newtons. No trend line is drawn."></svg></figure>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-progress-history" class="km-frame" data-populated="history" hidden>
+    <div class="km-phone" data-selected-tab="Progress">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span></header>
+      <main class="km-main"><h1>Progress</h1><p class="km-pop-meta">1–15 Oct 2026 · 3 visits</p>
+        <div class="km-trend-stack">
+          <figure class="km-chart km-mini-chart"><figcaption><span class="km-chart-title">Average peak force</span><span class="km-tag">Sample</span></figcaption><svg data-chart-kind="mini" data-series="force" role="img" aria-label="Sample. Average peak force over three visits: 116, 124 and 128 newtons."></svg></figure>
+          <figure class="km-chart km-mini-chart"><figcaption><span class="km-chart-title">Stability</span><span class="km-tag">Sample</span></figcaption><svg data-chart-kind="mini" data-series="stability" role="img" aria-label="Sample. Stability over three visits: 88, 90 and 91 percent. Illustrative scoring scale."></svg></figure>
+          <figure class="km-chart km-mini-chart"><figcaption><span class="km-chart-title">Symmetry</span><span class="km-tag">Sample</span></figcaption><svg data-chart-kind="mini" data-series="symmetry" role="img" aria-label="Sample. Symmetry over three visits: 94, 95 and 96 percent. Illustrative scoring scale."></svg></figure>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-first" class="km-frame" data-auth-state="guest">
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span><span data-template="km-home-arc-template"></span></header>
+      <main class="km-main">
+        <div class="km-headline km-headline-home"><h1>Sessions from your visits show up here.</h1></div>
+        <div data-template="km-home-card-template"></div>
+        <div class="km-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-session">View sample</a><a class="km-button cursor-interaction" href="#km-nearby">Find a location</a></div>
+        <div class="km-account-link"><a class="km-text-link cursor-interaction" href="#km-signin-home">I already have an account</a></div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-session" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-first"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a><span class="km-tag">Sample</span></header>
+      <main class="km-main">
+        <div class="km-session-heading"><h1>Session</h1></div>
+        <div class="km-session-meta"><p class="km-subtle">15 Oct 2026 · 10:24</p><p class="km-subtle">Harbour Movement Clinic</p></div>
+        <section class="km-measure-panel" aria-label="Sample session measures">
+          <div class="km-panel-label"><h2>Session measures</h2><span class="km-tag">Sample</span></div>
+          <dl class="km-measures"><div class="km-measure"><dt>Average peak<br>force</dt><dd>128 <small>N</small></dd></div><div class="km-measure"><dt>Stability</dt><dd>91<small>%</small></dd></div><div class="km-measure"><dt>Symmetry</dt><dd>96<small>%</small></dd></div></dl>
+        </section>
+        <div data-template="km-direction-template"></div>
+        <p class="km-after-visit">Yours looks like this after a visit.</p>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-nearby" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-guest" data-arc-home="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><div class="km-section-top"><h1>Find a location</h1><p class="km-subtle">Toronto</p></div><div data-template="km-locations-template"></div></main>
+    </div>
+  </section>
+
+  <section id="km-place-open" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-guest" data-arc-home="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main"><div class="km-section-top"><h1>Find a location</h1><p class="km-subtle">Toronto</p></div><div data-template="km-locations-template" data-open-first="true"></div></main>
+    </div>
+  </section>
+
+  <section id="km-no-arcs" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-guest" data-arc-home="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main">
+        <div class="km-section-top"><h1>Find a location</h1></div>
+        <p class="km-intro">No locations near you yet.</p>
+        <form class="km-notify" data-local-notify="true">
+          <label class="km-label" for="km-notify-email">Email me when one opens.<span class="km-optional">Optional</span></label>
+          <input class="km-input" id="km-notify-email" type="email" autocomplete="off" placeholder="Email address" aria-describedby="km-notify-error">
+          <p class="km-error" id="km-notify-error" role="alert" hidden>Enter an email address, or skip.</p>
+          <button class="km-button km-button-primary cursor-interaction" type="submit">Send</button>
+          <div class="km-skip"><a class="km-text-link cursor-interaction" href="#km-first">Skip</a></div>
+        </form>
+        <div class="km-confirm" data-local-confirm="true" aria-live="polite" hidden><p>We’ll email you when a location opens nearby.</p><p class="km-subtle" data-email></p><a class="km-text-link cursor-interaction" href="#km-first">Back to Home</a></div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-email-sent" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-arc-guest" data-arc-home="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main">
+        <div class="km-section-top"><h1>Find a location</h1></div><p class="km-intro">No locations near you yet.</p>
+        <div class="km-confirm"><p>We’ll email you when a location opens nearby.</p><a class="km-text-link cursor-interaction" href="#km-first">Back to Home</a></div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-progress" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Progress">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span></header>
+      <main class="km-main"><h1>Progress</h1><p class="km-intro km-progress-intro">A trend starts at your second visit.</p><div data-template="km-chart-template"></div></main>
+    </div>
+  </section>
+
+  <section id="km-profile" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Profile">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span></header>
+      <main class="km-main">
+        <h1>Profile</h1><p class="km-intro km-profile-intro">Set up your details now to save time when you sign in on the device.</p>
+        <div class="km-profile-links"><a class="km-text-link cursor-interaction" href="#km-create-account">Create account.</a><a class="km-text-link cursor-interaction" href="#km-signin-profile">Sign in.</a></div>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-create-account" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Profile">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-profile"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main">
+        <h1>Create account</h1><p class="km-setup-intro">Use this account to sign in on the device.</p>
+        <form class="km-signin" data-local-create="true">
+          <div class="km-field"><label class="km-label" for="km-create-email">Email</label><input class="km-input" id="km-create-email" type="email" autocomplete="off" required></div>
+          <div class="km-field"><label class="km-label" for="km-create-password">Password</label><input class="km-input" id="km-create-password" type="password" autocomplete="off" required></div>
+          <button class="km-button km-button-primary cursor-interaction" type="submit">Create account</button>
+        </form>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-prepare" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Profile">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-profile-incomplete"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main">
+        <h1>Prepare for a visit</h1><p class="km-setup-intro">Optional. You can do this on the device, too.</p>
+        <form class="km-setup-form" data-local-setup="true">
+          <div class="km-field"><label class="km-label" for="km-setup-name">Name</label><input class="km-input" id="km-setup-name" type="text" autocomplete="off" required></div>
+          <div class="km-field"><label class="km-label" for="km-setup-dob">Date of birth</label><input class="km-input" id="km-setup-dob" type="date" autocomplete="off" max="2026-10-20" aria-describedby="km-dob-help" required><p class="km-field-help" id="km-dob-help">Helps the device match your account.</p></div>
+          <fieldset class="km-contact-choice"><legend>Verify one contact</legend><div class="km-radio-row"><label class="km-radio cursor-interaction"><input type="radio" name="km-contact-method" value="email" checked>Email</label><label class="km-radio cursor-interaction"><input type="radio" name="km-contact-method" value="phone">Phone</label></div></fieldset>
+          <div class="km-field"><label class="km-label" id="km-contact-label" for="km-setup-contact">Email</label><input class="km-input" id="km-setup-contact" type="email" autocomplete="off" placeholder="Email address" required><p class="km-field-help">Next, enter a code to verify this contact.</p></div>
+          <button class="km-button km-button-primary cursor-interaction" type="submit">Save details</button>
+          <div class="km-skip"><a class="km-text-link cursor-interaction" href="#km-signed-home" data-setup-skip="true">Skip for now</a></div>
+        </form>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-verify-email" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Profile">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-prepare"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main">
+        <h1>Verify your email</h1><p class="km-setup-intro">Enter the code sent to your email.</p>
+        <section class="km-verify-recipient" aria-label="Sample verification recipient"><div class="km-panel-label"><h2>Email</h2><span class="km-tag">Sample</span></div><p data-recipient="email">alex@example.com</p></section>
+        <form class="km-verify-form" data-local-verify="email">
+          <label class="km-label" for="km-email-code">6-digit code</label><input class="km-input km-code" id="km-email-code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" required>
+          <p class="km-error" role="alert" hidden>That code doesn’t match. Try again.</p>
+          <button class="km-button km-button-primary cursor-interaction" type="submit">Verify email</button>
+          <div class="km-quiet-actions"><button class="km-text-link cursor-interaction" type="button" data-resend="true">Resend code</button><a class="km-text-link cursor-interaction" href="#km-signed-home" data-setup-skip="true">Skip for now</a></div>
+          <p class="km-field-help" data-resend-status="true" aria-live="polite"></p>
+        </form>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-verify-phone" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Profile">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-prepare"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main">
+        <h1>Verify your phone</h1><p class="km-setup-intro">Enter the code sent to your phone.</p>
+        <section class="km-verify-recipient" aria-label="Sample verification recipient"><div class="km-panel-label"><h2>Phone</h2><span class="km-tag">Sample</span></div><p data-recipient="phone">+1 416 555 0148</p></section>
+        <form class="km-verify-form" data-local-verify="phone">
+          <label class="km-label" for="km-phone-code">6-digit code</label><input class="km-input km-code" id="km-phone-code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" required>
+          <p class="km-error" role="alert" hidden>That code doesn’t match. Try again.</p>
+          <button class="km-button km-button-primary cursor-interaction" type="submit">Verify phone</button>
+          <div class="km-quiet-actions"><button class="km-text-link cursor-interaction" type="button" data-resend="true">Resend code</button><a class="km-text-link cursor-interaction" href="#km-signed-home" data-setup-skip="true">Skip for now</a></div>
+          <p class="km-field-help" data-resend-status="true" aria-live="polite"></p>
+        </form>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-profile-ready" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Profile">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span></header>
+      <main class="km-main">
+        <h1>Profile</h1><p class="km-intro km-profile-intro">Your details are ready for your visit.</p>
+        <section class="km-saved-details" aria-label="Sample saved profile"><div class="km-panel-label"><h2>Saved details</h2><span class="km-tag">Sample</span></div>
+          <dl class="km-saved-list"><div><dt>Name</dt><dd data-ready-name="true">Alex Morgan</dd></div><div><dt data-ready-method="true">Email</dt><dd><span data-ready-contact="true">alex@example.com</span><span class="km-verified">Verified</span></dd></div><div><dt>Date of birth</dt><dd data-ready-dob="true">16 May 1991</dd></div></dl>
+        </section>
+        <section class="km-units" aria-labelledby="km-units-label">
+          <div class="km-panel-label"><h2 id="km-units-label">Force units</h2></div>
+          <div class="km-unit-choice" role="group" aria-label="Force units">
+            <button type="button" class="cursor-interaction" data-units="Pounds" aria-pressed="true">Pounds</button>
+            <button type="button" class="cursor-interaction" data-units="Newtons" aria-pressed="false">Newtons</button>
+          </div>
+          <p class="km-field-help">Harbour Movement Clinic does not lock this. The tablet uses the same choice.</p>
+        </section>
+        <a class="km-text-link cursor-interaction" href="#km-prepare">Edit details</a>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-profile-incomplete" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Profile">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span></header>
+      <main class="km-main"><h1>Profile</h1><p class="km-intro km-profile-intro">Set up your details now to save time when you sign in on the device.</p><a class="km-text-link cursor-interaction" href="#km-prepare">Set up for a visit</a></main>
+    </div>
+  </section>
+
+  <section id="km-signin-home" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-first"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main">
+        <h1>Sign in</h1>
+        <form class="km-signin" data-local-signin="true">
+          <div class="km-field"><label class="km-label" for="km-home-email">Email</label><input class="km-input" id="km-home-email" type="email" autocomplete="off" required></div>
+          <div class="km-field"><label class="km-label" for="km-home-password">Password</label><input class="km-input" id="km-home-password" type="password" autocomplete="off" required></div>
+          <button class="km-button km-button-primary cursor-interaction" type="submit">Sign in</button>
+        </form>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-signin-profile" class="km-frame" hidden>
+    <div class="km-phone" data-selected-tab="Profile">
+      <header class="km-top"><a class="km-back cursor-interaction" href="#km-profile"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back</a></header>
+      <main class="km-main">
+        <h1>Sign in</h1>
+        <form class="km-signin" data-local-signin="true">
+          <div class="km-field"><label class="km-label" for="km-profile-email">Email</label><input class="km-input" id="km-profile-email" type="email" autocomplete="off" required></div>
+          <div class="km-field"><label class="km-label" for="km-profile-password">Password</label><input class="km-input" id="km-profile-password" type="password" autocomplete="off" required></div>
+          <button class="km-button km-button-primary cursor-interaction" type="submit">Sign in</button>
+        </form>
+      </main>
+    </div>
+  </section>
+
+  <section id="km-signed-home" class="km-frame" data-auth-state="signed" hidden>
+    <div class="km-phone" data-selected-tab="Home">
+      <header class="km-top"><span class="km-brand">Kinmetrix</span><span data-template="km-home-arc-template"></span></header>
+      <main class="km-main">
+        <div class="km-headline km-headline-home"><h1>Sessions from your visits show up here.</h1></div>
+        <div data-template="km-home-card-template"></div>
+        <div class="km-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-session">View sample</a><a class="km-button cursor-interaction" href="#km-nearby">Find a location</a></div>
+      </main>
+    </div>
+  </section>
+</div>
+
+  <p class="sr-only" id="prototype-screen-status" aria-live="polite"></p>
+  <noscript>This interactive prototype needs JavaScript enabled.</noscript>
+<script>
+(() => {
+const root=document.getElementById('kinmetrix-draft');
+const svgNs = 'http://www.w3.org/2000/svg';
+      function svgEl(tag, attrs, text) {
+        const element = document.createElementNS(svgNs, tag);
+        Object.entries(attrs).forEach(([k, v]) => element.setAttribute(k, v));
+        if (text !== undefined) element.textContent = text;
+        return element;
+      }
+      const sampleQR = [[1,1,1,1,1,1,1,0,1,0,0,1,1,0,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1],[1,0,0,0,0,0,1,0,1,1,1,0,1,1,1,0,1,0,0,0,1,0,1,0,0,0,0,0,1],[1,0,1,1,1,0,1,0,0,0,1,1,1,0,1,1,1,1,1,0,1,0,1,0,1,1,1,0,1],[1,0,1,1,1,0,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,1,0,1,1,1,0,1],[1,0,1,1,1,0,1,0,1,1,1,1,0,1,1,1,0,1,0,1,0,0,1,0,1,1,1,0,1],[1,0,0,0,0,0,1,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,1],[1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,1,0,1,1,1,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0],[1,1,1,0,0,1,1,0,1,1,1,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,0,1,1],[0,0,1,0,1,1,0,1,1,1,1,0,0,1,1,0,0,0,1,0,1,0,0,1,0,1,1,0,0],[0,1,1,0,0,1,1,0,0,0,0,1,0,0,0,1,1,0,1,1,0,0,0,0,1,0,1,0,1],[0,1,0,1,1,1,0,1,1,1,0,0,0,1,0,1,1,0,0,0,0,1,0,0,0,1,0,0,1],[0,0,1,0,1,0,1,1,0,1,0,1,1,1,0,1,0,0,1,1,1,0,1,1,1,1,1,0,0],[0,0,1,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1,1,0,1,0,1,0,0,0],[1,1,0,0,0,1,1,1,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,0,0,0,1,0,1],[1,0,1,0,0,0,0,0,0,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0],[1,0,0,1,0,1,1,0,1,1,1,0,0,1,1,1,0,0,0,1,1,0,1,0,1,0,1,1,0],[0,0,0,1,0,1,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,1,0,1,0,0,0],[1,1,1,1,0,0,1,1,1,0,1,1,0,0,0,1,0,1,0,1,1,0,0,1,1,1,1,0,1],[0,0,0,1,1,0,0,0,1,1,0,0,0,1,0,1,1,0,0,0,1,0,0,0,0,1,0,1,1],[1,1,1,1,0,0,1,0,0,0,0,1,1,1,0,1,0,0,1,0,1,1,1,1,1,0,1,1,0],[0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0],[1,1,1,1,1,1,1,0,0,0,1,0,1,1,1,1,1,1,1,0,1,0,1,0,1,1,0,0,1],[1,0,0,0,0,0,1,0,1,1,1,1,1,0,1,1,0,0,0,1,1,0,0,0,1,1,0,0,1],[1,0,1,1,1,0,1,0,0,0,1,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1],[1,0,1,1,1,0,1,0,0,1,1,0,0,1,1,1,0,0,1,0,0,1,0,0,1,0,1,0,1],[1,0,1,1,1,0,1,0,1,1,0,1,0,0,0,1,1,1,0,1,1,1,1,1,1,0,1,1,1],[1,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0],[1,1,1,1,1,1,1,0,1,0,1,1,1,1,0,0,0,0,1,1,1,0,1,1,0,0,1,0,1]];
+      root.querySelectorAll('[data-sample-qr]').forEach(slot => {
+        const qr = svgEl('svg', {viewBox:'0 0 '+sampleQR.length+' '+sampleQR.length, 'aria-hidden':'true', 'shape-rendering':'crispEdges'});
+        sampleQR.forEach((row,y) => row.forEach((dark,x) => { if (dark) qr.append(svgEl('rect',{x,y,width:1,height:1,fill:'currentColor'})); }));
+        slot.append(qr);
+      });
+      function drawChart(svg) {
+        const w = Math.max(230, Math.round(svg.getBoundingClientRect().width));
+        if (svg.dataset.chartKind === 'directions') { drawDirections(svg, w); return; }
+        if (svg.dataset.chartKind === 'mini') { drawMini(svg, w); return; }
+        const h = 210, left = 44, right = w - 17, top = 27, bottom = 156;
+        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+        svg.replaceChildren();
+        const y = value => bottom - (value - 100) / 40 * (bottom - top);
+        [140, 120, 100].forEach(value => {
+          svg.append(svgEl('line', {x1:left, y1:y(value), x2:right, y2:y(value), class:'km-chart-grid'}));
+          svg.append(svgEl('text', {x:0, y:y(value)+4}, value + ' N'));
+        });
+        if (svg.dataset.chartKind === 'single') {
+          const pointX = (left+right)/2;
+          svg.append(svgEl('circle',{cx:pointX,cy:y(128),r:4,class:'km-chart-dot'}));
+          svg.append(svgEl('text',{x:pointX,y:y(128)-14,'text-anchor':'middle',class:'km-chart-value'},'128 N'));
+          svg.append(svgEl('text',{x:pointX,y:180,'text-anchor':'middle'},'15 Oct 2026'));
+          svg.append(svgEl('text',{x:right,y:16,'text-anchor':'end',class:'km-chart-sample'},'Sample'));
+          svg.append(svgEl('text',{x:left,y:204},'Visit'));
+          return;
+        }
+        const x = [left + 10, (left + right) / 2, right - 10];
+        const values = [116, 124, 128];
+        const dates = ['1 Oct', '8 Oct', '15 Oct'];
+        svg.append(svgEl('path', {d: values.map((v,i) => (i ? 'L ' : 'M ') + x[i] + ' ' + y(v)).join(' '), class:'km-chart-line'}));
+        values.forEach((v, i) => {
+          svg.append(svgEl('circle', {cx:x[i], cy:y(v), r:4, class:'km-chart-dot'}));
+          svg.append(svgEl('text', {x:x[i], y:y(v)-13, 'text-anchor':'middle', class:'km-chart-value'}, v));
+          svg.append(svgEl('text', {x:x[i], y:180, 'text-anchor': i === 0 ? 'start' : i === 2 ? 'end' : 'middle'}, dates[i]));
+        });
+        svg.append(svgEl('text', {x:right, y:16, 'text-anchor':'end', class:'km-chart-sample'}, 'Sample'));
+        svg.append(svgEl('text', {x:left, y:204}, 'Visits · 2026'));
+      }
+      function drawDirections(svg, w) {
+        svg.setAttribute('viewBox', '0 0 '+w+' 284');
+        svg.replaceChildren();
+        const cx = w/2, cy = 137, r = Math.min(88, (w-90)/2);
+        const values = svg.dataset.forceValues ? JSON.parse(svg.dataset.forceValues) : [104,112,124,152,160,148,120,104];
+        const names = ['Forward','Forward-right','Right','Back-right','Back','Back-left','Left','Forward-left'];
+        const points = values.map((v,i) => {
+          const a = i*2*Math.PI/values.length-Math.PI/2;
+          return {x:cx+Math.cos(a)*r*v/200, y:cy+Math.sin(a)*r*v/200, a};
+        });
+        [r/2,r].forEach(radius => svg.append(svgEl('circle',{cx,cy,r:radius,fill:'none',class:'km-chart-grid'})));
+        points.forEach(p => svg.append(svgEl('line',{x1:cx,y1:cy,x2:cx+Math.cos(p.a)*r,y2:cy+Math.sin(p.a)*r,class:'km-chart-grid'})));
+        const d = points.map((p,i) => (i?'L ':'M ')+p.x+' '+p.y).join(' ')+' Z';
+        svg.append(svgEl('path',{d,class:'km-direction-fill'}));
+        svg.append(svgEl('path',{d,class:'km-chart-line'}));
+        points.forEach((p,i) => {
+          svg.append(svgEl('circle',{cx:p.x,cy:p.y,r:3,class:'km-chart-dot'}));
+          const side = Math.cos(p.a), vertical = Math.sin(p.a);
+          svg.append(svgEl('text',{x:p.x+(Math.abs(side)<.1?0:side>0?8:-8),y:p.y+(vertical>.1?17:-10),'text-anchor':Math.abs(side)<.1?'middle':side>0?'start':'end',class:'km-chart-value'},values[i]));
+        });
+        const diag = Math.min(55,w/2-93);
+        const labels = [[cx,12,'middle'],[cx+diag,39,'start'],[w-1,141,'end'],[cx+diag,241,'start'],[cx,266,'middle'],[cx-diag,241,'end'],[1,141,'start'],[cx-diag,39,'end']];
+        labels.forEach(([x,y,anchor],i)=>svg.append(svgEl('text',{x,y,'text-anchor':anchor},names[i])));
+        svg.append(svgEl('text',{x:cx+r*.82,y:cy-r*.78,'text-anchor':'start'},'200 N'));
+        svg.append(svgEl('text',{x:0,y:284},'8 directions · Viewed from above'));
+        svg.append(svgEl('text',{x:w,y:284,'text-anchor':'end',class:'km-chart-sample'},'Sample'));
+      }
+      function drawMini(svg, w) {
+        const force = svg.dataset.series === 'force';
+        const values = force ? [116,124,128] : svg.dataset.series === 'stability' ? [88,90,91] : [94,95,96];
+        const unit = force ? ' N' : '%';
+        const low = force ? 100 : 0, high = force ? 140 : 100;
+        const left=44, right=w-18, top=18, bottom=74;
+        const x=[left+12,(left+right)/2,right-12];
+        const y=v=>bottom-(v-low)/(high-low)*(bottom-top);
+        svg.setAttribute('viewBox','0 0 '+w+' 112'); svg.replaceChildren();
+        [low,(low+high)/2,high].forEach(v=>{
+          svg.append(svgEl('line',{x1:left,y1:y(v),x2:right,y2:y(v),class:'km-chart-grid'}));
+          svg.append(svgEl('text',{x:0,y:y(v)+4},v+unit));
+        });
+        svg.append(svgEl('path',{d:values.map((v,i)=>(i?'L ':'M ')+x[i]+' '+y(v)).join(' '),class:'km-chart-line'}));
+        values.forEach((v,i)=>{
+          svg.append(svgEl('circle',{cx:x[i],cy:y(v),r:3.5,class:'km-chart-dot'}));
+          svg.append(svgEl('text',{x:x[i],y:y(v)+(force?-12:19),'text-anchor':'middle',class:'km-chart-value'},v+(force?'':'%')));
+          svg.append(svgEl('text',{x:x[i],y:103,'text-anchor':i===0?'start':i===2?'end':'middle'},['1 Oct','8 Oct','15 Oct'][i]));
+        });
+      }
+      
+window.KinmetrixCharts={draw:drawChart};
+})();
+
+</script>
+<script>
+(() => {
+  'use strict';
+  const root = document.getElementById('kinmetrix-draft');
+  const THEME_KEY = 'kinmetrix-theme';
+  const SCENARIO_MODES = new Set(['first', 'empty', 'one', 'history']);
+  function setTheme(theme) {
+    if (theme !== 'light' && theme !== 'dark') return;
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem(THEME_KEY, theme); } catch (error) { /* quota / private mode */ }
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#151515' : '#f6f6f6');
+  }
+  const queryTheme = new URLSearchParams(location.search).get('theme');
+  if (queryTheme === 'light' || queryTheme === 'dark') setTheme(queryTheme);
+  else setTheme(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
+  const $ = (selector, parent = root) => parent.querySelector(selector);
+  const $$ = (selector, parent = root) => [...parent.querySelectorAll(selector)];
+  const sampleProfile = {name:'Alex Morgan',dob:'1991-05-16',method:'email',contact:'alex@example.com'};
+  const state = {signedIn:false,visits:0,profile:null,verified:false,accountEmail:'',nearby:true,screen:'km-first',findBack:'km-first',arcEntry:'km-arc-scan',codeBack:'km-arc-scan',mode:'first',units:'Pounds'};
+  const records = {
+    latest:{date:'15 Oct 2026 · 10:24',force:128,stability:91,symmetry:96,values:[104,112,124,152,160,148,120,104]},
+    middle:{date:'8 Oct 2026 · 10:10',force:124,stability:90,symmetry:95,values:[100,108,120,148,156,144,116,100]},
+    first:{date:'1 Oct 2026 · 10:15',force:116,stability:88,symmetry:94,values:[92,100,112,140,148,136,108,92]}
+  };
+  $$('[data-template]').forEach(slot => {
+    slot.append($('#'+slot.dataset.template).content.cloneNode(true));
+    if (slot.dataset.openFirst) {
+      $('.km-place-toggle',slot).setAttribute('aria-expanded','true');
+      $('.km-place-detail',slot).hidden = false;
+    }
+  });
+  $$('.km-phone').forEach(phone => {
+    phone.append($('#km-nav-template').content.cloneNode(true));
+    $('[data-tab="'+phone.dataset.selectedTab+'"]',phone).setAttribute('aria-current','page');
+  });
+  let detailIndex = 0;
+  $$('.km-place-toggle').forEach(button => {
+    const detail = button.nextElementSibling;
+    detail.id = 'prototype-place-'+(++detailIndex);
+    button.setAttribute('aria-controls',detail.id);
+    button.addEventListener('click',() => {
+      const open = button.getAttribute('aria-expanded') === 'true';
+      $$('.km-place-toggle',button.closest('.km-locations')).forEach(peer => {
+        peer.setAttribute('aria-expanded','false'); peer.nextElementSibling.hidden = true;
+      });
+      button.setAttribute('aria-expanded',String(!open)); detail.hidden = open;
+    });
+  });
+  $('#km-setup-dob').max = new Date().toISOString().slice(0,10);
+  const homeRoute = () => state.visits === 3 ? 'km-home-history' : state.visits === 1 ? 'km-home-one' : state.signedIn ? 'km-signed-home' : 'km-first';
+  const profileRoute = () => !state.signedIn ? 'km-profile' : state.verified ? 'km-profile-ready' : 'km-profile-incomplete';
+  const arcRoute = () => state.signedIn ? 'km-arc-home' : 'km-arc-guest';
+  const progressRoute = () => state.visits === 3 ? 'km-progress-history' : state.visits === 1 ? 'km-progress-one' : 'km-progress';
+  function updateProfile() {
+    const p = state.profile || sampleProfile;
+    $('[data-ready-name]').textContent = p.name;
+    $('[data-ready-method]').textContent = p.method === 'email' ? 'Email' : 'Phone';
+    $('[data-ready-contact]').textContent = p.contact;
+    $('[data-ready-dob]').textContent = new Date(p.dob+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    $$('[data-units]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.units === state.units)));
+  }
+  function prepareForm() {
+    const p = state.profile;
+    $('#km-setup-name').value = p?.name || '';
+    $('#km-setup-dob').value = p?.dob || '';
+    const method = p?.method || 'email';
+    $('input[name="km-contact-method"][value="'+method+'"]').checked = true;
+    contactMethod(method);
+    $('#km-setup-contact').value = p?.contact || state.accountEmail;
+  }
+  function contactMethod(method) {
+    const input = $('#km-setup-contact');
+    input.type = method === 'phone' ? 'tel' : 'email';
+    input.inputMode = method === 'phone' ? 'tel' : 'email';
+    input.placeholder = method === 'phone' ? 'Country code and number' : 'Email address';
+    input.removeAttribute('pattern'); input.setCustomValidity('');
+    $('#km-contact-label').textContent = method === 'phone' ? 'Phone' : 'Email';
+  }
+  function updateRecord(key) {
+    const r = records[key] || records.latest;
+    $('[data-saved-date]').textContent = r.date;
+    $('[data-saved-force]').textContent = r.force;
+    $('[data-saved-stability]').textContent = r.stability;
+    $('[data-saved-symmetry]').textContent = r.symmetry;
+    const svg = $('#km-saved-session .km-chart svg');
+    svg.dataset.forceValues = JSON.stringify(r.values);
+    svg.setAttribute('aria-label','Sample. Peak force in eight directions, averaging '+r.force+' newtons.');
+  }
+  function navigate(id, push = true) {
+    id = id.replace(/^#/,'');
+    if (['km-first','km-signed-home','km-home-one','km-home-history'].includes(id)) id=homeRoute();
+    if (['km-profile','km-profile-incomplete','km-profile-ready'].includes(id)) id=profileRoute();
+    if (['km-progress','km-progress-one','km-progress-history'].includes(id)) id=progressRoute();
+    if (['km-arc-home','km-arc-guest'].includes(id)) id=arcRoute();
+    if (id==='km-saved-session' && !state.visits) id=homeRoute();
+    const frame = $('#'+id);
+    if (!frame?.classList.contains('km-frame')) return;
+    $$('.km-frame').forEach(peer => { peer.hidden = peer !== frame; });
+    state.screen = id;
+    $('.km-main',frame).scrollTop = 0;
+    if (id === 'km-profile-ready') updateProfile();
+    if (id === 'km-prepare') prepareForm();
+    try {
+      if (push) history.pushState({screen:id},'', '#'+id);
+      else history.replaceState({screen:id},'', '#'+id);
+    } catch (error) {
+      if (location.protocol !== 'file:') throw error;
+    }
+    requestAnimationFrame(() => {
+      $$('.km-chart svg',frame).forEach(window.KinmetrixCharts.draw);
+      const title = $('h1',frame); title.setAttribute('tabindex','-1'); title.focus({preventScroll:true});
+    });
+    const selected = $('.km-phone',frame).dataset.selectedTab;
+    document.getElementById('prototype-screen-status').textContent = $('h1',frame).textContent+'. '+selected+' selected.';
+  }
+  function selectScenario(mode, push = false) {
+    state.mode=mode; state.signedIn=mode!=='first'; state.visits=mode==='history'?3:mode==='one'?1:0;
+    state.profile=state.visits?{...sampleProfile}:null; state.verified=!!state.visits; state.accountEmail=state.visits?'alex@example.com':''; state.nearby=true; state.units='Pounds';
+    $$('form').forEach(form=>form.reset());
+    $$('[role="alert"]').forEach(error=>{error.hidden=true;});
+    $$('[data-resend-status]').forEach(el=>{el.textContent='';});
+    const notify=$('[data-local-notify]'); notify.hidden=false; notify.nextElementSibling.hidden=true;
+    $$('.km-place-toggle').forEach(b=>{b.setAttribute('aria-expanded','false');b.nextElementSibling.hidden=true;});
+    updateProfile(); updateRecord('latest'); navigate(homeRoute(),push);
+  }
+  root.addEventListener('click',event=>{
+    const unitsButton=event.target.closest('[data-units]');
+    if(unitsButton && root.contains(unitsButton)){ state.units=unitsButton.dataset.units; updateProfile(); return; }
+    const link=event.target.closest('a[href^="#km-"]'); if(!link || !root.contains(link)) return;
+    event.preventDefault();
+    let id=link.getAttribute('href').slice(1);
+    const tab=link.dataset.tab;
+    if(tab==='Home') id=homeRoute();
+    if(tab==='Progress') id=progressRoute();
+    if(tab==='Profile') id=profileRoute();
+    if(link.hasAttribute('data-arc-home')) id=arcRoute();
+    if(link.hasAttribute('data-home-return') || link.hasAttribute('data-record-back')) id=homeRoute();
+    if(link.hasAttribute('data-arc-start')) id=state.signedIn?'km-arc-scan':'km-arc-signin';
+    if(link.hasAttribute('data-arc-back')) id=state.arcEntry;
+    if(link.hasAttribute('data-arc-code-back')) id=state.codeBack;
+    if(link.hasAttribute('data-setup-skip')) id=homeRoute();
+    if(link.dataset.session) updateRecord(link.dataset.session);
+    if(id==='km-profile-incomplete' && state.verified) id=profileRoute();
+    if(id==='km-first' || id==='km-signed-home') id=homeRoute();
+    if(id==='km-nearby' && !tab) { state.findBack=state.screen; id=state.nearby?'km-nearby':'km-no-arcs'; }
+    if(['km-nearby','km-no-arcs','km-email-sent','km-place-open'].includes(state.screen) && link.classList.contains('km-back')) id=state.findBack;
+    if(id==='km-arc-code' && !link.hasAttribute('data-arc-back')) state.codeBack=state.screen;
+    navigate(id);
+  });
+  root.addEventListener('submit',event=>{
+    event.preventDefault();
+    const form=event.target;
+    if(!form.reportValidity()) return;
+    if(form.matches('[data-local-signin],[data-local-create],[data-arc-auth]')) {
+      state.signedIn=true; state.accountEmail=$('input[type=email]',form).value.trim();
+      if (!state.visits) state.mode = 'empty';
+      const id=form.hasAttribute('data-arc-auth')?'km-arc-scan':form.hasAttribute('data-local-create')?'km-prepare':homeRoute();
+      form.reset(); navigate(id); return;
+    }
+    if(form.hasAttribute('data-local-setup')) {
+      const name=$('#km-setup-name'),contact=$('#km-setup-contact'),method=$('input[name="km-contact-method"]:checked',form).value;
+      name.setCustomValidity(name.value.trim()?'':'Enter your name.');
+      contact.setCustomValidity(method==='phone' && contact.value.replace(/\D/g,'').length<7?'Enter a phone number with country code.':'');
+      if(!form.reportValidity()) return;
+      state.profile={name:name.value.trim(),dob:$('#km-setup-dob').value,method,contact:contact.value.trim()};
+      state.verified=false;
+      $('[data-recipient="'+method+'"]').textContent=state.profile.contact;
+      navigate('km-verify-'+method); return;
+    }
+    if(form.hasAttribute('data-local-verify')) {
+      const error=$('[role="alert"]',form); error.hidden=$('input',form).value==='123456'; if(!error.hidden)return;
+      state.verified=true; form.reset(); updateProfile(); navigate('km-profile-ready'); return;
+    }
+    if(form.hasAttribute('data-arc-code-form')) {
+      const error=$('[role="alert"]',form); error.hidden=$('input',form).value.replace(/\s/g,'')==='482716'; if(!error.hidden)return;
+      state.arcEntry='km-arc-code'; form.reset(); navigate('km-arc-confirm'); return;
+    }
+    if(form.hasAttribute('data-local-notify')) {
+      const input=$('input',form),error=$('[role="alert"]',form);
+      error.hidden=!!input.value.trim(); if(!error.hidden){input.focus();return;}
+      const confirmation=form.nextElementSibling;
+      $('[data-email]',confirmation).textContent=input.value.trim(); form.reset(); form.hidden=true; confirmation.hidden=false;
+    }
+  });
+  root.addEventListener('input',event=>{
+    if(event.target.matches('input'))event.target.setCustomValidity('');
+    const form=event.target.closest('form'); if(form)$$('[role="alert"]',form).forEach(error=>{error.hidden=true;});
+  });
+  $$('input[name="km-contact-method"]').forEach(input=>input.addEventListener('change',()=>{
+    contactMethod(input.value); $('#km-setup-contact').value=input.value==='email'?state.accountEmail:'';
+  }));
+  $$('[data-resend]').forEach(button=>button.addEventListener('click',()=>{
+    $('[data-resend-status]',button.closest('form')).textContent='A new code has been sent.';
+  }));
+  window.addEventListener('resize',()=>$$('.km-chart svg',$('#'+state.screen)).forEach(window.KinmetrixCharts.draw));
+  window.addEventListener('popstate',()=>navigate(location.hash.slice(1)||homeRoute(),false));
+  const queryScenario = new URLSearchParams(location.search).get('scenario');
+  selectScenario(SCENARIO_MODES.has(queryScenario) ? queryScenario : 'first');
+})();
+
+</script>
+</body>
+</html>

@@ -19,20 +19,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: kinmetrix-prototype-oct13/yarn.lock
+      - run: corepack enable
       - uses: actions/configure-pages@v5
-      - name: Stage site root from prototype/
+      - name: Build Oct 13 prototype
+        working-directory: kinmetrix-prototype-oct13
         run: |
-          mkdir -p _site
-          rsync -a --delete \
+          YARN_ENABLE_SCRIPTS=false yarn install --immutable
+          yarn build
+      - name: Stage site
+        run: |
+          mkdir -p _site/web
+          cp site/index.html _site/index.html
+          touch _site/.nojekyll
+          rsync -a \
+            --exclude 'assets/models' \
+            --exclude 'motion-study*' \
+            --exclude 'vendor' \
+            kinmetrix-experience/dist/ _site/experience/
+          cp kinmetrix-web-prototype/index.html _site/web/index.html
+          rsync -a kinmetrix-prototype-oct13/dist/ _site/oct13/
+          rsync -a \
             --exclude 'node_modules' \
             --exclude 'scripts' \
+            --exclude '.git' \
             --exclude '_tmp*' \
             --exclude 'package.json' \
             --exclude 'yarn.lock' \
-            prototype/ _site/
-          touch _site/.nojekyll
+            prototype/ _site/prototype/
           test -f _site/index.html
-          ls -la _site | head -30
+          test -f _site/experience/index.html
+          test -f _site/web/index.html
+          test -f _site/oct13/index.html
+          test -f _site/prototype/index.html
+          ls -la _site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

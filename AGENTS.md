@@ -4,9 +4,12 @@ Kinmetrix **clinic shared iPad** prototype (landscape station UI). Not a persona
 
 | Path | Role |
 | --- | --- |
-| `prototype/` | Static HTML UI. Run `yarn dev` from there. |
+| `site/` | GitHub Pages hub (`index.html`). Cards open the four prototypes below. |
+| `kinmetrix-experience/` | Landscape iPad experience. Pages path `/experience/`. |
+| `kinmetrix-web-prototype/` | Phone-width web app. Pages path `/web/`. |
+| `kinmetrix-prototype-oct13/` | React clinic tablet app. Pages path `/oct13/`. |
+| `prototype/` | HTML screen inventory. Pages path `/prototype/`. |
 | `factory/` | Software-factory output (PRDs, runs). |
-| `prototype/docs/` | Product docs for agents and PMs (see `prototype/docs/README.md`). |
 
 ## Read before changing product UI
 

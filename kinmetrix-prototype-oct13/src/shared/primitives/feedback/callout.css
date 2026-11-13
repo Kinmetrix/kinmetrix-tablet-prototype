@@ -1,0 +1,42 @@
+/*
+  https://primer.style/product/components/banner
+  https://primer.style/product/components/inline-message
+*/
+
+.callout {
+  padding: 12px 16px;
+  border-radius: var(--control-radius);
+  border: 1px solid var(--border-accent-muted);
+  border-left-width: 4px;
+  border-left-color: var(--accent);
+  background: var(--info-muted);
+  color: var(--ink);
+}
+
+.callout[data-tone='info'] {
+  background: var(--info-muted);
+  border-color: var(--border-accent-muted);
+  border-left-color: var(--accent);
+}
+
+.callout[data-tone='warning'] {
+  background: var(--amber-soft);
+  border-color: var(--border-attention-muted);
+  border-left-color: var(--amber);
+}
+
+.callout[data-tone='success'] {
+  background: var(--success-muted);
+  border-color: var(--border-success-muted);
+  border-left-color: var(--success-emphasis);
+}
+
+.callout[data-tone='critical'] {
+  background: var(--danger-muted);
+  border-color: var(--border-danger-muted);
+  border-left-color: var(--danger);
+}
+
+.callout > * + * {
+  margin-top: 4px;
+}

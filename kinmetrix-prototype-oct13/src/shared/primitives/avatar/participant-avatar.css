@@ -1,0 +1,64 @@
+/*
+  Circle avatar for a person. 64px is on Primer's scale.
+  https://primer.style/product/components/avatar
+*/
+
+.participant-avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--canvas);
+  box-shadow: 0 0 0 1px #1f232826;
+  color: var(--sub);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.participant-avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.participant-avatar.is-member-jordan {
+  background: #ddf4ff;
+  color: #0550ae;
+  box-shadow: 0 0 0 1px #54aeff55;
+}
+
+.participant-avatar.is-member-alex {
+  background: #fff8c5;
+  color: #7d4e00;
+  box-shadow: 0 0 0 1px #d4a72c55;
+}
+
+.participant-avatar.is-member-jamie {
+  background: #fbefff;
+  color: #6e40c9;
+  box-shadow: 0 0 0 1px #bf87f855;
+}
+
+.participant-avatar.is-member-taylor {
+  background: #dafbe1;
+  color: #116329;
+  box-shadow: 0 0 0 1px #4ac26b55;
+}
+
+.participant-avatar.is-member-sam {
+  background: #ffebe9;
+  color: #cf222e;
+  box-shadow: 0 0 0 1px #ff818266;
+}
+
+.participant-avatar.is-member-default {
+  background: linear-gradient(145deg, #f6f8fa 0%, #eaeef2 100%);
+  color: #424a53;
+  box-shadow: 0 0 0 1px #1f23281f;
+}

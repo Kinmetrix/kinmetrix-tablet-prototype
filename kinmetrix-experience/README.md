@@ -4,16 +4,18 @@ Interactive browser exploration for a landscape iPad. Built from the product bri
 
 ## Run locally
 
-From this directory: `python3 -m http.server 4173 --directory dist`, then open http://localhost:4173. No install or build step. The 3D study uses a locally vendored Three.js runtime. Reload or **Reset demo** clears in-memory changes.
+From this directory: `yarn install` once, then `yarn dev`, and open http://localhost:4173. No build step (`serve` is fetched on first `dev` via npx). Alternatively: `python3 -m http.server 4173 --directory dist`. The 3D study uses a locally vendored Three.js runtime. Reload or **Reset demo** clears in-memory changes.
+
+After JS changes: `yarn check` (syntax plus `review/` integration checks).
 
 ## Explore
 
 Use **Settings** at the bottom of the sidebar to choose Light or Dark appearance; the prototype bar also provides a quick theme switch. This preference persists locally without changing the active session. Mode selection explains each option’s purpose; radials are prominent throughout preparation, live work, and review.
 
-- The sidebar owns global navigation: Find, Roster, and Programs above; Station, Settings, the clinician avatar switcher, and Lock below. There is no duplicate top bar. On narrow screens these become one bottom bar.
+- The sidebar owns global navigation: Find, Roster, and Templates above; Station, Settings, the clinician avatar switcher, and Lock below. There is no duplicate top bar. On narrow screens these become one bottom bar.
 - Start in Find with no member preselected. Search by name, or use Open roster for the full table. Selecting a result opens that member’s workspace; recent selections remain available for the current clinician.
 - Roster provides member search, clinician/program filters, sortable columns, and direct workspace/Profile access. Columns adds clinician, height, body weight, and activity level to the default performance view.
-- Programs separates reusable Templates from Assigned plans. Create/edit a template, assign an independent copy, and continue it through the shared session setup. Existing person-level New → Program creation remains available.
+- Templates opens Assessments, Sessions, and Programs libraries. Programs still separates reusable templates from Assigned plans. Create/edit a program template, assign an independent copy, and continue it through the shared session setup. Existing person-level New → Program creation remains available.
 - Overview shows the latest result. History and Programs have their own member tabs. Continue program and New sit in the member header; Profile holds personal details and working settings.
 - Start an assessment or training session, review settings, then begin. The mode picker explains each assessment or training option.
 - Try Endurance (release-driven completion), Range of motion (detected or manual completion), and Eccentric in the shared flow.
@@ -82,12 +84,12 @@ A person’s **Programs** tab shows their assigned plan, completed visits, and u
 
 ## Checks
 
-Run from this directory with Node.js:
+From this directory:
 
 ```sh
-node review/session-tools-check.cjs
-node review/mode-behavior-check.cjs
-node review/person-programs-check.cjs
+yarn check
 ```
 
-The redesign is independent of the `prototype/` route inventory and its verification harness. The existing GitHub Pages workflow still deploys engineering’s `prototype/`; this folder does not replace it. The separately hosted Sites copy excludes the unused WebGL model study because its model exceeds the host’s individual-file limit.
+Or run `yarn check:syntax` / `yarn check:review` separately.
+
+The redesign is independent of the `prototype/` route inventory and its verification harness. GitHub Pages serves this folder at `/experience/` from `dist/`. The unused WebGL model study is omitted from that deploy because of file-size limits.
