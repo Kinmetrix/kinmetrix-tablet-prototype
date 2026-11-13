@@ -19,20 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Use Yarn 4 from packageManager
-        run: |
-          corepack enable
-          corepack prepare yarn@4.3.1 --activate
-          yarn --version
       - uses: actions/configure-pages@v5
-      - name: Build Oct 13 prototype
-        working-directory: kinmetrix-prototype-oct13
-        run: |
-          YARN_ENABLE_SCRIPTS=false yarn install --immutable
-          yarn build
       - name: Stage site
         run: |
           mkdir -p _site/web
@@ -44,7 +31,6 @@ jobs:
             --exclude 'vendor' \
             kinmetrix-experience/dist/ _site/experience/
           cp kinmetrix-web-prototype/index.html _site/web/index.html
-          rsync -a kinmetrix-prototype-oct13/dist/ _site/oct13/
           rsync -a \
             --exclude 'node_modules' \
             --exclude 'scripts' \
@@ -56,7 +42,6 @@ jobs:
           test -f _site/index.html
           test -f _site/experience/index.html
           test -f _site/web/index.html
-          test -f _site/oct13/index.html
           test -f _site/prototype/index.html
           ls -la _site
       - uses: actions/upload-pages-artifact@v3

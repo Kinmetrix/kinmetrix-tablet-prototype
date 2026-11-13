@@ -55,6 +55,23 @@
       border-color: var(--red);
       outline: none;
     }
+    a.card--wide {
+      grid-column: 1 / -1;
+      background: #181818;
+      border-color: #333;
+    }
+    a.card--wide:hover,
+    a.card--wide:focus-visible {
+      border-color: #5a5a5a;
+    }
+    a.card--wide .copy strong {
+      color: var(--muted);
+      font-weight: 500;
+    }
+    a.card--wide .icon {
+      background: #262626;
+      color: var(--muted);
+    }
     .icon {
       width: 44px;
       height: 44px;
@@ -134,26 +151,7 @@
           </svg>
         </span>
       </a>
-      <a class="card" href="oct13/">
-        <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7" rx="1" />
-            <rect x="14" y="3" width="7" height="7" rx="1" />
-            <rect x="3" y="14" width="7" height="7" rx="1" />
-            <rect x="14" y="14" width="7" height="7" rx="1" />
-          </svg>
-        </span>
-        <span class="copy">
-          <strong>Old prototype (for reference)</strong>
-          <span>React clinic tablet prototype</span>
-        </span>
-        <span class="chev" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m9 5 7 7-7 7" />
-          </svg>
-        </span>
-      </a>
-      <a class="card" href="prototype/">
+      <a class="card card--wide" href="prototype/">
         <span class="icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />

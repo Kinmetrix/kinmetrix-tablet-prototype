@@ -4,10 +4,9 @@ Kinmetrix **clinic shared iPad** prototype (landscape station UI). Not a persona
 
 | Path | Role |
 | --- | --- |
-| `site/` | GitHub Pages hub (`index.html`). Cards open the four prototypes below. |
+| `site/` | GitHub Pages hub (`index.html`). Cards open the three linked prototypes below. |
 | `kinmetrix-experience/` | Landscape iPad experience. Pages path `/experience/`. |
 | `kinmetrix-web-prototype/` | Phone-width web app. Pages path `/web/`. |
-| `kinmetrix-prototype-oct13/` | React clinic tablet app. Pages path `/oct13/`. |
 | `prototype/` | HTML screen inventory. Pages path `/prototype/`. |
 | `factory/` | Software-factory output (PRDs, runs). |
 
