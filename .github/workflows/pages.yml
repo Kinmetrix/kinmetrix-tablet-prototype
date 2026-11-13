@@ -22,9 +22,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: yarn
-          cache-dependency-path: kinmetrix-prototype-oct13/yarn.lock
-      - run: corepack enable
+      - name: Use Yarn 4 from packageManager
+        run: |
+          corepack enable
+          corepack prepare yarn@4.3.1 --activate
+          yarn --version
       - uses: actions/configure-pages@v5
       - name: Build Oct 13 prototype
         working-directory: kinmetrix-prototype-oct13
