@@ -1,7 +1,7 @@
 # Agents
 
 Kinmetrix **clinic shared iPad** prototype (landscape station UI). Not a personal phone app. This repo is **self-contained** — no external app checkout.
-
+ 
 | Path | Role |
 | --- | --- |
 | `site/` | GitHub Pages hub (`index.html`). Cards open the three linked prototypes below. |
