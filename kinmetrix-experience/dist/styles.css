@@ -780,6 +780,16 @@ input::placeholder{color:var(--muted);opacity:1}
 .member-workspace .member-overview{grid-template-columns:minmax(280px,.9fr) minmax(350px,1.1fr);gap:48px}
 @media(max-width:860px){.people-finder{padding:48px 28px 32px}.member-workspace .member-overview{grid-template-columns:minmax(230px,.9fr) minmax(260px,1.1fr);gap:28px}}
 @media(max-width:620px){.people-finder{padding:30px 20px;min-height:calc(100dvh - 174px)}.finder-heading{margin-bottom:26px}.finder-heading h1{font-size:28px}.finder-heading p{font-size:14px}.finder-search input{height:58px;font-size:16px;padding-left:48px}.finder-search>.icon{top:18px;width:21px;height:21px}.finder-clear{top:7px}.finder-tools{gap:8px;font-size:12px}.finder-tools .text-button{font-size:12px}.finder-person{gap:12px;min-height:82px}.finder-person-status{display:none}.finder-person-name strong{font-size:16px}.finder-scope{margin-top:24px}.member-workspace .member-overview{grid-template-columns:1fr;gap:12px}.member-find-another{margin-top:-4px;margin-bottom:14px}}
+.finder-group{margin-top:20px}
+.finder-group-title{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+.finder-destinations{display:grid;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.finder-destination{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:56px;padding:12px 14px;border:0;border-top:1px solid var(--line);background:var(--surface);text-align:left;color:inherit}
+.finder-destination:first-child{border-top:0}
+.finder-destination:hover{background:var(--soft)}
+.finder-destination-main{display:grid;gap:3px;min-width:0}
+.finder-destination-main strong{font-size:15px;font-weight:550}
+.finder-destination-main small{font-size:12px;color:var(--muted)}
+.finder-destination>.icon{width:18px;height:18px;color:var(--muted);flex-shrink:0}
 
 .topbar .clinician-button .avatar{width:26px;height:26px;font-size:10px}.topbar .clinician-button strong{white-space:nowrap;line-height:1.2}.topbar .clinician-button>.icon{width:16px;height:16px}
 @media(max-width:620px){.member-workspace{min-height:calc(100dvh - 174px)}}

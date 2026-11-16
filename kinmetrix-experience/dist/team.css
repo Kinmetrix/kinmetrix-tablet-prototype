@@ -1,5 +1,13 @@
 .team-overview{max-width:none;display:flex;flex-direction:column;gap:16px;min-height:calc(100dvh - var(--prototype-footer-height))}
+.team-overview-home{display:flex;flex-direction:column;gap:16px;flex:1;min-height:0}
+.team-overview-home .settings-hub-pane{display:flex;flex-direction:column;flex:1;min-height:0;gap:16px}
 .team-overview>.directory-heading{margin-bottom:0}
+.team-overview-head--with-period .team-overview-head-main{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;width:100%}
+.team-overview-head-period{display:flex;align-items:flex-start;justify-content:flex-end;gap:12px;flex-shrink:0;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);max-width:min(100%,380px)}
+.team-overview-head-period .team-overview-compare-label{margin:0;max-width:20ch;text-align:right}
+.team-overview-head-period .team-overview-period-select select{min-height:40px}
+.team-overview-activity--expanded{flex:1;min-height:0;display:flex;flex-direction:column}
+.team-overview-activity--expanded .team-overview-activity-list{flex:1;min-height:280px;max-height:min(62vh,640px);max-height:min(62dvh,640px)}
 .team-overview-period{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
 .team-overview-period-range{font-weight:600;margin-bottom:2px}
 .team-overview-period-select select{min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
@@ -56,6 +64,17 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .settings-pane-head h1{margin:0;font-size:22px;line-height:1.25;letter-spacing:-.02em;font-weight:650}
 .settings-pane-desc{margin:6px 0 0;font-size:13px;color:var(--muted);line-height:1.45;max-width:52ch}
 .settings-pane-head-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;padding-top:2px}
+.device-page-pane .device-stats{margin:4px 0 0}
+.device-page-pane .device-stat{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);font-size:14px}
+.device-page-pane .device-stat span{color:var(--muted);flex-shrink:0}
+.device-page-pane .device-stat strong{text-align:right;font-weight:600}
+.device-page-status{font-size:13px;color:var(--muted)}
+.device-ready-toggle{margin-top:16px}
+.device-page-links{margin-top:12px}
+.device-page-links a{color:var(--action);font-size:14px;text-decoration:none;font-weight:520}
+.device-page-links a:hover{text-decoration:underline}
+.device-help-list{margin:8px 0 0;padding-left:1.15rem;color:var(--ink);font-size:14px;line-height:1.45}
+.device-help-list li+li{margin-top:8px}
 .settings-pane-subtabs{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 20px;margin:14px 0 22px;padding:0 0 0;border-bottom:1px solid var(--line)}
 .settings-pane-subtabs button{border:0;background:none;color:var(--muted);font-size:13px;font-weight:500;min-height:36px;padding:0 1px 10px;margin:0 0 -1px;border-bottom:2px solid transparent;border-radius:0;cursor:pointer}
 .settings-pane-subtabs button:hover{color:var(--ink)}
@@ -88,6 +107,27 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .settings-toggle-list li{border-bottom:1px solid var(--line)}
 .settings-toggle-list .check-label{margin:0;padding:4px 0}
 .settings-plan-fields{max-width:420px}
+.assessment-workspace{max-width:560px;display:flex;flex-direction:column;gap:20px}
+.assessment-workspace-lead{margin:0;font-size:14px;line-height:1.45;color:var(--muted)}
+.assessment-protocol-panel{display:flex;flex-direction:column;gap:2px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.assessment-arc-kind{margin:0 0 14px;font-size:15px;line-height:1.4}
+.assessment-protocol-row{display:grid;grid-template-columns:minmax(120px,1fr) minmax(160px,220px);gap:12px 20px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.assessment-protocol-row:first-of-type{border-top:0;padding-top:0}
+.assessment-protocol-row__text .field-label{margin:0}
+.assessment-protocol-row__text .muted{margin:4px 0 0;font-size:13px;line-height:1.35}
+.assessment-protocol-row__control{align-self:center;justify-self:end;width:100%;max-width:220px}
+.assessment-protocol-row__control select,.assessment-protocol-row__control input[type="number"]{width:100%}
+.assessment-protocol-row__control .segmented{width:100%;justify-content:stretch}
+.assessment-protocol-row__control .segmented button{flex:1}
+.assessment-weight-input{max-width:100%}
+.assessment-protocol-static{display:block;font-size:15px}
+.assessment-workspace-followup{margin:0;padding-top:4px;border-top:0}
+.assessment-workspace-followup h3{font-size:15px;font-weight:600;margin:0 0 6px}
+.assessment-workspace-followup .directory-footnote{margin-top:12px}
+@media(max-width:720px){
+ .assessment-protocol-row{grid-template-columns:1fr}
+ .assessment-protocol-row__control{justify-self:stretch;max-width:none}
+}
 .session-plan-page{padding-top:12px}
 @media(max-width:900px){
  .team-overview-split{grid-template-columns:1fr}

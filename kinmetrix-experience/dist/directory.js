@@ -4,7 +4,9 @@ function directoryUI(){
  return state.directoryUI[state.clinicianId]??={roster:{query:'',clinician:'all',status:'all',sort:'name',descending:false},programs:{tab:'templates',query:'',library:null,libraryFocus:'assessments',assessmentTab:'protocol'}};
 }
 function visitDirectory(page,keepLibrary=false){
- if(state.actor!=='coach'||!['roster','programs'].includes(page))return;
+ if(state.actor!=='coach')return;
+ if(page==='home'){visitHome();return;}
+ if(!['roster','programs'].includes(page))return;
  if(page==='programs'&&!keepLibrary)Object.assign(directoryUI().programs,{library:'assessments',query:''});
  state.nav=page;state.personId=null;state.pendingSetup=null;state.memberOrigin=page;render();window.scrollTo(0,0);
 }
@@ -17,7 +19,7 @@ function openDirectoryPerson(id,origin='find',tab='overview'){
  render();window.scrollTo(0,0);return true;
 }
 function returnToDirectory(){
- if(['roster','programs'].includes(state.memberOrigin))visitDirectory(state.memberOrigin,true);else showPeopleFinder();
+ if(['home','roster','programs'].includes(state.memberOrigin))visitDirectory(state.memberOrigin,true);else showGlobalFind();
 }
 const rosterColumnDefinitions=[
  {key:'sessions',label:'Sessions',width:80},{key:'force',label:'Avg peak force',width:126},{key:'stability',label:'Stability',width:92},{key:'visit',label:'Last activity',width:110},{key:'program',label:'Program',width:180},
@@ -210,7 +212,7 @@ const directoryActions={
  'add-person':()=>{if(state.actor!=='coach')return;openModal('add-person');$('#new-person-name')?.focus();},
  'roster-columns':()=>{if(state.actor==='coach')openModal('roster-columns');},
  'apply-roster-columns':()=>{if(state.actor!=='coach'||state.overlay?.type!=='roster-columns')return;const ui=directoryUI().roster;ui.columns=$$('input[name="roster-column"]:checked').map(el=>el.value).filter(key=>rosterColumnDefinitions.some(col=>col.key===key));if(!ui.columns.includes(ui.sort))ui.sort='name';state.overlay=null;render();$('[data-action="roster-columns"]')?.focus();},
- 'nav-roster':()=>visitDirectory('roster'),'nav-programs':()=>visitDirectory('programs'),
+ 'nav-home':()=>visitHome(),'nav-roster':()=>visitDirectory('roster'),'nav-programs':()=>visitDirectory('programs'),
  'open-roster-person':el=>openDirectoryPerson(el.dataset.id,'roster'),
  'open-roster-profile':el=>openDirectoryPerson(el.dataset.id,'roster','profile'),
  'sort-roster':el=>{const ui=directoryUI().roster,key=el.dataset.sort;if(key!=='name'&&!rosterColumnDefinitions.some(col=>col.key===key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-sort="${key}"]`)?.focus();},
