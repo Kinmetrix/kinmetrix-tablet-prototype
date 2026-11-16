@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
-const root=path.join(__dirname,'../dist'),context=vm.createContext({assert,console,structuredClone,URL,Blob,crypto:require('node:crypto').webcrypto,document:{addEventListener(){},querySelector(){return null},querySelectorAll(){return []},documentElement:{dataset:{}}},window:{addEventListener(){},scrollTo(){}},localStorage:{getItem(){return null}},matchMedia(){return {matches:false}},setTimeout(){},clearTimeout(){},setInterval(){},clearInterval(){}});
-for(const name of ['workspace','report','photos','profile','reps','setup','live-rules','export','directory','comparison','mode-experience','session-tools','person-programs','team-settings','team-overview','session-plan','app']){let source=fs.readFileSync(path.join(root,name+'.js'),'utf8');if(name==='app')source=source.replace(/\nrender\(\);\s*$/,'\n');vm.runInContext(source,context,{filename:name+'.js'});}
+const root=path.join(__dirname,'../dist'),context=vm.createContext({assert,console,structuredClone,URL,Blob,crypto:require('node:crypto').webcrypto,document:{addEventListener(){},querySelector(){return null},querySelectorAll(){return []},baseURI:'http://localhost/',documentElement:{dataset:{}}},location:{href:'http://localhost/'},window:{addEventListener(){},scrollTo(){},location:{href:'http://localhost/'}},localStorage:{getItem(){return null}},matchMedia(){return {matches:false}},setTimeout(){},clearTimeout(){},setInterval(){},clearInterval(){}});
+for(const name of ['workspace','report','photos','profile','reps','setup','live-rules','export','directory','comparison','mode-experience','session-tools','person-programs','team-settings','team-overview','session-plan','device','app']){let source=fs.readFileSync(path.join(root,name+'.js'),'utf8');if(name==='app')source=source.replace(/\nrender\(\);\s*$/,'\n');vm.runInContext(source,context,{filename:name+'.js'});}
 vm.runInContext(`
 render=()=>{};renderOverlay=()=>{};toast=()=>{};state.personId='alex';
 const fixed={positions:4,total:6,completed:2,load:{kind:'fixed',start:10}};
@@ -12,6 +12,9 @@ const dynamic={...fixed,load:{kind:'assessment',percent:60}};
 const result=resolveProgramTargets(dynamic,'alex');
 assert.equal(result.targets[0],11.9);assert.equal(result.targets[90],9.4);assert.ok(result.source);
 assert.equal(resolveProgramTargets(dynamic,'ella').targets[0],null);
+const assessPct={...fixed,load:{kind:'assessment',percent:60,increase:10,increaseKind:'percent'}};assert.equal(resolveProgramTargets({...assessPct,completed:1},'alex').targets[0],13.1);
+const assessKg={...fixed,load:{kind:'assessment',percent:60,increase:2,increaseKind:'kg'}};assert.equal(resolveProgramTargets({...assessKg,completed:1},'alex').targets[0],13.9);
+assert.equal(programLoad({}).kind,'assessment');assert.equal(programLoad({}).increase,0);
 state.setup={type:'isokinetic',purpose:'training',positions:4,reps:1,weight:12};initializeProgramTargets(dynamic);setupModeDefaults();
 activateProgramTarget(90);assert.equal(state.setup.weight,9.4);assert.equal(state.setup.challenge,8.4);
 assert.ok(programTargetsValid());state.setup.positions=8;assert.equal(programTargetsValid(),false);

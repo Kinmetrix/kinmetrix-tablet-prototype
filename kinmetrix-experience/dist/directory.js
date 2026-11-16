@@ -1,7 +1,7 @@
 /* Clinic navigation and plan management. All identities and plans are demo data. */
 function directoryUI(){
  state.directoryUI??={};
- return state.directoryUI[state.clinicianId]??={roster:{query:'',clinician:'all',status:'all',sort:'name',descending:false},programs:{tab:'templates',query:'',library:null,libraryFocus:'assessments'}};
+ return state.directoryUI[state.clinicianId]??={roster:{query:'',clinician:'all',status:'all',sort:'name',descending:false},programs:{tab:'templates',query:'',library:null,libraryFocus:'assessments',assessmentTab:'protocol'}};
 }
 function visitDirectory(page,keepLibrary=false){
  if(state.actor!=='coach'||!['roster','programs'].includes(page))return;
@@ -98,13 +98,10 @@ function clinicSessionTemplates(){
   {id:'deload',name:'Deload',detail:'45% · 10 reps',percent:45}
  ];
 }
-function clinicAssessmentTemplates(){
- return sessionModeKeys('assessment').map(key=>({id:key,name:sessionModes[key].name,detail:sessionModes[key].short,description:sessionModes[key].description}));
-}
 function assignedPrograms(){if(state.actor!=='coach')return [];return visiblePeople().flatMap(p=>memberPrograms(p.id).map(program=>({p,program})));}
 const TEMPLATE_LIBRARIES=[
- {id:'assessments',label:'Assessments',description:'Protocols the team runs from this workspace.'},
- {id:'sessions',label:'Sessions',description:'Session setups shared across the roster.'},
+ {id:'assessments',label:'Assessment',description:'Protocol defaults and session plan for assessments at the station.'},
+ {id:'sessions',label:'Sessions',description:'Reusable load presets for training and for session plans.'},
  {id:'programs',label:'Programs',description:'Multi-day plans assigned from this workspace.'}
 ];
 function programFields(draft,prefix='plan',tracked=false){
@@ -118,13 +115,13 @@ function templatesHubRail(activeLibraryId){
  </nav>`;
 }
 function templatesPaneHead(active,library){
+ const saveAssessment=library==='assessments'?button('Save','save-assessment-workspace','primary'):'';
  const createByLibrary={
-  assessments:{action:'new-assessment-template',ariaLabel:'New assessment template'},
   sessions:{action:'new-session-template',ariaLabel:'New session template'},
   programs:{action:'new-template',ariaLabel:'New program template'}
  };
  const create=createByLibrary[library];
- const action=create?button(icon('plus','icon-sm')+' New template',create.action,'primary',`aria-label="${create.ariaLabel}"`):'';
+ const action=saveAssessment||(create?button(icon('plus','icon-sm')+' New template',create.action,'primary',`aria-label="${create.ariaLabel}"`):'');
  const desc=active.description?`<p class="settings-pane-desc">${escapeHTML(active.description)}</p>`:'';
  return `<header class="settings-pane-head">
   <div class="settings-pane-head-row">
@@ -139,7 +136,7 @@ function templatesPaneSubnav(activeLibraryId){
  </nav>`;
 }
 function templatesLibraryPane(library){
- if(library==='assessments')return assessmentTemplatesBody();
+ if(library==='assessments')return assessmentWorkspaceBody();
  if(library==='sessions')return sessionTemplatesBody();
  Object.assign(directoryUI().programs,{library:'programs',tab:directoryUI().programs.tab||'templates'});
  return programLibraryBody();
@@ -159,15 +156,8 @@ function programsPage(){
   </div>
  </main>`;
 }
-function assessmentTemplatesBody(){
- const rows=clinicAssessmentTemplates();
- return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="Assessment templates">
-   <table class="data-table directory-table"><caption class="sr-only">Assessment templates</caption>
-    <thead><tr><th scope="col">Assessment</th><th scope="col">Purpose</th></tr></thead>
-    <tbody>${rows.map(row=>`<tr><th scope="row"><strong>${escapeHTML(row.name)}</strong><small>${escapeHTML(row.detail)}</small></th><td>${escapeHTML(row.description)}</td></tr>`).join('')}</tbody>
-   </table>
-  </div>
-  <p class="directory-footnote">These are the assessment modes available at the station. Editing a protocol is not in this prototype.</p>`;
+function assessmentWorkspaceBody(){
+ return teamAssessmentWorkspaceMarkup();
 }
 function sessionTemplatesBody(){
  const rows=clinicSessionTemplates();
@@ -177,7 +167,7 @@ function sessionTemplatesBody(){
     <tbody>${rows.map(row=>`<tr><th scope="row">${escapeHTML(row.name)}</th><td>${escapeHTML(row.detail)}</td></tr>`).join('')}</tbody>
    </table>
   </div>
-  <p class="directory-footnote">Session plan defaults in Settings use this list. New plans start from the selected template.</p>`;
+  <p class="directory-footnote">Load presets for training and for session plans. Defaults are chosen under Templates → Assessment.</p>`;
 }
 function programLibraryBody(){
  const ui=directoryUI().programs;
@@ -193,7 +183,7 @@ function programsResults(){
  return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="${assigned?'Assigned programs':'Program templates'}, scroll for more columns"><table class="data-table directory-table program-grid"><caption class="sr-only">${assigned?'Assigned programs':'Program templates'}</caption><thead><tr><th scope="col">${assigned?'Person':'Program'}</th><th scope="col">${assigned?'Program':'Mode'}</th><th scope="col">${assigned?'Progress':'Sessions'}</th><th scope="col">Setup</th><th scope="col">Target progression</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>${rows.map(row=>{const p=assigned?row.program:row,member=assigned?row.p:null;return `<tr><th scope="row">${assigned?`<div class="directory-identity">${photoAvatar(member,'mini')}<button class="directory-person" data-action="program-member" data-id="${member.id}"><span>${escapeHTML(member.name)}</span></button></div>`:`<button class="program-name-button" data-action="edit-template" data-id="${p.id}">${escapeHTML(p.name)}${icon('chevron','icon-sm')}</button>`}</th><td>${assigned?`<strong>${escapeHTML(p.name)}</strong><small>${sessionModes[p.type].name}</small>`:sessionModes[p.type].name}</td><td>${assigned?`<strong>${p.completed} / ${p.total}</strong><small>${p.completed>=p.total?'Completed':'Sessions completed'}</small>`:p.total}</td><td>${p.positions} directions<small>${p.reps} reps per direction</small></td><td>${programLoadLabel(p)}</td><td>${assigned?(p.completed<p.total?button('Continue','continue-assigned','small-button',`data-id="${member.id}" data-program-id="${p.id}" aria-label="Continue ${escapeHTML(p.name)} for ${escapeHTML(member.name)}"`):button('Open person','program-member','small-button',`data-id="${member.id}"`)):button('Assign','assign-template','small-button',`data-id="${p.id}" aria-label="Assign ${escapeHTML(p.name)}"`)}</td></tr>`;}).join('')}</tbody></table></div>`;
 }
 function directoryDialog(o){
- const template=clinicProgramTemplates().find(p=>p.id===o.id),editing=o.type==='program-editor',draft=template||{name:'',type:'strength',total:6,positions:4,reps:3};
+ const template=clinicProgramTemplates().find(p=>p.id===o.id),editing=o.type==='program-editor',draft=template||{name:'',type:'strength',total:6,positions:4,reps:3,load:{kind:'assessment',percent:60,increase:0,increaseKind:'percent'}};
  const title=editing?(template?'Edit program template':'New program template'):'Assign program';
  const content=editing?`<p class="directory-dialog-intro">${template?'Changes apply to future assignments. Existing assigned programs keep their settings.':'Create a reusable template, then assign it to people.'}</p><form id="template-form" class="program-form">${programFields(draft)}</form><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" form="template-form" class="button primary">Save program</button></footer>`:`<p class="directory-dialog-intro"><strong>${escapeHTML(draft.name)}</strong><br>${sessionModes[draft.type].name} · ${draft.total} sessions · ${draft.positions} directions · ${draft.reps} reps</p><form id="assign-program-form"><label class="field-label" for="assign-person">Assign to</label><select id="assign-person" required><option value="">Choose a person</option>${visiblePeople().map(p=>`<option value="${p.id}">${escapeHTML(p.name)}</option>`).join('')}</select><p class="program-form-note">This adds a program to their workspace. No session starts until the settings are reviewed.</p><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" form="assign-program-form" class="button primary">Assign program</button></footer></form>`;
  return `<div class="modal-backdrop"><section class="dialog directory-dialog ${editing?'program-editor-dialog':''}" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">${title}</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${content}</section></div>`;
@@ -226,10 +216,25 @@ const directoryActions={
  'sort-roster':el=>{const ui=directoryUI().roster,key=el.dataset.sort;if(key!=='name'&&!rosterColumnDefinitions.some(col=>col.key===key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-sort="${key}"]`)?.focus();},
  'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',clinician:'all',status:'all',sort:'name',descending:false});render();$('#directory-search')?.focus();},
  'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;directoryUI().programs.library=el.dataset.library;render();$(`[data-action="templates-library"][data-library="${el.dataset.library}"]`)?.focus();},
+ 'team-assessment-positions':el=>{
+  if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
+  const value=Number(el.dataset.value);
+  if(![4,8].includes(value))return;
+  teamAssessmentConfig().positions=value;
+  render();
+  $(`[data-action="team-assessment-positions"][data-value="${value}"]`)?.focus();
+ },
+ 'assessment-tab':el=>{
+  if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
+  const tab=el.dataset.tab;
+  if(!['protocol','session-plan'].includes(tab))return;
+  directoryUI().programs.assessmentTab=tab;
+  render();
+  $(`[data-action="assessment-tab"][data-tab="${tab}"]`)?.focus();
+ },
  'programs-tab':el=>{if(!['templates','assigned'].includes(el.dataset.tab))return;Object.assign(directoryUI().programs,{tab:el.dataset.tab,query:'',library:'programs'});render();$(`[data-tab="${el.dataset.tab}"]`)?.focus();},
  'browse-templates':()=>{Object.assign(directoryUI().programs,{tab:'templates',query:'',library:'programs'});render();},
  'clear-programs-search':()=>{directoryUI().programs.query='';render();$('#programs-search')?.focus();},
- 'new-assessment-template':()=>{if(state.actor==='coach')toast('Creating assessment protocols is not in this prototype.');},
  'new-session-template':()=>{if(state.actor==='coach')toast('Creating session templates is not in this prototype.');},
  'new-template':()=>{if(state.actor==='coach')openModal('program-editor');},
  'edit-template':el=>{if(state.actor==='coach'&&clinicProgramTemplates().some(p=>p.id===el.dataset.id))openModal('program-editor',{id:el.dataset.id});},
@@ -246,6 +251,14 @@ document.addEventListener('change',event=>{
  const el=event.target;if(el.id==='roster-clinician'){directoryUI().roster.clinician=el.value;refreshRoster();}
  if(el.id==='roster-program-filter'){directoryUI().roster.status=el.value;refreshRoster();}
  if(el.id==='assign-person')el.setCustomValidity('');
+ if(el.id==='team-assessment-mode'&&state.nav==='programs'&&directoryUI().programs.library==='assessments'){
+  teamAssessmentConfig().activeMode=el.value;
+  render();
+  $('#team-assessment-mode')?.focus();
+ }
+ if(el.id==='team-assessment-reps'&&state.nav==='programs'&&directoryUI().programs.library==='assessments'){
+  teamAssessmentConfig().reps=Number(el.value);
+ }
 });
 document.addEventListener('submit',event=>{
  if(event.target.id==='add-person-form'){event.preventDefault();saveNewPerson();}

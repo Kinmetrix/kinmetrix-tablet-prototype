@@ -17,8 +17,10 @@ function programRows(plan){
   const records=visits.filter(r=>r.programSession===n);
   if(records.length)records.forEach(r=>rows.push({number:n,record:r,status:r.partial?'Ended early':'Completed',targets:r.sessionSettings?.targets||null}));
   if(!records.some(r=>!r.partial)){
-   const future=n>plan.completed,load=programLoad(plan),value=load.kind==='assessment'?null:Number((load.start*(load.kind==='incremental'?(1+load.increase/100)**(n-1):1)).toFixed(1));
-   rows.push({number:n,record:null,status:future?(n===plan.completed+1?'Next session':'Planned'):'Record unavailable',targets:future&&value!==null?Object.fromEntries(Array.from({length:plan.positions},(_,i)=>[i*360/plan.positions,value])):null});
+   const future=n>plan.completed,load=programLoad(plan);
+   let targets=null;
+   if(future){if(load.kind==='assessment'){const resolved=resolveProgramTargets({...plan,completed:n-1},state.personId);if(Object.values(resolved.targets).every(Number.isFinite))targets=resolved.targets;}else{const value=Number((load.start*(load.kind==='incremental'?(1+load.increase/100)**(n-1):1)).toFixed(1));if(Number.isFinite(value))targets=Object.fromEntries(Array.from({length:plan.positions},(_,i)=>[i*360/plan.positions,value]));}}
+   rows.push({number:n,record:null,status:future?(n===plan.completed+1?'Next session':'Planned'):'Record unavailable',targets});
   }
  }
  return rows;
