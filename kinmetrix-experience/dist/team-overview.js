@@ -125,7 +125,8 @@ function rosterPage() {
   const selected = rosterCompareSelection();
   const activity = teamOverviewActivity(roster);
   const team = teamSettings();
-  return `<main class="directory-page team-overview">
+  return `<main class="directory-page team-overview templates-hub staff-single-pane">
+    <div class="settings-hub-pane" aria-label="Team overview">
     <header class="directory-heading team-overview-head">
       <div>
         <h1>Team overview</h1>
@@ -215,6 +216,7 @@ function rosterPage() {
           </button></li>`
         ).join('')}</ul>` : '<p class="muted">No sessions yet.</p>'}
       </section>
+    </div>
     </div>
   </main>`;
 }

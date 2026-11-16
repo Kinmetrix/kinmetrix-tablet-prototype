@@ -16,6 +16,13 @@ const TEAM_WAIVER_POLICIES = [
   {id: 'optional', label: 'Optional', description: 'Show the waiver. Do not block the session.'},
   {id: 'off', label: 'Off', description: 'Do not ask for a waiver on this team.'}
 ];
+const SETTINGS_RAIL_SECTIONS = [
+  {id: 'station', label: 'Station', description: 'Team and station preferences for this clinic.'},
+  {id: 'onboarding', label: 'Onboarding', description: 'Fields collected for a new person.'},
+  {id: 'waiver', label: 'Waiver', description: 'When members should sign a waiver.'},
+  {id: 'session-plan', label: 'Session plan', description: 'Default follow-up cadence after an assessment.'}
+];
+
 function teamSettings() {
   const defaults = {
     name: 'Northside clinic',
@@ -44,10 +51,20 @@ function sessionPlanLine(plan) {
   return `${plan.sessionsPerWeek}× weekly · ${plan.weeks} weeks · ${template.name}`;
 }
 
+function settingsActiveSection() {
+  const active = state.settingsHubSection ?? 'station';
+  return SETTINGS_RAIL_SECTIONS.some(item => item.id === active) ? active : 'station';
+}
+
 function visitSettings(section = null) {
   if (state.actor !== 'coach') return;
   state.nav = 'settings';
-  state.settingsSection = section;
+  state.settingsSection = null;
+  if (section) {
+    state.settingsHubSection = SETTINGS_RAIL_SECTIONS.some(item => item.id === section) ? section : 'station';
+  } else if (!state.settingsHubSection || !SETTINGS_RAIL_SECTIONS.some(item => item.id === state.settingsHubSection)) {
+    state.settingsHubSection = 'station';
+  }
   state.personId = null;
   state.pendingSetup = null;
   state.memberOrigin = 'find';
@@ -55,33 +72,36 @@ function visitSettings(section = null) {
   window.scrollTo(0, 0);
 }
 
-function settingsBack() {
-  return `<button class="text-button settings-back" data-action="settings-home">${icon('back', 'icon-sm')} Settings</button>`;
+function settingsTeamRail(activeSectionId) {
+  return `<nav class="settings-hub-rail" aria-label="Settings">
+    <p class="settings-rail-caption" aria-hidden="true">Settings</p>
+    ${SETTINGS_RAIL_SECTIONS.map(item => `<button type="button" class="settings-hub-rail-item ${item.id === activeSectionId ? 'is-active' : ''}" data-action="settings-hub-section" data-section="${item.id}" ${item.id === activeSectionId ? 'aria-current="true"' : ''}>${item.label}</button>`).join('')}
+  </nav>`;
 }
 
-function settingsPage() {
-  if (state.actor !== 'coach') return peopleView();
-  const section = state.settingsSection;
-  if (section === 'onboarding') return teamOnboardingPage();
-  if (section === 'waiver') return teamWaiverPage();
-  if (section === 'session-plan') return teamSessionPlanDefaultsPage();
-  return teamSettingsHome();
+function settingsPaneHead(activeItem, section) {
+  const actions = section === 'station' ? button('Save settings', 'save-settings', 'primary') : '';
+  const desc = activeItem.description ? `<p class="settings-pane-desc">${escapeHTML(activeItem.description)}</p>` : '';
+  return `<header class="settings-pane-head">
+    <div class="settings-pane-head-row">
+      <div class="settings-pane-head-text">
+        <h1>${escapeHTML(activeItem.label)}</h1>
+        ${desc}
+      </div>
+      ${actions ? `<div class="settings-pane-head-actions">${actions}</div>` : ''}
+    </div>
+  </header>`;
 }
 
-function teamSettingsHome() {
+function settingsPaneSubnav(activeSectionId) {
+  return `<nav class="settings-pane-subtabs settings-pane-subtabs--sections" aria-label="Settings sections">
+    ${SETTINGS_RAIL_SECTIONS.map(item => `<button type="button" data-action="settings-hub-section" data-section="${item.id}" ${item.id === activeSectionId ? 'aria-current="page"' : ''}>${item.label}</button>`).join('')}
+  </nav>`;
+}
+
+function teamStationBlocks() {
   const team = teamSettings();
-  const rows = [
-    {id: 'onboarding', label: 'Onboarding', description: 'Fields collected for a new person.'},
-    {id: 'waiver', label: 'Waiver', description: 'When members should sign a waiver.'},
-    {id: 'session-plan', label: 'Session plan', description: 'Default follow-up cadence after an assessment.'}
-  ];
-  return `<main class="directory-page settings-page">
-    <header class="directory-heading">
-      <div><h1>Settings</h1><p>Team and station preferences for this clinic.</p></div>
-      <div class="directory-heading-actions">${button('Save settings', 'save-settings', 'primary')}</div>
-    </header>
-    <section class="settings-block" aria-labelledby="settings-team-title">
-      <h2 id="settings-team-title">Team</h2>
+  return `<section class="settings-block settings-hub-station" aria-label="Station">
       <label class="field-label" for="team-name">Team name</label>
       <input id="team-name" type="text" maxlength="80" value="${escapeHTML(team.name)}" autocomplete="off">
       <p class="field-label">Preferred unit</p>
@@ -92,11 +112,6 @@ function teamSettingsHome() {
       </div>
       <p class="directory-footnote">Roster force uses this unit. Reports still choose a unit at export.</p>
     </section>
-    <nav class="settings-links" aria-label="Team settings">
-      ${rows.map(row => `<button type="button" class="settings-link" data-action="settings-section" data-section="${row.id}">
-        <span><strong>${row.label}</strong><small>${row.description}</small></span>${icon('chevron')}
-      </button>`).join('')}
-    </nav>
     <section class="settings-block" aria-labelledby="settings-appearance-title">
       <h2 id="settings-appearance-title">Appearance</h2>
       <label class="field-label" for="settings-theme">Theme</label>
@@ -115,49 +130,42 @@ function teamSettingsHome() {
         `<label class="radio-row"><input type="radio" name="default-entry" value="${value}" ${state.defaultEntry === value ? 'checked' : ''}><span><strong>${label}</strong></span></label>`
       ).join('')}
       <p class="directory-footnote">Clinic admins retain access to the full roster. Access policies are simulated.</p>
-    </section>` : `<section class="settings-block"><h2>Clinic access</h2><p class="directory-footnote">Roster visibility: ${state.rosterPolicy === 'all' ? 'Whole clinic' : 'Assigned members'}. Managed by a clinic admin.</p></section>`}
-  </main>`;
+    </section>` : `<section class="settings-block"><h2>Clinic access</h2><p class="directory-footnote">Roster visibility: ${state.rosterPolicy === 'all' ? 'Whole clinic' : 'Assigned members'}. Managed by a clinic admin.</p></section>`}`;
 }
 
-function teamOnboardingPage() {
+function teamOnboardingBody() {
   const team = teamSettings();
-  return `<main class="directory-page settings-page">
-    <header class="directory-heading">
-      <div>${settingsBack()}<h1>Onboarding</h1><p>First and last name stay required. Other fields can be collected later.</p></div>
-      <div class="directory-heading-actions">${button('Save', 'save-onboarding', 'primary')}</div>
-    </header>
-    <section class="settings-block" aria-label="New user fields">
-      <h2>New user fields</h2>
+  return `<section class="settings-block" aria-label="New user fields">
+      <div class="settings-hub-pane-toolbar">
+        <div><p class="muted small">First and last name stay required. Other fields can be collected later.</p></div>
+        ${button('Save', 'save-onboarding', 'primary')}
+      </div>
       <ul class="settings-toggle-list">
         ${TEAM_ONBOARDING_FIELDS.map(field => `<li><label class="check-label"><input type="checkbox" name="onboarding-field" value="${field.id}" ${team.onboarding[field.id] ? 'checked' : ''}>${field.label}</label></li>`).join('')}
       </ul>
-    </section>
-  </main>`;
+    </section>`;
 }
 
-function teamWaiverPage() {
+function teamWaiverBody() {
   const team = teamSettings();
-  return `<main class="directory-page settings-page">
-    <header class="directory-heading">
-      <div>${settingsBack()}<h1>Waiver</h1><p>When this team asks members to sign. This does not block Start yet.</p></div>
-      <div class="directory-heading-actions">${button('Save', 'save-waiver', 'primary')}</div>
-    </header>
-    <section class="settings-block" aria-label="Waiver policy">
+  return `<section class="settings-block" aria-label="Waiver policy">
+      <div class="settings-hub-pane-toolbar">
+        <div><p class="muted small">When this team asks members to sign. This does not block Start yet.</p></div>
+        ${button('Save', 'save-waiver', 'primary')}
+      </div>
       ${TEAM_WAIVER_POLICIES.map(item =>
         `<label class="radio-row"><input type="radio" name="waiver-policy" value="${item.id}" ${team.waiverPolicy === item.id ? 'checked' : ''}><span><strong>${item.label}</strong><small>${item.description}</small></span></label>`
       ).join('')}
-    </section>
-  </main>`;
+    </section>`;
 }
 
-function teamSessionPlanDefaultsPage() {
+function teamSessionPlanBody() {
   const plan = teamSettings().sessionPlan;
-  return `<main class="directory-page settings-page">
-    <header class="directory-heading">
-      <div>${settingsBack()}<h1>Session plan</h1><p>Defaults for the follow-up plan after an assessment.</p></div>
-      <div class="directory-heading-actions">${button('Save', 'save-session-plan-defaults', 'primary')}</div>
-    </header>
-    <section class="settings-block settings-plan-fields" aria-label="Session plan defaults">
+  return `<section class="settings-block settings-plan-fields" aria-label="Session plan defaults">
+      <div class="settings-hub-pane-toolbar">
+        <div><p class="muted small">Defaults for the follow-up plan after an assessment.</p></div>
+        ${button('Save', 'save-session-plan-defaults', 'primary')}
+      </div>
       <label class="field-label" for="plan-sessions">Sessions / week</label>
       <select id="plan-sessions">${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${plan.sessionsPerWeek === n ? 'selected' : ''}>${n}</option>`).join('')}</select>
       <label class="field-label" for="plan-weeks">Weeks</label>
@@ -165,12 +173,32 @@ function teamSessionPlanDefaultsPage() {
       <label class="field-label" for="plan-template">Session template</label>
       <select id="plan-template">${clinicSessionTemplates().map(item => `<option value="${item.id}" ${plan.templateId === item.id ? 'selected' : ''}>${item.name} · ${item.detail}</option>`).join('')}</select>
       <p class="directory-footnote">New plans start from ${escapeHTML(sessionPlanLine(plan))}.</p>
-    </section>
+    </section>`;
+}
+
+function settingsRailPane(section) {
+  if (section === 'onboarding') return teamOnboardingBody();
+  if (section === 'waiver') return teamWaiverBody();
+  if (section === 'session-plan') return teamSessionPlanBody();
+  return teamStationBlocks();
+}
+
+function settingsPage() {
+  if (state.actor !== 'coach') return peopleView();
+  const section = settingsActiveSection();
+  const activeItem = SETTINGS_RAIL_SECTIONS.find(item => item.id === section) || SETTINGS_RAIL_SECTIONS[0];
+  return `<main class="directory-page settings-page settings-hub settings-workspace settings-hub-layout settings-workspace-layout templates-hub">
+    ${settingsTeamRail(section)}
+    <div class="settings-hub-pane" aria-label="${escapeHTML(activeItem.label)}">
+      ${settingsPaneHead(activeItem, section)}
+      ${settingsPaneSubnav(section)}
+      ${settingsRailPane(section)}
+    </div>
   </main>`;
 }
 
 function saveTeamSettingsHome() {
-  if (state.actor !== 'coach' || state.nav !== 'settings' || state.settingsSection) return;
+  if (state.actor !== 'coach' || state.nav !== 'settings') return;
   const team = teamSettings();
   const name = ($('#team-name')?.value || '').trim().replace(/\s+/g, ' ');
   if (!name) {
@@ -193,10 +221,11 @@ function saveTeamSettingsHome() {
 }
 
 const teamSettingsActions = {
-  'settings-home': () => visitSettings(),
-  'settings-section': el => {
-    if (!['onboarding', 'waiver', 'session-plan'].includes(el.dataset.section)) return;
-    visitSettings(el.dataset.section);
+  'settings-hub-section': el => {
+    if (!SETTINGS_RAIL_SECTIONS.some(item => item.id === el.dataset.section)) return;
+    state.settingsHubSection = el.dataset.section;
+    render();
+    $(`[data-action="settings-hub-section"][data-section="${el.dataset.section}"]`)?.focus();
   },
   'settings-unit': el => {
     if (!exportForceUnits[el.dataset.unit] || state.nav !== 'settings') return;
@@ -206,21 +235,21 @@ const teamSettingsActions = {
     render();
   },
   'save-onboarding': () => {
-    if (state.actor !== 'coach' || state.settingsSection !== 'onboarding') return;
+    if (state.actor !== 'coach' || state.nav !== 'settings' || state.settingsHubSection !== 'onboarding') return;
     const selected = new Set($$('input[name="onboarding-field"]:checked').map(input => input.value));
     const team = teamSettings();
     TEAM_ONBOARDING_FIELDS.forEach(field => { team.onboarding[field.id] = selected.has(field.id); });
     toast('Onboarding preferences saved.');
   },
   'save-waiver': () => {
-    if (state.actor !== 'coach' || state.settingsSection !== 'waiver') return;
+    if (state.actor !== 'coach' || state.nav !== 'settings' || state.settingsHubSection !== 'waiver') return;
     const value = $('input[name="waiver-policy"]:checked')?.value;
     if (!TEAM_WAIVER_POLICIES.some(item => item.id === value)) return;
     teamSettings().waiverPolicy = value;
     toast('Waiver policy saved.');
   },
   'save-session-plan-defaults': () => {
-    if (state.actor !== 'coach' || state.settingsSection !== 'session-plan') return;
+    if (state.actor !== 'coach' || state.nav !== 'settings' || state.settingsHubSection !== 'session-plan') return;
     const sessions = Number($('#plan-sessions').value);
     const weeks = Number($('#plan-weeks').value);
     const templateId = $('#plan-template').value;
