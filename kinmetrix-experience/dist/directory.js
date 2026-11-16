@@ -1,11 +1,11 @@
 /* Clinic navigation and plan management. All identities and plans are demo data. */
 function directoryUI(){
  state.directoryUI??={};
- return state.directoryUI[state.clinicianId]??={roster:{query:'',clinician:'all',status:'all',sort:'name',descending:false},programs:{tab:'templates',query:'',library:null}};
+ return state.directoryUI[state.clinicianId]??={roster:{query:'',clinician:'all',status:'all',sort:'name',descending:false},programs:{tab:'templates',query:'',library:null,libraryFocus:'assessments'}};
 }
 function visitDirectory(page,keepLibrary=false){
  if(state.actor!=='coach'||!['roster','programs'].includes(page))return;
- if(page==='programs'&&!keepLibrary)directoryUI().programs.library=null;
+ if(page==='programs'&&!keepLibrary)Object.assign(directoryUI().programs,{library:'assessments',query:''});
  state.nav=page;state.personId=null;state.pendingSetup=null;state.memberOrigin=page;render();window.scrollTo(0,0);
 }
 function openDirectoryPerson(id,origin='find',tab='overview'){
@@ -111,63 +111,90 @@ function programFields(draft,prefix='plan',tracked=false){
  const field=name=>tracked?`data-program-field="${name}"`:'';
  return `<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><label>Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-form-grid"><label>Training mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('training').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label><label>Number of sessions<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n} sessions</option>`).join('')}</select></label><label>Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n} directions</option>`).join('')}</select></label><label>Reps per direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n} ${n===1?'rep':'reps'}</option>`).join('')}</select></label></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
 }
+function templatesHubRail(activeLibraryId){
+ return `<nav class="settings-hub-rail" aria-label="Template libraries">
+  <p class="settings-rail-caption" aria-hidden="true">Templates</p>
+  ${TEMPLATE_LIBRARIES.map(item=>`<button type="button" class="settings-hub-rail-item ${item.id===activeLibraryId?'is-active':''}" data-action="templates-library" data-library="${item.id}" ${item.id===activeLibraryId?'aria-current="true"':''}>${item.label}</button>`).join('')}
+ </nav>`;
+}
+function templatesPaneHead(active,library){
+ const createByLibrary={
+  assessments:{action:'new-assessment-template',ariaLabel:'New assessment template'},
+  sessions:{action:'new-session-template',ariaLabel:'New session template'},
+  programs:{action:'new-template',ariaLabel:'New program template'}
+ };
+ const create=createByLibrary[library];
+ const action=create?button(icon('plus','icon-sm')+' New template',create.action,'primary',`aria-label="${create.ariaLabel}"`):'';
+ const desc=active.description?`<p class="settings-pane-desc">${escapeHTML(active.description)}</p>`:'';
+ return `<header class="settings-pane-head">
+  <div class="settings-pane-head-row">
+   <div class="settings-pane-head-text"><h1>${escapeHTML(active.label)}</h1>${desc}</div>
+   ${action?`<div class="settings-pane-head-actions">${action}</div>`:''}
+  </div>
+ </header>`;
+}
+function templatesPaneSubnav(activeLibraryId){
+ return `<nav class="settings-pane-subtabs settings-pane-subtabs--sections" aria-label="Template libraries">
+  ${TEMPLATE_LIBRARIES.map(item=>`<button type="button" data-action="templates-library" data-library="${item.id}" ${item.id===activeLibraryId?'aria-current="page"':''}>${item.label}</button>`).join('')}
+ </nav>`;
+}
+function templatesLibraryPane(library){
+ if(library==='assessments')return assessmentTemplatesBody();
+ if(library==='sessions')return sessionTemplatesBody();
+ Object.assign(directoryUI().programs,{library:'programs',tab:directoryUI().programs.tab||'templates'});
+ return programLibraryBody();
+}
 function programsPage(){
  if(state.actor!=='coach')return peopleView();
  const ui=directoryUI().programs;
- if(ui.library==='assessments')return assessmentTemplatesPage();
- if(ui.library==='sessions')return sessionTemplatesPage();
- if(ui.library==='programs')return programLibraryPage();
- return `<main class="directory-page settings-page">
-  <header class="directory-heading"><div><h1>Templates</h1><p>Assessments, sessions, and programs for this team.</p></div></header>
-  <nav class="settings-links" aria-label="Template libraries">
-   ${TEMPLATE_LIBRARIES.map(item=>`<button type="button" class="settings-link" data-action="templates-library" data-library="${item.id}">
-    <span><strong>${item.label}</strong><small>${item.description}</small></span>${icon('chevron')}
-   </button>`).join('')}
-  </nav>
+ const library=TEMPLATE_LIBRARIES.some(item=>item.id===ui.library)?ui.library:'assessments';
+ ui.library=library;
+ const active=TEMPLATE_LIBRARIES.find(item=>item.id===library)||TEMPLATE_LIBRARIES[0];
+ return `<main class="directory-page settings-page settings-hub settings-workspace settings-hub-layout settings-workspace-layout templates-hub">
+  ${templatesHubRail(library)}
+  <div class="settings-hub-pane" aria-label="${escapeHTML(active.label)}">
+   ${templatesPaneHead(active,library)}
+   ${templatesPaneSubnav(library)}
+   ${templatesLibraryPane(library)}
+  </div>
  </main>`;
 }
-function templatesBack(){
- return `<button class="text-button settings-back" data-action="templates-home">${icon('back','icon-sm')} Templates</button>`;
-}
-function assessmentTemplatesPage(){
+function assessmentTemplatesBody(){
  const rows=clinicAssessmentTemplates();
- return `<main class="directory-page">
-  <header class="directory-heading"><div>${templatesBack()}<h1>Assessments</h1><p>Protocols the team runs from this workspace.</p></div></header>
-  <div class="directory-table-scroll" tabindex="0" role="region" aria-label="Assessment templates">
+ return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="Assessment templates">
    <table class="data-table directory-table"><caption class="sr-only">Assessment templates</caption>
     <thead><tr><th scope="col">Assessment</th><th scope="col">Purpose</th></tr></thead>
     <tbody>${rows.map(row=>`<tr><th scope="row"><strong>${escapeHTML(row.name)}</strong><small>${escapeHTML(row.detail)}</small></th><td>${escapeHTML(row.description)}</td></tr>`).join('')}</tbody>
    </table>
   </div>
-  <p class="directory-footnote">These are the assessment modes available at the station. Editing a protocol is not in this prototype.</p>
- </main>`;
+  <p class="directory-footnote">These are the assessment modes available at the station. Editing a protocol is not in this prototype.</p>`;
 }
-function sessionTemplatesPage(){
+function sessionTemplatesBody(){
  const rows=clinicSessionTemplates();
- return `<main class="directory-page">
-  <header class="directory-heading"><div>${templatesBack()}<h1>Sessions</h1><p>Session setups shared across the roster.</p></div></header>
-  <div class="directory-table-scroll" tabindex="0" role="region" aria-label="Session templates">
+ return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="Session templates">
    <table class="data-table directory-table"><caption class="sr-only">Session templates</caption>
     <thead><tr><th scope="col">Session</th><th scope="col">Load</th></tr></thead>
     <tbody>${rows.map(row=>`<tr><th scope="row">${escapeHTML(row.name)}</th><td>${escapeHTML(row.detail)}</td></tr>`).join('')}</tbody>
    </table>
   </div>
-  <p class="directory-footnote">Session plan defaults in Settings use this list. New plans start from the selected template.</p>
- </main>`;
+  <p class="directory-footnote">Session plan defaults in Settings use this list. New plans start from the selected template.</p>`;
 }
-function programLibraryPage(){
+function programLibraryBody(){
  const ui=directoryUI().programs;
- return `<main class="directory-page"><header class="directory-heading"><div>${templatesBack()}<h1>Programs</h1><p>Reusable plans and the people following them.</p></div>${button(icon('plus','icon-sm')+' New program','new-template','primary')}</header><nav class="directory-tabs" aria-label="Program views">${[['templates','Templates'],['assigned','Assigned']].map(([key,label])=>`<button data-action="programs-tab" data-tab="${key}" ${ui.tab===key?'aria-current="page"':''}>${label}<span>${key==='templates'?clinicProgramTemplates().length:assignedPrograms().length}</span></button>`).join('')}</nav><div class="directory-toolbar program-toolbar">${directorySearch('programs-search','Search programs',ui.query,ui.tab==='templates'?'Search programs':'Search programs or people')}<p>${ui.tab==='templates'?'Assign a copy to a person.':'Assigned programs keep their own settings and progress.'}</p></div><div id="programs-results">${programsResults()}</div><p class="directory-footnote">${ui.tab==='templates'?'Example templates use the existing demo plans.':'Only members you can access are shown.'} Changes are saved in this demo only.</p></main>`;
+ return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Program views">${[['templates','Templates'],['assigned','Assigned']].map(([key,label])=>`<button type="button" data-action="programs-tab" data-tab="${key}" ${ui.tab===key?'aria-current="page"':''}>${label}<span class="settings-pane-subtab-count">${key==='templates'?clinicProgramTemplates().length:assignedPrograms().length}</span></button>`).join('')}</nav>
+  <div class="directory-toolbar program-toolbar">${directorySearch('programs-search','Search programs',ui.query,ui.tab==='templates'?'Search programs':'Search programs or people')}<p>${ui.tab==='templates'?'Assign a copy to a person.':'Assigned programs keep their own settings and progress.'}</p></div>
+  <div id="programs-results">${programsResults()}</div>
+  <p class="directory-footnote">${ui.tab==='templates'?'Example templates use the existing demo plans.':'Only members you can access are shown.'} Changes are saved in this demo only.</p>`;
 }
 function programsResults(){
  const ui=directoryUI().programs,q=ui.query.trim().toLowerCase(),assigned=ui.tab==='assigned';
  const rows=assigned?assignedPrograms().filter(({p,program})=>(program.name+' '+p.name+' '+sessionModes[program.type].name).toLowerCase().includes(q)):clinicProgramTemplates().filter(p=>(p.name+' '+sessionModes[p.type].name).toLowerCase().includes(q));
- if(!rows.length)return `<div class="directory-empty"><h2>${q?'No matching programs':assigned?'No assigned programs':'No program templates'}</h2><p>${q?'Try another name or mode.':assigned?'Choose a template and assign it to a member.':'Create a reusable plan to assign to people.'}</p>${q?button('Clear search','clear-programs-search','small-button'):assigned?button('Browse templates','browse-templates','small-button'):button('New program','new-template','small-button')}</div>`;
+ if(!rows.length)return `<div class="directory-empty"><h2>${q?'No matching programs':assigned?'No assigned programs':'No program templates'}</h2><p>${q?'Try another name or mode.':assigned?'Choose a template and assign it to a member.':'Create a reusable plan to assign to people.'}</p>${q?button('Clear search','clear-programs-search','small-button'):assigned?button('Browse templates','browse-templates','small-button'):button('New template','new-template','small-button','aria-label="New program template"')}</div>`;
  return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="${assigned?'Assigned programs':'Program templates'}, scroll for more columns"><table class="data-table directory-table program-grid"><caption class="sr-only">${assigned?'Assigned programs':'Program templates'}</caption><thead><tr><th scope="col">${assigned?'Person':'Program'}</th><th scope="col">${assigned?'Program':'Mode'}</th><th scope="col">${assigned?'Progress':'Sessions'}</th><th scope="col">Setup</th><th scope="col">Target progression</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>${rows.map(row=>{const p=assigned?row.program:row,member=assigned?row.p:null;return `<tr><th scope="row">${assigned?`<div class="directory-identity">${photoAvatar(member,'mini')}<button class="directory-person" data-action="program-member" data-id="${member.id}"><span>${escapeHTML(member.name)}</span></button></div>`:`<button class="program-name-button" data-action="edit-template" data-id="${p.id}">${escapeHTML(p.name)}${icon('chevron','icon-sm')}</button>`}</th><td>${assigned?`<strong>${escapeHTML(p.name)}</strong><small>${sessionModes[p.type].name}</small>`:sessionModes[p.type].name}</td><td>${assigned?`<strong>${p.completed} / ${p.total}</strong><small>${p.completed>=p.total?'Completed':'Sessions completed'}</small>`:p.total}</td><td>${p.positions} directions<small>${p.reps} reps per direction</small></td><td>${programLoadLabel(p)}</td><td>${assigned?(p.completed<p.total?button('Continue','continue-assigned','small-button',`data-id="${member.id}" data-program-id="${p.id}" aria-label="Continue ${escapeHTML(p.name)} for ${escapeHTML(member.name)}"`):button('Open person','program-member','small-button',`data-id="${member.id}"`)):button('Assign','assign-template','small-button',`data-id="${p.id}" aria-label="Assign ${escapeHTML(p.name)}"`)}</td></tr>`;}).join('')}</tbody></table></div>`;
 }
 function directoryDialog(o){
  const template=clinicProgramTemplates().find(p=>p.id===o.id),editing=o.type==='program-editor',draft=template||{name:'',type:'strength',total:6,positions:4,reps:3};
- const title=editing?(template?'Edit program':'New program'):'Assign program';
+ const title=editing?(template?'Edit program template':'New program template'):'Assign program';
  const content=editing?`<p class="directory-dialog-intro">${template?'Changes apply to future assignments. Existing assigned programs keep their settings.':'Create a reusable template, then assign it to people.'}</p><form id="template-form" class="program-form">${programFields(draft)}</form><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" form="template-form" class="button primary">Save program</button></footer>`:`<p class="directory-dialog-intro"><strong>${escapeHTML(draft.name)}</strong><br>${sessionModes[draft.type].name} · ${draft.total} sessions · ${draft.positions} directions · ${draft.reps} reps</p><form id="assign-program-form"><label class="field-label" for="assign-person">Assign to</label><select id="assign-person" required><option value="">Choose a person</option>${visiblePeople().map(p=>`<option value="${p.id}">${escapeHTML(p.name)}</option>`).join('')}</select><p class="program-form-note">This adds a program to their workspace. No session starts until the settings are reviewed.</p><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" form="assign-program-form" class="button primary">Assign program</button></footer></form>`;
  return `<div class="modal-backdrop"><section class="dialog directory-dialog ${editing?'program-editor-dialog':''}" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">${title}</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${content}</section></div>`;
 }
@@ -179,7 +206,7 @@ function saveProgramTemplate(){
  const load=validateProgramLoadForm('plan',draft.total);if(!load)return;draft.load=load;
  const templates=clinicProgramTemplates(),existing=templates.find(p=>p.id===state.overlay.id);
  if(existing)Object.assign(existing,draft,{example:false});else templates.unshift({...draft,id:'template-'+Date.now(),example:false});
- state.overlay=null;directoryUI().programs={tab:'templates',query:''};render();$('[data-action="new-template"]')?.focus();toast('Program template saved.');
+ state.overlay=null;Object.assign(directoryUI().programs,{tab:'templates',query:'',library:'programs'});render();$('[data-action="new-template"]')?.focus();toast('Program template saved.');
 }
 function assignProgramTemplate(){
  if(state.actor!=='coach'||state.overlay?.type!=='program-assign')return;
@@ -198,11 +225,12 @@ const directoryActions={
  'open-roster-profile':el=>openDirectoryPerson(el.dataset.id,'roster','profile'),
  'sort-roster':el=>{const ui=directoryUI().roster,key=el.dataset.sort;if(key!=='name'&&!rosterColumnDefinitions.some(col=>col.key===key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-sort="${key}"]`)?.focus();},
  'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',clinician:'all',status:'all',sort:'name',descending:false});render();$('#directory-search')?.focus();},
- 'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;directoryUI().programs.library=el.dataset.library;render();},
- 'templates-home':()=>{directoryUI().programs.library=null;render();$('[data-action="templates-library"]')?.focus();},
+ 'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;directoryUI().programs.library=el.dataset.library;render();$(`[data-action="templates-library"][data-library="${el.dataset.library}"]`)?.focus();},
  'programs-tab':el=>{if(!['templates','assigned'].includes(el.dataset.tab))return;Object.assign(directoryUI().programs,{tab:el.dataset.tab,query:'',library:'programs'});render();$(`[data-tab="${el.dataset.tab}"]`)?.focus();},
  'browse-templates':()=>{Object.assign(directoryUI().programs,{tab:'templates',query:'',library:'programs'});render();},
  'clear-programs-search':()=>{directoryUI().programs.query='';render();$('#programs-search')?.focus();},
+ 'new-assessment-template':()=>{if(state.actor==='coach')toast('Creating assessment protocols is not in this prototype.');},
+ 'new-session-template':()=>{if(state.actor==='coach')toast('Creating session templates is not in this prototype.');},
  'new-template':()=>{if(state.actor==='coach')openModal('program-editor');},
  'edit-template':el=>{if(state.actor==='coach'&&clinicProgramTemplates().some(p=>p.id===el.dataset.id))openModal('program-editor',{id:el.dataset.id});},
  'assign-template':el=>{if(state.actor==='coach'&&clinicProgramTemplates().some(p=>p.id===el.dataset.id))openModal('program-assign',{id:el.dataset.id});},
