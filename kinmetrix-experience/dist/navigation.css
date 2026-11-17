@@ -22,7 +22,7 @@ body{padding-bottom:var(--prototype-footer-height)}
  .sidebar .side-nav,.sidebar .side-bottom{display:contents}
  .sidebar .nav-button{width:100%;min-width:0;min-height:56px;height:56px;font-size:10px;padding:5px 2px;gap:4px}
  .sidebar .nav-clinician .avatar{width:26px;height:26px;font-size:10px}
- .member-shell .sidebar{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .templates-layered-shell.member-shell .sidebar{grid-template-columns:repeat(3,minmax(0,1fr))}
  .people-finder,.member-workspace{min-height:calc(100dvh - 74px - var(--prototype-footer-height))}
  #toast{bottom:calc(var(--prototype-footer-height) + 86px)}
 }
