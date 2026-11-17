@@ -1,16 +1,19 @@
 /* Overview and session discovery. Motion explains the interaction, not device mechanics. */
+function isometricHoldStyle(cfg){if(!cfg||cfg.type!=='strength')return null;return cfg.holdStyle==='endurance'?'endurance':'timed';}
+function isIsometricEndurance(cfg){return cfg?.type==='strength'&&isometricHoldStyle(cfg)==='endurance';}
+function programModeLabel(program){return program?.type==='strength'?isIsometricEndurance(program)?'Isometric · Endurance':'Isometric':sessionModes[program.type].name;}
+function sessionRecordLabel(r){if(r?.type==='strength')return isIsometricEndurance(r.sessionSettings||r)?'Isometric · Endurance':'Isometric';return protocols[r.type].name;}
 const sessionModes = {
- strength:{name:'Isometric',mechanism:'Fixed position',short:'Push against a fixed position',purposes:['assessment','training'],description:'Measure force in each direction, or practice holding a target effort.',steps:['Build effort','Hold steady','Release'],cue:'Position stays fixed',trace:'M12 46L25 46L42 15L86 15L102 46L112 46'},
- endurance:{name:'Endurance',mechanism:'Isometric · untimed',short:'Hold effort, then release',purposes:['assessment','training'],description:'Measure how long you sustain effort. There’s no countdown; releasing effort ends the rep.',steps:['Build effort','Keep holding','Release to finish'],cue:'No countdown · release to finish',trace:'M12 46L24 46L38 15L88 15L100 46L112 46'},
+ strength:{name:'Isometric',mechanism:'Fixed position',short:'Push against a fixed position',purposes:['assessment','training'],description:'Measure force or hold time in each direction. In setup, choose timed seconds or Endurance.',steps:['Build effort','Hold steady','Release'],cue:'Position stays fixed',trace:'M12 46L25 46L42 15L86 15L102 46L112 46'},
  rom:{name:'Range of motion',mechanism:'Isokinetic assessment',short:'Find your movement limits',purposes:['assessment'],description:'Measure your available range. Your coach reviews the result before applying new working limits.',steps:['Move through range','Reach your limit','Stop automatically or manually'],cue:'Movement stops at your limit',trace:'M12 46L28 46L88 12L112 12'},
  eccentric:{name:'Eccentric',mechanism:'Resisted movement',short:'Resist as the device moves',purposes:['assessment','training'],description:'Measure or practice control while resisting movement in the opposite direction.',steps:['Device moves','You resist','Complete the movement'],cue:'Movement and effort oppose each other',trace:'M12 44L28 15L44 22L60 14L76 23L92 18L112 44'},
  isokinetic:{name:'Isokinetic',mechanism:'Controlled speed',short:'Move at a controlled speed',purposes:['assessment','training'],description:'Practice producing effort through your working range while movement stays at a set speed.',steps:['Begin moving','Keep a steady pace','Complete the range'],cue:'Movement keeps a steady pace',trace:'M12 46L112 12'}
 };
-const sessionModeOrder=['strength','isokinetic','rom','eccentric','endurance'];
+const sessionModeOrder=['strength','isokinetic','rom','eccentric'];
 const sessionModeKeys=purpose=>sessionModeOrder.filter(key=>sessionModes[key].purposes.includes(purpose));
 const modePurposeCopy={
- assessment:{strength:'Measure strength at a fixed position in each direction.',isokinetic:'Measure strength through your range at a controlled speed.',rom:'Measure your available range. Your coach reviews new limits.',eccentric:'Measure control while resisting the device’s movement.',endurance:'Measure sustained effort without a countdown. Release to end the rep.'},
- training:{strength:'Practice holding a target effort against a fixed pad.',isokinetic:'Train through your working range at a controlled speed.',eccentric:'Practice resisting the pad as the device moves against you.',endurance:'Hold your effort without a countdown. Release to end the rep.'}
+ assessment:{strength:'Measure strength at a fixed position, or how long you sustain effort. Choose timed seconds or Endurance in setup.',isokinetic:'Measure strength through your range at a controlled speed.',rom:'Measure your available range. Your coach reviews new limits.',eccentric:'Measure control while resisting the device’s movement.'},
+ training:{strength:'Practice holding a target effort against a fixed pad. In setup, choose timed seconds or Endurance.',isokinetic:'Train through your working range at a controlled speed.',eccentric:'Practice resisting the pad as the device moves against you.'}
 };
 
 function memberWorkspaceView(){
@@ -104,10 +107,7 @@ function overviewView(){
 
 function modeThumbnail(type){return `<svg class="mode-thumbnail" viewBox="0 0 124 60" aria-hidden="true"><path class="mode-trace-grid" d="M12 8V48H114"/><path class="mode-trace" d="${sessionModes[type].trace}"/>${type==='rom'?'<path class="mode-trace-limit" d="M88 5V49"/>':''}${type==='eccentric'?'<path class="mode-trace-limit" d="M20 51H104m-6-4 6 4-6 4M26 3H104m-72-4-6 4 6 4"/>':''}</svg>`;}
 
-function movementPreview(type){
- const renderer=['strength','endurance'].includes(type)?RenderedIsometric:RenderedIsokinetic;
- return renderer.markup({mode:type,compact:true});
-}
+function movementPreview(type){return type==='strength'?RenderedIsometric.markup({mode:'strength',compact:true}):RenderedIsokinetic.markup({mode:type,compact:true});}
 
 function pickerFrame(o,title,intro,body,footer='',compact=false){
  const back=o.step==='start'?'':`<button class="text-button picker-back" data-action="picker-back">${icon('back','icon-sm')} ${o.step==='create-program'?'Programs':'New'}</button>`;
@@ -189,11 +189,11 @@ function memberPrograms(personId=state.personId){
 function activeProgram(){return memberPrograms().find(p=>p.completed<p.total);}
 function programPickerView(o){
  const programs=memberPrograms(),active=programs.filter(p=>p.completed<p.total),complete=programs.filter(p=>p.completed>=p.total);
- return pickerFrame(o,'Programs',`Training plans for ${escapeHTML(person().name)}.`, `<div class="program-picker-content">${active.length?`<div class="program-list">${active.map(p=>`<article class="program-list-row"><div><h3>${escapeHTML(p.name)}</h3><p>${sessionModes[p.type].name} · ${p.positions} directions · ${p.reps} reps</p><span>Session ${p.completed+1} of ${p.total} · ${programLoadLabel(p)}</span></div>${button('Continue '+icon('play','icon-sm'),'continue-program','primary',`data-program-id="${p.id}" aria-label="Continue ${escapeHTML(p.name)}, session ${p.completed+1} of ${p.total}"`)}</article>`).join('')}</div>`:`<div class="program-empty"><h3>No active programs</h3><p>Create a plan to follow across several training sessions.</p></div>`}
+ return pickerFrame(o,'Programs',`Training plans for ${escapeHTML(person().name)}.`, `<div class="program-picker-content">${active.length?`<div class="program-list">${active.map(p=>`<article class="program-list-row"><div><h3>${escapeHTML(p.name)}</h3><p>${programModeLabel(p)} · ${p.positions} directions · ${p.reps} reps</p><span>Session ${p.completed+1} of ${p.total} · ${programLoadLabel(p)}</span></div>${button('Continue '+icon('play','icon-sm'),'continue-program','primary',`data-program-id="${p.id}" aria-label="Continue ${escapeHTML(p.name)}, session ${p.completed+1} of ${p.total}"`)}</article>`).join('')}</div>`:`<div class="program-empty"><h3>No active programs</h3><p>Create a plan to follow across several training sessions.</p></div>`}
  <button class="new-task-row new-program-row" data-action="new-program">${icon('plus')}<span><strong>Create a new program</strong><small>Choose a training mode, settings, and number of sessions.</small></span>${icon('chevron','icon-sm')}</button>${complete.length?`<p class="program-completed-note">Completed: ${complete.map(p=>escapeHTML(p.name)).join(', ')}</p>`:''}</div>`, '', true);
 }
 function programCreateView(o){
- const draft=o.programDraft||{name:'',type:'strength',total:6,positions:4,reps:3};o.programDraft=draft;
+ const draft=o.programDraft||{name:'',type:'strength',holdStyle:'timed',total:6,positions:4,reps:3};o.programDraft=draft;
  return pickerFrame(o,'New program',`Create a training plan for ${escapeHTML(person().name)}.`, `<form id="program-form" class="program-form">${programFields(draft,'program',true)}</form>`, `<span>Saved in this demo only</span><div>${button('Back','picker-back')}${button('Create & set up '+icon('arrow','icon-sm'),'create-program','primary')}</div>`,true);
 }
 function beginProgram(id){
@@ -204,8 +204,9 @@ function beginProgram(id){
 function createProgram(){
  const form=$('#program-form');if(!form)return;
  const name=$('#program-name');name.setCustomValidity(name.value.trim()?'':'Enter a program name.');if(!form.reportValidity())return;
- const program={id:'program-'+Date.now(),name:name.value.trim(),type:$('#program-mode').value,total:Number($('#program-total').value),positions:Number($('#program-positions').value),reps:Number($('#program-reps').value),completed:0};
+ const program={id:'program-'+Date.now(),name:name.value.trim(),type:$('#program-mode').value,holdStyle:$('#program-hold-style')?.value==='endurance'?'endurance':'timed',total:Number($('#program-total').value),positions:Number($('#program-positions').value),reps:Number($('#program-reps').value),completed:0};
  if(!sessionModeKeys('training').includes(program.type))return;
+ if(program.type!=='strength')program.holdStyle='timed';
  const load=validateProgramLoadForm('program',program.total);if(!load)return;program.load=load;
  memberPrograms().unshift(program);beginProgram(program.id);toast('Program created. Review the first session’s settings.');
 }

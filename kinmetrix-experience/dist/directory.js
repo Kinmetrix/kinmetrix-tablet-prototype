@@ -1,11 +1,11 @@
 /* Clinic navigation and plan management. All identities and plans are demo data. */
 function directoryUI(){
  state.directoryUI??={};
- return state.directoryUI[state.clinicianId]??={roster:{query:'',clinician:'all',status:'all',sort:'name',descending:false},programs:{tab:'templates',query:'',library:null,libraryFocus:'assessments',assessmentTab:'protocol'}};
+ return state.directoryUI[state.clinicianId]??={roster:{query:'',filterKind:'all',filterValue:'all',sort:'name',descending:false},programs:{tab:'templates',query:'',library:null,libraryFocus:'assessments',assessmentTab:'protocol'}};
 }
 function visitDirectory(page,keepLibrary=false){
  if(state.actor!=='coach')return;
- if(page==='home'){visitHome();return;}
+ if(page==='pulse'){visitPulse();return;}
  if(!['roster','programs'].includes(page))return;
  if(page==='programs'&&!keepLibrary)Object.assign(directoryUI().programs,{library:'assessments',query:''});
  state.nav=page;state.personId=null;state.pendingSetup=null;state.memberOrigin=page;render();window.scrollTo(0,0);
@@ -19,14 +19,56 @@ function openDirectoryPerson(id,origin='find',tab='overview'){
  render();window.scrollTo(0,0);return true;
 }
 function returnToDirectory(){
- if(['home','roster','programs'].includes(state.memberOrigin))visitDirectory(state.memberOrigin,true);else showGlobalFind();
+ if(['pulse','roster','programs'].includes(state.memberOrigin))visitDirectory(state.memberOrigin,true);else showGlobalFind();
 }
 const rosterColumnDefinitions=[
  {key:'sessions',label:'Sessions',width:80},{key:'force',label:'Avg peak force',width:126},{key:'stability',label:'Stability',width:92},{key:'visit',label:'Last activity',width:110},{key:'program',label:'Program',width:180},
  {key:'clinician',label:'Clinician',width:150},{key:'height',label:'Height',width:88},{key:'weight',label:'Body weight',width:100},{key:'activity',label:'Activity level',width:110}
 ];
 const rosterDefaultColumns=['sessions','force','stability','visit','program'];
-function rosterColumns(){const ui=directoryUI().roster;ui.columns??=[...rosterDefaultColumns];return rosterColumnDefinitions.filter(col=>ui.columns.includes(col.key));}
+const ROSTER_SORT_KEYS=new Set(['name','sessions','force','stability','visit','program','clinician','height','weight','activity']);
+const ROSTER_FILTER_KINDS=[
+ {id:'all',label:'All members',values:[['all','All']]},
+ {id:'programStatus',label:'Program status',values:[['active','Active program'],['none','No active program'],['new','No assessment yet']]},
+ {id:'programName',label:'Current program',values:[]},
+ {id:'lastActivity',label:'Last activity',values:[['recent','Within 7 days'],['quiet','8–30 days ago'],['stale','Over 30 days'],['none','No activity']]},
+ {id:'sessions',label:'Sessions',values:[['none','0 sessions'],['few','1–3 sessions'],['many','4 or more']]}
+];
+function rosterUI(){const ui=directoryUI().roster;if(ui.status&&ui.status!=='all'&&!ui.filterKind){ui.filterKind='programStatus';ui.filterValue=ui.status;delete ui.status;}ui.filterKind??='all';ui.filterValue??='all';if(ui.filterKind==='all')ui.filterValue='all';return ui;}
+function rosterProgramOptions(permitted){const names=new Map();for(const p of permitted){const plan=memberPrograms(p.id).find(pr=>pr.completed<pr.total);if(plan)names.set(plan.id,plan.name);}return [...names.entries()].map(([id,name])=>[id,name]);}
+function rosterFilterValueOptions(kind,permitted){const def=ROSTER_FILTER_KINDS.find(item=>item.id===kind)||ROSTER_FILTER_KINDS[0];if(kind==='programName'){const programs=rosterProgramOptions(permitted);return programs.length?programs:[['none','No active programs']];}return def.values;}
+function rosterPassesFilter(row,ui){
+ if(ui.filterKind==='all'||ui.filterValue==='all')return true;
+ if(ui.filterKind==='programStatus'){
+  if(ui.filterValue==='active')return !!row.program;
+  if(ui.filterValue==='none')return !row.program;
+  if(ui.filterValue==='new')return !row.assessment;
+ }
+ if(ui.filterKind==='programName'){if(ui.filterValue==='none')return false;return row.program?.id===ui.filterValue;}
+ if(ui.filterKind==='lastActivity'){
+  const order=row.visit.order,now=Date.UTC(2026,10,13,12),days=order?(now-order)/86400000:null;
+  if(ui.filterValue==='none')return !order;
+  if(ui.filterValue==='recent')return days!==null&&days<=7;
+  if(ui.filterValue==='quiet')return days!==null&&days>7&&days<=30;
+  if(ui.filterValue==='stale')return days===null||days>30;
+ }
+ if(ui.filterKind==='sessions'){
+  const n=row.sessions;
+  if(ui.filterValue==='none')return n===0;
+  if(ui.filterValue==='few')return n>=1&&n<=3;
+  if(ui.filterValue==='many')return n>=4;
+ }
+ return true;
+}
+function rosterColumns(){const ui=rosterUI();ui.columns??=[...rosterDefaultColumns];return rosterColumnDefinitions.filter(col=>ui.columns.includes(col.key));}
+function rosterHeadToolsMarkup(){
+ const count=rosterCompareSelection().length;
+ return `<div class="roster-head-tools" id="roster-head-tools">${count?button('Clear','comparison-clear','ghost small-button',`data-source="roster"`):''}${button(icon('compare','icon-sm')+' Compare'+(count?` (${count})`:''),'comparison-open',count>=2?'small-button':'small-button','data-source="roster" aria-haspopup="dialog" '+(count<2?'disabled':''))}</div>`;
+}
+function rosterFilterToolbar(permitted){
+ const ui=rosterUI(),valueOptions=rosterFilterValueOptions(ui.filterKind,permitted),showValue=ui.filterKind!=='all';
+ return `<div class="directory-toolbar roster-toolbar">${directorySearch('directory-search','Search roster',ui.query,'Search names')}<div class="roster-toolbar-filters"><label class="directory-filter">Filter by<select id="roster-filter-kind">${ROSTER_FILTER_KINDS.map(item=>`<option value="${item.id}" ${ui.filterKind===item.id?'selected':''}>${item.label}</option>`).join('')}</select></label>${showValue?`<label class="directory-filter"><span class="sr-only">Filter value</span><select id="roster-filter-value">${valueOptions.map(([value,label])=>`<option value="${value}" ${ui.filterValue===value?'selected':''}>${label}</option>`).join('')}</select></label>`:''}<button type="button" class="icon-button roster-columns-button" data-action="roster-columns" aria-label="Choose visible columns" aria-haspopup="dialog">${icon('columns')}</button></div></div>`;
+}
 function directoryPersonSummary(p){
  const records=[...state.history.filter(r=>r.personId===p.id),...reportFixtureHistory(p.id)].sort((a,b)=>(b.completedAt||0)-(a.completedAt||0));
  const assessment=records.find(r=>!r.partial&&r.type==='strength'&&r.purpose==='assessment');
@@ -34,11 +76,10 @@ function directoryPersonSummary(p){
  return {sessions:records.length,force:data?.force??null,stability:data?.stability??null,assessment,visit:latest?{label:latest.date,order:latest.completedAt||0}:p.last?{label:p.last,order:Date.UTC(2026,10,parseInt(p.last),12)}:{label:'No activity',order:0}};
 }
 function rosterModel(){
- const ui=directoryUI().roster,query=ui.query.trim().toLowerCase(),permitted=visiblePeople();
+ const ui=rosterUI(),query=ui.query.trim().toLowerCase(),permitted=visiblePeople();
  const rows=permitted.map(p=>({p,clinician:clinicians.find(c=>c.id===p.assigned),...directoryPersonSummary(p),program:memberPrograms(p.id).find(pr=>pr.completed<pr.total),details:state.memberDetails[p.id]||profileExampleDetails[p.id]||{}})).filter(row=>
   (!query||query.split(/\s+/).every(word=>row.p.name.toLowerCase().includes(word)))&&
-  (ui.clinician==='all'||row.p.assigned===ui.clinician)&&
-  (ui.status==='all'||(ui.status==='active'?!!row.program:ui.status==='none'?!row.program:!row.assessment))
+  rosterPassesFilter(row,ui)
  );
  const value=row=>ui.sort==='clinician'?row.clinician.name:ui.sort==='visit'?row.visit.order:ui.sort==='program'?(row.program?.name||null):ui.sort==='height'?(row.details.heightCm??null):ui.sort==='weight'?(row.details.bodyWeightKg??null):ui.sort==='activity'?(row.details.activityLevel||null):['sessions','force','stability'].includes(ui.sort)?row[ui.sort]:row.p.name;
  rows.sort((a,b)=>{const av=value(a),bv=value(b);if(av===null)return bv===null?0:1;if(bv===null)return -1;return (typeof av==='number'?av-bv:String(av).localeCompare(String(bv)))*(ui.descending?-1:1);});
@@ -47,11 +88,10 @@ function rosterModel(){
 function directorySearch(id,label,value,placeholder){return `<div class="search-wrap directory-search">${icon('search')}<label class="sr-only" for="${id}">${label}</label><input id="${id}" type="search" value="${escapeHTML(value)}" placeholder="${placeholder}" autocomplete="off"></div>`;}
 function rosterPage(){
  if(state.actor!=='coach')return peopleView();
- const ui=directoryUI().roster,permitted=visiblePeople(),scope=state.rosterPolicy==='assigned'&&!isAdmin()?'Members assigned to '+clinician().name:'All clinic members';
- const allowedClinicians=clinicians.filter(c=>permitted.some(p=>p.assigned===c.id));
- return `<main class="directory-page"><header class="directory-heading"><div><h1>Roster</h1><p>${escapeHTML(scope)}</p></div><div class="directory-heading-actions"><span class="directory-total">${permitted.length} members</span>${button(icon('plus','icon-sm')+' Add person','add-person','primary','aria-haspopup="dialog"')}</div></header>
- <div class="directory-toolbar">${directorySearch('directory-search','Search roster',ui.query,'Search names')}<label class="directory-filter">Clinician<select id="roster-clinician">${[['all','All clinicians'],...allowedClinicians.map(c=>[c.id,c.name])].map(([value,label])=>`<option value="${value}" ${value===ui.clinician?'selected':''}>${label}</option>`).join('')}</select></label><label class="directory-filter">Program<select id="roster-program-filter">${[['all','Any status'],['active','Active program'],['none','No active program'],['new','No assessment yet']].map(([value,label])=>`<option value="${value}" ${value===ui.status?'selected':''}>${label}</option>`).join('')}</select></label></div>
- <div id="roster-results">${rosterResults()}</div><p class="directory-footnote">Force and stability use the latest complete Isometric assessment. Values are synthetic. Open a name for their workspace or Profile for personal details.</p></main>`;
+ const permitted=visiblePeople(),scope=state.rosterPolicy==='assigned'&&!isAdmin()?'Members assigned to '+clinician().name:'All clinic members';
+ return `<main class="directory-page roster-workspace templates-hub staff-single-pane"><div class="settings-hub-pane" aria-label="Roster"><header class="settings-pane-head"><div class="settings-pane-head-row"><div class="settings-pane-head-text"><h1>Roster</h1><p class="settings-pane-desc">${escapeHTML(scope)}</p></div><div class="settings-pane-head-actions">${rosterHeadToolsMarkup()}${button(icon('plus','icon-sm')+' Add person','add-person','primary','aria-haspopup="dialog"')}</div></div></header>
+ ${rosterFilterToolbar(permitted)}
+ <div id="roster-results">${rosterResults()}</div></div></main>`;
 }
 function rosterCell(row,key){
  const missing='<span class="muted" aria-label="Not recorded">—</span>';
@@ -67,12 +107,19 @@ function rosterCell(row,key){
  return missing;
 }
 function rosterResults(){
- const {rows,permitted}=rosterModel(),ui=directoryUI().roster,columns=rosterColumns();
- const heading=(key,label,width)=>`<th scope="col" style="min-width:${width}px" aria-sort="${ui.sort===key?(ui.descending?'descending':'ascending'):'none'}"><button data-action="sort-roster" data-sort="${key}">${label}${ui.sort===key?icon('down','sort-icon '+(ui.descending?'descending':'ascending')):''}</button></th>`;
- return `<div class="directory-selection-row"><p class="directory-result-count" role="status">${rows.length} of ${permitted.length} members</p>${comparisonSelectionTools('roster')}</div>${rows.length?`<div class="directory-table-scroll" tabindex="0" role="region" aria-label="Roster table, scroll for more columns"><table class="data-table directory-table roster-grid" style="min-width:${304+columns.reduce((sum,col)=>sum+col.width,0)}px"><caption class="sr-only">Clinic member roster</caption><thead><tr><th scope="col" class="comparison-select-column"><span class="sr-only">Compare</span></th>${heading('name','Name',195)}${columns.map(col=>heading(col.key,col.label,col.width)).join('')}<th scope="col"><span class="sr-only">Profile</span></th></tr></thead><tbody>${rows.map(row=>`<tr class="${rosterCompareSelection().includes(row.p.id)?'is-selected':''}"><td class="comparison-select-column">${comparisonCheckbox('roster',row.p.id,row.assessment,row.p.name)}</td><th scope="row"><div class="directory-identity">${photoAvatar(row.p,'mini')}<button class="directory-person" data-action="open-roster-person" data-id="${row.p.id}"><span>${escapeHTML(row.p.name)}</span></button></div></th>${columns.map(col=>`<td>${rosterCell(row,col.key)}</td>`).join('')}<td><button class="text-button" data-action="open-roster-profile" data-id="${row.p.id}" aria-label="Open ${escapeHTML(row.p.name)} profile">Profile</button></td></tr>`).join('')}</tbody></table></div>`:`<div class="directory-empty"><h2>No matching members</h2><p>Try another name or clear the filters.</p>${button('Clear filters','clear-roster-filters','small-button')}</div>`}`;
+ const {rows,permitted}=rosterModel(),ui=rosterUI(),columns=rosterColumns(),compareCount=rosterCompareSelection().length;
+ const footer=`<footer class="roster-table-footer"><p class="directory-result-count" role="status">${rows.length} of ${permitted.length} members</p>${compareCount?`<p class="roster-compare-hint muted small">${compareCount} selected for compare</p>`:''}</footer>`;
+ if(!rows.length)return `<div class="directory-empty"><h2>No matching members</h2><p>Try another name or clear the filters.</p>${button('Clear filters','clear-roster-filters','small-button')}</div>`;
+ return `<div class="roster-table-shell"><div class="directory-table-scroll roster-table-scroll" tabindex="0" role="region" aria-label="Roster table, scroll for more columns"><table class="data-table directory-table roster-grid" style="min-width:${304+columns.reduce((sum,col)=>sum+col.width,0)}px"><caption class="sr-only">Clinic member roster</caption><thead><tr><th scope="col" class="comparison-select-column roster-sticky-head"><span class="sr-only">Compare</span></th><th scope="col" class="roster-sticky-head" style="min-width:195px" aria-sort="${ui.sort==='name'?(ui.descending?'descending':'ascending'):'none'}"><button type="button" data-action="sort-roster" data-sort="name">Name${ui.sort==='name'?icon('down','sort-icon '+(ui.descending?'descending':'ascending')):''}</button></th>${columns.map(col=>`<th scope="col" class="roster-sticky-head" style="min-width:${col.width}px" aria-sort="${ui.sort===col.key?(ui.descending?'descending':'ascending'):'none'}"><button type="button" data-action="sort-roster" data-sort="${col.key}">${col.label}${ui.sort===col.key?icon('down','sort-icon '+(ui.descending?'descending':'ascending')):''}</button></th>`).join('')}<th scope="col" class="roster-sticky-head roster-profile-cell"><span class="sr-only">Profile</span><span class="roster-profile-head-icon" aria-hidden="true">${icon('user')}</span></th></tr></thead><tbody>${rows.map(row=>`<tr class="${rosterCompareSelection().includes(row.p.id)?'is-selected':''}"><td class="comparison-select-column">${comparisonCheckbox('roster',row.p.id,row.assessment,row.p.name)}</td><th scope="row"><div class="directory-identity">${photoAvatar(row.p,'mini')}<button type="button" class="directory-person" data-action="open-roster-person" data-id="${row.p.id}"><span>${escapeHTML(row.p.name)}</span></button></div></th>${columns.map(col=>`<td>${rosterCell(row,col.key)}</td>`).join('')}<td class="roster-profile-cell"><button type="button" class="icon-button roster-profile-button" data-action="open-roster-profile" data-id="${row.p.id}" aria-label="Open ${escapeHTML(row.p.name)} profile">${icon('user')}</button></td></tr>`).join('')}</tbody></table></div>${footer}</div>`;
 }
 function rosterColumnsDialog(){const selected=rosterColumns().map(col=>col.key);return `<div class="modal-backdrop"><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">Roster columns</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header><p class="directory-dialog-intro">Name and Profile stay visible.</p><div class="roster-column-options">${rosterColumnDefinitions.map(col=>`<label class="check-label"><input type="checkbox" name="roster-column" value="${col.key}" ${selected.includes(col.key)?'checked':''}>${col.label}${col.key==='weight'?' · kg':''}${col.key==='force'?' · kg':''}</label>`).join('')}</div><footer class="directory-dialog-footer">${button('Cancel','close-modal')}${button('Apply columns','apply-roster-columns','primary')}</footer></section></div>`;}
-function refreshRoster(){const slot=$('#roster-results');if(slot)slot.innerHTML=rosterResults();}
+function refreshRoster({refreshToolbar=false}={}){
+ const slot=$('#roster-results');
+ if(slot)slot.innerHTML=rosterResults();
+ const tools=$('#roster-head-tools');
+ if(tools)tools.outerHTML=rosterHeadToolsMarkup();
+ if(refreshToolbar){const toolbar=$('.roster-toolbar');if(toolbar)toolbar.outerHTML=rosterFilterToolbar(visiblePeople());}
+}
 function newPersonClinicians(){return state.rosterPolicy==='assigned'&&!isAdmin()?[clinician()]:clinicians;}
 function addPersonDialog(){return `<div class="modal-backdrop"><section class="dialog directory-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="add-person-intro"><header class="dialog-header"><h2 id="dialog-title">Add person</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header><p id="add-person-intro" class="directory-dialog-intro">Add a photo and name. Personal details can follow.</p><form id="add-person-form">${photoCaptureControl('new-person',state.overlay)}<label class="field-label" for="new-person-name">Full name</label><input id="new-person-name" name="name" type="text" autocomplete="off" required maxlength="80" placeholder="First and last name"><label class="field-label" for="new-person-clinician">Assigned clinician</label><select id="new-person-clinician">${newPersonClinicians().map(c=>`<option value="${c.id}" ${c.id===state.clinicianId?'selected':''}>${escapeHTML(c.name)}</option>`).join('')}</select><p class="program-form-note">Saved for this demo only.</p><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" class="button primary">Add person</button></footer></form></section></div>`;}
 function saveNewPerson(){
@@ -82,7 +129,7 @@ function saveNewPerson(){
  const words=name.split(' '),initials=[words[0],...(words.length>1?[words.at(-1)]:[])].map(word=>Array.from(word)[0]).join('').toLocaleUpperCase();
  const member={id:'person-'+crypto.randomUUID(),name,initials,assigned,color:'',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false,createdInDemo:true};
  people.push(member);if(state.overlay.photo)state.memberPhotos[member.id]=state.overlay.photo;state.overlay=null;
- Object.assign(directoryUI().roster,{query:'',clinician:'all',status:'all'});
+ Object.assign(directoryUI().roster,{query:'',filterKind:'all',filterValue:'all'});
  openDirectoryPerson(member.id,'roster','profile');
  $('.member-identity h1')?.setAttribute('tabindex','-1');$('.member-identity h1')?.focus({preventScroll:true});toast(name+' added.');
 }
@@ -108,7 +155,8 @@ const TEMPLATE_LIBRARIES=[
 ];
 function programFields(draft,prefix='plan',tracked=false){
  const field=name=>tracked?`data-program-field="${name}"`:'';
- return `<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><label>Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-form-grid"><label>Training mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('training').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label><label>Number of sessions<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n} sessions</option>`).join('')}</select></label><label>Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n} directions</option>`).join('')}</select></label><label>Reps per direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n} ${n===1?'rep':'reps'}</option>`).join('')}</select></label></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
+ const holdStyle=draft.holdStyle||'timed';
+ return `<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><label>Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-form-grid"><label>Training mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('training').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label>${draft.type==='strength'?`<label>Hold time<select id="${prefix}-hold-style" ${field('holdStyle')}><option value="timed" ${holdStyle==='timed'?'selected':''}>Seconds</option><option value="endurance" ${holdStyle==='endurance'?'selected':''}>Endurance</option></select></label>`:''}<label>Number of sessions<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n} sessions</option>`).join('')}</select></label><label>Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n} directions</option>`).join('')}</select></label><label>Reps per direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n} ${n===1?'rep':'reps'}</option>`).join('')}</select></label></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
 }
 function templatesHubRail(activeLibraryId){
  return `<nav class="settings-hub-rail" aria-label="Template libraries">
@@ -180,9 +228,9 @@ function programLibraryBody(){
 }
 function programsResults(){
  const ui=directoryUI().programs,q=ui.query.trim().toLowerCase(),assigned=ui.tab==='assigned';
- const rows=assigned?assignedPrograms().filter(({p,program})=>(program.name+' '+p.name+' '+sessionModes[program.type].name).toLowerCase().includes(q)):clinicProgramTemplates().filter(p=>(p.name+' '+sessionModes[p.type].name).toLowerCase().includes(q));
+ const rows=assigned?assignedPrograms().filter(({p,program})=>(program.name+' '+p.name+' '+programModeLabel(program)).toLowerCase().includes(q)):clinicProgramTemplates().filter(p=>(p.name+' '+programModeLabel(p)).toLowerCase().includes(q));
  if(!rows.length)return `<div class="directory-empty"><h2>${q?'No matching programs':assigned?'No assigned programs':'No program templates'}</h2><p>${q?'Try another name or mode.':assigned?'Choose a template and assign it to a member.':'Create a reusable plan to assign to people.'}</p>${q?button('Clear search','clear-programs-search','small-button'):assigned?button('Browse templates','browse-templates','small-button'):button('New template','new-template','small-button','aria-label="New program template"')}</div>`;
- return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="${assigned?'Assigned programs':'Program templates'}, scroll for more columns"><table class="data-table directory-table program-grid"><caption class="sr-only">${assigned?'Assigned programs':'Program templates'}</caption><thead><tr><th scope="col">${assigned?'Person':'Program'}</th><th scope="col">${assigned?'Program':'Mode'}</th><th scope="col">${assigned?'Progress':'Sessions'}</th><th scope="col">Setup</th><th scope="col">Target progression</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>${rows.map(row=>{const p=assigned?row.program:row,member=assigned?row.p:null;return `<tr><th scope="row">${assigned?`<div class="directory-identity">${photoAvatar(member,'mini')}<button class="directory-person" data-action="program-member" data-id="${member.id}"><span>${escapeHTML(member.name)}</span></button></div>`:`<button class="program-name-button" data-action="edit-template" data-id="${p.id}">${escapeHTML(p.name)}${icon('chevron','icon-sm')}</button>`}</th><td>${assigned?`<strong>${escapeHTML(p.name)}</strong><small>${sessionModes[p.type].name}</small>`:sessionModes[p.type].name}</td><td>${assigned?`<strong>${p.completed} / ${p.total}</strong><small>${p.completed>=p.total?'Completed':'Sessions completed'}</small>`:p.total}</td><td>${p.positions} directions<small>${p.reps} reps per direction</small></td><td>${programLoadLabel(p)}</td><td>${assigned?(p.completed<p.total?button('Continue','continue-assigned','small-button',`data-id="${member.id}" data-program-id="${p.id}" aria-label="Continue ${escapeHTML(p.name)} for ${escapeHTML(member.name)}"`):button('Open person','program-member','small-button',`data-id="${member.id}"`)):button('Assign','assign-template','small-button',`data-id="${p.id}" aria-label="Assign ${escapeHTML(p.name)}"`)}</td></tr>`;}).join('')}</tbody></table></div>`;
+ return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="${assigned?'Assigned programs':'Program templates'}, scroll for more columns"><table class="data-table directory-table program-grid"><caption class="sr-only">${assigned?'Assigned programs':'Program templates'}</caption><thead><tr><th scope="col">${assigned?'Person':'Program'}</th><th scope="col">${assigned?'Program':'Mode'}</th><th scope="col">${assigned?'Progress':'Sessions'}</th><th scope="col">Setup</th><th scope="col">Target progression</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>${rows.map(row=>{const p=assigned?row.program:row,member=assigned?row.p:null;return `<tr><th scope="row">${assigned?`<div class="directory-identity">${photoAvatar(member,'mini')}<button class="directory-person" data-action="program-member" data-id="${member.id}"><span>${escapeHTML(member.name)}</span></button></div>`:`<button class="program-name-button" data-action="edit-template" data-id="${p.id}">${escapeHTML(p.name)}${icon('chevron','icon-sm')}</button>`}</th><td>${assigned?`<strong>${escapeHTML(p.name)}</strong><small>${programModeLabel(p)}</small>`:programModeLabel(p)}</td><td>${assigned?`<strong>${p.completed} / ${p.total}</strong><small>${p.completed>=p.total?'Completed':'Sessions completed'}</small>`:p.total}</td><td>${p.positions} directions<small>${p.reps} reps per direction</small></td><td>${programLoadLabel(p)}</td><td>${assigned?(p.completed<p.total?button('Continue','continue-assigned','small-button',`data-id="${member.id}" data-program-id="${p.id}" aria-label="Continue ${escapeHTML(p.name)} for ${escapeHTML(member.name)}"`):button('Open person','program-member','small-button',`data-id="${member.id}"`)):button('Assign','assign-template','small-button',`data-id="${p.id}" aria-label="Assign ${escapeHTML(p.name)}"`)}</td></tr>`;}).join('')}</tbody></table></div>`;
 }
 function directoryDialog(o){
  const template=clinicProgramTemplates().find(p=>p.id===o.id),editing=o.type==='program-editor',draft=template||{name:'',type:'strength',total:6,positions:4,reps:3,load:{kind:'assessment',percent:60,increase:0,increaseKind:'percent'}};
@@ -193,7 +241,8 @@ function directoryDialog(o){
 function saveProgramTemplate(){
  if(state.actor!=='coach'||state.overlay?.type!=='program-editor')return;
  const form=$('#template-form'),name=$('#plan-name');name.setCustomValidity(name.value.trim()?'':'Enter a program name.');if(!form.reportValidity())return;
- const draft={name:name.value.trim(),type:$('#plan-mode').value,total:Number($('#plan-total').value),positions:Number($('#plan-positions').value),reps:Number($('#plan-reps').value)};
+ const draft={name:name.value.trim(),type:$('#plan-mode').value,holdStyle:$('#plan-hold-style')?.value==='endurance'?'endurance':'timed',total:Number($('#plan-total').value),positions:Number($('#plan-positions').value),reps:Number($('#plan-reps').value)};
+ if(draft.type!=='strength')draft.holdStyle='timed';
  if(!sessionModeKeys('training').includes(draft.type)||![2,4,6,8,12].includes(draft.total)||![4,8].includes(draft.positions)||![1,2,3,4,5].includes(draft.reps))return;
  const load=validateProgramLoadForm('plan',draft.total);if(!load)return;draft.load=load;
  const templates=clinicProgramTemplates(),existing=templates.find(p=>p.id===state.overlay.id);
@@ -205,18 +254,18 @@ function assignProgramTemplate(){
  const field=$('#assign-person'),template=clinicProgramTemplates().find(p=>p.id===state.overlay.id),member=visiblePeople().find(p=>p.id===field.value);
  if(!template||!member){$('#assign-program-form').reportValidity();return;}
  if(memberPrograms(member.id).some(p=>p.templateId===template.id&&p.completed<p.total)){field.setCustomValidity('This person already has an active copy of this program.');field.reportValidity();return;}
- memberPrograms(member.id).unshift({id:'program-'+Date.now(),templateId:template.id,name:template.name,type:template.type,total:template.total,positions:template.positions,reps:template.reps,load:{...programLoad(template)},completed:0});
+ memberPrograms(member.id).unshift({id:'program-'+Date.now(),templateId:template.id,name:template.name,type:template.type,holdStyle:template.holdStyle||'timed',total:template.total,positions:template.positions,reps:template.reps,load:{...programLoad(template)},completed:0});
  state.overlay=null;Object.assign(directoryUI().programs,{tab:'assigned',query:'',library:'programs'});openDirectoryPerson(member.id,'programs');toast('Program assigned to '+member.name+'.');
 }
 const directoryActions={
  'add-person':()=>{if(state.actor!=='coach')return;openModal('add-person');$('#new-person-name')?.focus();},
  'roster-columns':()=>{if(state.actor==='coach')openModal('roster-columns');},
- 'apply-roster-columns':()=>{if(state.actor!=='coach'||state.overlay?.type!=='roster-columns')return;const ui=directoryUI().roster;ui.columns=$$('input[name="roster-column"]:checked').map(el=>el.value).filter(key=>rosterColumnDefinitions.some(col=>col.key===key));if(!ui.columns.includes(ui.sort))ui.sort='name';state.overlay=null;render();$('[data-action="roster-columns"]')?.focus();},
- 'nav-home':()=>visitHome(),'nav-roster':()=>visitDirectory('roster'),'nav-programs':()=>visitDirectory('programs'),
+ 'apply-roster-columns':()=>{if(state.actor!=='coach'||state.overlay?.type!=='roster-columns')return;const ui=rosterUI();ui.columns=$$('input[name="roster-column"]:checked').map(el=>el.value).filter(key=>rosterColumnDefinitions.some(col=>col.key===key));if(!ROSTER_SORT_KEYS.has(ui.sort)||(ui.sort!=='name'&&!ui.columns.includes(ui.sort)))ui.sort='name';state.overlay=null;render();$('[data-action="roster-columns"]')?.focus();},
+ 'nav-pulse':()=>visitPulse(),'nav-roster':()=>visitDirectory('roster'),'nav-programs':()=>visitDirectory('programs'),
  'open-roster-person':el=>openDirectoryPerson(el.dataset.id,'roster'),
  'open-roster-profile':el=>openDirectoryPerson(el.dataset.id,'roster','profile'),
- 'sort-roster':el=>{const ui=directoryUI().roster,key=el.dataset.sort;if(key!=='name'&&!rosterColumnDefinitions.some(col=>col.key===key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-sort="${key}"]`)?.focus();},
- 'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',clinician:'all',status:'all',sort:'name',descending:false});render();$('#directory-search')?.focus();},
+ 'sort-roster':el=>{const ui=rosterUI(),key=el.dataset.sort;if(!ROSTER_SORT_KEYS.has(key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-action="sort-roster"][data-sort="${key}"]`)?.focus({preventScroll:true});},
+ 'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',filterKind:'all',filterValue:'all',sort:'name',descending:false});render();$('#directory-search')?.focus();},
  'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;directoryUI().programs.library=el.dataset.library;render();$(`[data-action="templates-library"][data-library="${el.dataset.library}"]`)?.focus();},
  'team-assessment-positions':el=>{
   if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
@@ -250,8 +299,9 @@ document.addEventListener('input',event=>{
  if(el.id==='plan-name'||el.id==='new-person-name')el.setCustomValidity('');
 });
 document.addEventListener('change',event=>{
- const el=event.target;if(el.id==='roster-clinician'){directoryUI().roster.clinician=el.value;refreshRoster();}
- if(el.id==='roster-program-filter'){directoryUI().roster.status=el.value;refreshRoster();}
+ const el=event.target;
+ if(el.id==='roster-filter-kind'){const ui=rosterUI();ui.filterKind=el.value;const options=rosterFilterValueOptions(ui.filterKind,visiblePeople());ui.filterValue=ui.filterKind==='all'?'all':options[0]?.[0]||'all';refreshRoster({refreshToolbar:true});el.focus();}
+ if(el.id==='roster-filter-value'){rosterUI().filterValue=el.value;refreshRoster();el.focus();}
  if(el.id==='assign-person')el.setCustomValidity('');
  if(el.id==='team-assessment-mode'&&state.nav==='programs'&&directoryUI().programs.library==='assessments'){
   teamAssessmentConfig().activeMode=el.value;

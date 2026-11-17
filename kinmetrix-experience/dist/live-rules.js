@@ -29,7 +29,7 @@ function liveSimulate(s){
   s.tiltNow=sim.tilt.start+span*(1-Math.pow(1-reach,2))+(reach>=1?Math.sin(t*5)*.08:0);
   const stoppedFor=Math.max(0,t-span/6);s.effort=3*ramp*(1+Math.sin(t*3)*.008)*Math.max(.3,1-stoppedFor*.02);
   s.force=s.tiltNow;
- }else if(type==='endurance'){
+ }else if(isIsometricEndurance(cfg)){
   // Ramp up, hold steady, then a quick fatigue drop.
   const tired=Math.max(0,t-sim.fatigueAt);
   s.force=cfg.weight*ramp*wobble*Math.max(.25,1-tired*.24);s.effort=s.force;
@@ -51,7 +51,7 @@ function liveSimulate(s){
 function liveEndReason(s){
  const cfg=state.setup,type=cfg.type;
  if(!s.armed)return null;
- if(type==='strength'){s.note='';return s.seconds>=cfg.holdSeconds?'Timed hold':null;}
+ if(type==='strength'&&!isIsometricEndurance(cfg)){s.note='';return s.seconds>=cfg.holdSeconds?'Timed hold':null;}
  if(type==='eccentric'||type==='isokinetic'){
   if(type==='eccentric'&&s.force>cfg.eccCap)return 'Safety stop · force cap reached';
   // Eccentric stops at once when the person lets go; isokinetic allows a short grace time.
@@ -60,7 +60,7 @@ function liveEndReason(s){
   s.note=`Pad at ${Math.round(s.tiltNow)}°`;
   return s.progress>=1?'Movement complete':null;
  }
- if(type==='endurance'){
+ if(type==='strength'&&isIsometricEndurance(cfg)){
   if(cfg.endCapOn&&s.seconds>=cfg.endCap)return 'Time cap reached';
   const seconds=s.perSecond;s.note=s.hold?s.note:'';if(!seconds.length)return null;
   // Steady seconds are those close to the best second so far. This leaves out the ramp up.
@@ -86,9 +86,10 @@ function liveEndReason(s){
 function liveScaleMax(){const s=state.session;return state.setup.type==='rom'?(s?.sim?.tilt.end||SETUP_MAX_TILT):state.setup.weight*1.25;}
 function liveChallengePercent(){const cfg=state.setup;return cfg.type==='rom'?null:Math.min(100,cfg.challenge/(cfg.weight*1.25)*100);}
 function liveUnitLabel(){const cfg=state.setup;return cfg.type==='rom'?'° tilt':`kg / ${cfg.weight} target<br>${cfg.challenge} challenge`;}
-function liveElapsedLabel(){const cfg=state.setup;return cfg.type==='strength'?`of ${cfg.holdSeconds} second hold`:cfg.type==='endurance'?'seconds held':'seconds elapsed';}
+function liveElapsedLabel(){const cfg=state.setup;if(cfg.type==='strength')return isIsometricEndurance(cfg)?'seconds held':`of ${cfg.holdSeconds} second hold`;return 'seconds elapsed';}
 function liveInstruction(){
  const cfg=state.setup;
- return ({strength:`Aim for ${cfg.weight} kg and hold for ${cfg.holdSeconds} seconds. Timing starts above ${cfg.challenge} kg.`,endurance:`No countdown. The rep ends by itself when your force drops ${cfg.endDrop}% below your hold.`,rom:'Move as far as is comfortable. The rep ends when you stop moving.',eccentric:`The device moves the pad back at ${eccentricSpeeds[cfg.eccSpeed].label.toLowerCase()} speed. Resist all the way. It stops if you let go.`,isokinetic:`Push above ${cfg.challenge} kg and the pad moves with you. Ease off and it stops.`})[cfg.type];
+ if(cfg.type==='strength')return isIsometricEndurance(cfg)?`No countdown. The rep ends by itself when your force drops ${cfg.endDrop}% below your hold.`:`Aim for ${cfg.weight} kg and hold for ${cfg.holdSeconds} seconds. Timing starts above ${cfg.challenge} kg.`;
+ return ({rom:'Move as far as is comfortable. The rep ends when you stop moving.',eccentric:`The device moves the pad back at ${eccentricSpeeds[cfg.eccSpeed].label.toLowerCase()} speed. Resist all the way. It stops if you let go.`,isokinetic:`Push above ${cfg.challenge} kg and the pad moves with you. Ease off and it stops.`})[cfg.type];
 }
-function liveBusyLabel(){return ({strength:'Hold in progress…',endurance:'Holding…',rom:'Measuring…',eccentric:'Device moving…',isokinetic:'Moving…'})[state.setup.type];}
+function liveBusyLabel(){const cfg=state.setup;if(cfg.type==='strength')return isIsometricEndurance(cfg)?'Holding…':'Hold in progress…';return ({rom:'Measuring…',eccentric:'Device moving…',isokinetic:'Moving…'})[cfg.type];}

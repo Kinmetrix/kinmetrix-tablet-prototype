@@ -19,8 +19,7 @@ const TEAM_WAIVER_POLICIES = [
 const SETTINGS_RAIL_SECTIONS = [
   {id: 'station', label: 'Station', description: 'Team and station preferences for this clinic.'},
   {id: 'onboarding', label: 'Onboarding', description: 'Fields collected for a new person.'},
-  {id: 'waiver', label: 'Waiver', description: 'When members should sign a waiver.'},
-  {id: 'session-plan', label: 'Session plan', description: 'Default follow-up cadence after an assessment.'}
+  {id: 'waiver', label: 'Waiver', description: 'When members should sign a waiver.'}
 ];
 
 function teamSettings() {
@@ -39,7 +38,108 @@ function teamSettings() {
   if (!TEAM_WAIVER_POLICIES.some(item => item.id === team.waiverPolicy)) team.waiverPolicy = defaults.waiverPolicy;
   team.sessionPlan = {...defaults.sessionPlan, ...team.sessionPlan};
   if (!clinicSessionTemplates().some(item => item.id === team.sessionPlan.templateId)) team.sessionPlan.templateId = 'light';
+  team.assessment = normalizeTeamAssessment(team.assessment);
   return team;
+}
+
+const TEAM_ASSESSMENT_DEFAULTS = {
+  activeMode: 'strength',
+  holdStyle: 'timed',
+  positions: 4,
+  reps: 3,
+  weight: 12,
+  tiltStart: 5,
+  tiltEnd: 33,
+  romStart: 0,
+  romMax: 45
+};
+
+function normalizeTeamAssessment(raw) {
+  const assessment = {...TEAM_ASSESSMENT_DEFAULTS, ...raw};
+  if (!sessionModeKeys('assessment').includes(assessment.activeMode)) assessment.activeMode = TEAM_ASSESSMENT_DEFAULTS.activeMode;
+  assessment.holdStyle = assessment.activeMode === 'strength' && assessment.holdStyle === 'endurance' ? 'endurance' : 'timed';
+  assessment.positions = assessment.positions === 8 ? 8 : 4;
+  assessment.reps = [1, 2, 3, 4, 5].includes(assessment.reps) ? assessment.reps : 3;
+  assessment.weight = Math.min(50, Math.max(1, Number(assessment.weight) || TEAM_ASSESSMENT_DEFAULTS.weight));
+  assessment.tiltStart = Math.min(SETUP_MAX_TILT, Math.max(0, Number(assessment.tiltStart) ?? TEAM_ASSESSMENT_DEFAULTS.tiltStart));
+  assessment.tiltEnd = Math.min(SETUP_MAX_TILT, Math.max(assessment.tiltStart + 1, Number(assessment.tiltEnd) ?? TEAM_ASSESSMENT_DEFAULTS.tiltEnd));
+  assessment.romStart = Math.min(assessment.romMax - 1, Math.max(0, Number(assessment.romStart) ?? 0));
+  assessment.romMax = Math.min(SETUP_MAX_TILT, Math.max(assessment.romStart + 1, Number(assessment.romMax) ?? TEAM_ASSESSMENT_DEFAULTS.romMax));
+  return assessment;
+}
+
+function teamAssessmentConfig() {
+  return teamSettings().assessment;
+}
+
+function teamAssessmentArcLabel(modeKey) {
+  const kind = setupTiltKind(modeKey);
+  return ({fixed: 'Fixed pad', travel: 'Controlled travel', return: 'Resisted return', limit: 'Range limit'})[kind] || 'Pad motion';
+}
+
+function assessmentProtocolRow(label, control, detail = '') {
+  return `<div class="assessment-protocol-row">
+    <div class="assessment-protocol-row__text">
+      <span class="field-label">${label}</span>
+      ${detail ? `<p class="muted small">${detail}</p>` : ''}
+    </div>
+    <div class="assessment-protocol-row__control">${control}</div>
+  </div>`;
+}
+
+function teamAssessmentArcFieldsMarkup(assessment) {
+  const kind = setupTiltKind(assessment.activeMode);
+  if (kind === 'limit') {
+    return assessmentProtocolRow('Start tilt', `<input id="team-rom-start" type="number" min="0" max="${assessment.romMax - 1}" step="1" value="${assessment.romStart}" inputmode="numeric" aria-label="Start tilt degrees">`, 'ROM assessments start here.')
+      + assessmentProtocolRow('Max tilt', `<input id="team-rom-max" type="number" min="${assessment.romStart + 1}" max="${SETUP_MAX_TILT}" step="1" value="${assessment.romMax}" inputmode="numeric" aria-label="Max tilt degrees">`, 'Safety limit the pad never passes.');
+  }
+  const endRow = kind === 'fixed' ? '' : assessmentProtocolRow(kind === 'return' ? 'End tilt' : 'End travel', `<input id="team-tilt-end" type="number" min="0" max="${SETUP_MAX_TILT}" step="1" value="${assessment.tiltEnd}" inputmode="numeric" aria-label="End tilt degrees">`, kind === 'return' ? 'Pad returns toward this tilt.' : 'Pad travels to this tilt each rep.');
+  const startDetail = kind === 'fixed' ? 'Same tilt for every direction until session setup.' : 'Default start for each direction.';
+  return assessmentProtocolRow('Start tilt', `<input id="team-tilt-start" type="number" min="0" max="${SETUP_MAX_TILT}" step="1" value="${assessment.tiltStart}" inputmode="numeric" aria-label="Start tilt degrees">`, startDetail) + endRow;
+}
+
+function assessmentWorkspaceTab() {
+  const ui = directoryUI().programs;
+  const tab = ui.assessmentTab ?? 'protocol';
+  ui.assessmentTab = tab === 'session-plan' ? 'session-plan' : 'protocol';
+  return ui.assessmentTab;
+}
+
+function assessmentWorkspaceSubnav() {
+  const tab = assessmentWorkspaceTab();
+  return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Assessment views">${[['protocol', 'Protocol'], ['session-plan', 'Session plan']].map(([key, label]) => `<button type="button" data-action="assessment-tab" data-tab="${key}" ${tab === key ? 'aria-current="page"' : ''}>${label}</button>`).join('')}</nav>`;
+}
+
+function teamAssessmentProtocolMarkup() {
+  const assessment = teamAssessmentConfig();
+  const modeKey = assessment.activeMode;
+  const mode = sessionModes[modeKey];
+  const arcHint = `${teamAssessmentArcLabel(modeKey)} · ${setupModeLine[modeKey]}`;
+  const unit = exportForceUnits[teamSettings().forceUnit]?.short || 'kg';
+  const directions = `<div class="segmented" role="group" aria-label="Directions">${[4, 8].map(n => `<button type="button" class="${assessment.positions === n ? 'active' : ''}" data-action="team-assessment-positions" data-value="${n}" aria-pressed="${assessment.positions === n}">${n}</button>`).join('')}</div>`;
+  const reps = `<select id="team-assessment-reps" aria-label="Reps per direction">${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${assessment.reps === n ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
+  const weight = modeKey === 'rom'
+    ? `<span class="assessment-protocol-static muted">Not used for ROM</span>`
+    : `<div class="weight-input assessment-weight-input"><input id="team-assessment-weight" type="number" min="1" max="50" step="0.5" value="${assessment.weight}" inputmode="decimal" aria-label="Target force"><span>${unit}</span></div>`;
+  return `<div class="assessment-workspace">
+    <p class="assessment-workspace-lead">Team defaults for session setup. Per-direction tilts stay on the setup screen before Begin.</p>
+    <section class="assessment-protocol-panel" aria-labelledby="assessment-defaults-title">
+      <h2 id="assessment-defaults-title" class="sr-only">Assessment defaults</h2>
+      <p class="assessment-arc-kind"><strong>${escapeHTML(mode.name)}</strong> · ${escapeHTML(arcHint)}</p>
+      ${assessmentProtocolRow('Mode', `<select id="team-assessment-mode" aria-label="Assessment mode">${sessionModeKeys('assessment').map(key => `<option value="${key}" ${key === modeKey ? 'selected' : ''}>${sessionModes[key].name}</option>`).join('')}</select>`)}
+      ${modeKey === 'strength' ? assessmentProtocolRow('Hold time', `<select id="team-assessment-hold-style" aria-label="Isometric hold time"><option value="timed" ${assessment.holdStyle !== 'endurance' ? 'selected' : ''}>Seconds</option><option value="endurance" ${assessment.holdStyle === 'endurance' ? 'selected' : ''}>Endurance</option></select>`, 'Timed hold or hold until release.') : ''}
+      ${teamAssessmentArcFieldsMarkup(assessment)}
+      ${assessmentProtocolRow('Directions', directions)}
+      ${assessmentProtocolRow('Reps / direction', reps)}
+      ${modeKey === 'rom' ? '' : assessmentProtocolRow('Target force', weight, 'Starting target when no member baseline exists.')}
+    </section>
+  </div>`;
+}
+
+function teamAssessmentWorkspaceMarkup() {
+  const tab = assessmentWorkspaceTab();
+  const body = tab === 'session-plan' ? teamFollowUpPlanFieldsMarkup() : teamAssessmentProtocolMarkup();
+  return `${assessmentWorkspaceSubnav()}${body}`;
 }
 
 function sessionPlanTemplate(id) {
@@ -159,27 +259,26 @@ function teamWaiverBody() {
     </section>`;
 }
 
-function teamSessionPlanBody() {
+function teamFollowUpPlanFieldsMarkup() {
   const plan = teamSettings().sessionPlan;
-  return `<section class="settings-block settings-plan-fields" aria-label="Session plan defaults">
-      <div class="settings-hub-pane-toolbar">
-        <div><p class="muted small">Defaults for the follow-up plan after an assessment.</p></div>
-        ${button('Save', 'save-session-plan-defaults', 'primary')}
-      </div>
+  return `<div class="assessment-workspace settings-plan-fields">
+      <p class="assessment-workspace-lead">Defaults for the coach step on the report after a completed assessment.</p>
+      <section class="settings-block assessment-workspace-followup" aria-labelledby="follow-up-plan-title">
+      <h2 id="follow-up-plan-title" class="sr-only">Session plan defaults</h2>
       <label class="field-label" for="plan-sessions">Sessions / week</label>
       <select id="plan-sessions">${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${plan.sessionsPerWeek === n ? 'selected' : ''}>${n}</option>`).join('')}</select>
       <label class="field-label" for="plan-weeks">Weeks</label>
       <select id="plan-weeks">${[4, 5, 6, 7, 8].map(n => `<option value="${n}" ${plan.weeks === n ? 'selected' : ''}>${n}</option>`).join('')}</select>
-      <label class="field-label" for="plan-template">Session template</label>
+      <label class="field-label" for="plan-template">Load preset</label>
       <select id="plan-template">${clinicSessionTemplates().map(item => `<option value="${item.id}" ${plan.templateId === item.id ? 'selected' : ''}>${item.name} · ${item.detail}</option>`).join('')}</select>
-      <p class="directory-footnote">New plans start from ${escapeHTML(sessionPlanLine(plan))}.</p>
-    </section>`;
+      <p class="directory-footnote">${escapeHTML(sessionPlanLine(plan))} · presets from <strong>Sessions</strong> in this hub</p>
+    </section>
+  </div>`;
 }
 
 function settingsRailPane(section) {
   if (section === 'onboarding') return teamOnboardingBody();
   if (section === 'waiver') return teamWaiverBody();
-  if (section === 'session-plan') return teamSessionPlanBody();
   return teamStationBlocks();
 }
 
@@ -248,14 +347,39 @@ const teamSettingsActions = {
     teamSettings().waiverPolicy = value;
     toast('Waiver policy saved.');
   },
-  'save-session-plan-defaults': () => {
-    if (state.actor !== 'coach' || state.nav !== 'settings' || state.settingsHubSection !== 'session-plan') return;
-    const sessions = Number($('#plan-sessions').value);
-    const weeks = Number($('#plan-weeks').value);
-    const templateId = $('#plan-template').value;
-    if (![1, 2, 3, 4, 5].includes(sessions) || ![4, 5, 6, 7, 8].includes(weeks) || !sessionPlanTemplate(templateId)) return;
-    teamSettings().sessionPlan = {sessionsPerWeek: sessions, weeks, templateId};
+  'save-assessment-workspace': () => {
+    if (state.actor !== 'coach' || state.nav !== 'programs' || directoryUI().programs.library !== 'assessments') return;
+    const team = teamSettings();
+    const assessment = teamAssessmentConfig();
+    const modeEl = $('#team-assessment-mode');
+    if (modeEl) {
+      const mode = modeEl.value;
+      if (!sessionModeKeys('assessment').includes(mode)) return;
+      assessment.activeMode = mode;
+      if (mode === 'strength') assessment.holdStyle = $('#team-assessment-hold-style')?.value === 'endurance' ? 'endurance' : 'timed';
+      else delete assessment.holdStyle;
+      const reps = Number($('#team-assessment-reps')?.value);
+      if ([1, 2, 3, 4, 5].includes(reps)) assessment.reps = reps;
+      if (mode === 'rom') {
+        assessment.romStart = Number($('#team-rom-start')?.value);
+        assessment.romMax = Number($('#team-rom-max')?.value);
+      } else {
+        assessment.tiltStart = Number($('#team-tilt-start')?.value);
+        if (setupTiltKind(mode) !== 'fixed') assessment.tiltEnd = Number($('#team-tilt-end')?.value);
+        const weight = Number($('#team-assessment-weight')?.value);
+        if (Number.isFinite(weight)) assessment.weight = weight;
+      }
+      team.assessment = normalizeTeamAssessment(assessment);
+    }
+    const sessionsEl = $('#plan-sessions');
+    if (sessionsEl) {
+      const sessions = Number(sessionsEl.value);
+      const weeks = Number($('#plan-weeks')?.value);
+      const templateId = $('#plan-template')?.value;
+      if (![1, 2, 3, 4, 5].includes(sessions) || ![4, 5, 6, 7, 8].includes(weeks) || !sessionPlanTemplate(templateId)) return;
+      team.sessionPlan = {sessionsPerWeek: sessions, weeks, templateId};
+    }
     render();
-    toast('Session plan defaults saved.');
+    toast('Assessment defaults saved.');
   }
 };

@@ -5,7 +5,7 @@ function repHasStableWindow(r){return r.type==='strength';}
 function repTrace(r,d,rep){
  if(isMovementMode(r.type))return modeTrace(r,d,rep);
  if(rep.trace)return rep.trace;
- const duration=rep.seconds,stableStart=Number((.92+rep.number*.12).toFixed(2)),stableEnd=Number((duration*(r.type==='endurance'?.87:.95)).toFixed(2));
+ const duration=rep.seconds,stableStart=Number((.92+rep.number*.12).toFixed(2)),stableEnd=Number((duration*(isIsometricEndurance(r.sessionSettings||r)?.87:.95)).toFixed(2));
  const points=Array.from({length:181},(_,i)=>{
   const time=duration*i/180,t=time/duration,k=rep.number;
   const texture=.009*Math.sin(i*1.7+k)+.007*Math.sin(i*.53+k*.9)+.004*Math.cos(i*2.9);
@@ -13,7 +13,7 @@ function repTrace(r,d,rep){
   if(repHasStableWindow(r)){
    const ramp=Math.min(1,Math.max(0,(time-.06*k)/(stableStart*.83)));
    value=(.08+.92*Math.sin(ramp*Math.PI/2))*(1-.065*Math.max(0,time-stableStart)/duration)+texture;
-   if(r.type==='endurance'&&time>stableEnd)value*=Math.max(.03,1-(time-stableEnd)/(duration-stableEnd));
+   if(isIsometricEndurance(r.sessionSettings||r)&&time>stableEnd)value*=Math.max(.03,1-(time-stableEnd)/(duration-stableEnd));
   }else value=.12+.87*Math.pow(Math.sin(Math.PI*t),.8)+texture;
   return {time,force:Math.max(0,value)};
  });
@@ -91,7 +91,7 @@ function repReviewView(r,ui){
  const data=reportData(r),d=data.directions[ui.direction],v=repViewerState(r,d),maxTime=Math.max(...d.reps.map(rep=>rep.seconds)),selected=d.reps.find(rep=>rep.number===v.selected);
  return `<section class="rep-review ${isMovementMode(r.type)?'mode-rep-review':''}"><header class="rep-review-heading"><button class="text-button" data-action="rep-back">${icon('back','icon-sm')} Report</button><div class="rep-angle-heading"><button class="icon-button" data-action="rep-angle-step" data-step="-1" aria-label="Previous angle" ${ui.direction===0?'disabled':''}>${icon('back')}</button><div><h1>${d.angle}° <span>${d.name}</span></h1><p>${isMovementMode(r.type)?protocols[r.type].name:protocols[r.type].mode} · Angle ${ui.direction+1} of ${r.positions}</p></div><button class="icon-button" data-action="rep-angle-step" data-step="1" aria-label="Next angle" ${ui.direction===r.positions-1?'disabled':''}>${icon('arrow')}</button></div>${button('Export','export-report','small-button')}</header>
  <div class="rep-review-layout"><div class="rep-plot-column">${repMetricStrip(r,d,v)}
- <div class="rep-chart-toolbar"><h2>${selected?'Rep '+selected.number+' · '+(repHasStableWindow(r)?'stable window':r.type==='rom'?'tilt trace':'force trace'):'Compare reps'}</h2><div class="rep-chart-layers"><button data-action="rep-layer" data-layer="average" aria-pressed="${v.average}" ${v.visible.length<2?'disabled':''}><span class="rep-line-key average"></span>Average</button>${r.type==='rom'?'':`<button data-action="rep-layer" data-layer="target" aria-pressed="${v.target}"><span class="rep-line-key target"></span>${r.type==='endurance'?'End threshold':'Target'}</button>`}</div></div>
+ <div class="rep-chart-toolbar"><h2>${selected?'Rep '+selected.number+' · '+(repHasStableWindow(r)?'stable window':r.type==='rom'?'tilt trace':'force trace'):'Compare reps'}</h2><div class="rep-chart-layers"><button data-action="rep-layer" data-layer="average" aria-pressed="${v.average}" ${v.visible.length<2?'disabled':''}><span class="rep-line-key average"></span>Average</button>${r.type==='rom'?'':`<button data-action="rep-layer" data-layer="target" aria-pressed="${v.target}"><span class="rep-line-key target"></span>${isIsometricEndurance(r.sessionSettings||r)?'End threshold':'Target'}</button>`}</div></div>
  <div id="rep-plot-slot">${repForceChart(r,d,v)}</div>
  <div class="rep-scrubber"><label for="rep-time">Inspect time</label><input id="rep-time" type="range" min="0" max="${maxTime}" step="0.01" value="${v.cursor??0}" aria-describedby="rep-readout"><output id="rep-time-value" for="rep-time">${(v.cursor??0).toFixed(2)} s</output></div><p class="rep-readout" id="rep-readout">${repSampleReadout(r,d,v)}</p>
  <p class="rep-data-note">Synthetic traces${selected&&repHasStableWindow(r)?' · Example stable window; detection and stability scoring are not connected.':'. Measurements are illustrative.'}</p></div>
