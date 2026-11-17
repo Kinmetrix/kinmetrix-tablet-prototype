@@ -14,7 +14,6 @@ function visitDirectory(page,keepLibrary=false){
 function openDirectoryPerson(id,origin='find',tab='overview'){
  if(state.actor!=='coach'||!visiblePeople().some(p=>p.id===id))return false;
  state.personId=id;state.nav='people';state.memberOrigin=origin;state.tab=tab;
- state.recentPeople[state.clinicianId]=[id,...(state.recentPeople[state.clinicianId]||[]).filter(key=>key!==id)].slice(0,3);
  const pending=state.pendingSetup;state.pendingSetup=null;
  if(pending){beginSetup(pending.purpose,pending.type,pending.continuing);return true;}
  render();window.scrollTo(0,0);return true;

@@ -51,7 +51,7 @@ function modeIntro(type,purpose){
  if(type==='strength'&&purpose==='training')return {question:'Practice isometric holds.',why:modePurposeCopy.training.strength,how:'Build to the target. Choose timed seconds or Endurance in setup.'};
  return modeGuidance[type];
 }
-const initialState = () => ({nav:'pulse',tab:'overview',personId:null,clinicianId:'sam',actor:'coach',recentPeople:{},pendingSetup:null,search:'',memberOrigin:'pulse',rosterPolicy:'all',defaultEntry:'coach',deviceReady:true,stage:null,session:null,result:null,profiles:{},memberDetails:{},memberPhotos:{alex:'assets/profiles/alex-v1.png',maya:'assets/profiles/maya-v1.png',daniel:'assets/profiles/daniel-v1.png'},profileDrafts:{},history:[],overlay:null,guided:false,showCompare:true,reportDetails:false,setup:{purpose:'assessment',type:'strength',positions:4,reps:3,weight:12,accepted:true}});
+const initialState = () => ({nav:'pulse',tab:'overview',personId:null,clinicianId:'sam',actor:'coach',pendingSetup:null,search:'',memberOrigin:'pulse',rosterPolicy:'all',defaultEntry:'coach',deviceReady:true,stage:null,session:null,result:null,profiles:{},memberDetails:{},memberPhotos:{alex:'assets/profiles/alex-v1.png',maya:'assets/profiles/maya-v1.png',daniel:'assets/profiles/daniel-v1.png'},profileDrafts:{},history:[],overlay:null,guided:false,showCompare:true,reportDetails:false,setup:{purpose:'assessment',type:'strength',positions:4,reps:3,weight:12,accepted:true}});
 let state=initialState(), timer=null, toastTimer=null, modalReturnFocus=null;
 let theme='light';
 try { theme=localStorage.getItem('kinmetrix-theme')==='dark'?'dark':'light'; } catch {}
@@ -133,8 +133,7 @@ const GLOBAL_FIND_DESTINATIONS = [
 ];
 function globalFindModel(){
  const permitted=visiblePeople(),query=state.search.trim().toLowerCase(),terms=query?query.split(/\s+/).filter(Boolean):[];
- const recent=(state.recentPeople[state.clinicianId]||[]).map(id=>permitted.find(p=>p.id===id)).filter(Boolean);
- const members=query?permitted.filter(p=>terms.every(term=>p.name.toLowerCase().includes(term))):recent;
+ const members=query?permitted.filter(p=>terms.every(term=>p.name.toLowerCase().includes(term))):[];
  const destinations=GLOBAL_FIND_DESTINATIONS.filter(item=>{
   if(!query)return true;
   const hay=`${item.label} ${item.subtitle} ${item.keywords}`.toLowerCase();
@@ -142,7 +141,7 @@ function globalFindModel(){
  });
  const showDestinations=!!query;
  const destHits=showDestinations?destinations:[];
- const label=query?`${members.length+destHits.length} ${members.length+destHits.length===1?'match':'matches'}`:(recent.length?'Recently opened':'');
+ const label=query?`${members.length+destHits.length} ${members.length+destHits.length===1?'match':'matches'}`:'';
  return {members,destinations:destHits,query,label};
 }
 function globalFindRows(){
@@ -155,7 +154,7 @@ function globalFindRows(){
  return parts.join('');
 }
 function globalFindView(){const pending=state.pendingSetup,prompt=pending?`Choose who will use ${protocols[pending.type].name.toLowerCase()} ${pending.purpose==='assessment'?'assessment':'training'}.`:'Search the clinic workspace.';const model=globalFindModel();const status=model.label?`<span id="finder-status" role="status" aria-live="polite">${model.label}</span>`:'';const cancelPending=pending?`<button class="text-button" data-action="cancel-pending-protocol">Cancel protocol selection</button>`:'';const finderTools=[status,cancelPending].filter(Boolean).join('');const toolsMarkup=finderTools?`<div class="finder-tools">${finderTools}</div>`:'';return `<main class="people-finder templates-hub staff-single-pane"><div class="settings-hub-pane" aria-label="Find"><section class="finder-content"><div class="finder-heading"><h1>Find</h1><p>${prompt}</p></div><label class="sr-only" for="roster-search">Search clinic</label><div class="search-wrap finder-search">${icon('search')}<input id="roster-search" type="search" placeholder="Members, templates, settings…" value="${escapeHTML(state.search)}" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-controls="global-find-results"><button class="icon-button finder-clear" data-action="clear-people-search" aria-label="Clear search" ${state.search?'':'hidden'}>${icon('close')}</button></div>${toolsMarkup}<div id="global-find-results">${globalFindRows()}</div></section></div></main>`;}
-function showGlobalFind(){state.nav='find';state.memberOrigin='find';if(state.actor==='coach'){state.personId=null;}render();window.scrollTo(0,0);}
+function showGlobalFind(){state.nav='find';state.memberOrigin='find';state.search='';if(state.actor==='coach'){state.personId=null;}render();window.scrollTo(0,0);}
 function showPeopleFinder(){showGlobalFind();}
 function updatePeopleResults(){const model=globalFindModel();const slot=$('#global-find-results');if(slot)slot.innerHTML=globalFindRows();const status=$('#finder-status');if(status)status.textContent=model.label;const clear=$('.finder-clear');if(clear)clear.hidden=!state.search;}
 function openGlobalFindTarget(el){
