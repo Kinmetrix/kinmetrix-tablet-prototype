@@ -1,4 +1,4 @@
-/* Home canvas: team KPIs and Activity. Loaded after directory.js — exports homePage(), not rosterPage(). */
+/* Pulse: team KPIs and activity. Loaded after directory.js — exports pulsePage(). */
 const TEAM_OVERVIEW_PERIODS = {
   'last-7': {rangeLabel: '6 Nov 2026 – 13 Nov 2026', compareLabel: 'Compared with 30 Oct 2026 – 5 Nov 2026', presetLabel: 'Last 7 days'},
   'last-30': {rangeLabel: '14 Oct 2026 – 13 Nov 2026', compareLabel: 'Compared with 13 Sept 2026 – 13 Oct 2026', presetLabel: 'Last 30 days'},
@@ -7,18 +7,18 @@ const TEAM_OVERVIEW_PERIODS = {
 
 function teamOverviewUI() {
   const store = directoryUI();
-  store.home ??= {period: 'last-30'};
-  const ui = store.home;
+  store.pulse ??= store.home ?? {period: 'last-30'};
+  const ui = store.pulse;
   if (!TEAM_OVERVIEW_PERIODS[ui.period]) ui.period = 'last-30';
   return ui;
 }
 
-function visitHome() {
+function visitPulse() {
   if (state.actor !== 'coach') return;
-  state.nav = 'home';
+  state.nav = 'pulse';
   state.personId = null;
   state.pendingSetup = null;
-  state.memberOrigin = 'home';
+  state.memberOrigin = 'pulse';
   render();
   window.scrollTo(0, 0);
 }
@@ -80,29 +80,51 @@ function teamKpiSparkline(id, values) {
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(' ');
   const last = values.at(-1), first = values[0];
-  const color = last > first ? 'var(--signal)' : last < first ? 'var(--red)' : 'var(--muted)';
+  const color = last > first ? 'var(--kpi-up)' : last < first ? 'var(--kpi-down)' : 'var(--muted)';
   return `<svg class="team-kpi-spark" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" aria-hidden="true"><polyline fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${points}"/></svg>`;
+}
+
+function teamActivityKindLabel(record, memberRecords) {
+  const proto = protocols[record.type]?.name || 'Session';
+  if (record.partial) return 'Ended session early';
+  const programName = record.programName || record.sessionSettings?.programName;
+  const sessionNum = record.programSession ?? record.sessionSettings?.programSession;
+  const programTotal = record.sessionSettings?.programTotal ?? record.programTotal;
+  if (programName && programTotal && sessionNum === programTotal) {
+    return `Completed program “${programName}”`;
+  }
+  if (record.purpose === 'assessment') {
+    const earlier = memberRecords.filter(
+      r => r.purpose === 'assessment' && !r.partial && (r.completedAt || 0) < (record.completedAt || 0)
+    );
+    if (!earlier.length) return 'Completed first assessment';
+    return `${proto} assessment`;
+  }
+  if (programName && sessionNum) return `Training · ${programName} · session ${sessionNum}`;
+  if (record.purpose === 'training') return `${proto} training`;
+  return `${proto} session`;
 }
 
 function teamOverviewActivity(roster) {
   const rows = [];
   for (const member of roster) {
-    for (const record of teamOverviewRecords(member.id)) {
+    const memberRecords = teamOverviewRecords(member.id);
+    for (const record of memberRecords) {
       rows.push({
         id: `${member.id}:${record.id}`,
         memberId: member.id,
         memberName: member.name,
-        kindLabel: `${protocols[record.type]?.name || 'Session'} ${record.purpose === 'training' ? 'training' : 'assessment'}`,
+        kindLabel: teamActivityKindLabel(record, memberRecords),
         timeLabel: record.date || sessionStamp(record),
         at: record.completedAt || 0
       });
     }
   }
   rows.sort((a, b) => b.at - a.at);
-  return rows.slice(0, 36);
+  return rows.slice(0, 20);
 }
 
-function homePage() {
+function pulsePage() {
   if (state.actor !== 'coach') return peopleView();
   const ui = teamOverviewUI();
   const roster = visiblePeople();
@@ -111,29 +133,26 @@ function homePage() {
   const activity = teamOverviewActivity(roster);
   const team = teamSettings();
   return `<main class="team-overview team-overview-home templates-hub staff-single-pane">
-    <div class="settings-hub-pane" aria-label="Home">
-    <header class="directory-heading team-overview-head team-overview-head--with-period">
-      <div class="team-overview-head-main">
-        <div class="team-overview-title-block">
-          <h1>Home</h1>
-          <p>${escapeHTML(team.name)}. Team KPIs and activity for the selected period.</p>
+    <div class="settings-hub-pane" aria-label="Pulse">
+    <header class="settings-pane-head team-overview-head">
+      <div class="settings-pane-head-row team-overview-head-row">
+        <div class="settings-pane-head-text">
+          <h1>Pulse</h1>
+          <p class="settings-pane-desc">${escapeHTML(team.name)}. Team KPIs and activity for the selected period.</p>
         </div>
-        <section class="team-overview-head-period" aria-label="Reporting period">
-        <div>
-          <p class="team-overview-period-range">${period.rangeLabel}</p>
-          <p class="muted small team-overview-compare-label">${period.compareLabel}</p>
+        <div class="team-overview-period-inline" aria-label="Reporting period">
+          <label class="team-overview-period-select"><span class="sr-only">Reporting period</span>
+            <select id="team-overview-period">${Object.entries(TEAM_OVERVIEW_PERIODS).map(([value, item]) =>
+              `<option value="${value}" ${ui.period === value ? 'selected' : ''}>${item.presetLabel}</option>`
+            ).join('')}</select>
+          </label>
+          <p class="muted small team-overview-period-range-inline">${period.rangeLabel}</p>
         </div>
-        <label class="team-overview-period-select"><span class="sr-only">Reporting period</span>
-          <select id="team-overview-period">${Object.entries(TEAM_OVERVIEW_PERIODS).map(([value, item]) =>
-            `<option value="${value}" ${ui.period === value ? 'selected' : ''}>${item.presetLabel}</option>`
-          ).join('')}</select>
-        </label>
-        </section>
       </div>
     </header>
     <div class="team-overview-kpis" aria-label="Team summary">
       ${kpis.map(kpi => {
-        const deltaClass = kpi.deltaLabel.startsWith('+') ? 'is-positive' : kpi.deltaLabel.startsWith('-') ? 'is-negative' : '';
+        const deltaClass = kpi.deltaLabel.startsWith('+') ? 'is-up' : kpi.deltaLabel.startsWith('-') ? 'is-down' : '';
         return `<article class="team-overview-kpi">
           <p class="muted small">${kpi.label}</p>
           <div class="team-overview-kpi-main">
@@ -159,7 +178,7 @@ function homePage() {
   </main>`;
 }
 
-const teamOverviewActions = {'nav-home': () => visitHome()};
+const teamOverviewActions = {'nav-pulse': () => visitPulse()};
 
 document.addEventListener('change', event => {
   if (event.target.id !== 'team-overview-period') return;

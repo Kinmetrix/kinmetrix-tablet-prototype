@@ -18,7 +18,9 @@ Product vocabulary for the Kinmetrix clinic tablet prototype. Use these terms in
 
 | Term | Definition |
 | --- | --- |
-| **Isometric** | Hold at a fixed arc position. |
+| **Isometric** | Hold at a fixed arc position. Not the same as **Endurance** (see hold styles below). |
+| **Timed hold** | Isometric hold for a fixed duration in seconds. |
+| **Endurance hold** | Isometric hold with no countdown; the rep ends on effort release or configured rules. A **hold style**, not a separate exercise mode alongside Isometric / Isokinetic / Eccentric. |
 | **Isokinetic** | Move through an arc (start and final arc angles). |
 | **Rotator angle** | Device direction for a step (0°, 45°, 90°, … 315°). |
 | **Arc angle** | Position along the movement arc (range of motion). |

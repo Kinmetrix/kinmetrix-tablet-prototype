@@ -10,6 +10,24 @@
 .directory-filter{display:flex;flex-direction:column;gap:7px;min-width:160px;font-size:12px;color:var(--muted)}
 .directory-filter select{min-height:46px;margin:0;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font:inherit;font-size:13px;color:var(--ink)}
 .directory-result-count{font-size:12px;color:var(--muted);margin-bottom:12px;font-variant-numeric:tabular-nums}
+.roster-table-shell{display:flex;flex-direction:column;flex:1;min-height:0}
+.roster-table-scroll{flex:1;min-height:0;border:1px solid var(--line);border-radius:12px}
+.roster-table-scroll .roster-grid thead th.roster-sticky-head{position:sticky;top:0;z-index:2;background:var(--surface);box-shadow:0 1px 0 var(--line)}
+.roster-table-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 4px 0;margin-top:10px;flex-shrink:0}
+.roster-table-footer .directory-result-count{margin:0}
+.roster-compare-hint{margin:0;font-variant-numeric:tabular-nums}
+.roster-head-tools{display:flex;align-items:center;gap:8px}
+.settings-pane-head-actions .roster-head-tools .button{white-space:nowrap}
+.roster-toolbar .directory-search{flex:1;max-width:none}
+.roster-toolbar-filters{display:flex;align-items:flex-end;gap:12px;flex-shrink:0}
+.roster-toolbar-icon-button{align-self:flex-end;min-height:46px;min-width:46px;flex-shrink:0}
+.roster-toolbar-icon-button[aria-pressed=true]{background:var(--soft);color:var(--ink)}
+.roster-filter-anchor{position:relative;display:flex;align-self:flex-end}
+.roster-filter-popover{position:absolute;top:calc(100% + 8px);right:0;z-index:30;width:min(280px,calc(100vw - 52px));padding:14px 14px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 14px 36px rgba(15,17,21,.14)}
+.roster-filter-popover .directory-filter{min-width:0;margin:0}
+.roster-filter-popover .directory-filter+.directory-filter{margin-top:12px}
+.roster-filter-popover-footer{display:flex;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.roster-grid td:last-child,.roster-grid th:last-child{text-align:left;padding-right:8px}
 .directory-table-scroll{position:relative;overflow:auto;max-width:100%;border-top:1px solid var(--line)}
 .directory-table{font-variant-numeric:tabular-nums}
 .directory-table th,.directory-table td{vertical-align:middle;white-space:nowrap;padding:8px 12px}

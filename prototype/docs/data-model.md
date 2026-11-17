@@ -12,7 +12,13 @@ Team
         └── User analyses (from completed Groups or Assessment batches)
 ```
 
-Templates live under **Team settings** and spawn Programs / Groups / Steps (or team session templates) for members.
+**Templates** (sidebar) holds:
+
+- **Assessment** — team defaults for assessment **session setup** (mode, arc/tilt, directions, reps, target force) plus optional **follow-up plan** after a completed run—not a template library.
+- **Sessions** — reusable load presets for training and session plans.
+- **Programs** — multi-day program templates assigned to members.
+
+Team **Settings** covers station, onboarding, and waiver only.
 
 ## Two paths that produce analysis
 
@@ -46,7 +52,8 @@ A **user analysis** belongs to either a Group **or** an Assessment batch, never 
 | Group list / run / results | Group, Steps, session / analysis summary |
 | Session history / details | User analyses, Group or Assessment batch context |
 | Compare sessions | Multiple user analyses / sessions |
-| Team settings templates | Program / Group / Step / session templates |
+| Templates hub | Active assessment + session plan defaults; session load presets; program templates |
+| Team settings | Station, onboarding, waiver |
 | Device / calibration / exercise | Hardware placeholders — not live BLE |
 
 ## Design rules

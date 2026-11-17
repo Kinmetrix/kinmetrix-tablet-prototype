@@ -30,6 +30,8 @@ body{padding-bottom:var(--prototype-footer-height)}
 @media(max-width:360px){.sidebar{padding-left:6px;padding-right:6px}}
 @media print{body{padding-bottom:0}.app-shell,.session-page,.welcome,.people-finder,.member-workspace{min-height:0}}
 
-/* Supplied Kinmetrix mark; original vector retained, color follows the theme. */
-.wordmark .brand-mark{width:32px;height:32px;flex:0 0 32px;transform:none;background:var(--ink);-webkit-mask:url("assets/kinmetrix.svg") center/contain no-repeat;mask:url("assets/kinmetrix.svg") center/contain no-repeat}
+/* Supplied Kinmetrix mark in the sidebar wordmark. */
+.wordmark .brand-mark{width:32px;height:32px;flex:0 0 32px;display:block;object-fit:contain;transform:none;border:0}
+.wordmark img.brand-mark{background:none}
+.wordmark span.brand-mark{background:var(--ink);-webkit-mask:var(--brand-mark-url,url("assets/kinmetrix.svg")) center/contain no-repeat;mask:var(--brand-mark-url,url("assets/kinmetrix.svg")) center/contain no-repeat}
 .wordmark .brand-mark::before,.wordmark .brand-mark::after{content:none}

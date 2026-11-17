@@ -1,10 +1,9 @@
 const POLICY_SECTIONS = [
   { id: 'onboarding', label: 'Onboarding' },
-  { id: 'waiver', label: 'Waiver' },
-  { id: 'session-plan', label: 'Session plan' }
+  { id: 'waiver', label: 'Waiver' }
 ];
 const LIBRARY_SECTIONS = [
-  { id: 'assessments', label: 'Assessments' },
+  { id: 'assessments', label: 'Assessment' },
   { id: 'sessions', label: 'Sessions' },
   { id: 'programs', label: 'Programs' }
 ];
@@ -12,8 +11,7 @@ const LIBRARY_SECTIONS = [
 const DIR2_SECTIONS = [
   { id: 'station', label: 'Station' },
   { id: 'onboarding', label: 'Onboarding' },
-  { id: 'waiver', label: 'Waiver' },
-  { id: 'session-plan', label: 'Session plan' }
+  { id: 'waiver', label: 'Waiver' }
 ];
 
 const redesignState = {
@@ -82,20 +80,8 @@ function mockWaiverFields() {
   </section>`;
 }
 
-function mockSessionPlanFields() {
-  return `<section class="settings-block settings-plan-fields settings-block--last">
-    <label class="field-label">Sessions / week</label>
-    <select tabindex="-1"><option>2</option></select>
-    <label class="field-label">Weeks</label>
-    <select tabindex="-1"><option>6</option></select>
-    <label class="field-label">Session template</label>
-    <select tabindex="-1"><option>Light · 50% · 10 reps</option></select>
-  </section>`;
-}
-
 function mockPolicyBody(section) {
   if (section === 'waiver') return mockWaiverFields();
-  if (section === 'session-plan') return mockSessionPlanFields();
   return mockOnboardingFields();
 }
 
@@ -110,16 +96,6 @@ function mockDir2SectionContent(section) {
       <li><label class="radio-row"><input type="radio" disabled> <span><strong>Optional</strong><small>Show the waiver. Do not block the session.</small></span></label></li>
     </ul>`;
   }
-  if (section === 'session-plan') {
-    return `<div class="settings-plan-fields settings-redesign-policy-fields">
-      <label class="field-label">Sessions / week</label>
-      <select tabindex="-1"><option>2</option></select>
-      <label class="field-label">Weeks</label>
-      <select tabindex="-1"><option>6</option></select>
-      <label class="field-label">Session template</label>
-      <select tabindex="-1"><option>Light · 50% · 10 reps</option></select>
-    </div>`;
-  }
   return `<p class="field-label settings-redesign-policy-lead">New user fields</p>
     <ul class="settings-toggle-list">${fields.map(f => `<li><label class="check-label"><input type="checkbox" checked disabled> ${f}</label></li>`).join('')}</ul>`;
 }
@@ -129,16 +105,20 @@ function mockDir2PaneBody(sectionId) {
   return `<div class="settings-redesign-pane-body" aria-label="${item.label}">${mockDir2SectionContent(item.id)}</div>`;
 }
 
-function mockAssessmentsTable() {
-  return `<div class="directory-table-scroll" tabindex="-1">
-    <table class="data-table directory-table">
-      <thead><tr><th>Assessment</th><th>Purpose</th></tr></thead>
-      <tbody>
-        <tr><th scope="row"><strong>Isometric</strong><small>Strength</small></th><td>Peak force at each angle</td></tr>
-        <tr><th scope="row"><strong>Range of motion</strong><small>ROM</small></th><td>Joint excursion per direction</td></tr>
-      </tbody>
-    </table>
-  </div>`;
+function mockAssessmentWorkspace() {
+  return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Assessment views">
+    <button type="button" aria-current="page">Protocol</button>
+    <button type="button">Session plan</button>
+  </nav>
+  <p class="muted small">Team defaults for session setup.</p>
+  <section class="assessment-protocol-panel">
+    <p><strong>Isometric</strong></p>
+    <label class="field-label">Start tilt</label>
+    <input type="number" tabindex="-1" value="5" disabled>
+    <label class="field-label">Directions</label>
+    <label class="field-label">Reps / direction</label>
+    <label class="field-label">Target force</label>
+  </section>`;
 }
 
 function mockSessionsTable() {
@@ -185,7 +165,7 @@ function mockLibrarySubnav(panel, active) {
 function mockLibraryBody(library) {
   if (library === 'sessions') return mockSessionsTable();
   if (library === 'programs') return mockProgramsFlat();
-  return mockAssessmentsTable();
+  return mockAssessmentWorkspace();
 }
 
 function mockHubHeader(title, save) {
@@ -254,13 +234,13 @@ const REDESIGN_DIRECTIONS = [
     id: 'dir2',
     number: 2,
     title: 'Split nav · full-width pane',
-    note: 'Left rail: Station, Onboarding, Waiver, Session plan. Right pane: full-width fields for the selection only — no in-pane label column. Save in header when Station is selected (name, units, theme, access).'
+    note: 'Left rail: Station, Onboarding, Waiver. Session plan defaults live under Templates → Assessment. Save in header on Station.'
   },
   {
     id: 'dir3',
     number: 3,
     title: 'Flatten Programs',
-    note: 'Same library sub-nav for Assessments, Sessions, Programs. Programs shows templates plus an Assigned section below — no Templates/Assigned tab row.'
+    note: 'Assessment is a single workspace (protocol + session plan defaults), not a template table. Sessions and Programs keep library patterns.'
   }
 ];
 

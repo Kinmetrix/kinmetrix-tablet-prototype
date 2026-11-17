@@ -65,7 +65,7 @@
 }
 .templates-layered-shell main.directory-page.templates-hub{
  flex:1;min-height:0;
- padding:0;max-width:none;
+ padding:0;max-width:none;margin:0;
  align-content:stretch;background:transparent;
 }
 .templates-layered-shell main.templates-hub.settings-hub-layout.settings-workspace-layout{
@@ -130,11 +130,11 @@
 }
 .templates-layered-shell main.templates-hub .settings-pane-head{margin-bottom:24px}
 .templates-layered-shell main.templates-hub.staff-single-pane{
- flex:1;min-height:0;padding:0;max-width:none;
- display:flex;flex-direction:column;background:transparent;
+ flex:1;min-height:0;padding:0;max-width:none;margin:0;width:100%;
+ display:flex;flex-direction:column;background:transparent;align-self:stretch;
 }
 .templates-layered-shell main.templates-hub.staff-single-pane>.settings-hub-pane{
- flex:1;width:100%;min-width:0;
+ flex:1;width:100%;min-width:0;align-self:stretch;
 }
 .templates-layered-shell main.people-finder.templates-hub{
  min-height:0;background:transparent;padding:0;
@@ -145,9 +145,23 @@
 .templates-layered-shell main.workspace.member-workspace{
  max-width:none;margin:0;min-height:0;padding:0;background:transparent;
 }
-.templates-layered-shell main.directory-page.team-overview.templates-hub{
- flex:1;min-height:0;padding:0;max-width:none;background:transparent;
+.templates-layered-shell main.team-overview.templates-hub.staff-single-pane{
+ min-height:0;gap:0;
 }
+.templates-layered-shell main.team-overview .settings-hub-pane{
+ display:flex;flex-direction:column;gap:8px;min-height:0;
+}
+.templates-layered-shell main.team-overview .settings-pane-head{margin-bottom:0}
+.templates-layered-shell main.directory-page.roster-workspace{
+ flex:1;min-height:0;padding:0;max-width:none;margin:0;width:100%;
+ display:flex;flex-direction:column;background:transparent;
+}
+.templates-layered-shell main.directory-page.roster-workspace .settings-hub-pane{
+ display:flex;flex-direction:column;flex:1;min-height:0;gap:0;
+}
+.templates-layered-shell main.directory-page.roster-workspace .directory-toolbar{margin-bottom:16px}
+.templates-layered-shell main.directory-page.roster-workspace #roster-results{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.templates-layered-shell main.directory-page.roster-workspace .settings-pane-head-actions{gap:10px;flex-wrap:wrap;justify-content:flex-end}
 @media(max-width:820px){
  .templates-layered-shell main.templates-hub.settings-hub-layout.settings-workspace-layout{min-height:0;padding:0}
  .templates-layered-shell main.templates-hub .settings-hub-pane{

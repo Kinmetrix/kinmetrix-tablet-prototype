@@ -153,7 +153,10 @@ function syncModalSurface(){
  document.body.classList.toggle('modal-open',open);
 }
 function updatePicker(focusSelector='#dialog-title'){
- renderOverlay();$('.session-picker').scrollTop=0;$(focusSelector)?.focus();
+ renderOverlay();
+ const o=state.overlay;
+ if(o?.type==='session-picker'&&o.step==='create-program')syncProgramHoldSecondsRow('program');
+ $('.session-picker').scrollTop=0;$(focusSelector)?.focus();
 }
 function expandModePreview(){
  const o=state.overlay,dialog=$('.session-picker');
@@ -180,6 +183,15 @@ function collapseModePreview(){
  $('.mode-choices').scrollLeft=o.previewScroll?.left||0;
  $('[data-action="expand-mode-preview"]').focus({preventScroll:true});
 }
+function syncHoldSecondsVisibility(selectEl){
+ if(!selectEl)return;
+ const endurance=selectEl.value==='endurance';
+ const row=selectEl.closest('.hold-time-row');
+ const wrap=row?.querySelector('.hold-seconds-inline');
+ if(wrap)wrap.hidden=endurance;
+ row?.classList.toggle('hold-time-row--endurance',endurance);
+}
+function syncProgramHoldSecondsRow(prefix){syncHoldSecondsVisibility($('#'+prefix+'-hold-style'));}
 function memberPrograms(personId=state.personId){
  state.programs??={};
  const p=people.find(p=>p.id===personId);if(!p)return [];
@@ -192,8 +204,11 @@ function programPickerView(o){
  return pickerFrame(o,'Programs',`Training plans for ${escapeHTML(person().name)}.`, `<div class="program-picker-content">${active.length?`<div class="program-list">${active.map(p=>`<article class="program-list-row"><div><h3>${escapeHTML(p.name)}</h3><p>${programModeLabel(p)} · ${p.positions} directions · ${p.reps} reps</p><span>Session ${p.completed+1} of ${p.total} · ${programLoadLabel(p)}</span></div>${button('Continue '+icon('play','icon-sm'),'continue-program','primary',`data-program-id="${p.id}" aria-label="Continue ${escapeHTML(p.name)}, session ${p.completed+1} of ${p.total}"`)}</article>`).join('')}</div>`:`<div class="program-empty"><h3>No active programs</h3><p>Create a plan to follow across several training sessions.</p></div>`}
  <button class="new-task-row new-program-row" data-action="new-program">${icon('plus')}<span><strong>Create a new program</strong><small>Choose a training mode, settings, and number of sessions.</small></span>${icon('chevron','icon-sm')}</button>${complete.length?`<p class="program-completed-note">Completed: ${complete.map(p=>escapeHTML(p.name)).join(', ')}</p>`:''}</div>`, '', true);
 }
+function captureMemberProgramDraft(prefix='program',draft={}){
+ return {...draft,name:$('#'+prefix+'-name')?.value??draft.name??'',type:$('#'+prefix+'-mode')?.value??draft.type??'strength',holdStyle:$('#'+prefix+'-hold-style')?.value==='endurance'?'endurance':'timed',holdSeconds:Number($('#'+prefix+'-hold-seconds')?.value??draft.holdSeconds??6),total:Number($('#'+prefix+'-total')?.value??draft.total??6),positions:Number($('#'+prefix+'-positions')?.value??draft.positions??4),reps:Number($('#'+prefix+'-reps')?.value??draft.reps??3),load:typeof readProgramLoad==='function'?readProgramLoad(prefix):draft.load};
+}
 function programCreateView(o){
- const draft=o.programDraft||{name:'',type:'strength',holdStyle:'timed',total:6,positions:4,reps:3};o.programDraft=draft;
+ const draft=o.programDraft||{name:'',type:'strength',holdStyle:'timed',holdSeconds:6,total:6,positions:4,reps:3};o.programDraft=draft;
  return pickerFrame(o,'New program',`Create a training plan for ${escapeHTML(person().name)}.`, `<form id="program-form" class="program-form">${programFields(draft,'program',true)}</form>`, `<span>Saved in this demo only</span><div>${button('Back','picker-back')}${button('Create & set up '+icon('arrow','icon-sm'),'create-program','primary')}</div>`,true);
 }
 function beginProgram(id){
@@ -204,9 +219,10 @@ function beginProgram(id){
 function createProgram(){
  const form=$('#program-form');if(!form)return;
  const name=$('#program-name');name.setCustomValidity(name.value.trim()?'':'Enter a program name.');if(!form.reportValidity())return;
- const program={id:'program-'+Date.now(),name:name.value.trim(),type:$('#program-mode').value,holdStyle:$('#program-hold-style')?.value==='endurance'?'endurance':'timed',total:Number($('#program-total').value),positions:Number($('#program-positions').value),reps:Number($('#program-reps').value),completed:0};
+ const program={id:'program-'+Date.now(),name:name.value.trim(),type:$('#program-mode').value,holdStyle:$('#program-hold-style')?.value==='endurance'?'endurance':'timed',holdSeconds:Number($('#program-hold-seconds')?.value),total:Number($('#program-total').value),positions:Number($('#program-positions').value),reps:Number($('#program-reps').value),completed:0};
  if(!sessionModeKeys('training').includes(program.type))return;
- if(program.type!=='strength')program.holdStyle='timed';
+ if(program.type!=='strength'){program.holdStyle='timed';delete program.holdSeconds;}
+ else if(program.holdStyle==='endurance')delete program.holdSeconds;
  const load=validateProgramLoadForm('program',program.total);if(!load)return;program.load=load;
  memberPrograms().unshift(program);beginProgram(program.id);toast('Program created. Review the first session’s settings.');
 }
@@ -233,7 +249,7 @@ const workspaceActions={
  'confirm-session-mode':()=>{const o=state.overlay;if(o?.type!=='session-picker'||!sessionModeKeys(o.purpose).includes(o.mode))return;beginSetup(o.purpose,o.mode);const heading=$('.session-title h1');heading?.setAttribute('tabindex','-1');heading?.focus();}
 };
 document.addEventListener('input',event=>{const field=event.target.dataset.programField,o=state.overlay;if(field&&o?.step==='create-program'){o.programDraft[field]=event.target.value;event.target.setCustomValidity('');}});
-document.addEventListener('change',event=>{const field=event.target.dataset.programField,o=state.overlay;if(field&&o?.step==='create-program')o.programDraft[field]=event.target.value;});
+document.addEventListener('change',event=>{const el=event.target;const field=el.dataset.programField,o=state.overlay;if(field&&o?.step==='create-program')o.programDraft[field]=el.value;if(el.id==='program-mode'&&o?.step==='create-program'){o.programDraft=captureMemberProgramDraft('program',o.programDraft);updatePicker('#program-mode');return;}if(el.id==='program-hold-style')syncProgramHoldSecondsRow('program');});
 document.addEventListener('submit',event=>{if(event.target.id==='program-form'){event.preventDefault();createProgram();}});
 
 document.addEventListener('keydown',event=>{

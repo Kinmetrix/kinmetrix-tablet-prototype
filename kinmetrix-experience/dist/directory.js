@@ -8,6 +8,7 @@ function visitDirectory(page,keepLibrary=false){
  if(page==='pulse'){visitPulse();return;}
  if(!['roster','programs'].includes(page))return;
  if(page==='programs'&&!keepLibrary)Object.assign(directoryUI().programs,{library:'assessments',query:''});
+ if(page!=='roster')rosterUI().filterOpen=false;
  state.nav=page;state.personId=null;state.pendingSetup=null;state.memberOrigin=page;render();window.scrollTo(0,0);
 }
 function openDirectoryPerson(id,origin='find',tab='overview'){
@@ -65,9 +66,25 @@ function rosterHeadToolsMarkup(){
  const count=rosterCompareSelection().length;
  return `<div class="roster-head-tools" id="roster-head-tools">${count?button('Clear','comparison-clear','ghost small-button',`data-source="roster"`):''}${button(icon('compare','icon-sm')+' Compare'+(count?` (${count})`:''),'comparison-open',count>=2?'small-button':'small-button','data-source="roster" aria-haspopup="dialog" '+(count<2?'disabled':''))}</div>`;
 }
-function rosterFilterToolbar(permitted){
+function rosterFilterFieldsMarkup(permitted){
  const ui=rosterUI(),valueOptions=rosterFilterValueOptions(ui.filterKind,permitted),showValue=ui.filterKind!=='all';
- return `<div class="directory-toolbar roster-toolbar">${directorySearch('directory-search','Search roster',ui.query,'Search names')}<div class="roster-toolbar-filters"><label class="directory-filter">Filter by<select id="roster-filter-kind">${ROSTER_FILTER_KINDS.map(item=>`<option value="${item.id}" ${ui.filterKind===item.id?'selected':''}>${item.label}</option>`).join('')}</select></label>${showValue?`<label class="directory-filter"><span class="sr-only">Filter value</span><select id="roster-filter-value">${valueOptions.map(([value,label])=>`<option value="${value}" ${ui.filterValue===value?'selected':''}>${label}</option>`).join('')}</select></label>`:''}<button type="button" class="icon-button roster-columns-button" data-action="roster-columns" aria-label="Choose visible columns" aria-haspopup="dialog">${icon('columns')}</button></div></div>`;
+ return `<label class="directory-filter" for="roster-filter-kind">Filter by<select id="roster-filter-kind">${ROSTER_FILTER_KINDS.map(item=>`<option value="${item.id}" ${ui.filterKind===item.id?'selected':''}>${item.label}</option>`).join('')}</select></label>${showValue?`<label class="directory-filter" for="roster-filter-value">Value<select id="roster-filter-value">${valueOptions.map(([value,label])=>`<option value="${value}" ${ui.filterValue===value?'selected':''}>${label}</option>`).join('')}</select></label>`:''}`;
+}
+function rosterFilterPopoverMarkup(permitted){
+ const ui=rosterUI(),active=ui.filterKind!=='all';
+ return `${rosterFilterFieldsMarkup(permitted)}${active?`<div class="roster-filter-popover-footer">${button('Clear filters','clear-roster-filters','ghost small-button')}</div>`:''}`;
+}
+function rosterFilterActiveLabel(ui){
+ if(ui.filterKind==='all')return 'Filter roster';
+ const kind=ROSTER_FILTER_KINDS.find(item=>item.id===ui.filterKind)?.label||'Filter';
+ if(ui.filterKind==='programName'){const match=rosterFilterValueOptions(ui.filterKind,visiblePeople()).find(([value])=>value===ui.filterValue);return match?`Filter roster · ${match[1]}`:`Filter roster · ${kind}`;}
+ const value=rosterFilterValueOptions(ui.filterKind,visiblePeople()).find(([id])=>id===ui.filterValue)?.[1];
+ return value&&value!=='All'?`Filter roster · ${kind}: ${value}`:`Filter roster · ${kind}`;
+}
+function rosterFilterToolbar(permitted){
+ const ui=rosterUI(),active=ui.filterKind!=='all',open=!!ui.filterOpen;
+ const popover=open?`<div class="roster-filter-popover" id="roster-filter-popover" role="dialog" aria-label="Filter roster">${rosterFilterPopoverMarkup(permitted)}</div>`:'';
+ return `<div class="directory-toolbar roster-toolbar">${directorySearch('directory-search','Search roster',ui.query,'Search names')}<div class="roster-toolbar-filters"><div class="roster-filter-anchor"><button type="button" class="icon-button roster-filter-button roster-toolbar-icon-button" data-action="roster-filters" aria-label="${escapeHTML(rosterFilterActiveLabel(ui))}" aria-haspopup="dialog" aria-expanded="${open}"${open?' aria-controls="roster-filter-popover"':''} aria-pressed="${active}">${icon(active?'filterFilled':'filter')}</button>${popover}</div><button type="button" class="icon-button roster-columns-button roster-toolbar-icon-button" data-action="roster-columns" aria-label="Choose visible columns" aria-haspopup="dialog">${icon('columns')}</button></div></div>`;
 }
 function directoryPersonSummary(p){
  const records=[...state.history.filter(r=>r.personId===p.id),...reportFixtureHistory(p.id)].sort((a,b)=>(b.completedAt||0)-(a.completedAt||0));
@@ -153,10 +170,27 @@ const TEMPLATE_LIBRARIES=[
  {id:'sessions',label:'Sessions',description:'Reusable load presets for training and for session plans.'},
  {id:'programs',label:'Programs',description:'Multi-day plans assigned from this workspace.'}
 ];
+function programHoldTimeField(draft,prefix,field){
+ const holdStyle=draft.holdStyle||'timed';
+ const timed=holdStyle==='timed';
+ return `<label class="program-field program-field-hold program-hold-time-label">Hold<div class="hold-time-row${timed?'':' hold-time-row--endurance'}"><select id="${prefix}-hold-style" ${field('holdStyle')} aria-label="Timed hold or endurance"><option value="timed" ${holdStyle==='timed'?'selected':''}>Timed</option><option value="endurance" ${holdStyle==='endurance'?'selected':''}>Endurance</option></select><div class="weight-input hold-seconds-inline"${timed?'':' hidden'}><input id="${prefix}-hold-seconds" ${field('holdSeconds')} type="number" min="2" max="15" step="1" value="${draft.holdSeconds??6}" inputmode="numeric" aria-label="Hold length in seconds"><span>s</span></div></div></label>`;
+}
+function captureProgramBasicsDraft(prefix,draft={}){
+ return {...draft,name:$('#'+prefix+'-name')?.value??draft.name??'',type:$('#'+prefix+'-mode')?.value??draft.type??'strength',holdStyle:$('#'+prefix+'-hold-style')?.value==='endurance'?'endurance':'timed',holdSeconds:Number($('#'+prefix+'-hold-seconds')?.value??draft.holdSeconds??6),total:Number($('#'+prefix+'-total')?.value??draft.total??6),positions:Number($('#'+prefix+'-positions')?.value??draft.positions??4),reps:Number($('#'+prefix+'-reps')?.value??draft.reps??3),load:typeof readProgramLoad==='function'?readProgramLoad(prefix):draft.load};
+}
+function refreshProgramEditorForm(focusSelector){
+ const o=state.overlay;
+ if(o?.type!=='program-editor')return;
+ const template=clinicProgramTemplates().find(p=>p.id===o.id);
+ o.editorDraft=captureProgramBasicsDraft('plan',template||o.editorDraft);
+ renderOverlay();
+ syncProgramHoldSecondsRow('plan');
+ if(focusSelector) $(focusSelector)?.focus({preventScroll:true});
+}
 function programFields(draft,prefix='plan',tracked=false){
  const field=name=>tracked?`data-program-field="${name}"`:'';
- const holdStyle=draft.holdStyle||'timed';
- return `<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><label>Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-form-grid"><label>Training mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('training').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label>${draft.type==='strength'?`<label>Hold time<select id="${prefix}-hold-style" ${field('holdStyle')}><option value="timed" ${holdStyle==='timed'?'selected':''}>Seconds</option><option value="endurance" ${holdStyle==='endurance'?'selected':''}>Endurance</option></select></label>`:''}<label>Number of sessions<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n} sessions</option>`).join('')}</select></label><label>Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n} directions</option>`).join('')}</select></label><label>Reps per direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n} ${n===1?'rep':'reps'}</option>`).join('')}</select></label></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
+ const isometric=draft.type==='strength';
+ return `<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><div class="program-basics-layout"><label class="program-field program-field-name">Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-mode-block${isometric?' program-mode-block--isometric':''}"><label class="program-field program-field-mode">Training mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('training').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label>${isometric?programHoldTimeField(draft,prefix,field):''}</div><div class="program-structure-grid"><label class="program-field">Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field">Reps / direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field program-field-sessions">Sessions in plan<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n}</option>`).join('')}</select></label></div></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
 }
 function templatesHubRail(activeLibraryId){
  return `<nav class="settings-hub-rail" aria-label="Template libraries">
@@ -233,7 +267,7 @@ function programsResults(){
  return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="${assigned?'Assigned programs':'Program templates'}, scroll for more columns"><table class="data-table directory-table program-grid"><caption class="sr-only">${assigned?'Assigned programs':'Program templates'}</caption><thead><tr><th scope="col">${assigned?'Person':'Program'}</th><th scope="col">${assigned?'Program':'Mode'}</th><th scope="col">${assigned?'Progress':'Sessions'}</th><th scope="col">Setup</th><th scope="col">Target progression</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>${rows.map(row=>{const p=assigned?row.program:row,member=assigned?row.p:null;return `<tr><th scope="row">${assigned?`<div class="directory-identity">${photoAvatar(member,'mini')}<button class="directory-person" data-action="program-member" data-id="${member.id}"><span>${escapeHTML(member.name)}</span></button></div>`:`<button class="program-name-button" data-action="edit-template" data-id="${p.id}">${escapeHTML(p.name)}${icon('chevron','icon-sm')}</button>`}</th><td>${assigned?`<strong>${escapeHTML(p.name)}</strong><small>${programModeLabel(p)}</small>`:programModeLabel(p)}</td><td>${assigned?`<strong>${p.completed} / ${p.total}</strong><small>${p.completed>=p.total?'Completed':'Sessions completed'}</small>`:p.total}</td><td>${p.positions} directions<small>${p.reps} reps per direction</small></td><td>${programLoadLabel(p)}</td><td>${assigned?(p.completed<p.total?button('Continue','continue-assigned','small-button',`data-id="${member.id}" data-program-id="${p.id}" aria-label="Continue ${escapeHTML(p.name)} for ${escapeHTML(member.name)}"`):button('Open person','program-member','small-button',`data-id="${member.id}"`)):button('Assign','assign-template','small-button',`data-id="${p.id}" aria-label="Assign ${escapeHTML(p.name)}"`)}</td></tr>`;}).join('')}</tbody></table></div>`;
 }
 function directoryDialog(o){
- const template=clinicProgramTemplates().find(p=>p.id===o.id),editing=o.type==='program-editor',draft=template||{name:'',type:'strength',total:6,positions:4,reps:3,load:{kind:'assessment',percent:60,increase:0,increaseKind:'percent'}};
+ const template=clinicProgramTemplates().find(p=>p.id===o.id),editing=o.type==='program-editor',draft=o.editorDraft||template||{name:'',type:'strength',holdStyle:'timed',holdSeconds:6,total:6,positions:4,reps:3,load:{kind:'assessment',percent:60,increase:0,increaseKind:'percent'}};
  const title=editing?(template?'Edit program template':'New program template'):'Assign program';
  const content=editing?`<p class="directory-dialog-intro">${template?'Changes apply to future assignments. Existing assigned programs keep their settings.':'Create a reusable template, then assign it to people.'}</p><form id="template-form" class="program-form">${programFields(draft)}</form><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" form="template-form" class="button primary">Save program</button></footer>`:`<p class="directory-dialog-intro"><strong>${escapeHTML(draft.name)}</strong><br>${sessionModes[draft.type].name} · ${draft.total} sessions · ${draft.positions} directions · ${draft.reps} reps</p><form id="assign-program-form"><label class="field-label" for="assign-person">Assign to</label><select id="assign-person" required><option value="">Choose a person</option>${visiblePeople().map(p=>`<option value="${p.id}">${escapeHTML(p.name)}</option>`).join('')}</select><p class="program-form-note">This adds a program to their workspace. No session starts until the settings are reviewed.</p><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" form="assign-program-form" class="button primary">Assign program</button></footer></form>`;
  return `<div class="modal-backdrop"><section class="dialog directory-dialog ${editing?'program-editor-dialog':''}" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">${title}</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${content}</section></div>`;
@@ -241,8 +275,9 @@ function directoryDialog(o){
 function saveProgramTemplate(){
  if(state.actor!=='coach'||state.overlay?.type!=='program-editor')return;
  const form=$('#template-form'),name=$('#plan-name');name.setCustomValidity(name.value.trim()?'':'Enter a program name.');if(!form.reportValidity())return;
- const draft={name:name.value.trim(),type:$('#plan-mode').value,holdStyle:$('#plan-hold-style')?.value==='endurance'?'endurance':'timed',total:Number($('#plan-total').value),positions:Number($('#plan-positions').value),reps:Number($('#plan-reps').value)};
- if(draft.type!=='strength')draft.holdStyle='timed';
+ const draft={name:name.value.trim(),type:$('#plan-mode').value,holdStyle:$('#plan-hold-style')?.value==='endurance'?'endurance':'timed',holdSeconds:Number($('#plan-hold-seconds')?.value),total:Number($('#plan-total').value),positions:Number($('#plan-positions').value),reps:Number($('#plan-reps').value)};
+ if(draft.type!=='strength'){draft.holdStyle='timed';delete draft.holdSeconds;}
+ else if(draft.holdStyle==='endurance')delete draft.holdSeconds;
  if(!sessionModeKeys('training').includes(draft.type)||![2,4,6,8,12].includes(draft.total)||![4,8].includes(draft.positions)||![1,2,3,4,5].includes(draft.reps))return;
  const load=validateProgramLoadForm('plan',draft.total);if(!load)return;draft.load=load;
  const templates=clinicProgramTemplates(),existing=templates.find(p=>p.id===state.overlay.id);
@@ -254,17 +289,19 @@ function assignProgramTemplate(){
  const field=$('#assign-person'),template=clinicProgramTemplates().find(p=>p.id===state.overlay.id),member=visiblePeople().find(p=>p.id===field.value);
  if(!template||!member){$('#assign-program-form').reportValidity();return;}
  if(memberPrograms(member.id).some(p=>p.templateId===template.id&&p.completed<p.total)){field.setCustomValidity('This person already has an active copy of this program.');field.reportValidity();return;}
- memberPrograms(member.id).unshift({id:'program-'+Date.now(),templateId:template.id,name:template.name,type:template.type,holdStyle:template.holdStyle||'timed',total:template.total,positions:template.positions,reps:template.reps,load:{...programLoad(template)},completed:0});
+ memberPrograms(member.id).unshift({id:'program-'+Date.now(),templateId:template.id,name:template.name,type:template.type,holdStyle:template.holdStyle||'timed',holdSeconds:template.holdSeconds,total:template.total,positions:template.positions,reps:template.reps,load:{...programLoad(template)},completed:0});
  state.overlay=null;Object.assign(directoryUI().programs,{tab:'assigned',query:'',library:'programs'});openDirectoryPerson(member.id,'programs');toast('Program assigned to '+member.name+'.');
 }
 const directoryActions={
  'add-person':()=>{if(state.actor!=='coach')return;openModal('add-person');$('#new-person-name')?.focus();},
+ 'roster-filters':()=>{if(state.actor!=='coach')return;const ui=rosterUI();ui.filterOpen=!ui.filterOpen;refreshRoster({refreshToolbar:true});(ui.filterOpen?$('#roster-filter-kind'):$('[data-action="roster-filters"]'))?.focus();},
+ 'close-roster-filters':()=>{rosterUI().filterOpen=false;refreshRoster({refreshToolbar:true});$('[data-action="roster-filters"]')?.focus();},
  'roster-columns':()=>{if(state.actor==='coach')openModal('roster-columns');},
  'apply-roster-columns':()=>{if(state.actor!=='coach'||state.overlay?.type!=='roster-columns')return;const ui=rosterUI();ui.columns=$$('input[name="roster-column"]:checked').map(el=>el.value).filter(key=>rosterColumnDefinitions.some(col=>col.key===key));if(!ROSTER_SORT_KEYS.has(ui.sort)||(ui.sort!=='name'&&!ui.columns.includes(ui.sort)))ui.sort='name';state.overlay=null;render();$('[data-action="roster-columns"]')?.focus();},
  'nav-pulse':()=>visitPulse(),'nav-roster':()=>visitDirectory('roster'),'nav-programs':()=>visitDirectory('programs'),
  'open-roster-person':el=>openDirectoryPerson(el.dataset.id,'roster'),
  'sort-roster':el=>{const ui=rosterUI(),key=el.dataset.sort;if(!ROSTER_SORT_KEYS.has(key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-action="sort-roster"][data-sort="${key}"]`)?.focus({preventScroll:true});},
- 'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',filterKind:'all',filterValue:'all',sort:'name',descending:false});render();$('#directory-search')?.focus();},
+ 'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',filterKind:'all',filterValue:'all',sort:'name',descending:false});refreshRoster({refreshToolbar:true});if(rosterUI().filterOpen)$('#roster-filter-kind')?.focus();else $('#directory-search')?.focus();},
  'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;directoryUI().programs.library=el.dataset.library;render();$(`[data-action="templates-library"][data-library="${el.dataset.library}"]`)?.focus();},
  'team-assessment-positions':el=>{
   if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
@@ -300,7 +337,7 @@ document.addEventListener('input',event=>{
 document.addEventListener('change',event=>{
  const el=event.target;
  if(el.id==='roster-filter-kind'){const ui=rosterUI();ui.filterKind=el.value;const options=rosterFilterValueOptions(ui.filterKind,visiblePeople());ui.filterValue=ui.filterKind==='all'?'all':options[0]?.[0]||'all';refreshRoster({refreshToolbar:true});el.focus();}
- if(el.id==='roster-filter-value'){rosterUI().filterValue=el.value;refreshRoster();el.focus();}
+ if(el.id==='roster-filter-value'){rosterUI().filterValue=el.value;refreshRoster({refreshToolbar:true});el.focus();}
  if(el.id==='assign-person')el.setCustomValidity('');
  if(el.id==='team-assessment-mode'&&state.nav==='programs'&&directoryUI().programs.library==='assessments'){
   teamAssessmentConfig().activeMode=el.value;
@@ -310,9 +347,31 @@ document.addEventListener('change',event=>{
  if(el.id==='team-assessment-reps'&&state.nav==='programs'&&directoryUI().programs.library==='assessments'){
   teamAssessmentConfig().reps=Number(el.value);
  }
+ if(el.id==='team-assessment-hold-style'&&state.nav==='programs'&&directoryUI().programs.library==='assessments'){
+  const assessment=teamAssessmentConfig();
+  assessment.holdStyle=el.value==='endurance'?'endurance':'timed';
+  teamSettings().assessment=normalizeTeamAssessment(assessment);
+  syncHoldSecondsVisibility(el);
+  el.focus();
+ }
+ if(el.id==='plan-mode'&&state.overlay?.type==='program-editor')refreshProgramEditorForm('#plan-mode');
+ if((el.id==='plan-hold-style'||el.id==='program-hold-style')&&typeof syncProgramHoldSecondsRow==='function')syncProgramHoldSecondsRow(el.id.replace(/-hold-style$/,''));
 });
 document.addEventListener('submit',event=>{
  if(event.target.id==='add-person-form'){event.preventDefault();saveNewPerson();}
  if(event.target.id==='template-form'){event.preventDefault();saveProgramTemplate();}
  if(event.target.id==='assign-program-form'){event.preventDefault();assignProgramTemplate();}
+});
+document.addEventListener('click',event=>{
+ if(!rosterUI().filterOpen||state.nav!=='roster')return;
+ if(event.target.closest('.roster-filter-anchor'))return;
+ rosterUI().filterOpen=false;
+ refreshRoster({refreshToolbar:true});
+});
+document.addEventListener('keydown',event=>{
+ if(event.key!=='Escape'||state.overlay||!rosterUI().filterOpen||state.nav!=='roster')return;
+ rosterUI().filterOpen=false;
+ refreshRoster({refreshToolbar:true});
+ $('[data-action="roster-filters"]')?.focus();
+ event.preventDefault();
 });
