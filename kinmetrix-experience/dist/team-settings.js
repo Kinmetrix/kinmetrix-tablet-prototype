@@ -45,6 +45,7 @@ function teamSettings() {
 const TEAM_ASSESSMENT_DEFAULTS = {
   activeMode: 'strength',
   holdStyle: 'timed',
+  holdSeconds: 6,
   positions: 4,
   reps: 3,
   weight: 12,
@@ -58,6 +59,10 @@ function normalizeTeamAssessment(raw) {
   const assessment = {...TEAM_ASSESSMENT_DEFAULTS, ...raw};
   if (!sessionModeKeys('assessment').includes(assessment.activeMode)) assessment.activeMode = TEAM_ASSESSMENT_DEFAULTS.activeMode;
   assessment.holdStyle = assessment.activeMode === 'strength' && assessment.holdStyle === 'endurance' ? 'endurance' : 'timed';
+  if (assessment.activeMode === 'strength' && assessment.holdStyle !== 'endurance') {
+    const seconds = Number(assessment.holdSeconds);
+    assessment.holdSeconds = Number.isFinite(seconds) ? Math.min(15, Math.max(2, Math.round(seconds))) : TEAM_ASSESSMENT_DEFAULTS.holdSeconds;
+  } else delete assessment.holdSeconds;
   assessment.positions = assessment.positions === 8 ? 8 : 4;
   assessment.reps = [1, 2, 3, 4, 5].includes(assessment.reps) ? assessment.reps : 3;
   assessment.weight = Math.min(50, Math.max(1, Number(assessment.weight) || TEAM_ASSESSMENT_DEFAULTS.weight));
@@ -87,15 +92,19 @@ function assessmentProtocolRow(label, control, detail = '') {
   </div>`;
 }
 
+function assessmentDegreesInput(id, {min, max, value, ariaLabel}) {
+  return `<div class="weight-input assessment-weight-input"><input id="${id}" type="number" min="${min}" max="${max}" step="1" value="${value}" inputmode="numeric" aria-label="${ariaLabel}"><span>°</span></div>`;
+}
+
 function teamAssessmentArcFieldsMarkup(assessment) {
   const kind = setupTiltKind(assessment.activeMode);
   if (kind === 'limit') {
-    return assessmentProtocolRow('Start tilt', `<input id="team-rom-start" type="number" min="0" max="${assessment.romMax - 1}" step="1" value="${assessment.romStart}" inputmode="numeric" aria-label="Start tilt degrees">`, 'ROM assessments start here.')
-      + assessmentProtocolRow('Max tilt', `<input id="team-rom-max" type="number" min="${assessment.romStart + 1}" max="${SETUP_MAX_TILT}" step="1" value="${assessment.romMax}" inputmode="numeric" aria-label="Max tilt degrees">`, 'Safety limit the pad never passes.');
+    return assessmentProtocolRow('Start tilt', assessmentDegreesInput('team-rom-start', {min: 0, max: assessment.romMax - 1, value: assessment.romStart, ariaLabel: 'Start tilt degrees'}), 'ROM assessments start here.')
+      + assessmentProtocolRow('Max tilt', assessmentDegreesInput('team-rom-max', {min: assessment.romStart + 1, max: SETUP_MAX_TILT, value: assessment.romMax, ariaLabel: 'Max tilt degrees'}), 'Safety limit the pad never passes.');
   }
-  const endRow = kind === 'fixed' ? '' : assessmentProtocolRow(kind === 'return' ? 'End tilt' : 'End travel', `<input id="team-tilt-end" type="number" min="0" max="${SETUP_MAX_TILT}" step="1" value="${assessment.tiltEnd}" inputmode="numeric" aria-label="End tilt degrees">`, kind === 'return' ? 'Pad returns toward this tilt.' : 'Pad travels to this tilt each rep.');
+  const endRow = kind === 'fixed' ? '' : assessmentProtocolRow(kind === 'return' ? 'End tilt' : 'End travel', assessmentDegreesInput('team-tilt-end', {min: 0, max: SETUP_MAX_TILT, value: assessment.tiltEnd, ariaLabel: 'End tilt degrees'}), kind === 'return' ? 'Pad returns toward this tilt.' : 'Pad travels to this tilt each rep.');
   const startDetail = kind === 'fixed' ? 'Same tilt for every direction until session setup.' : 'Default start for each direction.';
-  return assessmentProtocolRow('Start tilt', `<input id="team-tilt-start" type="number" min="0" max="${SETUP_MAX_TILT}" step="1" value="${assessment.tiltStart}" inputmode="numeric" aria-label="Start tilt degrees">`, startDetail) + endRow;
+  return assessmentProtocolRow('Start tilt', assessmentDegreesInput('team-tilt-start', {min: 0, max: SETUP_MAX_TILT, value: assessment.tiltStart, ariaLabel: 'Start tilt degrees'}), startDetail) + endRow;
 }
 
 function assessmentWorkspaceTab() {
@@ -127,7 +136,7 @@ function teamAssessmentProtocolMarkup() {
       <h2 id="assessment-defaults-title" class="sr-only">Assessment defaults</h2>
       <p class="assessment-arc-kind"><strong>${escapeHTML(mode.name)}</strong> · ${escapeHTML(arcHint)}</p>
       ${assessmentProtocolRow('Mode', `<select id="team-assessment-mode" aria-label="Assessment mode">${sessionModeKeys('assessment').map(key => `<option value="${key}" ${key === modeKey ? 'selected' : ''}>${sessionModes[key].name}</option>`).join('')}</select>`)}
-      ${modeKey === 'strength' ? assessmentProtocolRow('Hold time', `<select id="team-assessment-hold-style" aria-label="Isometric hold time"><option value="timed" ${assessment.holdStyle !== 'endurance' ? 'selected' : ''}>Seconds</option><option value="endurance" ${assessment.holdStyle === 'endurance' ? 'selected' : ''}>Endurance</option></select>`, 'Timed hold or hold until release.') : ''}
+      ${modeKey === 'strength' ? assessmentProtocolRow('Hold', `<div class="hold-time-row${assessment.holdStyle === 'endurance' ? ' hold-time-row--endurance' : ''}"><select id="team-assessment-hold-style" aria-label="Timed hold or endurance"><option value="timed" ${assessment.holdStyle !== 'endurance' ? 'selected' : ''}>Timed</option><option value="endurance" ${assessment.holdStyle === 'endurance' ? 'selected' : ''}>Endurance</option></select><div class="weight-input assessment-weight-input hold-seconds-inline"${assessment.holdStyle === 'endurance' ? ' hidden' : ''}><input id="team-assessment-hold-seconds" type="number" min="2" max="15" step="1" value="${assessment.holdSeconds ?? 6}" inputmode="numeric" aria-label="Hold length in seconds"><span>s</span></div></div>`, 'Timed: enter seconds (2–15). Endurance: hold until release.') : ''}
       ${teamAssessmentArcFieldsMarkup(assessment)}
       ${assessmentProtocolRow('Directions', directions)}
       ${assessmentProtocolRow('Reps / direction', reps)}
@@ -356,8 +365,13 @@ const teamSettingsActions = {
       const mode = modeEl.value;
       if (!sessionModeKeys('assessment').includes(mode)) return;
       assessment.activeMode = mode;
-      if (mode === 'strength') assessment.holdStyle = $('#team-assessment-hold-style')?.value === 'endurance' ? 'endurance' : 'timed';
-      else delete assessment.holdStyle;
+      if (mode === 'strength') {
+        assessment.holdStyle = $('#team-assessment-hold-style')?.value === 'endurance' ? 'endurance' : 'timed';
+        if (assessment.holdStyle !== 'endurance') assessment.holdSeconds = Number($('#team-assessment-hold-seconds')?.value);
+      } else {
+        delete assessment.holdStyle;
+        delete assessment.holdSeconds;
+      }
       const reps = Number($('#team-assessment-reps')?.value);
       if ([1, 2, 3, 4, 5].includes(reps)) assessment.reps = reps;
       if (mode === 'rom') {
