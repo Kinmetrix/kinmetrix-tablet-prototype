@@ -39,7 +39,35 @@ function teamSettings() {
   team.sessionPlan = {...defaults.sessionPlan, ...team.sessionPlan};
   if (!clinicSessionTemplates().some(item => item.id === team.sessionPlan.templateId)) team.sessionPlan.templateId = 'light';
   team.assessment = normalizeTeamAssessment(team.assessment);
+  team.rom = normalizeTeamRom(team.rom, team.assessment);
   return team;
+}
+
+const TEAM_ROM_DEFAULTS = {
+  positions: 4,
+  romStillOn: true,
+  romStill: 2,
+  romDropOn: true,
+  romDrop: 5,
+  challenge: 1
+};
+
+function normalizeTeamRom(raw, legacyAssessment) {
+  const rom = {...TEAM_ROM_DEFAULTS, ...raw};
+  if (legacyAssessment?.romStart != null && raw?.positions == null) {
+    /* legacy protocol fields ignored for team ROM tab */
+  }
+  rom.positions = rom.positions === 8 ? 8 : 4;
+  rom.romStill = Math.min(5, Math.max(1, Number(rom.romStill) || TEAM_ROM_DEFAULTS.romStill));
+  rom.romDrop = Math.min(50, Math.max(5, Number(rom.romDrop) || TEAM_ROM_DEFAULTS.romDrop));
+  rom.romStillOn = rom.romStillOn !== false;
+  rom.romDropOn = rom.romDropOn !== false;
+  rom.challenge = Math.min(5, Math.max(0.5, Number(rom.challenge) || TEAM_ROM_DEFAULTS.challenge));
+  return rom;
+}
+
+function teamRomConfig() {
+  return teamSettings().rom;
 }
 
 const TEAM_ASSESSMENT_DEFAULTS = {
@@ -51,13 +79,11 @@ const TEAM_ASSESSMENT_DEFAULTS = {
   weight: 12,
   tiltStart: 5,
   tiltEnd: 33,
-  romStart: 0,
-  romMax: 45
 };
 
 function normalizeTeamAssessment(raw) {
   const assessment = {...TEAM_ASSESSMENT_DEFAULTS, ...raw};
-  if (!sessionModeKeys('assessment').includes(assessment.activeMode)) assessment.activeMode = TEAM_ASSESSMENT_DEFAULTS.activeMode;
+  if (!standardExerciseModeKeys('assessment').includes(assessment.activeMode)) assessment.activeMode = TEAM_ASSESSMENT_DEFAULTS.activeMode;
   assessment.holdStyle = assessment.activeMode === 'strength' && assessment.holdStyle === 'endurance' ? 'endurance' : 'timed';
   if (assessment.activeMode === 'strength' && assessment.holdStyle !== 'endurance') {
     const seconds = Number(assessment.holdSeconds);
@@ -68,8 +94,8 @@ function normalizeTeamAssessment(raw) {
   assessment.weight = Math.min(50, Math.max(1, Number(assessment.weight) || TEAM_ASSESSMENT_DEFAULTS.weight));
   assessment.tiltStart = Math.min(SETUP_MAX_TILT, Math.max(0, Number(assessment.tiltStart) ?? TEAM_ASSESSMENT_DEFAULTS.tiltStart));
   assessment.tiltEnd = Math.min(SETUP_MAX_TILT, Math.max(assessment.tiltStart + 1, Number(assessment.tiltEnd) ?? TEAM_ASSESSMENT_DEFAULTS.tiltEnd));
-  assessment.romStart = Math.min(assessment.romMax - 1, Math.max(0, Number(assessment.romStart) ?? 0));
-  assessment.romMax = Math.min(SETUP_MAX_TILT, Math.max(assessment.romStart + 1, Number(assessment.romMax) ?? TEAM_ASSESSMENT_DEFAULTS.romMax));
+  delete assessment.romStart;
+  delete assessment.romMax;
   return assessment;
 }
 
@@ -98,10 +124,6 @@ function assessmentDegreesInput(id, {min, max, value, ariaLabel}) {
 
 function teamAssessmentArcFieldsMarkup(assessment) {
   const kind = setupTiltKind(assessment.activeMode);
-  if (kind === 'limit') {
-    return assessmentProtocolRow('Start tilt', assessmentDegreesInput('team-rom-start', {min: 0, max: assessment.romMax - 1, value: assessment.romStart, ariaLabel: 'Start tilt degrees'}), 'ROM assessments start here.')
-      + assessmentProtocolRow('Max tilt', assessmentDegreesInput('team-rom-max', {min: assessment.romStart + 1, max: SETUP_MAX_TILT, value: assessment.romMax, ariaLabel: 'Max tilt degrees'}), 'Safety limit the pad never passes.');
-  }
   const endRow = kind === 'fixed' ? '' : assessmentProtocolRow(kind === 'return' ? 'End tilt' : 'End travel', assessmentDegreesInput('team-tilt-end', {min: 0, max: SETUP_MAX_TILT, value: assessment.tiltEnd, ariaLabel: 'End tilt degrees'}), kind === 'return' ? 'Pad returns toward this tilt.' : 'Pad travels to this tilt each rep.');
   const startDetail = kind === 'fixed' ? 'Same tilt for every direction until session setup.' : 'Default start for each direction.';
   return assessmentProtocolRow('Start tilt', assessmentDegreesInput('team-tilt-start', {min: 0, max: SETUP_MAX_TILT, value: assessment.tiltStart, ariaLabel: 'Start tilt degrees'}), startDetail) + endRow;
@@ -110,13 +132,14 @@ function teamAssessmentArcFieldsMarkup(assessment) {
 function assessmentWorkspaceTab() {
   const ui = directoryUI().programs;
   const tab = ui.assessmentTab ?? 'protocol';
-  ui.assessmentTab = tab === 'session-plan' ? 'session-plan' : 'protocol';
+  const allowed = ['protocol', 'rom', 'session-plan'];
+  ui.assessmentTab = allowed.includes(tab) ? tab : 'protocol';
   return ui.assessmentTab;
 }
 
 function assessmentWorkspaceSubnav() {
   const tab = assessmentWorkspaceTab();
-  return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Assessment views">${[['protocol', 'Protocol'], ['session-plan', 'Session plan']].map(([key, label]) => `<button type="button" data-action="assessment-tab" data-tab="${key}" ${tab === key ? 'aria-current="page"' : ''}>${label}</button>`).join('')}</nav>`;
+  return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Assessment views">${[['protocol', 'Protocol'], ['rom', 'ROM'], ['session-plan', 'Session plan']].map(([key, label]) => `<button type="button" data-action="assessment-tab" data-tab="${key}" ${tab === key ? 'aria-current="page"' : ''}>${label}</button>`).join('')}</nav>`;
 }
 
 function teamAssessmentProtocolMarkup() {
@@ -127,27 +150,51 @@ function teamAssessmentProtocolMarkup() {
   const unit = exportForceUnits[teamSettings().forceUnit]?.short || 'kg';
   const directions = `<div class="segmented" role="group" aria-label="Directions">${[4, 8].map(n => `<button type="button" class="${assessment.positions === n ? 'active' : ''}" data-action="team-assessment-positions" data-value="${n}" aria-pressed="${assessment.positions === n}">${n}</button>`).join('')}</div>`;
   const reps = `<select id="team-assessment-reps" aria-label="Reps per direction">${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${assessment.reps === n ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
-  const weight = modeKey === 'rom'
-    ? `<span class="assessment-protocol-static muted">Not used for ROM</span>`
-    : `<div class="weight-input assessment-weight-input"><input id="team-assessment-weight" type="number" min="1" max="50" step="0.5" value="${assessment.weight}" inputmode="decimal" aria-label="Target force"><span>${unit}</span></div>`;
+  const weight = `<div class="weight-input assessment-weight-input"><input id="team-assessment-weight" type="number" min="1" max="50" step="0.5" value="${assessment.weight}" inputmode="decimal" aria-label="Target force"><span>${unit}</span></div>`;
   return `<div class="assessment-workspace">
-    <p class="assessment-workspace-lead">Team defaults for session setup. Per-direction tilts stay on the setup screen before Begin.</p>
+    <p class="assessment-workspace-lead">Team defaults for standard assessments (isometric, isokinetic, eccentric). Per-direction tilts stay on the setup screen before Begin.</p>
     <section class="assessment-protocol-panel" aria-labelledby="assessment-defaults-title">
       <h2 id="assessment-defaults-title" class="sr-only">Assessment defaults</h2>
       <p class="assessment-arc-kind"><strong>${escapeHTML(mode.name)}</strong> · ${escapeHTML(arcHint)}</p>
-      ${assessmentProtocolRow('Mode', `<select id="team-assessment-mode" aria-label="Assessment mode">${sessionModeKeys('assessment').map(key => `<option value="${key}" ${key === modeKey ? 'selected' : ''}>${sessionModes[key].name}</option>`).join('')}</select>`)}
+      ${assessmentProtocolRow('Exercise mode', `<select id="team-assessment-mode" aria-label="Exercise mode">${standardExerciseModeKeys('assessment').map(key => `<option value="${key}" ${key === modeKey ? 'selected' : ''}>${sessionModes[key].name}</option>`).join('')}</select>`)}
       ${modeKey === 'strength' ? assessmentProtocolRow('Hold', `<div class="hold-time-row${assessment.holdStyle === 'endurance' ? ' hold-time-row--endurance' : ''}"><select id="team-assessment-hold-style" aria-label="Timed hold or endurance"><option value="timed" ${assessment.holdStyle !== 'endurance' ? 'selected' : ''}>Timed</option><option value="endurance" ${assessment.holdStyle === 'endurance' ? 'selected' : ''}>Endurance</option></select><div class="weight-input assessment-weight-input hold-seconds-inline"${assessment.holdStyle === 'endurance' ? ' hidden' : ''}><input id="team-assessment-hold-seconds" type="number" min="2" max="15" step="1" value="${assessment.holdSeconds ?? 6}" inputmode="numeric" aria-label="Hold length in seconds"><span>s</span></div></div>`, 'Timed: enter seconds (2–15). Endurance: hold until release.') : ''}
       ${teamAssessmentArcFieldsMarkup(assessment)}
       ${assessmentProtocolRow('Directions', directions)}
       ${assessmentProtocolRow('Reps / direction', reps)}
-      ${modeKey === 'rom' ? '' : assessmentProtocolRow('Target force', weight, 'Starting target when no member baseline exists.')}
+      ${assessmentProtocolRow('Target force', weight, 'Starting target when no member baseline exists.')}
+    </section>
+  </div>`;
+}
+
+function teamRomRuleRow(key, on, label, control) {
+  return `<div class="assessment-protocol-row assessment-rom-rule"><div class="assessment-protocol-row__text"><label class="check-label"><input type="checkbox" id="team-rom-${key}-on" data-team-rom-toggle="${key}" ${on ? 'checked' : ''}>${label}</label></div><div class="assessment-protocol-row__control">${control}</div></div>`;
+}
+
+function teamRomWorkspaceMarkup() {
+  const rom = teamRomConfig();
+  const unit = exportForceUnits[teamSettings().forceUnit]?.short || 'kg';
+  const directions = `<div class="segmented" role="group" aria-label="Directions">${[4, 8].map(n => `<button type="button" class="${rom.positions === n ? 'active' : ''}" data-action="team-rom-positions" data-value="${n}" aria-pressed="${rom.positions === n}">${n}</button>`).join('')}</div>`;
+  const stillStep = setupStepper(rom.romStill, {id: 'team-rom-still', action: 'team-rom-step', attrs: 'data-key="romStill" data-step="1" data-min="1" data-max="5"', label: 'no movement time', min: 1, max: 5, current: rom.romStill, unit: 's'});
+  const dropStep = setupStepper(rom.romDrop, {id: 'team-rom-drop', action: 'team-rom-step', attrs: 'data-key="romDrop" data-step="5" data-min="5" data-max="50"', label: 'force drop', min: 5, max: 50, current: rom.romDrop, unit: '%'});
+  const challenge = `<div class="weight-input assessment-weight-input"><input id="team-rom-challenge" type="number" min="0.5" max="5" step="0.5" value="${rom.challenge}" inputmode="decimal" aria-label="Challenge weight"><span>${unit}</span></div>`;
+  return `<div class="assessment-workspace">
+    <p class="assessment-workspace-lead">Team defaults for range of motion assessments. No target force or reps per direction.</p>
+    <section class="assessment-protocol-panel" aria-labelledby="team-rom-title">
+      <h2 id="team-rom-title" class="sr-only">Range of motion defaults</h2>
+      <p class="assessment-arc-kind"><strong>Range of motion</strong> · ${escapeHTML(setupModeLine.rom)}</p>
+      ${assessmentProtocolRow('Directions', directions)}
+      ${assessmentProtocolRow('Challenge weight', challenge, 'Light push needed before movement counts.')}
+      <h3 class="assessment-subheading">Finish the rep when</h3>
+      ${teamRomRuleRow('romStill', rom.romStillOn, 'No movement for', stillStep)}
+      ${teamRomRuleRow('romDrop', rom.romDropOn, 'Force drops by', dropStep)}
+      <p class="muted small">Whichever happens first. Coaches can always stop a rep by hand.</p>
     </section>
   </div>`;
 }
 
 function teamAssessmentWorkspaceMarkup() {
   const tab = assessmentWorkspaceTab();
-  const body = tab === 'session-plan' ? teamFollowUpPlanFieldsMarkup() : teamAssessmentProtocolMarkup();
+  const body = tab === 'session-plan' ? teamFollowUpPlanFieldsMarkup() : tab === 'rom' ? teamRomWorkspaceMarkup() : teamAssessmentProtocolMarkup();
   return `${assessmentWorkspaceSubnav()}${body}`;
 }
 
@@ -359,31 +406,36 @@ const teamSettingsActions = {
   'save-assessment-workspace': () => {
     if (state.actor !== 'coach' || state.nav !== 'programs' || directoryUI().programs.library !== 'assessments') return;
     const team = teamSettings();
-    const assessment = teamAssessmentConfig();
-    const modeEl = $('#team-assessment-mode');
-    if (modeEl) {
-      const mode = modeEl.value;
-      if (!sessionModeKeys('assessment').includes(mode)) return;
-      assessment.activeMode = mode;
-      if (mode === 'strength') {
-        assessment.holdStyle = $('#team-assessment-hold-style')?.value === 'endurance' ? 'endurance' : 'timed';
-        if (assessment.holdStyle !== 'endurance') assessment.holdSeconds = Number($('#team-assessment-hold-seconds')?.value);
-      } else {
-        delete assessment.holdStyle;
-        delete assessment.holdSeconds;
-      }
-      const reps = Number($('#team-assessment-reps')?.value);
-      if ([1, 2, 3, 4, 5].includes(reps)) assessment.reps = reps;
-      if (mode === 'rom') {
-        assessment.romStart = Number($('#team-rom-start')?.value);
-        assessment.romMax = Number($('#team-rom-max')?.value);
-      } else {
+    const tab = assessmentWorkspaceTab();
+    if (tab === 'protocol') {
+      const assessment = teamAssessmentConfig();
+      const modeEl = $('#team-assessment-mode');
+      if (modeEl) {
+        const mode = modeEl.value;
+        if (!standardExerciseModeKeys('assessment').includes(mode)) return;
+        assessment.activeMode = mode;
+        if (mode === 'strength') {
+          assessment.holdStyle = $('#team-assessment-hold-style')?.value === 'endurance' ? 'endurance' : 'timed';
+          if (assessment.holdStyle !== 'endurance') assessment.holdSeconds = Number($('#team-assessment-hold-seconds')?.value);
+        } else {
+          delete assessment.holdStyle;
+          delete assessment.holdSeconds;
+        }
+        const reps = Number($('#team-assessment-reps')?.value);
+        if ([1, 2, 3, 4, 5].includes(reps)) assessment.reps = reps;
         assessment.tiltStart = Number($('#team-tilt-start')?.value);
         if (setupTiltKind(mode) !== 'fixed') assessment.tiltEnd = Number($('#team-tilt-end')?.value);
         const weight = Number($('#team-assessment-weight')?.value);
         if (Number.isFinite(weight)) assessment.weight = weight;
+        team.assessment = normalizeTeamAssessment(assessment);
       }
-      team.assessment = normalizeTeamAssessment(assessment);
+    } else if (tab === 'rom') {
+      const rom = teamRomConfig();
+      rom.romStillOn = $('#team-rom-romStill-on')?.checked !== false;
+      rom.romDropOn = $('#team-rom-romDrop-on')?.checked !== false;
+      const challenge = Number($('#team-rom-challenge')?.value);
+      if (Number.isFinite(challenge)) rom.challenge = challenge;
+      team.rom = normalizeTeamRom(rom);
     }
     const sessionsEl = $('#plan-sessions');
     if (sessionsEl) {

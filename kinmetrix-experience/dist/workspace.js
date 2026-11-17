@@ -2,7 +2,7 @@
 function isometricHoldStyle(cfg){if(!cfg||cfg.type!=='strength')return null;return cfg.holdStyle==='endurance'?'endurance':'timed';}
 function isIsometricEndurance(cfg){return cfg?.type==='strength'&&isometricHoldStyle(cfg)==='endurance';}
 function programModeLabel(program){return program?.type==='strength'?isIsometricEndurance(program)?'Isometric · Endurance':'Isometric':sessionModes[program.type].name;}
-function sessionRecordLabel(r){if(r?.type==='strength')return isIsometricEndurance(r.sessionSettings||r)?'Isometric · Endurance':'Isometric';return protocols[r.type].name;}
+function sessionRecordLabel(r){if(r?.type==='strength')return isIsometricEndurance(r.sessionSettings||r)?'Isometric · Endurance':'Isometric';if(r?.type==='rom'&&r?.purpose==='assessment')return 'Range of motion';return protocols[r.type].name;}
 const sessionModes = {
  strength:{name:'Isometric',mechanism:'Fixed position',short:'Push against a fixed position',purposes:['assessment','training'],description:'Measure force or hold time in each direction. In setup, choose timed seconds or Endurance.',steps:['Build effort','Hold steady','Release'],cue:'Position stays fixed',trace:'M12 46L25 46L42 15L86 15L102 46L112 46'},
  rom:{name:'Range of motion',mechanism:'Isokinetic assessment',short:'Find your movement limits',purposes:['assessment'],description:'Measure your available range. Your coach reviews the result before applying new working limits.',steps:['Move through range','Reach your limit','Stop automatically or manually'],cue:'Movement stops at your limit',trace:'M12 46L28 46L88 12L112 12'},
@@ -11,6 +11,7 @@ const sessionModes = {
 };
 const sessionModeOrder=['strength','isokinetic','rom','eccentric'];
 const sessionModeKeys=purpose=>sessionModeOrder.filter(key=>sessionModes[key].purposes.includes(purpose));
+const standardExerciseModeKeys=purpose=>sessionModeKeys(purpose).filter(key=>key!=='rom');
 const modePurposeCopy={
  assessment:{strength:'Measure strength at a fixed position, or how long you sustain effort. Choose timed seconds or Endurance in setup.',isokinetic:'Measure strength through your range at a controlled speed.',rom:'Measure your available range. Your coach reviews new limits.',eccentric:'Measure control while resisting the device’s movement.'},
  training:{strength:'Practice holding a target effort against a fixed pad. In setup, choose timed seconds or Endurance.',isokinetic:'Train through your working range at a controlled speed.',eccentric:'Practice resisting the pad as the device moves against you.'}
@@ -123,8 +124,14 @@ function sessionPickerView(o){
  if(o.step==='programs')return programPickerView(o);
  if(o.step==='create-program')return programCreateView(o);
  const mode=sessionModes[o.mode],isMeasure=o.purpose==='assessment',label=isMeasure?'Assessment':'Training session';
- return pickerFrame(o,label,`Choose a mode for ${name}.`,
- `<div class="session-picker-body"><div class="mode-choices" role="group" aria-label="${label} mode">${sessionModeKeys(o.purpose).map(key=>{const m=sessionModes[key];return `<button class="mode-choice ${key===o.mode?'selected':''}" data-action="choose-session-mode" data-mode="${key}" aria-pressed="${key===o.mode}" aria-controls="mode-detail"><span><strong>${m.name}</strong><small>${m.short}</small></span><span class="mode-choice-indicator" aria-hidden="true">${key===o.mode?icon('check','icon-sm'):icon('chevron','icon-sm')}</span></button>`;}).join('')}</div>
+ const modeChoices=isMeasure?`<div class="mode-choices mode-choices-grouped" role="group" aria-label="${label} type">
+  <p class="mode-group-label">Range of motion</p>
+  ${(()=>{const key='rom',m=sessionModes[key];return `<button class="mode-choice ${key===o.mode?'selected':''}" data-action="choose-session-mode" data-mode="${key}" aria-pressed="${key===o.mode}" aria-controls="mode-detail"><span><strong>${m.name}</strong><small>${m.short}</small></span><span class="mode-choice-indicator" aria-hidden="true">${key===o.mode?icon('check','icon-sm'):icon('chevron','icon-sm')}</span></button>`;})()}
+  <p class="mode-group-label">Standard assessment</p>
+  ${standardExerciseModeKeys(o.purpose).map(key=>{const m=sessionModes[key];return `<button class="mode-choice ${key===o.mode?'selected':''}" data-action="choose-session-mode" data-mode="${key}" aria-pressed="${key===o.mode}" aria-controls="mode-detail"><span><strong>${m.name}</strong><small>${m.short}</small></span><span class="mode-choice-indicator" aria-hidden="true">${key===o.mode?icon('check','icon-sm'):icon('chevron','icon-sm')}</span></button>`;}).join('')}
+ </div>`:`<div class="mode-choices" role="group" aria-label="${label} mode">${sessionModeKeys(o.purpose).map(key=>{const m=sessionModes[key];return `<button class="mode-choice ${key===o.mode?'selected':''}" data-action="choose-session-mode" data-mode="${key}" aria-pressed="${key===o.mode}" aria-controls="mode-detail"><span><strong>${m.name}</strong><small>${m.short}</small></span><span class="mode-choice-indicator" aria-hidden="true">${key===o.mode?icon('check','icon-sm'):icon('chevron','icon-sm')}</span></button>`;}).join('')}</div>`;
+ return pickerFrame(o,label,isMeasure?`Choose an assessment kind for ${name}.`:`Choose a mode for ${name}.`,
+ `<div class="session-picker-body">${modeChoices}
  <section class="mode-detail" id="mode-detail" aria-labelledby="mode-detail-title"><div class="mode-expanded-bar"><button type="button" class="text-button" data-action="collapse-mode-preview">${icon('back','icon-sm')} Back to modes</button><h3 id="expanded-preview-title">${mode.name}</h3></div><div class="mode-detail-heading"><h3 id="mode-detail-title">${mode.name}</h3></div>
  <p class="mode-description">${modePurposeCopy[o.purpose][o.mode]}</p>
  <div class="mode-animation ${o.paused?'is-paused':''}">${movementPreview(o.mode)}<div class="mode-render-controls"><button type="button" data-action="expand-mode-preview" aria-label="Open larger ${mode.name} example" title="Larger example">${icon('expand','icon-sm')}</button><button type="button" data-action="toggle-mode-preview" aria-label="${o.paused?'Play':'Pause'} animation" title="${o.paused?'Play':'Pause'} animation">${icon(o.paused?'play':'pause','icon-sm')}</button></div></div></section></div>`,

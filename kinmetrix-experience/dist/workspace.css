@@ -30,6 +30,8 @@
 .session-picker .dialog-header>.icon-button{margin-top:1px}
 .session-picker-body{display:grid;grid-template-columns:42% minmax(0,1fr);min-height:456px}
 .mode-choices{padding:16px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:5px}
+.mode-choices-grouped .mode-group-label{margin:10px 10px 2px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.mode-choices-grouped .mode-group-label:first-child{margin-top:0}
 .mode-choice{display:flex;align-items:center;gap:12px;text-align:left;min-height:80px;width:100%;border:1px solid transparent;background:transparent;border-radius:9px;padding:12px 10px}
 .mode-choice:hover{background:var(--soft)}
 .mode-choice.selected{border-color:var(--ink);background:var(--soft)}

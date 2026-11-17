@@ -1,4 +1,16 @@
 /* Session identity, instance notes, reference interpretation and program progression. */
+function sessionHistoryCategory(record){
+ if(record?.programId)return 'program';
+ if(record?.purpose==='assessment'&&record?.type==='rom')return 'range-of-motion';
+ if(record?.purpose==='assessment')return 'assessment';
+ if(record?.purpose==='training')return 'smart-session';
+ return 'other';
+}
+function historyRecordMatchesFilter(record,filter){
+ if(!filter||filter==='all')return true;
+ return sessionHistoryCategory(record)===filter;
+}
+const HISTORY_FILTER_OPTIONS=[['all','All sessions'],['assessment','Assessment'],['range-of-motion','Range of motion'],['smart-session','Smart session'],['program','Programs']];
 function sessionDate(r){return Number.isFinite(r?.completedAt)?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'America/Toronto'}).format(r.completedAt):r?.date||'Date unavailable';}
 function sessionTime(r){return Number.isFinite(r?.completedAt)?new Intl.DateTimeFormat('en-CA',{hour:'numeric',minute:'2-digit',timeZone:'America/Toronto'}).format(r.completedAt):'';}
 function sessionStamp(r){return sessionDate(r)+(sessionTime(r)?' · '+sessionTime(r):'');}

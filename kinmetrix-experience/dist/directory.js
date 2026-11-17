@@ -311,10 +311,27 @@ const directoryActions={
   render();
   $(`[data-action="team-assessment-positions"][data-value="${value}"]`)?.focus();
  },
+ 'team-rom-positions':el=>{
+  if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
+  const value=Number(el.dataset.value);
+  if(![4,8].includes(value))return;
+  teamRomConfig().positions=value;
+  render();
+  $(`[data-action="team-rom-positions"][data-value="${value}"]`)?.focus();
+ },
+ 'team-rom-step':el=>{
+  if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
+  const key=el.dataset.key,rom=teamRomConfig();
+  if(!['romStill','romDrop'].includes(key))return;
+  const step=Number(el.dataset.step),min=Number(el.dataset.min),max=Number(el.dataset.max);
+  rom[key]=Math.max(min,Math.min(max,rom[key]+Number(el.dataset.delta)*step));
+  render();
+  $(`#${el.id}`)?.focus({preventScroll:true});
+ },
  'assessment-tab':el=>{
   if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
   const tab=el.dataset.tab;
-  if(!['protocol','session-plan'].includes(tab))return;
+  if(!['protocol','rom','session-plan'].includes(tab))return;
   directoryUI().programs.assessmentTab=tab;
   render();
   $(`[data-action="assessment-tab"][data-tab="${tab}"]`)?.focus();
