@@ -25,6 +25,7 @@ const SETTINGS_RAIL_SECTIONS = [
 function teamSettings() {
   const defaults = {
     name: 'Northside clinic',
+    logo: 'assets/team-northside.svg',
     forceUnit: 'kg',
     onboarding: Object.fromEntries(TEAM_ONBOARDING_FIELDS.map(field => [field.id, field.on])),
     waiverPolicy: 'before-session',
@@ -33,6 +34,7 @@ function teamSettings() {
   if (!state.team) state.team = defaults;
   const team = state.team;
   team.name ??= defaults.name;
+  team.logo ??= defaults.logo;
   team.forceUnit = exportForceUnits[team.forceUnit] ? team.forceUnit : 'kg';
   team.onboarding = {...defaults.onboarding, ...team.onboarding};
   if (!TEAM_WAIVER_POLICIES.some(item => item.id === team.waiverPolicy)) team.waiverPolicy = defaults.waiverPolicy;
