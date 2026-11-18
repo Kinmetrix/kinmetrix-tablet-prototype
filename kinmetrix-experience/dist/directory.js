@@ -26,7 +26,97 @@ const rosterColumnDefinitions=[
  {key:'clinician',label:'Clinician',width:150},{key:'height',label:'Height',width:88},{key:'weight',label:'Body weight',width:100},{key:'activity',label:'Activity level',width:110}
 ];
 const rosterDefaultColumns=['sessions','force','stability','visit','program'];
+const ROSTER_IMPORT_MAX_ROWS=200;
+const ROSTER_IMPORT_HEADERS=['name','email'];
 const ROSTER_SORT_KEYS=new Set(['name','sessions','force','stability','visit','program','clinician','height','weight','activity']);
+function rosterImportTemplateText(){return ROSTER_IMPORT_HEADERS.join(',')+'\r\n';}
+function parseCsvFieldLine(line){
+ const cells=[];let cur='',inQuotes=false;
+ for(let i=0;i<line.length;i++){
+  const ch=line[i];
+  if(inQuotes){if(ch==='"'&&line[i+1]==='"'){cur+='"';i++;continue;}if(ch==='"'){inQuotes=false;continue;}cur+=ch;continue;}
+  if(ch==='"'){inQuotes=true;continue;}
+  if(ch===','){cells.push(cur);cur='';continue;}
+  cur+=ch;
+ }
+ cells.push(cur);
+ return cells.map(cell=>cell.trim());
+}
+function parseRosterImportCSV(text){
+ const raw=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(line=>line.trim()!=='');
+ if(!raw.length)return {error:'This file is empty.'};
+ const headerCells=parseCsvFieldLine(raw[0]);
+ if(headerCells.length!==ROSTER_IMPORT_HEADERS.length||headerCells.some((cell,index)=>cell.trim().toLowerCase()!==ROSTER_IMPORT_HEADERS[index]))return {error:'Use the downloaded template.'};
+ const dataLines=raw.slice(1);
+ if(dataLines.length>ROSTER_IMPORT_MAX_ROWS)return {error:'This prototype accepts up to 200 rows.'};
+ return {rows:dataLines.map((line,index)=>({line:index+2,name:(parseCsvFieldLine(line)[0]??'').trim(),email:(parseCsvFieldLine(line)[1]??'').trim()}))};
+}
+function rosterImportEmailShapeOk(email){const value=email.trim();if(!value)return true;const at=value.indexOf('@');return at>0&&at<value.length-1;}
+function memberStoredEmail(personId){return String(state.memberDetails[personId]?.email||'').trim().toLowerCase();}
+function buildRosterImportPreview(rows){
+ const rosterNames=new Set(people.map(p=>p.name.trim().toLowerCase()));
+ const rosterEmails=new Set(people.map(p=>memberStoredEmail(p.id)).filter(Boolean));
+ const seenNames=new Set(),seenEmails=new Set();
+ return rows.map(row=>{
+  const name=row.name.trim().replace(/\s+/g,' ');
+  const email=row.email.trim(),emailKey=email.toLowerCase();
+  let issue='';
+  if(!name)issue='Enter a name.';
+  else if(rosterNames.has(name.toLowerCase()))issue='Already on roster.';
+  else if(seenNames.has(name.toLowerCase()))issue='Duplicate name in this file.';
+  else if(email&&!rosterImportEmailShapeOk(email))issue='Enter a valid email.';
+  else if(emailKey&&rosterEmails.has(emailKey))issue='Email already on roster.';
+  else if(emailKey&&seenEmails.has(emailKey))issue='Duplicate email in this file.';
+  if(!issue){seenNames.add(name.toLowerCase());if(emailKey)seenEmails.add(emailKey);}
+  return {name,email,status:issue?'Blocked':'Ready',issue};
+ });
+}
+function downloadRosterImportTemplate(){
+ const link=document.createElement('a'),url=URL.createObjectURL(new Blob(['\ufeff'+rosterImportTemplateText()],{type:'text/csv;charset=utf-8'}));
+ link.href=url;link.download='kinmetrix-roster-import-template.csv';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function rosterImportWizardSteps(active){
+ const steps=[['prepare','Prepare'],['review','Review'],['result','Done']];
+ return `<ol class="roster-import-steps" aria-label="Import steps">${steps.map(([id,label])=>`<li class="${id===active?'is-active':''}">${label}</li>`).join('')}</ol>`;
+}
+function rosterImportDialog(){
+ const o=state.overlay,step=o.step||'prepare',clinicianName=escapeHTML(clinician().name);
+ if(step==='prepare'){
+  return `<div class="modal-backdrop"><section class="dialog directory-dialog roster-import-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">Import members</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${rosterImportWizardSteps('prepare')}<p class="directory-dialog-intro">Add many members from a CSV file. New members will be assigned to <strong>${clinicianName}</strong>.</p><div class="roster-import-prepare"><button type="button" class="button" data-action="roster-import-download-template">${icon('download','icon-sm')} Download template</button><label class="roster-import-upload button" for="roster-import-file">${icon('upload','icon-sm')} Choose CSV file</label><input id="roster-import-file" type="file" accept=".csv,text/csv" class="sr-only"></div>${o.fileError?`<p class="form-error" role="alert">${escapeHTML(o.fileError)}</p>`:''}${o.fileName?`<p class="small muted">Selected: ${escapeHTML(o.fileName)}</p>`:''}<footer class="directory-dialog-footer">${button('Cancel','close-modal')}</footer></section></div>`;
+ }
+ if(step==='review'){
+  const preview=o.preview||[],ready=preview.filter(row=>row.status==='Ready');
+  const body=preview.length?`<div class="directory-table-scroll roster-import-preview-scroll"><table class="data-table directory-table"><caption class="sr-only">Import preview</caption><thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Status</th><th scope="col">Issue</th></tr></thead><tbody>${preview.map(row=>`<tr><th scope="row">${escapeHTML(row.name||'—')}</th><td>${row.email?escapeHTML(row.email):'<span class="muted">—</span>'}</td><td>${row.status==='Ready'?'<span class="badge neutral">Ready</span>':'<span class="badge amber">Blocked</span>'}</td><td>${row.issue?escapeHTML(row.issue):'<span class="muted">—</span>'}</td></tr>`).join('')}</tbody></table></div>`:`<p class="directory-dialog-intro">No members to import.</p>`;
+  return `<div class="modal-backdrop"><section class="dialog directory-dialog roster-import-dialog wide" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">Import members</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${rosterImportWizardSteps('review')}${body}<footer class="directory-dialog-footer">${button('Back','roster-import-back')}${button('Import '+ready.length+' members','roster-import-confirm','primary',ready.length?'':'disabled')}</footer></section></div>`;
+ }
+ const added=o.added??0,skipped=o.skipped??0;
+ return `<div class="modal-backdrop"><section class="dialog directory-dialog roster-import-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">Import members</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${rosterImportWizardSteps('result')}<p class="directory-dialog-intro">Added <strong>${added}</strong> members · Skipped <strong>${skipped}</strong> with issues.</p><p class="small muted">New members are assigned to ${clinicianName}. Saved for this demo only.</p><footer class="directory-dialog-footer">${button('Done','close-modal','primary')}</footer></section></div>`;
+}
+function readRosterImportFile(file){
+ if(state.overlay?.type!=='roster-import')return;
+ if(!/\.csv$/i.test(file.name)){state.overlay.fileError='Choose a CSV file.';state.overlay.fileName='';renderOverlay();return;}
+ file.text().then(text=>{
+  const parsed=parseRosterImportCSV(text);
+  if(parsed.error){state.overlay={...state.overlay,step:'prepare',fileError:parsed.error,preview:null,fileName:file.name};renderOverlay();return;}
+  state.overlay={...state.overlay,step:'review',fileError:'',fileName:file.name,preview:buildRosterImportPreview(parsed.rows),sourceRows:parsed.rows};
+  renderOverlay();
+ }).catch(()=>{state.overlay.fileError='Could not read this file.';renderOverlay();});
+}
+function confirmRosterImport(){
+ const o=state.overlay;
+ if(state.actor!=='coach'||o?.type!=='roster-import'||o.step!=='review'||!o.preview)return;
+ const valid=o.preview.filter(row=>row.status==='Ready'),skipped=o.preview.length-valid.length;
+ for(const row of valid){
+  const name=row.name.trim().replace(/\s+/g,' '),words=name.split(' '),initials=[words[0],...(words.length>1?[words.at(-1)]:[])].map(word=>Array.from(word)[0]).join('').toLocaleUpperCase();
+  const member={id:'person-'+crypto.randomUUID(),name,initials,assigned:state.clinicianId,color:'',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false,createdInDemo:true};
+  people.push(member);
+  if(row.email.trim())state.memberDetails[member.id]={...(state.memberDetails[member.id]||{}),email:row.email.trim()};
+ }
+ state.overlay={type:'roster-import',step:'result',added:valid.length,skipped};
+ render();
+ renderOverlay();
+ toast('Import complete.');
+}
 const ROSTER_FILTER_KINDS=[
  {id:'all',label:'All members',values:[['all','All']]},
  {id:'programStatus',label:'Program status',values:[['active','Active program'],['none','No active program'],['new','No assessment yet']]},
@@ -105,7 +195,7 @@ function directorySearch(id,label,value,placeholder){return `<div class="search-
 function rosterPage(){
  if(state.actor!=='coach')return peopleView();
  const permitted=visiblePeople(),scope=state.rosterPolicy==='assigned'&&!isAdmin()?'Members assigned to '+clinician().name:'All clinic members';
- return `<main class="directory-page roster-workspace templates-hub staff-single-pane"><div class="settings-hub-pane" aria-label="Roster"><header class="settings-pane-head"><div class="settings-pane-head-row"><div class="settings-pane-head-text"><h1>Roster</h1><p class="settings-pane-desc">${escapeHTML(scope)}</p></div><div class="settings-pane-head-actions">${rosterHeadToolsMarkup()}${button(icon('plus','icon-sm')+' Add person','add-person','primary','aria-haspopup="dialog"')}</div></div></header>
+ return `<main class="directory-page roster-workspace templates-hub staff-single-pane"><div class="settings-hub-pane" aria-label="Roster"><header class="settings-pane-head"><div class="settings-pane-head-row"><div class="settings-pane-head-text"><h1>Roster</h1><p class="settings-pane-desc">${escapeHTML(scope)}</p></div><div class="settings-pane-head-actions">${rosterHeadToolsMarkup()}${button('Import','roster-import-open','small-button')}${button(icon('plus','icon-sm')+' Add person','add-person','primary','aria-haspopup="dialog"')}</div></div></header>
  ${rosterFilterToolbar(permitted)}
  <div id="roster-results">${rosterResults()}</div></div></main>`;
 }
@@ -137,14 +227,17 @@ function refreshRoster({refreshToolbar=false}={}){
  if(refreshToolbar){const toolbar=$('.roster-toolbar');if(toolbar)toolbar.outerHTML=rosterFilterToolbar(visiblePeople());}
 }
 function newPersonClinicians(){return state.rosterPolicy==='assigned'&&!isAdmin()?[clinician()]:clinicians;}
-function addPersonDialog(){return `<div class="modal-backdrop"><section class="dialog directory-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="add-person-intro"><header class="dialog-header"><h2 id="dialog-title">Add person</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header><p id="add-person-intro" class="directory-dialog-intro">Add a photo and name. Personal details can follow.</p><form id="add-person-form">${photoCaptureControl('new-person',state.overlay)}<label class="field-label" for="new-person-name">Full name</label><input id="new-person-name" name="name" type="text" autocomplete="off" required maxlength="80" placeholder="First and last name"><label class="field-label" for="new-person-clinician">Assigned clinician</label><select id="new-person-clinician">${newPersonClinicians().map(c=>`<option value="${c.id}" ${c.id===state.clinicianId?'selected':''}>${escapeHTML(c.name)}</option>`).join('')}</select><p class="program-form-note">Saved for this demo only.</p><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" class="button primary">Add person</button></footer></form></section></div>`;}
+function addPersonDialog(){return `<div class="modal-backdrop"><section class="dialog directory-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="add-person-intro"><header class="dialog-header"><h2 id="dialog-title">Add person</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header><p id="add-person-intro" class="directory-dialog-intro">Add a photo and name. Personal details can follow.</p><form id="add-person-form">${photoCaptureControl('new-person',state.overlay)}<label class="field-label" for="new-person-name">Full name</label><input id="new-person-name" name="name" type="text" autocomplete="off" required maxlength="80" placeholder="First and last name"><label class="field-label" for="new-person-email">Email <span class="muted">(optional)</span></label><input id="new-person-email" name="email" type="email" autocomplete="off" maxlength="120" placeholder="name@example.com"><label class="field-label" for="new-person-clinician">Assigned clinician</label><select id="new-person-clinician">${newPersonClinicians().map(c=>`<option value="${c.id}" ${c.id===state.clinicianId?'selected':''}>${escapeHTML(c.name)}</option>`).join('')}</select><p class="program-form-note">Saved for this demo only.</p><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" class="button primary">Add person</button></footer></form></section></div>`;}
 function saveNewPerson(){
  if(state.actor!=='coach'||state.overlay?.type!=='add-person'||state.overlay.photoLoading)return;
- const form=$('#add-person-form'),field=$('#new-person-name'),name=field.value.trim().replace(/\s+/g,' '),assigned=$('#new-person-clinician').value;
- field.setCustomValidity(name?'':'Enter a name.');if(!form.reportValidity()||!newPersonClinicians().some(c=>c.id===assigned))return;
+ const form=$('#add-person-form'),field=$('#new-person-name'),name=field.value.trim().replace(/\s+/g,' '),email=$('#new-person-email').value.trim(),assigned=$('#new-person-clinician').value;
+ field.setCustomValidity(name?'':'Enter a name.');
+ const emailField=$('#new-person-email');
+ if(email&&!rosterImportEmailShapeOk(email)){emailField.setCustomValidity('Enter a valid email.');}else emailField.setCustomValidity('');
+ if(!form.reportValidity()||!newPersonClinicians().some(c=>c.id===assigned))return;
  const words=name.split(' '),initials=[words[0],...(words.length>1?[words.at(-1)]:[])].map(word=>Array.from(word)[0]).join('').toLocaleUpperCase();
  const member={id:'person-'+crypto.randomUUID(),name,initials,assigned,color:'',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false,createdInDemo:true};
- people.push(member);if(state.overlay.photo)state.memberPhotos[member.id]=state.overlay.photo;state.overlay=null;
+ people.push(member);if(state.overlay.photo)state.memberPhotos[member.id]=state.overlay.photo;if(email)state.memberDetails[member.id]={...(state.memberDetails[member.id]||{}),email};state.overlay=null;
  Object.assign(directoryUI().roster,{query:'',filterKind:'all',filterValue:'all'});
  openDirectoryPerson(member.id,'roster','profile');
  $('.member-identity h1')?.setAttribute('tabindex','-1');$('.member-identity h1')?.focus({preventScroll:true});toast(name+' added.');
@@ -293,6 +386,10 @@ function assignProgramTemplate(){
 }
 const directoryActions={
  'add-person':()=>{if(state.actor!=='coach')return;openModal('add-person');$('#new-person-name')?.focus();},
+ 'roster-import-open':()=>{if(state.actor!=='coach')return;openModal('roster-import',{step:'prepare',fileError:'',fileName:'',preview:null});},
+ 'roster-import-download-template':()=>{if(state.overlay?.type!=='roster-import')return;downloadRosterImportTemplate();},
+ 'roster-import-back':()=>{if(state.overlay?.type!=='roster-import'||state.overlay.step!=='review')return;state.overlay={type:'roster-import',step:'prepare',fileError:'',fileName:'',preview:null};renderOverlay();},
+ 'roster-import-confirm':confirmRosterImport,
  'roster-filters':()=>{if(state.actor!=='coach')return;const ui=rosterUI();ui.filterOpen=!ui.filterOpen;refreshRoster({refreshToolbar:true});(ui.filterOpen?$('#roster-filter-kind'):$('[data-action="roster-filters"]'))?.focus();},
  'close-roster-filters':()=>{rosterUI().filterOpen=false;refreshRoster({refreshToolbar:true});$('[data-action="roster-filters"]')?.focus();},
  'roster-columns':()=>{if(state.actor==='coach')openModal('roster-columns');},
@@ -348,10 +445,11 @@ const directoryActions={
 document.addEventListener('input',event=>{
  const el=event.target;if(el.id==='directory-search'){directoryUI().roster.query=el.value;refreshRoster();}
  if(el.id==='programs-search'){directoryUI().programs.query=el.value;$('#programs-results').innerHTML=programsResults();}
- if(el.id==='plan-name'||el.id==='new-person-name')el.setCustomValidity('');
+ if(el.id==='plan-name'||el.id==='new-person-name'||el.id==='new-person-email')el.setCustomValidity('');
 });
 document.addEventListener('change',event=>{
  const el=event.target;
+ if(el.id==='roster-import-file'&&el.files?.[0])readRosterImportFile(el.files[0]);
  if(el.id==='roster-filter-kind'){const ui=rosterUI();ui.filterKind=el.value;const options=rosterFilterValueOptions(ui.filterKind,visiblePeople());ui.filterValue=ui.filterKind==='all'?'all':options[0]?.[0]||'all';refreshRoster({refreshToolbar:true});el.focus();}
  if(el.id==='roster-filter-value'){rosterUI().filterValue=el.value;refreshRoster({refreshToolbar:true});el.focus();}
  if(el.id==='assign-person')el.setCustomValidity('');

@@ -84,3 +84,9 @@
  .directory-heading-actions .directory-total{display:none}
  .directory-dialog-footer .button{flex:1}
 }
+.roster-import-steps{display:flex;gap:12px;list-style:none;margin:0 0 16px;padding:0;font-size:13px;color:var(--muted)}
+.roster-import-steps li{padding:6px 10px;border-radius:999px;background:var(--soft)}
+.roster-import-steps li.is-active{background:var(--selected);color:var(--action);font-weight:600}
+.roster-import-prepare{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:8px 0 12px}
+.roster-import-upload{cursor:pointer}
+.roster-import-preview-scroll{max-height:min(52vh,420px);margin:12px 0}
