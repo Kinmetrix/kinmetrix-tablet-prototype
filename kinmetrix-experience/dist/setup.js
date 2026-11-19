@@ -1,6 +1,8 @@
 /* Session preparation. One row per direction; the middle of each row changes with the mode.
    All limits, thresholds and speeds are placeholders for the prototype, not validated values. */
 const SETUP_MAX_TILT=45;
+function isSetupStageContext(){return state.stage==='setup'||state.stage==='team-assessment-edit';}
+function isTeamAssessmentSetupContext(){return state.stage==='team-assessment-edit';}
 const setupDirectionNames={0:'Forward',45:'Forward right',90:'Right',135:'Rear right',180:'Rear',225:'Rear left',270:'Left',315:'Forward left'};
 const setupModeLine={strength:'Push against a pad that stays still.',endurance:'Hold a steady push for as long as you can.',isokinetic:'Push while the pad moves at a controlled speed.',eccentric:'Resist while the device moves the pad back toward you.',rom:'Move as far as is comfortable. This finds their limits.'};
 const eccentricSpeeds={slow:{label:'Slow',rate:4},medium:{label:'Medium',rate:8},fast:{label:'Fast',rate:12}};
@@ -73,10 +75,11 @@ function resetSetupAcceptance(){
 }
 function renderSetupControl(selector){render();$(selector)?.focus({preventScroll:true});}
 function changeSetupMode(type){
- if(state.setup.programLoad||!sessionModeKeys(state.setup.purpose).includes(type))return;
+ if((!isTeamAssessmentSetupContext()&&state.setup.programLoad)||!sessionModeKeys(state.setup.purpose).includes(type))return;
  state.setup.type=type;
  if(type!=='strength')delete state.setup.holdStyle;
  else state.setup.holdStyle??='timed';
+ if(isTeamAssessmentSetupContext())teamAssessmentConfig().activeMode=type;
  resetSetupAcceptance();renderSetupControl('#setup-mode');
 }
 function setupStepperDisplay(text,{unit=''}){
@@ -127,7 +130,7 @@ function setupTiltRow(angle){
 }
 function setupView(){
  setupModeDefaults();
- if(state.setup.type==='isokinetic')return isokineticSetupView();
+ if(splitSetupUsesSplitLayout())return isokineticSetupView();
  const cfg=state.setup,kind=setupTiltKind(),angles=currentAngles(),purpose=cfg.purpose==='assessment'?'assessment':'training',invalid=angles.some(angle=>!validTilt(setupTilt(angle)));
  const anyChanged=angles.some(angle=>cfg.tiltOverrides?.[cfg.type]?.[angle]);
  const columns=kind==='fixed'?['Tilt','Pad position']:kind==='travel'?['Start tilt → End tilt','Travel']:kind==='return'?['Start tilt → End tilt','Travel · device moves back']:['Start tilt → Max tilt','Allowed travel'];
@@ -168,11 +171,11 @@ const setupActions={
 document.addEventListener('change',event=>{
  const el=event.target;
  if(el.id==='setup-mode')changeSetupMode(el.value);
- else if(state.stage==='setup'&&el.dataset.setupToggle&&['endCapOn','romStillOn','romDropOn'].includes(el.dataset.setupToggle)){state.setup[el.dataset.setupToggle]=el.checked;resetSetupAcceptance();renderSetupControl('#'+el.id);}
+ else if(isSetupStageContext()&&el.dataset.setupToggle&&['endCapOn','romStillOn','romDropOn'].includes(el.dataset.setupToggle)){state.setup[el.dataset.setupToggle]=el.checked;resetSetupAcceptance();renderSetupControl('#'+el.id);}
 });
 document.addEventListener('input',event=>{
  const el=event.target;
- if(state.stage!=='setup')return;
+ if(!isSetupStageContext())return;
  if(el.id==='target-weight'){
   state.setup.forceEdited=true;const source=$('#force-source');if(source)source.textContent='For this session';
   const weight=Number(el.value),shown=$('#setup-challenge-minus')?.parentElement.querySelector('output');

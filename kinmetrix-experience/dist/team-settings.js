@@ -107,7 +107,76 @@ function normalizeTeamAssessment(raw) {
   assessment.tiltEnd = Math.min(SETUP_MAX_TILT, Math.max(assessment.tiltStart + 1, Number(assessment.tiltEnd) ?? TEAM_ASSESSMENT_DEFAULTS.tiltEnd));
   delete assessment.romStart;
   delete assessment.romMax;
+  if (assessment.tiltOverrides && typeof assessment.tiltOverrides === 'object') {
+    assessment.tiltOverrides = Object.fromEntries(
+      Object.entries(assessment.tiltOverrides).filter(([key]) => standardExerciseModeKeys('assessment').includes(key))
+    );
+  } else delete assessment.tiltOverrides;
   return assessment;
+}
+
+function syncTeamAssessmentEditor() {
+  const ui = directoryUI().programs;
+  const a = teamAssessmentConfig();
+  const type = a.activeMode;
+  const kind = setupTiltKind(type);
+  const angles = [0, 45, 90, 135, 180, 225, 270, 315].slice(0, a.positions === 8 ? 8 : 4);
+  const overrides = {};
+  angles.forEach(angle => {
+    const custom = a.tiltOverrides?.[type]?.[angle];
+    overrides[angle] = custom ? {...custom} : kind === 'fixed' ? {start: a.tiltStart} : {start: a.tiltStart, end: a.tiltEnd};
+  });
+  state.stage = 'team-assessment-edit';
+  state.setup = {
+    purpose: 'assessment',
+    type,
+    holdStyle: a.holdStyle,
+    holdSeconds: a.holdSeconds,
+    positions: a.positions,
+    reps: a.reps,
+    weight: a.weight,
+    angle: ui.teamAngle ?? 0,
+    isokTab: ui.teamTab ?? 'session',
+    tiltOverrides: {[type]: overrides},
+    accepted: true,
+    continuing: false,
+    programLoad: null,
+    forceEdited: false,
+    challenge: ({strength: 1.5, isokinetic: 3, eccentric: 3})[type] ?? 1.5,
+    challengeAuto: type === 'isokinetic',
+    challengeHold: 1,
+    eccSpeed: 'slow',
+    eccCap: Math.ceil((a.weight || 12) * 1.5)
+  };
+  setupModeDefaults();
+}
+
+function persistTeamAssessmentFromSetup(cfg = state.setup) {
+  const a = teamAssessmentConfig();
+  a.activeMode = cfg.type;
+  if (cfg.type === 'strength') {
+    a.holdStyle = isometricHoldStyle(cfg);
+    if (a.holdStyle === 'timed') a.holdSeconds = cfg.holdSeconds;
+    else delete a.holdSeconds;
+  } else {
+    delete a.holdStyle;
+    delete a.holdSeconds;
+  }
+  a.positions = cfg.positions;
+  a.reps = cfg.reps;
+  a.weight = cfg.weight;
+  const overrides = cfg.tiltOverrides?.[cfg.type];
+  if (overrides) {
+    const first = overrides[Object.keys(overrides).map(Number).sort((x, y) => x - y)[0]];
+    a.tiltStart = first?.start ?? a.tiltStart;
+    if (setupTiltKind(cfg.type) !== 'fixed') a.tiltEnd = first?.end ?? a.tiltEnd;
+    a.tiltOverrides = {...a.tiltOverrides, [cfg.type]: {...overrides}};
+  }
+  teamSettings().assessment = normalizeTeamAssessment(a);
+}
+
+function leaveTeamAssessmentEditor() {
+  if (state.stage === 'team-assessment-edit') state.stage = null;
 }
 
 function teamAssessmentConfig() {
@@ -170,28 +239,17 @@ function sessionWorkspaceSubnav() {
   return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Session views">${[['templates', 'Templates'], ['session-plan', 'Session plan']].map(([key, label]) => `<button type="button" data-action="session-tab" data-tab="${key}" ${tab === key ? 'aria-current="page"' : ''}>${label}</button>`).join('')}</nav>`;
 }
 
+function ensureTeamAssessmentEditor() {
+  if (state.stage === 'team-assessment-edit' && state.setup?.purpose === 'assessment') {
+    setupModeDefaults();
+    return;
+  }
+  syncTeamAssessmentEditor();
+}
+
 function teamAssessmentProtocolMarkup() {
-  const assessment = teamAssessmentConfig();
-  const modeKey = assessment.activeMode;
-  const mode = sessionModes[modeKey];
-  const arcHint = `${teamAssessmentArcLabel(modeKey)} · ${setupModeLine[modeKey]}`;
-  const unit = exportForceUnits[teamSettings().forceUnit]?.short || 'kg';
-  const directions = `<div class="segmented" role="group" aria-label="Directions">${[4, 8].map(n => `<button type="button" class="${assessment.positions === n ? 'active' : ''}" data-action="team-assessment-positions" data-value="${n}" aria-pressed="${assessment.positions === n}">${n}</button>`).join('')}</div>`;
-  const reps = `<select id="team-assessment-reps" aria-label="Reps per direction">${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${assessment.reps === n ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
-  const weight = `<div class="weight-input assessment-weight-input"><input id="team-assessment-weight" type="number" min="1" max="50" step="0.5" value="${assessment.weight}" inputmode="decimal" aria-label="Target force"><span>${unit}</span></div>`;
-  return `<div class="assessment-workspace">
-    <p class="assessment-workspace-lead">Team defaults for standard assessments (isometric, isokinetic, eccentric). Per-direction tilts stay on the setup screen before Begin.</p>
-    <section class="assessment-protocol-panel" aria-labelledby="assessment-defaults-title">
-      <h2 id="assessment-defaults-title" class="sr-only">Assessment defaults</h2>
-      <p class="assessment-arc-kind"><strong>${escapeHTML(mode.name)}</strong> · ${escapeHTML(arcHint)}</p>
-      ${assessmentProtocolRow('Exercise mode', `<select id="team-assessment-mode" aria-label="Exercise mode">${standardExerciseModeKeys('assessment').map(key => `<option value="${key}" ${key === modeKey ? 'selected' : ''}>${sessionModes[key].name}</option>`).join('')}</select>`)}
-      ${modeKey === 'strength' ? assessmentProtocolRow('Hold', `<div class="hold-time-row${assessment.holdStyle === 'endurance' ? ' hold-time-row--endurance' : ''}"><select id="team-assessment-hold-style" aria-label="Timed hold or endurance"><option value="timed" ${assessment.holdStyle !== 'endurance' ? 'selected' : ''}>Timed</option><option value="endurance" ${assessment.holdStyle === 'endurance' ? 'selected' : ''}>Endurance</option></select><div class="weight-input assessment-weight-input hold-seconds-inline"${assessment.holdStyle === 'endurance' ? ' hidden' : ''}><input id="team-assessment-hold-seconds" type="number" min="2" max="15" step="1" value="${assessment.holdSeconds ?? 6}" inputmode="numeric" aria-label="Hold length in seconds"><span>s</span></div></div>`, 'Timed: enter seconds (2–15). Endurance: hold until release.') : ''}
-      ${teamAssessmentArcFieldsMarkup(assessment)}
-      ${assessmentProtocolRow('Directions', directions)}
-      ${assessmentProtocolRow('Reps / direction', reps)}
-      ${assessmentProtocolRow('Target force', weight, 'Starting target when no member baseline exists.')}
-    </section>
-  </div>`;
+  ensureTeamAssessmentEditor();
+  return `<div class="assessment-workspace assessment-workspace--split">${isokineticSetupView()}</div>`;
 }
 
 function teamRomRuleRow(key, on, label, control) {
@@ -287,10 +345,6 @@ function teamHubResolveCard() {
     return isTeamHubLibraryId(library) ? library : 'assessments';
   }
   if (state.teamHubCard && isTeamHubCardId(state.teamHubCard)) return state.teamHubCard;
-  if (state.nav === 'team') {
-    const library = directoryUI().programs.library;
-    if (library && isTeamHubLibraryId(library)) return library;
-  }
   return null;
 }
 
@@ -319,6 +373,7 @@ function teamHubCardHint(cardId) {
 
 function visitTeamHub(card = null) {
   if (state.actor !== 'coach') return;
+  if (card !== 'assessments' || assessmentWorkspaceTab() !== 'protocol') leaveTeamAssessmentEditor();
   state.nav = 'team';
   state.settingsSection = null;
   state.personId = null;
@@ -341,6 +396,7 @@ function visitTeamHub(card = null) {
     }
   } else {
     state.teamHubCard = null;
+    directoryUI().programs.library = null;
   }
   rosterUI().filterOpen = false;
   render();
@@ -633,27 +689,11 @@ const teamSettingsActions = {
     const team = teamSettings();
     const tab = assessmentWorkspaceTab();
     if (tab === 'protocol') {
-      const assessment = teamAssessmentConfig();
-      const modeEl = $('#team-assessment-mode');
-      if (modeEl) {
-        const mode = modeEl.value;
-        if (!standardExerciseModeKeys('assessment').includes(mode)) return;
-        assessment.activeMode = mode;
-        if (mode === 'strength') {
-          assessment.holdStyle = $('#team-assessment-hold-style')?.value === 'endurance' ? 'endurance' : 'timed';
-          if (assessment.holdStyle !== 'endurance') assessment.holdSeconds = Number($('#team-assessment-hold-seconds')?.value);
-        } else {
-          delete assessment.holdStyle;
-          delete assessment.holdSeconds;
-        }
-        const reps = Number($('#team-assessment-reps')?.value);
-        if ([1, 2, 3, 4, 5].includes(reps)) assessment.reps = reps;
-        assessment.tiltStart = Number($('#team-tilt-start')?.value);
-        if (setupTiltKind(mode) !== 'fixed') assessment.tiltEnd = Number($('#team-tilt-end')?.value);
-        const weight = Number($('#team-assessment-weight')?.value);
-        if (Number.isFinite(weight)) assessment.weight = weight;
-        team.assessment = normalizeTeamAssessment(assessment);
+      if (state.stage === 'team-assessment-edit' && !setupIsValid()) {
+        toast('Check tilt settings before saving.');
+        return;
       }
+      persistTeamAssessmentFromSetup();
     } else if (tab === 'rom') {
       const rom = teamRomConfig();
       rom.romStillOn = $('#team-rom-romStill-on')?.checked !== false;

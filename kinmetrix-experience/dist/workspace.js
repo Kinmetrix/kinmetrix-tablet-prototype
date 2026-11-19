@@ -24,7 +24,7 @@ function memberHasSessionData(personId=state.personId){
  return state.history.some(record=>record.personId===personId);
 }
 function memberWorkspaceView(){
- const p=person(),continuing=activeProgram(),backLabel=state.memberOrigin==='roster'?'Back to roster':state.memberOrigin==='programs'||state.memberOrigin==='team'?'Back to team':'Find another person';
+ const p=person(),continuing=activeProgram(),backLabel=state.memberOrigin==='roster'?'Back to roster':state.memberOrigin==='pulse'?'Back to Pulse':state.memberOrigin==='programs'||state.memberOrigin==='team'?'Back to team':'Find another person';
  if((state.tab==='history'||state.tab==='programs')&&!memberHasSessionData())state.tab='overview';
  const waiverNext=waiverBlocksCurrent();
  return `${waiverRequiredBannerMarkup()}<div class="member-heading">${state.actor==='coach'?`<button class="icon-button member-find-another" data-action="show-roster" aria-label="${backLabel}" title="${backLabel}">${icon('back','icon-sm')}</button>`:''}${photoAvatar(p,'large')}<div class="member-identity"><h1>${escapeHTML(p.name)}</h1><p>${p.detail}${state.history.some(h=>h.personId===p.id)?' · Last visit Today':p.last?' · Last visit '+p.last:' · First visit'}</p></div>

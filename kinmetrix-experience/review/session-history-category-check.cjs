@@ -32,7 +32,7 @@ assert.match(romPane,/data-action="assessment-tab"[^>]*data-tab="rom"/);
 assert.match(romPane,/Finish the rep when/);
 assert.doesNotMatch(romPane,/team-assessment-mode/);
 directoryUI().programs.assessmentTab='protocol';
-assert.match(protocolPane,/team-assessment-mode/);
+assert.match(protocolPane,/isok-split/);
 state.overlay={type:'session-picker',step:'modes',purpose:'assessment',mode:'strength',selections:{},paused:true};
 const picker=sessionPickerView(state.overlay);
 assert.match(picker,/mode-group-label/);

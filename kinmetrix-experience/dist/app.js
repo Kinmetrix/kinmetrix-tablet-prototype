@@ -124,8 +124,13 @@ function sidebarWordmark(){
  return `<div class="wordmark" role="img" aria-label="${name}"><img class="brand-mark" src="${mark}" alt="" width="32" height="32" decoding="async"><span class="brand-text">${name}</span></div>`;
 }
 function brand(full=false){if(full)return fullBrand();return sidebarWordmark();}
+function appRootView(){
+ if(state.nav==='welcome')return welcomeView();
+ if(state.stage&&state.stage!=='team-assessment-edit')return sessionView();
+ return shell();
+}
 function render(){
- $('#app').innerHTML = state.nav==='welcome'?welcomeView():state.stage?sessionView():shell();
+ $('#app').innerHTML = appRootView();
  renderOverlay();
  syncRepChartLayout();
  if(state.stage==='live'&&isMovementMode(state.setup.type))modeUpdateLive();
@@ -193,9 +198,9 @@ function beginSetup(purpose='assessment',type='strength',continuing=false){
  const program=continuing?memberPrograms().find(p=>p.id===continuing):null;
  const teamProto=purpose==='assessment'&&!program&&type!=='rom'?teamAssessmentConfig():null;
  const teamRom=purpose==='assessment'&&!program&&type==='rom'?teamRomConfig():null;
- const setupType=program?.type||teamProto?.activeMode||type;
+ const setupType=program?.type||type;
  stopTimer();state.stage='setup';state.reportReturnTab=state.tab==='programs'?'programs':'overview';state.guided=state.actor==='member';state.session=null;state.result=null;
- state.setup={purpose,type:setupType,holdStyle:setupType==='strength'?(program?.holdStyle||teamProto?.holdStyle||'timed'):undefined,holdSeconds:setupType==='strength'?(program?.holdSeconds??teamProto?.holdSeconds):undefined,positions:program?.positions||(setupType==='rom'?teamRom?.positions:teamProto?.positions)||4,reps:program?.reps||(setupType==='rom'?1:teamProto?.reps)||3,weight:person().target??teamProto?.weight??8,accepted:false,angle:0,tiltOverrides:{},forceEdited:false,continuing:!!program,programId:program?.id,programName:program?.name,programSession:program?program.completed+1:null,programTotal:program?.total};
+ state.setup={purpose,type:setupType,holdStyle:setupType==='strength'?(program?.holdStyle||teamProto?.holdStyle||'timed'):undefined,holdSeconds:setupType==='strength'?(program?.holdSeconds??teamProto?.holdSeconds):undefined,positions:program?.positions||(setupType==='rom'?teamRom?.positions:teamProto?.positions)||4,reps:program?.reps||(setupType==='rom'?1:teamProto?.reps)||3,weight:person().target??teamProto?.weight??8,accepted:false,angle:0,isokTab:'session',tiltOverrides:{},forceEdited:false,continuing:!!program,programId:program?.id,programName:program?.name,programSession:program?program.completed+1:null,programTotal:program?.total};
  if(teamRom&&!program){
   state.setup.romStillOn=teamRom.romStillOn;state.setup.romStill=teamRom.romStill;state.setup.romDropOn=teamRom.romDropOn;state.setup.romDrop=teamRom.romDrop;state.setup.challenge=teamRom.challenge;state.setup.challengeFor='rom';
  }
@@ -204,7 +209,8 @@ function beginSetup(purpose='assessment',type='strength',continuing=false){
   state.setup.tiltOverrides??={};
   state.setup.tiltOverrides[setupType]??={};
   const angles=[0,45,90,135,180,225,270,315].slice(0,teamProto.positions===8?8:4);
-  angles.forEach(angle=>{state.setup.tiltOverrides[setupType][angle]=kind==='fixed'?{start:teamProto.tiltStart}:{start:teamProto.tiltStart,end:teamProto.tiltEnd};});
+  const teamTilts=teamProto.tiltOverrides?.[setupType];
+  angles.forEach(angle=>{const custom=teamTilts?.[angle];state.setup.tiltOverrides[setupType][angle]=custom?{...custom}:kind==='fixed'?{start:teamProto.tiltStart}:{start:teamProto.tiltStart,end:teamProto.tiltEnd};});
  }
  state.overlay=null;initializeProgramTargets(program);render();window.scrollTo(0,0);
 }
@@ -313,6 +319,6 @@ const actions={
 seedDemoMemberWaivers();
 document.addEventListener('click',event=>{const el=event.target.closest('[data-action]');if(!el||el.disabled)return;const action=actions[el.dataset.action];if(action)action(el);});
 document.addEventListener('input',event=>{const el=event.target;if(el.id==='roster-search'){state.search=el.value;updatePeopleResults();}else if(el.id==='working-percent')$('#range-output').textContent=el.value;else if(el.id==='target-weight'){const value=Number(el.value);state.setup.weight=value;state.setup.accepted=false;$('#accept-settings').checked=false;$('#begin-session-button').disabled=true;}});
-document.addEventListener('change',event=>{const el=event.target;if(el.name==='waiver-policy'&&state.actor==='coach'&&isTeamHubNav()&&teamHubResolveCard()==='waiver'&&TEAM_WAIVER_POLICIES.some(item=>item.id===el.value)){teamSettings().waiverPolicy=el.value;render();toast('Waiver policy updated.');}else if(el.id==='accept-settings'){const weight=$('#target-weight');if((weight&&!weight.checkValidity())||!setupIsValid()){if(weight&&!weight.checkValidity())weight.reportValidity();else{const invalid=currentAngles().find(angle=>!validTilt(setupTilt(angle)));if(invalid!==undefined){state.setup.angle=invalid;if(state.setup.type==='isokinetic')state.setup.isokTab='tilts';renderSetupControl(`#tilt-${invalid}-end-plus`);toast('Check the tilt settings before beginning.');}}el.checked=false;state.setup.accepted=false;}else state.setup.accepted=el.checked;$('#begin-session-button').disabled=!state.setup.accepted||!state.deviceReady;}else if(el.id==='clinician-select')$('#demo-pin-hint').textContent='Demo PIN: '+clinicians.find(c=>c.id===el.value).pin+'. This is an interaction preview, not secure authentication.';else if(el.id==='device-ready'){state.deviceReady=el.checked;render();}else if(el.id==='review-confirmation')$('#apply-limits-button').disabled=!el.checked;else if(el.id==='compare-previous'){state.showCompare=el.checked;render();}});
+document.addEventListener('change',event=>{const el=event.target;if(el.name==='waiver-policy'&&state.actor==='coach'&&isTeamHubNav()&&teamHubResolveCard()==='waiver'&&TEAM_WAIVER_POLICIES.some(item=>item.id===el.value)){teamSettings().waiverPolicy=el.value;render();toast('Waiver policy updated.');}else if(el.id==='accept-settings'){const weight=$('#target-weight');if((weight&&!weight.checkValidity())||!setupIsValid()){if(weight&&!weight.checkValidity())weight.reportValidity();else{const invalid=currentAngles().find(angle=>!validTilt(setupTilt(angle)));if(invalid!==undefined){state.setup.angle=invalid;if(splitSetupUsesSplitLayout())state.setup.isokTab='tilts';const field=setupHasFixedTilt()?'start':'end';renderSetupControl(`#tilt-${invalid}-${field}-plus`);toast('Check the tilt settings before beginning.');}}el.checked=false;state.setup.accepted=false;}else state.setup.accepted=el.checked;$('#begin-session-button').disabled=!state.setup.accepted||!state.deviceReady;}else if(el.id==='clinician-select')$('#demo-pin-hint').textContent='Demo PIN: '+clinicians.find(c=>c.id===el.value).pin+'. This is an interaction preview, not secure authentication.';else if(el.id==='device-ready'){state.deviceReady=el.checked;render();}else if(el.id==='review-confirmation')$('#apply-limits-button').disabled=!el.checked;else if(el.id==='compare-previous'){state.showCompare=el.checked;render();}});
 document.addEventListener('keydown',event=>{if(event.target.id==='roster-search'&&['ArrowDown','Enter'].includes(event.key)){$('.finder-person-open')?.focus();event.preventDefault();return;}const target=event.target.closest('svg [data-action]');if(target&&['Enter',' '].includes(event.key)){event.preventDefault();actions[target.dataset.action]?.(target);return;}if(!state.overlay)return;if(event.key==='Escape'){event.preventDefault();if(state.overlay?.type==='waiver-sign'&&waiverBlocksCurrent()){toast('A signature is required to continue.');return;}closeModal();return;}if(event.key==='Enter'&&(event.target.id==='clinician-pin'||event.target.id==='member-code')){event.preventDefault();actions[event.target.id==='clinician-pin'?'confirm-clinician':'confirm-member-code']();}if(event.key==='Tab'){const elements=$$('button:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]',$('#overlay-root')).filter(el=>el.getClientRects().length&&!el.closest('[inert]'));if(!elements.length)return;const first=elements[0],last=elements.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
 render();

@@ -1,5 +1,16 @@
 /* Isokinetic setup: calm form + direction plan. Existing theme tokens remain authoritative. */
 .isok-setup{max-width:1240px;margin:0 auto;padding:8px 8px 0}
+.isok-setup--team .setup-heading{padding-bottom:12px}
+.isok-team-save-note{margin:16px 0 0;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);max-width:52ch}
+.assessment-workspace--split .isok-setup{max-width:none;padding:0}
+.program-editor-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.85fr);gap:24px;align-items:start}
+.program-setup-preview{border:1px solid var(--line);border-radius:12px;padding:12px 12px 8px;background:var(--soft)}
+.program-setup-preview-label{font-size:13px;color:var(--muted);margin:0 0 8px}
+.program-setup-preview .isok-preview-heading{text-align:left}
+.program-setup-preview .isok-preview-heading p{font-size:13px}
+.program-setup-preview .isok-radial{max-width:280px;margin-inline:0}
+.program-setup-preview .isok-range-summary{justify-content:flex-start}
+@media(max-width:900px){.program-editor-split{grid-template-columns:1fr}}
 .isok-setup .setup-heading{padding-bottom:18px;margin-bottom:0}
 .isok-setup .setup-heading h1{font-size:28px}
 .isok-split{display:grid;grid-template-columns:minmax(360px,.95fr) minmax(380px,1.05fr);border-top:1px solid var(--line)}
@@ -9,7 +20,7 @@
 .isok-tabs [aria-selected=true]{border-bottom-color:var(--ink);color:var(--ink)}
 .isok-tab-error{font-size:12px;color:var(--red);margin-left:8px}
 .isok-main-fields{display:grid;grid-template-columns:1fr 1fr;gap:26px 20px}
-.isok-main-fields .setup-force-field,.isok-program-source{grid-column:1/-1}
+.isok-main-fields .setup-force-field,.isok-program-source,.isok-main-fields .setup-hold-time-field,.isok-main-fields .setup-field:has(#speed-label){grid-column:1/-1}
 .isok-setup .setup-label{font-size:14px;margin-bottom:10px}
 .isok-setup .setup-help{font-size:13px;line-height:1.45;max-width:none}
 .isok-setup .segmented{display:inline-flex;min-height:46px}

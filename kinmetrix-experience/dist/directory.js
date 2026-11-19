@@ -294,10 +294,24 @@ function refreshProgramEditorForm(focusSelector){
  syncProgramHoldSecondsRow('plan');
  if(focusSelector) $(focusSelector)?.focus({preventScroll:true});
 }
+function programDraftSetupCfg(draft){
+ return {purpose:'training',type:draft.type,holdStyle:draft.holdStyle,holdSeconds:draft.holdSeconds,positions:draft.positions,reps:draft.reps,weight:12,angle:0,isokTab:'session',tiltOverrides:{},accepted:true,continuing:false,programLoad:null,forceEdited:false,challenge:1.5,challengeAuto:draft.type==='isokinetic',challengeHold:1,eccSpeed:'slow',eccCap:18};
+}
+function programSetupPreviewMarkup(draft){
+ if(!splitSetupTypes.has(draft.type))return '';
+ const prevSetup=state.setup,prevStage=state.stage;
+ state.setup=programDraftSetupCfg(draft);
+ setupModeDefaults();
+ const html=`<aside class="program-setup-preview" aria-label="Session layout preview"><p class="program-setup-preview-label">How each session opens</p>${isokineticPreview()}</aside>`;
+ state.setup=prevSetup;state.stage=prevStage;
+ return html;
+}
 function programFields(draft,prefix='plan',tracked=false){
  const field=name=>tracked?`data-program-field="${name}"`:'';
  const isometric=draft.type==='strength';
- return `<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><div class="program-basics-layout"><label class="program-field program-field-name">Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-mode-block${isometric?' program-mode-block--isometric':''}"><label class="program-field program-field-mode">Training mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('training').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label>${isometric?programHoldTimeField(draft,prefix,field):''}</div><div class="program-structure-grid"><label class="program-field">Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field">Reps / direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field program-field-sessions">Sessions in plan<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n}</option>`).join('')}</select></label></div></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
+ const grid=`<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><div class="program-basics-layout"><label class="program-field program-field-name">Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-mode-block${isometric?' program-mode-block--isometric':''}"><label class="program-field program-field-mode">Training mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('training').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label>${isometric?programHoldTimeField(draft,prefix,field):''}</div><div class="program-structure-grid"><label class="program-field">Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field">Reps / direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field program-field-sessions">Sessions in plan<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n}</option>`).join('')}</select></label></div></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
+ const preview=programSetupPreviewMarkup(draft);
+ return preview?`<div class="program-editor-split">${grid}${preview}</div>`:grid;
 }
 function templatesHubRail(activeLibraryId){
  return `<nav class="settings-hub-rail" aria-label="Template libraries">
@@ -427,6 +441,7 @@ const directoryActions={
   if(!isTeamHubNav()||teamHubResolveCard()!=='assessments')return;
   const tab=el.dataset.tab;
   if(!['protocol','rom'].includes(tab))return;
+  if(tab!=='protocol')leaveTeamAssessmentEditor();
   directoryUI().programs.assessmentTab=tab;
   render();
   $(`[data-action="assessment-tab"][data-tab="${tab}"]`)?.focus();

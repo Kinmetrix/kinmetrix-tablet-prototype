@@ -101,6 +101,32 @@ state.setup.programLoad={kind:'fixed'};state.setup.targets={0:10,90:11,180:12,27
 assert.equal(isokForce(90),11,'program preview uses the target for each direction');
 assert.equal(isokForceText(.5),'0.5 kg','minimum movement threshold stays visible');
 console.log('PASS — isokinetic split setup, workload preview, tilt selection, apply selected range and invalid-range blocking.');
+for(const type of ['strength','eccentric']){
+ state.setup={purpose:'training',type,holdStyle:type==='strength'?'timed':undefined,positions:4,reps:2,weight:12,accepted:true,angle:0,tiltOverrides:{}};
+ setupModeDefaults();
+ const html=setupView();
+ assert.ok(html.includes('isok-split'),type+' uses split setup');
+ assert.ok(html.includes('reps total'),type+' preview shows workload total');
+ assert.ok(!html.includes('tilt-table'),type+' keeps the wide tilt table out of the main view');
+ actions['isok-direction']({dataset:{angle:'90'}});
+ assert.equal(state.setup.isokTab,'tilts');
+ assert.ok(setupView().includes('id="tilt-90-'),type+' tilt editor opens from the diagram');
+}
+state.setup={purpose:'training',type:'strength',holdStyle:'timed',positions:4,reps:2,weight:12,accepted:true,angle:90,tiltOverrides:{}};
+setTiltOverride(90,{start:8});
+actions['tilt-apply-selected']();
+for(const a of currentAngles())assert.equal(setupTilt(a).start,8,'isometric apply-to-all copies pad position');
+state.setup={purpose:'training',type:'eccentric',positions:4,reps:2,weight:12,accepted:true,angle:180,tiltOverrides:{}};
+setTiltOverride(180,{start:10,end:30});
+assert.equal(setupIsValid(),false,'eccentric invalid return range blocks start');
+console.log('PASS — isometric and eccentric split setup, diagram tilt editor, and apply-to-all.');
+state.personId='alex';
+beginSetup('assessment','eccentric');
+assert.match(setupView(),/Eccentric assessment/);
+assert.ok(setupView().includes('isok-split'));
+beginSetup('training',memberPrograms('alex')[0].id);
+assert.ok(setupView().includes('isok-split'));
+console.log('PASS — assessment and program sessions honor chosen mode with split setup.');
 // A safety cap must stop eccentric motion rather than count it as completed travel.
 state.setup={type:'eccentric',weight:12,challenge:3,eccCap:5,eccSpeed:'slow',reps:1};
 const stopped={armed:true,force:6,below:0,progress:.25,tiltNow:26};
