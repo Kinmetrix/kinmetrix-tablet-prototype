@@ -116,7 +116,13 @@ function radar(values,compare=true,type='strength'){
 }
 function assetUrl(path){return new URL(path,document.baseURI).href;}
 function fullBrand(){return `<img class="full-brand" src="${assetUrl('assets/kinmetrix-full.svg')}" width="1063" height="252" alt="Kinmetrix">`;}
-function sidebarWordmark(){const team=teamSettings();const mark=assetUrl(team.logo||'assets/team-northside.svg');const name=escapeHTML(team.name);return `<div class="wordmark" role="img" aria-label="${name}"><img class="brand-mark" src="${mark}" alt="" width="32" height="32" decoding="async"><span class="brand-text">${name}</span></div>`;}
+function sidebarWordmark(){
+ const team=teamSettings(),mark=assetUrl(team.logo||'assets/team-northside.svg'),name=escapeHTML(team.name);
+ const teamActive=state.actor==='coach'&&isTeamHubNav();
+ const inner=`<img class="brand-mark" src="${mark}" alt="" width="32" height="32" decoding="async"><span class="brand-text">${name}</span>`;
+ if(state.actor==='coach')return `<button type="button" class="wordmark wordmark-button${teamActive?' active':''}" data-action="nav-team" aria-label="${name}. Team policy and libraries" title="Team"${teamActive?' aria-current="page"':''}>${inner}</button>`;
+ return `<div class="wordmark" role="img" aria-label="${name}">${inner}</div>`;
+}
 function brand(full=false){if(full)return fullBrand();return sidebarWordmark();}
 function render(){
  $('#app').innerHTML = state.nav==='welcome'?welcomeView():state.stage?sessionView():shell();
@@ -124,14 +130,15 @@ function render(){
  syncRepChartLayout();
  if(state.stage==='live'&&isMovementMode(state.setup.type))modeUpdateLive();
 }
-function staffNavActive(nav,origin){if(nav==='settings'||nav==='device')return '';if(nav==='people')return origin||'find';if(nav==='find')return 'find';return nav;}
-function shell(){const c=clinician(),staff=state.actor==='coach',settingsOpen=state.nav==='settings',deviceOpen=state.nav==='device',active=settingsOpen||deviceOpen?'':staffNavActive(state.nav,state.memberOrigin);const templatesLayered=true;return `<div class="app-shell ${staff?'staff-shell':'member-shell'}${templatesLayered?' templates-layered-shell':''}">
+function staffNavActive(nav,origin){if(isTeamHubNav()||nav==='device')return '';if(nav==='people')return origin==='team'||origin==='programs'?'find':origin||'find';if(nav==='find')return 'find';return nav;}
+function shellMainView(){if(state.nav==='device')return devicePage();if(isTeamHubNav())return teamHubPage();if(state.nav==='pulse')return pulsePage();if(state.nav==='roster')return rosterPage();if(state.nav==='programs')return programsPage();if(state.nav==='find')return globalFindView();return peopleView();}
+function shell(){const c=clinician(),staff=state.actor==='coach',deviceOpen=state.nav==='device',active=staffNavActive(state.nav,state.memberOrigin);const templatesLayered=true;return `<div class="app-shell ${staff?'staff-shell':'member-shell'}${templatesLayered?' templates-layered-shell':''}">
  <aside class="sidebar" aria-label="${staff?'Clinic navigation':'Private member navigation'}">${brand()}<nav class="side-nav" aria-label="Main navigation">
- ${staff?['find','pulse','roster','programs'].map(key=>navItem({pulse:'Pulse',find:'Find',roster:'Roster',programs:'Templates'}[key],`nav-${key}`,{pulse:'pulse',find:'search',roster:'people',programs:'library'}[key],active===key)).join(''):navItem('My progress','nav-find','user',true,' aria-label="My progress · Private"')}
+ ${staff?['find','pulse','roster'].map(key=>navItem({pulse:'Pulse',find:'Find',roster:'Roster'}[key],`nav-${key}`,{pulse:'pulse',find:'search',roster:'people'}[key],active===key)).join(''):navItem('My progress','nav-find','user',true,' aria-label="My progress · Private"')}
  </nav><div class="side-bottom" role="group" aria-label="${staff?'Device and clinician':'Device controls'}">
  <button class="nav-button nav-station ${deviceOpen?'active':''}" data-action="nav-device" ${deviceOpen?'aria-current="page"':''} aria-label="Device · ${state.deviceReady?'Ready':'Unavailable'}" title="${state.deviceReady?'Device ready':'Device unavailable'}"><span class="nav-glyph-wrap nav-station-icon">${navGlyph('device',deviceOpen)}<span class="status-dot ${state.deviceReady?'':'offline'}"></span></span><span class="nav-label">${state.deviceReady?'Device':'Offline'}</span></button>
- ${staff?`${navItem('Settings','settings','settings',settingsOpen)}<button class="nav-button nav-clinician" data-action="switch-clinician" aria-label="Switch clinician · ${c.name} · ${c.role}" title="${c.name} · Switch clinician" aria-haspopup="dialog"><span class="nav-glyph-wrap nav-clinician-glyph">${avatar(c,'mini')}</span><span class="nav-label">${c.name.split(' ')[0]}</span></button>${navItem('Lock','lock-station','lock',false,' aria-label="Lock station"')}`:navItem('Finish','signout','logout',false)}
- </div></aside><div class="shell-main">${deviceOpen?devicePage():settingsOpen?settingsPage():state.nav==='pulse'?pulsePage():state.nav==='roster'?rosterPage():state.nav==='programs'?programsPage():state.nav==='find'?globalFindView():peopleView()}</div></div>`;}
+ ${staff?`<button class="nav-button nav-clinician" data-action="switch-clinician" aria-label="Switch clinician · ${c.name} · ${c.role}" title="${c.name} · Switch clinician" aria-haspopup="dialog"><span class="nav-glyph-wrap nav-clinician-glyph">${avatar(c,'mini')}</span><span class="nav-label">${c.name.split(' ')[0]}</span></button>${navItem('Lock','lock-station','lock',false,' aria-label="Lock station"')}`:navItem('Finish','signout','logout',false)}
+ </div></aside><div class="shell-main">${shellMainView()}</div></div>`;}
 function peopleView(){
  if(state.actor==='coach'&&!person())return globalFindView();
  const name=person()?.name||'Member workspace';
@@ -174,8 +181,8 @@ function showPeopleFinder(){showGlobalFind();}
 function updatePeopleResults(){const model=globalFindModel();const slot=$('#global-find-results');if(slot)slot.innerHTML=globalFindRows();const status=$('#finder-status');if(status)status.textContent=model.label;const clear=$('.finder-clear');if(clear)clear.hidden=!state.search;}
 function openGlobalFindTarget(el){
  const kind=el.dataset.findKind;
- if(kind==='template'){const library=el.dataset.findLibrary||'assessments';visitDirectory('programs');const patch={library,libraryFocus:library==='assessments'?'assessments':library,tab:'templates'};if(el.dataset.findSessionTab==='session-plan')patch.sessionTab='session-plan';Object.assign(directoryUI().programs,patch);render();return;}
- if(kind==='settings'){visitSettings(el.dataset.findSection||'station');}
+ if(kind==='template'){const library=el.dataset.findLibrary||'assessments';visitTeamHub(library);const patch={library,libraryFocus:library==='assessments'?'assessments':library,tab:'templates'};if(el.dataset.findSessionTab==='session-plan')patch.sessionTab='session-plan';Object.assign(directoryUI().programs,patch);render();return;}
+ if(kind==='settings')visitTeamHub(el.dataset.findSection||'station');
 }
 function memberView(){return memberWorkspaceView();}
 function profileView(){return memberProfileView();}
@@ -286,7 +293,7 @@ const actions={
  'fast-forward':fastForward,
  'toggle-guided':()=>{if(state.guided){if(state.session)state.session.paused=true;render();openModal('clinician',{takeover:true});}else{state.guided=true;render();updateLive();}},
  'help':()=>{if(state.session)state.session.paused=true;render();openModal('help');},
- 'settings':()=>{if(state.actor==='coach')visitSettings();},
+ 'settings':()=>{if(state.actor==='coach')visitTeamHub(null);},
  'switch-clinician':()=>openModal('clinician'),'staff-entry':()=>openModal('clinician'),
  'confirm-clinician':clinicianConfirmed,'close-modal':closeModal,
  'phone-entry':()=>openModal('phone'),'code-entry':()=>openModal('member-code'),'member-approved':memberApproved,
@@ -306,6 +313,6 @@ const actions={
 seedDemoMemberWaivers();
 document.addEventListener('click',event=>{const el=event.target.closest('[data-action]');if(!el||el.disabled)return;const action=actions[el.dataset.action];if(action)action(el);});
 document.addEventListener('input',event=>{const el=event.target;if(el.id==='roster-search'){state.search=el.value;updatePeopleResults();}else if(el.id==='working-percent')$('#range-output').textContent=el.value;else if(el.id==='target-weight'){const value=Number(el.value);state.setup.weight=value;state.setup.accepted=false;$('#accept-settings').checked=false;$('#begin-session-button').disabled=true;}});
-document.addEventListener('change',event=>{const el=event.target;if(el.name==='waiver-policy'&&state.actor==='coach'&&state.nav==='settings'&&state.settingsHubSection==='waiver'&&TEAM_WAIVER_POLICIES.some(item=>item.id===el.value)){teamSettings().waiverPolicy=el.value;render();toast('Waiver policy updated.');}else if(el.id==='accept-settings'){const weight=$('#target-weight');if((weight&&!weight.checkValidity())||!setupIsValid()){if(weight&&!weight.checkValidity())weight.reportValidity();else{const invalid=currentAngles().find(angle=>!validTilt(setupTilt(angle)));if(invalid!==undefined){state.setup.angle=invalid;renderSetupControl('#tilt-start');toast('Check the tilt settings before beginning.');}}el.checked=false;state.setup.accepted=false;}else state.setup.accepted=el.checked;$('#begin-session-button').disabled=!state.setup.accepted||!state.deviceReady;}else if(el.id==='clinician-select')$('#demo-pin-hint').textContent='Demo PIN: '+clinicians.find(c=>c.id===el.value).pin+'. This is an interaction preview, not secure authentication.';else if(el.id==='device-ready'){state.deviceReady=el.checked;render();}else if(el.id==='review-confirmation')$('#apply-limits-button').disabled=!el.checked;else if(el.id==='compare-previous'){state.showCompare=el.checked;render();}});
+document.addEventListener('change',event=>{const el=event.target;if(el.name==='waiver-policy'&&state.actor==='coach'&&isTeamHubNav()&&teamHubResolveCard()==='waiver'&&TEAM_WAIVER_POLICIES.some(item=>item.id===el.value)){teamSettings().waiverPolicy=el.value;render();toast('Waiver policy updated.');}else if(el.id==='accept-settings'){const weight=$('#target-weight');if((weight&&!weight.checkValidity())||!setupIsValid()){if(weight&&!weight.checkValidity())weight.reportValidity();else{const invalid=currentAngles().find(angle=>!validTilt(setupTilt(angle)));if(invalid!==undefined){state.setup.angle=invalid;renderSetupControl('#tilt-start');toast('Check the tilt settings before beginning.');}}el.checked=false;state.setup.accepted=false;}else state.setup.accepted=el.checked;$('#begin-session-button').disabled=!state.setup.accepted||!state.deviceReady;}else if(el.id==='clinician-select')$('#demo-pin-hint').textContent='Demo PIN: '+clinicians.find(c=>c.id===el.value).pin+'. This is an interaction preview, not secure authentication.';else if(el.id==='device-ready'){state.deviceReady=el.checked;render();}else if(el.id==='review-confirmation')$('#apply-limits-button').disabled=!el.checked;else if(el.id==='compare-previous'){state.showCompare=el.checked;render();}});
 document.addEventListener('keydown',event=>{if(event.target.id==='roster-search'&&['ArrowDown','Enter'].includes(event.key)){$('.finder-person-open')?.focus();event.preventDefault();return;}const target=event.target.closest('svg [data-action]');if(target&&['Enter',' '].includes(event.key)){event.preventDefault();actions[target.dataset.action]?.(target);return;}if(!state.overlay)return;if(event.key==='Escape'){event.preventDefault();if(state.overlay?.type==='waiver-sign'&&waiverBlocksCurrent()){toast('A signature is required to continue.');return;}closeModal();return;}if(event.key==='Enter'&&(event.target.id==='clinician-pin'||event.target.id==='member-code')){event.preventDefault();actions[event.target.id==='clinician-pin'?'confirm-clinician':'confirm-member-code']();}if(event.key==='Tab'){const elements=$$('button:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]',$('#overlay-root')).filter(el=>el.getClientRects().length&&!el.closest('[inert]'));if(!elements.length)return;const first=elements[0],last=elements.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
 render();

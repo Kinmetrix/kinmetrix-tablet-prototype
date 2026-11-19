@@ -262,24 +262,184 @@ function settingsActiveSection() {
   return SETTINGS_RAIL_SECTIONS.some(item => item.id === active) ? active : 'station';
 }
 
-function visitSettings(section = null) {
-  if (state.actor !== 'coach') return;
-  state.nav = 'settings';
-  state.settingsSection = null;
-  if (section === 'waiver-signatures') {
-    state.settingsHubSection = 'waiver';
-    state.waiverHubTab = 'signatures';
-  } else if (section) {
-    state.settingsHubSection = SETTINGS_RAIL_SECTIONS.some(item => item.id === section) ? section : 'station';
-    if (section === 'waiver' && !state.waiverHubTab) state.waiverHubTab = 'policy';
-  } else if (!state.settingsHubSection || !SETTINGS_RAIL_SECTIONS.some(item => item.id === state.settingsHubSection)) {
-    state.settingsHubSection = 'station';
+const TEAM_HUB_POLICY_IDS = new Set(SETTINGS_RAIL_SECTIONS.map(item => item.id));
+
+function isTeamHubLibraryId(id) {
+  return typeof TEMPLATE_LIBRARIES !== 'undefined' && TEMPLATE_LIBRARIES.some(item => item.id === id);
+}
+
+function isTeamHubCardId(id) {
+  return TEAM_HUB_POLICY_IDS.has(id) || isTeamHubLibraryId(id);
+}
+
+function isTeamHubNav() {
+  return state.actor === 'coach' && (state.nav === 'team' || state.nav === 'settings' || state.nav === 'programs');
+}
+
+function teamHubShowsGrid() {
+  return state.nav === 'team' && !teamHubResolveCard();
+}
+
+function teamHubResolveCard() {
+  if (state.nav === 'settings') return settingsActiveSection();
+  if (state.nav === 'programs') {
+    const library = directoryUI().programs.library || 'assessments';
+    return isTeamHubLibraryId(library) ? library : 'assessments';
   }
+  if (state.teamHubCard && isTeamHubCardId(state.teamHubCard)) return state.teamHubCard;
+  if (state.nav === 'team') {
+    const library = directoryUI().programs.library;
+    if (library && isTeamHubLibraryId(library)) return library;
+  }
+  return null;
+}
+
+function teamHubCardMeta(cardId) {
+  const policy = SETTINGS_RAIL_SECTIONS.find(item => item.id === cardId);
+  if (policy) return policy;
+  return TEMPLATE_LIBRARIES.find(item => item.id === cardId) || null;
+}
+
+function teamHubCardHint(cardId) {
+  const team = teamSettings();
+  if (cardId === 'station') return `${exportForceUnits[team.forceUnit]?.short || 'kg'} · ${theme === 'dark' ? 'Dark' : 'Light'} theme`;
+  if (cardId === 'onboarding') {
+    const count = TEAM_ONBOARDING_FIELDS.filter(field => team.onboarding[field.id]).length;
+    return `${count} fields on for new members`;
+  }
+  if (cardId === 'waiver') {
+    const policy = TEAM_WAIVER_POLICIES.find(item => item.id === team.waiverPolicy);
+    return policy?.label || 'Waiver policy';
+  }
+  if (cardId === 'assessments') return 'Protocol, ROM, and session plan defaults';
+  if (cardId === 'sessions') return `${clinicSessionTemplates().length} load presets`;
+  if (cardId === 'programs') return `${clinicProgramTemplates().length} templates · ${assignedPrograms().length} assigned`;
+  return '';
+}
+
+function visitTeamHub(card = null) {
+  if (state.actor !== 'coach') return;
+  state.nav = 'team';
+  state.settingsSection = null;
   state.personId = null;
   state.pendingSetup = null;
-  state.memberOrigin = 'find';
+  state.memberOrigin = 'team';
+  if (card === 'waiver-signatures') {
+    state.teamHubCard = 'waiver';
+    state.settingsHubSection = 'waiver';
+    state.waiverHubTab = 'signatures';
+  } else if (card && isTeamHubCardId(card)) {
+    state.teamHubCard = card;
+    if (TEAM_HUB_POLICY_IDS.has(card)) {
+      state.settingsHubSection = card;
+      if (card === 'waiver' && !state.waiverHubTab) state.waiverHubTab = 'policy';
+    }
+    if (isTeamHubLibraryId(card)) {
+      if (card !== 'sessions') directoryUI().programs.query = '';
+      if (card === 'programs') Object.assign(directoryUI().programs, {tab: directoryUI().programs.tab || 'templates', library: 'programs'});
+      else Object.assign(directoryUI().programs, {library: card});
+    }
+  } else {
+    state.teamHubCard = null;
+  }
+  rosterUI().filterOpen = false;
   render();
   window.scrollTo(0, 0);
+}
+
+function visitSettings(section = null) {
+  if (state.actor !== 'coach') return;
+  if (section === 'waiver-signatures') {
+    visitTeamHub('waiver-signatures');
+    return;
+  }
+  if (section) visitTeamHub(section);
+  else visitTeamHub(null);
+}
+
+function teamHubCardButton(item) {
+  return `<button type="button" class="team-hub-card" data-action="team-hub-card" data-card="${item.id}">
+    <span class="team-hub-card-text"><strong>${escapeHTML(item.label)}</strong><small>${escapeHTML(teamHubCardHint(item.id) || item.description)}</small></span>
+    ${icon('chevron', 'icon-sm')}
+  </button>`;
+}
+
+function teamHubCardsMarkup() {
+  const team = teamSettings();
+  return `<header class="settings-pane-head team-hub-head">
+    <div class="settings-pane-head-row">
+      <div class="settings-pane-head-text">
+        <h1>Team</h1>
+        <p class="settings-pane-desc">${escapeHTML(team.name)}. Policy and reusable libraries for this clinic.</p>
+      </div>
+    </div>
+  </header>
+  <div class="team-hub-sections">
+    <section class="team-hub-section" aria-labelledby="team-hub-policy-title">
+      <h2 id="team-hub-policy-title" class="team-hub-section-title">Team policy</h2>
+      <div class="team-hub-card-grid settings-links settings-links--grid-2">${SETTINGS_RAIL_SECTIONS.map(teamHubCardButton).join('')}</div>
+    </section>
+    <section class="team-hub-section" aria-labelledby="team-hub-libraries-title">
+      <h2 id="team-hub-libraries-title" class="team-hub-section-title">Libraries</h2>
+      <div class="team-hub-card-grid settings-links settings-links--grid-2">${TEMPLATE_LIBRARIES.map(teamHubCardButton).join('')}</div>
+    </section>
+  </div>`;
+}
+
+function teamHubDetailHead(activeItem, cardId) {
+  const library = isTeamHubLibraryId(cardId) ? cardId : null;
+  const saveAssessment = library === 'assessments' ? button('Save', 'save-assessment-workspace', 'primary') : '';
+  const saveSessionPlan = library === 'sessions' && sessionWorkspaceTab() === 'session-plan' ? button('Save', 'save-session-workspace', 'primary') : '';
+  const createByLibrary = {
+    sessions: {action: 'new-session-template', ariaLabel: 'New session template'},
+    programs: {action: 'new-template', ariaLabel: 'New program template'}
+  };
+  const create = createByLibrary[library];
+  const showCreate = create && !(library === 'sessions' && sessionWorkspaceTab() === 'session-plan');
+  const action = cardId === 'station'
+    ? button('Save settings', 'save-settings', 'primary')
+    : saveAssessment || saveSessionPlan || (showCreate ? button(icon('plus', 'icon-sm') + ' New template', create.action, 'primary', `aria-label="${create.ariaLabel}"`) : '');
+  const desc = activeItem.description ? `<p class="settings-pane-desc">${escapeHTML(activeItem.description)}</p>` : '';
+  return `<header class="settings-pane-head team-hub-detail-head">
+    ${button(icon('back', 'icon-sm') + ' Team', 'team-hub-back', 'small-button text-button team-hub-back', 'aria-label="Back to team hub"')}
+    <div class="settings-pane-head-row">
+      <div class="settings-pane-head-text">
+        <h1>${escapeHTML(activeItem.label)}</h1>
+        ${desc}
+      </div>
+      ${action ? `<div class="settings-pane-head-actions">${action}</div>` : ''}
+    </div>
+  </header>`;
+}
+
+function teamHubDetailBody(cardId) {
+  if (TEAM_HUB_POLICY_IDS.has(cardId)) return settingsRailPane(cardId);
+  if (cardId === 'assessments') return assessmentWorkspaceBody();
+  if (cardId === 'sessions') return teamSessionWorkspaceMarkup();
+  if (cardId === 'programs') {
+    Object.assign(directoryUI().programs, {library: 'programs', tab: directoryUI().programs.tab || 'templates'});
+    return programLibraryBody();
+  }
+  return '';
+}
+
+function teamHubPage() {
+  if (state.actor !== 'coach') return peopleView();
+  const card = teamHubResolveCard();
+  if (!card) {
+    return `<main class="directory-page settings-page settings-hub templates-hub team-hub-layout staff-single-pane" aria-label="Team">
+      <div class="settings-hub-pane team-hub-pane" aria-label="Team policy and libraries">
+        ${teamHubCardsMarkup()}
+      </div>
+    </main>`;
+  }
+  const activeItem = teamHubCardMeta(card) || SETTINGS_RAIL_SECTIONS[0];
+  return `<main class="directory-page settings-page settings-hub templates-hub team-hub-layout staff-single-pane" aria-label="${escapeHTML(activeItem.label)}">
+    <div class="settings-hub-pane team-hub-pane" aria-label="${escapeHTML(activeItem.label)}">
+      ${teamHubDetailHead(activeItem, card)}
+      ${teamHubDetailBody(card)}
+    </div>
+  </main>`;
 }
 
 function settingsTeamRail(activeSectionId) {
@@ -396,7 +556,7 @@ function teamFollowUpPlanFieldsMarkup() {
       <select id="plan-weeks">${[4, 5, 6, 7, 8].map(n => `<option value="${n}" ${plan.weeks === n ? 'selected' : ''}>${n}</option>`).join('')}</select>
       <label class="field-label" for="plan-template">Load preset</label>
       <select id="plan-template">${clinicSessionTemplates().map(item => `<option value="${item.id}" ${plan.templateId === item.id ? 'selected' : ''}>${item.name} · ${item.detail}</option>`).join('')}</select>
-      <p class="directory-footnote">${escapeHTML(sessionPlanLine(plan))} · presets from the <strong>Templates</strong> tab here</p>
+      <p class="directory-footnote">${escapeHTML(sessionPlanLine(plan))} · presets from <strong>Sessions</strong> in Team</p>
     </section>
   </div>`;
 }
@@ -408,21 +568,11 @@ function settingsRailPane(section) {
 }
 
 function settingsPage() {
-  if (state.actor !== 'coach') return peopleView();
-  const section = settingsActiveSection();
-  const activeItem = SETTINGS_RAIL_SECTIONS.find(item => item.id === section) || SETTINGS_RAIL_SECTIONS[0];
-  return `<main class="directory-page settings-page settings-hub settings-workspace settings-hub-layout settings-workspace-layout templates-hub">
-    ${settingsTeamRail(section)}
-    <div class="settings-hub-pane" aria-label="${escapeHTML(activeItem.label)}">
-      ${settingsPaneHead(activeItem, section)}
-      ${settingsPaneSubnav(section)}
-      ${settingsRailPane(section)}
-    </div>
-  </main>`;
+  return teamHubPage();
 }
 
 function saveTeamSettingsHome() {
-  if (state.actor !== 'coach' || state.nav !== 'settings') return;
+  if (state.actor !== 'coach' || !isTeamHubNav() || teamHubResolveCard() !== 'station') return;
   const team = teamSettings();
   const name = ($('#team-name')?.value || '').trim().replace(/\s+/g, ' ');
   if (!name) {
@@ -445,36 +595,41 @@ function saveTeamSettingsHome() {
 }
 
 const teamSettingsActions = {
+  'nav-team': () => visitTeamHub(null),
+  'team-hub-card': el => {
+    if (!isTeamHubCardId(el.dataset.card)) return;
+    visitTeamHub(el.dataset.card);
+    $(`[data-action="team-hub-card"][data-card="${el.dataset.card}"]`)?.focus();
+  },
+  'team-hub-back': () => visitTeamHub(null),
   'settings-hub-section': el => {
     if (!SETTINGS_RAIL_SECTIONS.some(item => item.id === el.dataset.section)) return;
-    state.settingsHubSection = el.dataset.section;
-    if (el.dataset.section === 'waiver' && !state.waiverHubTab) state.waiverHubTab = 'policy';
-    render();
+    visitTeamHub(el.dataset.section);
     $(`[data-action="settings-hub-section"][data-section="${el.dataset.section}"]`)?.focus();
   },
   'waiver-hub-tab': el => {
-    if (state.actor !== 'coach' || state.nav !== 'settings' || state.settingsHubSection !== 'waiver') return;
+    if (state.actor !== 'coach' || !isTeamHubNav() || teamHubResolveCard() !== 'waiver') return;
     if (!WAIVER_HUB_TABS.some(item => item.id === el.dataset.tab)) return;
     state.waiverHubTab = el.dataset.tab;
     render();
     $(`[data-action="waiver-hub-tab"][data-tab="${el.dataset.tab}"]`)?.focus();
   },
   'settings-unit': el => {
-    if (!exportForceUnits[el.dataset.unit] || state.nav !== 'settings') return;
+    if (!exportForceUnits[el.dataset.unit] || !isTeamHubNav() || teamHubResolveCard() !== 'station') return;
     const typed = ($('#team-name')?.value || '').trim().replace(/\s+/g, ' ');
     if (typed) teamSettings().name = typed;
     teamSettings().forceUnit = el.dataset.unit;
     render();
   },
   'save-onboarding': () => {
-    if (state.actor !== 'coach' || state.nav !== 'settings' || state.settingsHubSection !== 'onboarding') return;
+    if (state.actor !== 'coach' || !isTeamHubNav() || teamHubResolveCard() !== 'onboarding') return;
     const selected = new Set($$('input[name="onboarding-field"]:checked').map(input => input.value));
     const team = teamSettings();
     TEAM_ONBOARDING_FIELDS.forEach(field => { team.onboarding[field.id] = selected.has(field.id); });
     toast('Onboarding preferences saved.');
   },
   'save-assessment-workspace': () => {
-    if (state.actor !== 'coach' || state.nav !== 'programs' || directoryUI().programs.library !== 'assessments') return;
+    if (state.actor !== 'coach' || !isTeamHubNav() || teamHubResolveCard() !== 'assessments') return;
     const team = teamSettings();
     const tab = assessmentWorkspaceTab();
     if (tab === 'protocol') {
@@ -511,7 +666,7 @@ const teamSettingsActions = {
     toast('Assessment defaults saved.');
   },
   'save-session-workspace': () => {
-    if (state.actor !== 'coach' || state.nav !== 'programs' || directoryUI().programs.library !== 'sessions') return;
+    if (state.actor !== 'coach' || !isTeamHubNav() || teamHubResolveCard() !== 'sessions') return;
     const sessions = Number($('#plan-sessions')?.value);
     const weeks = Number($('#plan-weeks')?.value);
     const templateId = $('#plan-template')?.value;

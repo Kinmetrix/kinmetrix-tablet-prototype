@@ -163,3 +163,14 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
  .team-overview-kpi-main{grid-template-columns:minmax(0,1fr) 88px}
  .team-kpi-spark{width:88px}
 }
+.team-hub-sections{display:grid;gap:28px;margin-top:8px}
+.team-hub-section-title{margin:0 0 12px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.team-hub-card-grid{margin:0}
+.team-hub-card{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-align:left;min-height:64px;color:inherit;cursor:pointer}
+.team-hub-card:hover{background:var(--soft)}
+.team-hub-card strong{display:block;font-size:15px}
+.team-hub-card small{display:block;color:var(--muted);font-size:12px;margin-top:3px;line-height:1.35}
+.team-hub-detail-head .team-hub-back{margin:0 0 12px;padding-left:0}
+.team-hub-detail-head .settings-pane-head-row{margin-top:0}
+.templates-layered-shell .team-hub-card{border-color:rgba(0,0,0,.08)}
+:root[data-theme="dark"] .templates-layered-shell .team-hub-card{border-color:rgba(255,255,255,.1)}

@@ -6,9 +6,13 @@ function directoryUI(){
 function visitDirectory(page,keepLibrary=false){
  if(state.actor!=='coach')return;
  if(page==='pulse'){visitPulse();return;}
- if(!['roster','programs'].includes(page))return;
- if(page==='programs'&&!keepLibrary)Object.assign(directoryUI().programs,{library:'assessments',query:''});
- if(page!=='roster')rosterUI().filterOpen=false;
+ if(page==='programs'){
+  if(!keepLibrary)Object.assign(directoryUI().programs,{library:'assessments',query:''});
+  visitTeamHub(keepLibrary?(directoryUI().programs.library||'assessments'):null);
+  return;
+ }
+ if(page!=='roster')return;
+ rosterUI().filterOpen=false;
  state.nav=page;state.personId=null;state.pendingSetup=null;state.memberOrigin=page;render();window.scrollTo(0,0);
 }
 function openDirectoryPerson(id,origin='find',tab='overview'){
@@ -19,7 +23,9 @@ function openDirectoryPerson(id,origin='find',tab='overview'){
  render();window.scrollTo(0,0);return true;
 }
 function returnToDirectory(){
- if(['pulse','roster','programs'].includes(state.memberOrigin))visitDirectory(state.memberOrigin,true);else showGlobalFind();
+ if(state.memberOrigin==='programs'||state.memberOrigin==='team')visitTeamHub(directoryUI().programs.library||'assessments');
+ else if(['pulse','roster'].includes(state.memberOrigin))visitDirectory(state.memberOrigin,true);
+ else showGlobalFind();
 }
 const rosterColumnDefinitions=[
  {key:'sessions',label:'Sessions',width:80},{key:'force',label:'Avg peak force',width:126},{key:'stability',label:'Stability',width:92},{key:'visit',label:'Last activity',width:110},{key:'program',label:'Program',width:180},
@@ -327,17 +333,8 @@ function templatesLibraryPane(library){
 function programsPage(){
  if(state.actor!=='coach')return peopleView();
  const ui=directoryUI().programs;
- const library=TEMPLATE_LIBRARIES.some(item=>item.id===ui.library)?ui.library:'assessments';
- ui.library=library;
- const active=TEMPLATE_LIBRARIES.find(item=>item.id===library)||TEMPLATE_LIBRARIES[0];
- return `<main class="directory-page settings-page settings-hub settings-workspace settings-hub-layout settings-workspace-layout templates-hub">
-  ${templatesHubRail(library)}
-  <div class="settings-hub-pane" aria-label="${escapeHTML(active.label)}">
-   ${templatesPaneHead(active,library)}
-   ${templatesPaneSubnav(library)}
-   ${templatesLibraryPane(library)}
-  </div>
- </main>`;
+ ui.library=TEMPLATE_LIBRARIES.some(item=>item.id===ui.library)?ui.library:'assessments';
+ return teamHubPage();
 }
 function assessmentWorkspaceBody(){
  return teamAssessmentWorkspaceMarkup();
@@ -391,13 +388,13 @@ const directoryActions={
  'close-roster-filters':()=>{rosterUI().filterOpen=false;refreshRoster({refreshToolbar:true});$('[data-action="roster-filters"]')?.focus();},
  'roster-columns':()=>{if(state.actor==='coach')openModal('roster-columns');},
  'apply-roster-columns':()=>{if(state.actor!=='coach'||state.overlay?.type!=='roster-columns')return;const ui=rosterUI();ui.columns=$$('input[name="roster-column"]:checked').map(el=>el.value).filter(key=>rosterColumnDefinitions.some(col=>col.key===key));if(!ROSTER_SORT_KEYS.has(ui.sort)||(ui.sort!=='name'&&!ui.columns.includes(ui.sort)))ui.sort='name';state.overlay=null;render();$('[data-action="roster-columns"]')?.focus();},
- 'nav-pulse':()=>visitPulse(),'nav-roster':()=>visitDirectory('roster'),'nav-programs':()=>visitDirectory('programs'),
+ 'nav-pulse':()=>visitPulse(),'nav-roster':()=>visitDirectory('roster'),'nav-programs':()=>visitTeamHub(null),
  'open-roster-person':el=>openDirectoryPerson(el.dataset.id,'roster'),
  'sort-roster':el=>{const ui=rosterUI(),key=el.dataset.sort;if(!ROSTER_SORT_KEYS.has(key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-action="sort-roster"][data-sort="${key}"]`)?.focus({preventScroll:true});},
  'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',filterKind:'all',filterValue:'all',sort:'name',descending:false});refreshRoster({refreshToolbar:true});if(rosterUI().filterOpen)$('#roster-filter-kind')?.focus();else $('#directory-search')?.focus();},
- 'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;directoryUI().programs.library=el.dataset.library;render();$(`[data-action="templates-library"][data-library="${el.dataset.library}"]`)?.focus();},
+ 'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;visitTeamHub(el.dataset.library);$(`[data-action="templates-library"][data-library="${el.dataset.library}"]`)?.focus();},
  'team-assessment-positions':el=>{
-  if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
+  if(!isTeamHubNav()||teamHubResolveCard()!=='assessments')return;
   const value=Number(el.dataset.value);
   if(![4,8].includes(value))return;
   teamAssessmentConfig().positions=value;
@@ -405,7 +402,7 @@ const directoryActions={
   $(`[data-action="team-assessment-positions"][data-value="${value}"]`)?.focus();
  },
  'team-rom-positions':el=>{
-  if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
+  if(!isTeamHubNav()||teamHubResolveCard()!=='assessments')return;
   const value=Number(el.dataset.value);
   if(![4,8].includes(value))return;
   teamRomConfig().positions=value;
@@ -413,7 +410,7 @@ const directoryActions={
   $(`[data-action="team-rom-positions"][data-value="${value}"]`)?.focus();
  },
  'team-rom-step':el=>{
-  if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
+  if(!isTeamHubNav()||teamHubResolveCard()!=='assessments')return;
   const key=el.dataset.key,rom=teamRomConfig();
   if(!['romStill','romDrop'].includes(key))return;
   const step=Number(el.dataset.step),min=Number(el.dataset.min),max=Number(el.dataset.max);
@@ -422,7 +419,7 @@ const directoryActions={
   $(`#${el.id}`)?.focus({preventScroll:true});
  },
  'assessment-tab':el=>{
-  if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
+  if(!isTeamHubNav()||teamHubResolveCard()!=='assessments')return;
   const tab=el.dataset.tab;
   if(!['protocol','rom'].includes(tab))return;
   directoryUI().programs.assessmentTab=tab;
@@ -430,7 +427,7 @@ const directoryActions={
   $(`[data-action="assessment-tab"][data-tab="${tab}"]`)?.focus();
  },
  'session-tab':el=>{
-  if(state.nav!=='programs'||directoryUI().programs.library!=='sessions')return;
+  if(!isTeamHubNav()||teamHubResolveCard()!=='sessions')return;
   const tab=el.dataset.tab;
   if(!['templates','session-plan'].includes(tab))return;
   directoryUI().programs.sessionTab=tab;
@@ -458,15 +455,15 @@ document.addEventListener('change',event=>{
  if(el.id==='roster-filter-kind'){const ui=rosterUI();ui.filterKind=el.value;const options=rosterFilterValueOptions(ui.filterKind,visiblePeople());ui.filterValue=ui.filterKind==='all'?'all':options[0]?.[0]||'all';refreshRoster({refreshToolbar:true});el.focus();}
  if(el.id==='roster-filter-value'){rosterUI().filterValue=el.value;refreshRoster({refreshToolbar:true});el.focus();}
  if(el.id==='assign-person')el.setCustomValidity('');
- if(el.id==='team-assessment-mode'&&state.nav==='programs'&&directoryUI().programs.library==='assessments'){
+ if(el.id==='team-assessment-mode'&&isTeamHubNav()&&teamHubResolveCard()==='assessments'){
   teamAssessmentConfig().activeMode=el.value;
   render();
   $('#team-assessment-mode')?.focus();
  }
- if(el.id==='team-assessment-reps'&&state.nav==='programs'&&directoryUI().programs.library==='assessments'){
+ if(el.id==='team-assessment-reps'&&isTeamHubNav()&&teamHubResolveCard()==='assessments'){
   teamAssessmentConfig().reps=Number(el.value);
  }
- if(el.id==='team-assessment-hold-style'&&state.nav==='programs'&&directoryUI().programs.library==='assessments'){
+ if(el.id==='team-assessment-hold-style'&&isTeamHubNav()&&teamHubResolveCard()==='assessments'){
   const assessment=teamAssessmentConfig();
   assessment.holdStyle=el.value==='endurance'?'endurance':'timed';
   teamSettings().assessment=normalizeTeamAssessment(assessment);
