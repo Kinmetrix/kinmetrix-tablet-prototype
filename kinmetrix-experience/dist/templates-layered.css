@@ -17,6 +17,7 @@
  --templates-library-rail-pane-gap:8px;
  --templates-library-item-gap:4px;
  --templates-shell-gap:8px;
+ --templates-nav-icon-active:rgba(255,255,255,.16);
  max-width:none;margin:0;
  padding:var(--templates-shell-inset);
  gap:var(--templates-shell-gap,10px);
@@ -50,12 +51,29 @@
  overflow:hidden;
 }
 .templates-layered-shell .wordmark .brand-mark{filter:none}
-.templates-layered-shell .nav-button{color:var(--templates-nav-muted)}
-.templates-layered-shell .nav-button:hover{background:rgba(255,255,255,.07);color:var(--templates-nav-ink)}
-.templates-layered-shell .nav-button.active{background:var(--templates-nav-active-bg);color:var(--templates-nav-ink);font-weight:620}
+.templates-layered-shell .side-nav,.templates-layered-shell .side-bottom{align-items:center;gap:4px}
+.templates-layered-shell .nav-button{
+  width:72px;min-width:72px;min-height:62px;max-height:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;padding:6px 4px;background:transparent;border-radius:0;
+  color:var(--templates-nav-muted);font-size:11px;font-weight:500;line-height:1.15;text-align:center;
+ }
+.templates-layered-shell .nav-button:hover{background:transparent;color:var(--templates-nav-ink)}
+.templates-layered-shell .nav-button:hover .nav-glyph-wrap{background:rgba(255,255,255,.08)}
+.templates-layered-shell .nav-button.active{background:transparent;color:var(--templates-nav-ink);font-weight:700}
+.templates-layered-shell .nav-glyph-wrap{
+ display:inline-flex;align-items:center;justify-content:center;
+ width:36px;height:36px;border-radius:10px;position:relative;transition:background .12s ease;
+}
+.templates-layered-shell .nav-button.active .nav-glyph-wrap{background:var(--templates-nav-icon-active)}
+.templates-layered-shell .nav-glyph{width:22px;height:22px;flex-shrink:0}
+.templates-layered-shell .nav-label{display:block;max-width:68px}
 .templates-layered-shell .sidebar .nav-clinician{color:var(--templates-nav-ink)}
+.templates-layered-shell .nav-clinician .nav-glyph-wrap{background:transparent}
+.templates-layered-shell .nav-clinician:hover .nav-glyph-wrap{background:rgba(255,255,255,.08)}
 .templates-layered-shell .nav-clinician .avatar{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.12);color:var(--templates-nav-ink)}
 .templates-layered-shell .nav-station-icon .status-dot{box-shadow:0 0 0 3px var(--templates-nav-bg)}
+.templates-layered-shell .nav-clinician-glyph .avatar{width:28px;height:28px;font-size:11px}
 .templates-layered-shell .shell-main{
  display:flex;flex-direction:column;
  background:var(--templates-shell-bg);
@@ -183,9 +201,7 @@
   color:inherit;
   height:auto;min-height:0;max-height:none;
  }
+ .templates-layered-shell .sidebar>.wordmark{display:flex;flex:0 0 auto;margin-right:4px}
  .templates-layered-shell .wordmark .brand-mark{filter:none}
- .templates-layered-shell .nav-button{color:var(--muted)}
- .templates-layered-shell .nav-button.active{background:var(--selected);color:var(--action)}
- .templates-layered-shell .nav-button:hover{background:var(--selected)}
  .templates-layered-shell .shell-main{background:var(--surface)}
 }

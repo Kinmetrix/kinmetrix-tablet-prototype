@@ -23,7 +23,7 @@ Choose **Timed** vs **Endurance** in session setup, program templates (when mode
 
 Use **Settings** at the bottom of the sidebar to choose Light or Dark appearance; the prototype bar also provides a quick theme switch. This preference persists locally without changing the active session. Mode selection explains each option’s purpose; radials are prominent throughout preparation, live work, and review.
 
-- The sidebar owns global navigation: Find, Roster, and Templates above; Station, Settings, the clinician avatar switcher, and Lock below. There is no duplicate top bar. On narrow screens these become one bottom bar.
+- The sidebar owns global navigation: **Find**, **Pulse**, **Roster**, and **Templates** above; **Device**, **Settings**, the clinician avatar switcher, and **Lock** below (icon above label, Slack-style active squircle). The wordmark shows the **team logo** from station settings. There is no duplicate top bar. On narrow screens the rail becomes a bottom bar; the team mark stays visible in the layered shell.
 - Start in Find with no member preselected. The idle Find screen stays minimal—heading, prompt, and search—until you type. Search by name, or use Roster for the full table. Selecting a result opens that member’s workspace.
 - Roster provides member search, clinician/program filters, sortable columns, and direct workspace/Profile access. Columns adds clinician, height, body weight, and activity level to the default performance view.
 - Templates opens Assessments, Sessions, and Programs libraries. Programs still separates reusable templates from Assigned plans. Create/edit a program template, assign an independent copy, and continue it through the shared session setup. Existing person-level New → Program creation remains available.
@@ -48,7 +48,7 @@ All people, authentication, permissions, force/movement readings, scoring, and d
 
 ## Verification
 
-Browser checks at 1180 × 820 and 390 × 844: core session journey, guided takeover and private exit, first ROM approval state, assigned-only clinician roster, member isolation, endurance release, setup acknowledgement, and responsive overflow. JavaScript syntax checks: `node --check dist/app.js` `node --check dist/report.js`, `node --check dist/profile.js`, and `node --check dist/reps.js`. Browser simulation does not establish native iPad or hardware readiness.
+Browser checks at 1180 × 820 and 390 × 844: core session journey, guided takeover and private exit, first ROM approval state, assigned-only clinician roster, member isolation, endurance release, setup acknowledgement, and responsive overflow. Automated checks: `yarn check` (`check:syntax` includes `dist/nav-icons.js` and other dist scripts; `check:review` runs `review/*.cjs`). Browser simulation does not establish native iPad or hardware readiness.
 
 
 The New flow starts with Assessment, Training session, or Program. **Assessment** modes: Isometric, Isokinetic, Eccentric, and Range of motion. **Training** modes: Isometric, Isokinetic, and Eccentric. **Isometric** sessions and program templates also set **Hold: Timed or Endurance** (not a fourth training mode). Programs support a simple repeated-mode plan with session-count progression, saved only in demo memory. The Overview radial retains stability and symmetry information.

@@ -19,6 +19,20 @@ const icons = {
  print:'<path d="M6 9V3h12v6M6 17H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6zM18 12h.01"/>',compare:'<path d="M5 4v16m14-16v16M2 7h6m8 10h6M9 4l6 16"/>',columns:'<path d="M9 3v18M4 3v18M15 3v18M20 3v18"/>',filter:'<path d="M4 6h16l-6 7v7l-4-2v-5Z"/>',filterFilled:'<path d="M4 6h16l-6 7v7l-4-2v-5Z" fill="currentColor" stroke="none"/>',phone:'<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 5h4m-3 14h2"/>',lock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4m-4 5v2"/>',logout:'<path d="M9 4H4v16h5m4-12 4 4-4 4m-5-4h13"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>',home:'<path d="M5 10.5 12 4l7 6.5V19a1 1 0 0 1-1 1h-4v-6H10v6H6a1 1 0 0 1-1-1z"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/>',arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>'
 };
 function icon(name, cls='') {return `<svg class="icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || icons.info}</svg>`;}
+const navStrokeGlyphs=new Set(['pulse']);
+function navGlyph(name,active){
+ if(navStrokeGlyphs.has(name)&&icons[name]){
+  const weight=active?2.4:1.5;
+  const cls='icon nav-glyph';
+  return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${weight}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
+ }
+ const set=typeof navIconSets!=='undefined'?navIconSets[name]:null;
+ const body=set?(active?set.solid:set.outline):(icons[name]||icons.info);
+ if(active&&set)return `<svg class="icon nav-glyph" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${body}</svg>`;
+ if(set)return `<svg class="icon nav-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">${body}</svg>`;
+ return icon(name,'nav-glyph');
+}
+function navItem(label,action,glyph,active,extra=''){return `<button class="nav-button${active?' active':''}" data-action="${action}"${active?' aria-current="page"':''}${extra}><span class="nav-glyph-wrap">${navGlyph(glyph,active)}</span><span class="nav-label">${label}</span></button>`;}
 const clinicians = [
  {id:'sam',name:'Sam Rivera',initials:'SR',pin:'1111',role:'Clinician'},
  {id:'jordan',name:'Jordan Chen',initials:'JC',pin:'2222',role:'Clinician'},
@@ -113,10 +127,10 @@ function render(){
 function staffNavActive(nav,origin){if(nav==='settings'||nav==='device')return '';if(nav==='people')return origin||'find';if(nav==='find')return 'find';return nav;}
 function shell(){const c=clinician(),staff=state.actor==='coach',settingsOpen=state.nav==='settings',deviceOpen=state.nav==='device',active=settingsOpen||deviceOpen?'':staffNavActive(state.nav,state.memberOrigin);const templatesLayered=true;return `<div class="app-shell ${staff?'staff-shell':'member-shell'}${templatesLayered?' templates-layered-shell':''}">
  <aside class="sidebar" aria-label="${staff?'Clinic navigation':'Private member navigation'}">${brand()}<nav class="side-nav" aria-label="Main navigation">
- ${staff?['find','pulse','roster','programs'].map(key=>`<button class="nav-button ${active===key?'active':''}" data-action="nav-${key}" ${active===key?'aria-current="page"':''}>${icon({pulse:'pulse',find:'search',roster:'people',programs:'library'}[key])}<span>${{pulse:'Pulse',find:'Find',roster:'Roster',programs:'Templates'}[key]}</span></button>`).join(''):`<button class="nav-button active" data-action="nav-find" aria-current="page" aria-label="My progress · Private">${icon('user')}<span>My progress</span></button>`}
+ ${staff?['find','pulse','roster','programs'].map(key=>navItem({pulse:'Pulse',find:'Find',roster:'Roster',programs:'Templates'}[key],`nav-${key}`,{pulse:'pulse',find:'search',roster:'people',programs:'library'}[key],active===key)).join(''):navItem('My progress','nav-find','user',true,' aria-label="My progress · Private"')}
  </nav><div class="side-bottom" role="group" aria-label="${staff?'Device and clinician':'Device controls'}">
- <button class="nav-button nav-station ${deviceOpen?'active':''}" data-action="nav-device" ${deviceOpen?'aria-current="page"':''} aria-label="Device · ${state.deviceReady?'Ready':'Unavailable'}" title="${state.deviceReady?'Device ready':'Device unavailable'}"><span class="nav-station-icon">${icon('device')}<span class="status-dot ${state.deviceReady?'':'offline'}"></span></span><span>${state.deviceReady?'Device':'Offline'}</span></button>
- ${staff?`<button class="nav-button ${settingsOpen?'active':''}" data-action="settings" ${settingsOpen?'aria-current="page"':''}>${icon('settings')}<span>Settings</span></button><button class="nav-button nav-clinician" data-action="switch-clinician" aria-label="Switch clinician · ${c.name} · ${c.role}" title="${c.name} · Switch clinician" aria-haspopup="dialog">${avatar(c,'mini')}<span>${c.name.split(' ')[0]}</span></button><button class="nav-button" data-action="lock-station" aria-label="Lock station">${icon('lock')}<span>Lock</span></button>`:`<button class="nav-button" data-action="signout">${icon('logout')}<span>Finish</span></button>`}
+ <button class="nav-button nav-station ${deviceOpen?'active':''}" data-action="nav-device" ${deviceOpen?'aria-current="page"':''} aria-label="Device · ${state.deviceReady?'Ready':'Unavailable'}" title="${state.deviceReady?'Device ready':'Device unavailable'}"><span class="nav-glyph-wrap nav-station-icon">${navGlyph('device',deviceOpen)}<span class="status-dot ${state.deviceReady?'':'offline'}"></span></span><span class="nav-label">${state.deviceReady?'Device':'Offline'}</span></button>
+ ${staff?`${navItem('Settings','settings','settings',settingsOpen)}<button class="nav-button nav-clinician" data-action="switch-clinician" aria-label="Switch clinician · ${c.name} · ${c.role}" title="${c.name} · Switch clinician" aria-haspopup="dialog"><span class="nav-glyph-wrap nav-clinician-glyph">${avatar(c,'mini')}</span><span class="nav-label">${c.name.split(' ')[0]}</span></button>${navItem('Lock','lock-station','lock',false,' aria-label="Lock station"')}`:navItem('Finish','signout','logout',false)}
  </div></aside><div class="shell-main">${deviceOpen?devicePage():settingsOpen?settingsPage():state.nav==='pulse'?pulsePage():state.nav==='roster'?rosterPage():state.nav==='programs'?programsPage():state.nav==='find'?globalFindView():peopleView()}</div></div>`;}
 function peopleView(){
  if(state.actor==='coach'&&!person())return globalFindView();

@@ -1,0 +1,4 @@
+Heroicons (sidebar nav icons in nav-icons.js)
+Copyright (c) Tailwind Labs, Inc.
+MIT License — https://heroicons.com
+Regenerate paths: node scripts/extract-nav-icons.mjs
