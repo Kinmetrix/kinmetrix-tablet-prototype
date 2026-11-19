@@ -190,7 +190,7 @@ function directoryPersonSummary(p){
  const records=[...state.history.filter(r=>r.personId===p.id),...reportFixtureHistory(p.id)].sort((a,b)=>(b.completedAt||0)-(a.completedAt||0));
  const assessment=records.find(r=>!r.partial&&r.type==='strength'&&r.purpose==='assessment');
  const latest=records[0],data=assessment?reportData(assessment):null;
- return {sessions:records.length,force:data?.force??null,stability:data?.stability??null,assessment,visit:latest?{label:latest.date,order:latest.completedAt||0}:p.last?{label:p.last,order:Date.UTC(2026,10,parseInt(p.last),12)}:{label:'No activity',order:0}};
+ return {sessions:records.length,force:data?.force??null,stability:data?.stability??null,assessment,visit:latest?{label:latest.date,order:latest.completedAt||0,recordId:latest.id}:p.last?{label:p.last,order:Date.UTC(2026,10,parseInt(p.last),12),recordId:null}:{label:'No activity',order:0,recordId:null}};
 }
 function rosterModel(){
  const ui=rosterUI(),query=ui.query.trim().toLowerCase(),permitted=visiblePeople();
@@ -215,7 +215,10 @@ function rosterCell(row,key){
  if(key==='sessions')return row.sessions;
  if(key==='force')return row.force===null?missing:row.force.toFixed(1)+' kg';
  if(key==='stability')return row.stability===null?missing:Math.round(row.stability)+'%';
- if(key==='visit')return row.visit.label;
+ if(key==='visit'){
+  if(!row.visit.recordId)return row.visit.label==='No activity'?'<span class="muted">No activity</span>':escapeHTML(row.visit.label);
+  return `<button type="button" class="program-name-button roster-activity-button" data-action="open-roster-activity" data-id="${row.p.id}" aria-label="Open latest session for ${escapeHTML(row.p.name)}, ${escapeHTML(row.visit.label)}">${escapeHTML(row.visit.label)}</button>`;
+ }
  if(key==='program'){
   if(!row.program)return '<span class="muted">No active program</span>';
   const progress=`${row.program.completed} of ${row.program.total} sessions`;
@@ -409,6 +412,7 @@ const directoryActions={
  'nav-pulse':()=>visitPulse(),'nav-roster':()=>visitDirectory('roster'),'nav-programs':()=>visitTeamHub(null),
  'open-roster-person':el=>openDirectoryPerson(el.dataset.id,'roster'),
  'open-roster-program':el=>openDirectoryPerson(el.dataset.id,'roster','programs'),
+ 'open-roster-activity':el=>{if(!openDirectoryPerson(el.dataset.id,'roster','history'))return;const recordId=directoryPersonSummary({id:el.dataset.id}).visit.recordId;if(recordId)openHistoryRecord(recordId);},
  'sort-roster':el=>{const ui=rosterUI(),key=el.dataset.sort;if(!ROSTER_SORT_KEYS.has(key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-action="sort-roster"][data-sort="${key}"]`)?.focus({preventScroll:true});},
  'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',filterKind:'all',filterValue:'all',sort:'name',descending:false});refreshRoster({refreshToolbar:true});if(rosterUI().filterOpen)$('#roster-filter-kind')?.focus();else $('#directory-search')?.focus();},
  'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;visitTeamHub(el.dataset.library);$(`[data-action="templates-library"][data-library="${el.dataset.library}"]`)?.focus();},

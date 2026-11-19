@@ -28,18 +28,30 @@
 .roster-filter-popover .directory-filter+.directory-filter{margin-top:12px}
 .roster-filter-popover-footer{display:flex;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
 .roster-grid td:last-child,.roster-grid th:last-child{text-align:left;padding-right:8px}
-.roster-program-cell{display:flex;flex-direction:column;align-items:flex-start;gap:2px;white-space:normal;max-width:180px}
-.roster-program-cell .roster-program-button{align-self:stretch;justify-content:flex-start;min-height:44px}
-.roster-program-cell .roster-program-button strong{font-size:13px;font-weight:500}
-.roster-program-cell small{display:block;font-size:11px;line-height:1.5;pointer-events:none}
-.roster-grid .directory-person{color:var(--action);-webkit-tap-highlight-color:transparent}
-.roster-grid .directory-person span:last-child{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
-.roster-grid .roster-program-button{color:var(--action);-webkit-tap-highlight-color:transparent}
-.roster-grid .roster-program-button strong{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;font-weight:550}
+.roster-grid tbody tr{height:52px}
+.roster-grid tbody td,.roster-grid tbody th{padding-top:4px;padding-bottom:4px}
+.roster-grid .directory-person,
+.roster-grid .program-name-button,
+.roster-grid .roster-activity-button{min-height:0}
+.roster-grid .photo-avatar-button{min-width:30px;min-height:30px}
+.roster-program-cell{display:flex;flex-direction:column;align-items:flex-start;gap:1px;white-space:normal;max-width:180px}
+.roster-program-cell .roster-program-button{align-self:stretch;justify-content:flex-start;min-height:0;min-width:0;max-width:100%}
+.roster-program-cell .roster-program-button strong{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.roster-program-cell small{display:block;margin-top:0;font-size:11px;line-height:1.5;pointer-events:none}
+.roster-grid .directory-person,
+.roster-grid .roster-program-button,
+.roster-grid .roster-activity-button{color:var(--action);-webkit-tap-highlight-color:transparent}
+.roster-grid .directory-person span:last-child,
+.roster-grid .roster-program-button strong,
+.roster-grid .roster-activity-button{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.roster-grid .roster-program-button strong{font-weight:550}
+.roster-grid .roster-activity-button{font-size:13px;font-weight:550}
 .roster-grid .directory-person:active,
-.roster-grid .roster-program-button:active{background:var(--soft);border-radius:8px}
+.roster-grid .roster-program-button:active,
+.roster-grid .roster-activity-button:active{background:var(--soft);border-radius:8px}
 .roster-grid .directory-person:focus-visible,
-.roster-grid .roster-program-button:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:8px}
+.roster-grid .roster-program-button:focus-visible,
+.roster-grid .roster-activity-button:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:8px}
 .directory-table-scroll{position:relative;overflow:auto;max-width:100%;border-top:1px solid var(--line)}
 .directory-table{font-variant-numeric:tabular-nums}
 .directory-table th,.directory-table td{vertical-align:middle;white-space:nowrap;padding:8px 12px}
