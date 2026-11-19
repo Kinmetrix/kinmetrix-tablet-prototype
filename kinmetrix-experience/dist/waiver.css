@@ -1,0 +1,156 @@
+.dialog.waiver-sign-dialog {
+  max-width: 640px;
+}
+
+.waiver-terms {
+  max-height: 28vh;
+  overflow: auto;
+  padding: 14px 16px;
+  margin: 0 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-raised, var(--surface));
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.waiver-terms h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.waiver-pad-wrap {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  min-height: 160px;
+}
+
+.waiver-pad-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 160px;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.waiver-pad-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.waiver-pad-bar p {
+  flex: 1;
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.waiver-policy-lead {
+  margin: 0 0 4px;
+}
+
+.waiver-policy-options .radio-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.settings-block--waiver {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.waiver-signatures-list {
+  margin-top: 16px;
+}
+
+.settings-block--waiver-signatures .waiver-signatures-list {
+  margin-top: 20px;
+}
+
+.waiver-signatures-heading {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.waiver-signature-card {
+  display: grid;
+  grid-template-columns: 1fr minmax(140px, 200px);
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.waiver-signature-card:last-child {
+  border-bottom: 0;
+}
+
+.waiver-signature-card img {
+  width: 100%;
+  height: 72px;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.waiver-signature-card strong {
+  display: block;
+  font-size: 14px;
+}
+
+.waiver-signature-card small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.member-waiver-panel {
+  margin-top: 24px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.member-waiver-panel h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.member-waiver-panel img {
+  max-width: 280px;
+  width: 100%;
+  height: auto;
+  max-height: 100px;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.waiver-required-banner {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--signal, #c2410c);
+  background: color-mix(in srgb, var(--signal, #c2410c) 8%, transparent);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.waiver-required-banner p {
+  margin: 0;
+  font-size: 14px;
+}

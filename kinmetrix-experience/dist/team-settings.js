@@ -12,15 +12,24 @@ const TEAM_ONBOARDING_FIELDS = [
   {id: 'waiver', label: 'Waiver', on: true}
 ];
 const TEAM_WAIVER_POLICIES = [
-  {id: 'before-session', label: 'Before a session', description: 'Members should sign before assessment or training.'},
-  {id: 'optional', label: 'Optional', description: 'Show the waiver. Do not block the session.'},
+  {id: 'before-session', label: 'Required before session', description: 'Members must sign and show their signature before assessment or training.'},
   {id: 'off', label: 'Off', description: 'Do not ask for a waiver on this team.'}
 ];
 const SETTINGS_RAIL_SECTIONS = [
   {id: 'station', label: 'Station', description: 'Team and station preferences for this clinic.'},
   {id: 'onboarding', label: 'Onboarding', description: 'Fields collected for a new person.'},
-  {id: 'waiver', label: 'Waiver', description: 'When members should sign a waiver.'}
+  {id: 'waiver', label: 'Waiver', description: 'Policy and on-file signatures for this team.'}
 ];
+
+const WAIVER_HUB_TABS = [
+  {id: 'policy', label: 'Policy'},
+  {id: 'signatures', label: 'On file'}
+];
+
+function waiverHubTab() {
+  const tab = state.waiverHubTab ?? 'policy';
+  return WAIVER_HUB_TABS.some(item => item.id === tab) ? tab : 'policy';
+}
 
 function teamSettings() {
   const defaults = {
@@ -210,7 +219,12 @@ function sessionPlanLine(plan) {
 }
 
 function settingsActiveSection() {
-  const active = state.settingsHubSection ?? 'station';
+  let active = state.settingsHubSection ?? 'station';
+  if (active === 'waiver-signatures') {
+    active = 'waiver';
+    state.settingsHubSection = 'waiver';
+    state.waiverHubTab = 'signatures';
+  }
   return SETTINGS_RAIL_SECTIONS.some(item => item.id === active) ? active : 'station';
 }
 
@@ -218,8 +232,12 @@ function visitSettings(section = null) {
   if (state.actor !== 'coach') return;
   state.nav = 'settings';
   state.settingsSection = null;
-  if (section) {
+  if (section === 'waiver-signatures') {
+    state.settingsHubSection = 'waiver';
+    state.waiverHubTab = 'signatures';
+  } else if (section) {
     state.settingsHubSection = SETTINGS_RAIL_SECTIONS.some(item => item.id === section) ? section : 'station';
+    if (section === 'waiver' && !state.waiverHubTab) state.waiverHubTab = 'policy';
   } else if (!state.settingsHubSection || !SETTINGS_RAIL_SECTIONS.some(item => item.id === state.settingsHubSection)) {
     state.settingsHubSection = 'station';
   }
@@ -304,16 +322,31 @@ function teamOnboardingBody() {
     </section>`;
 }
 
-function teamWaiverBody() {
+function waiverPaneSubnav(activeTab) {
+  return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Waiver views">${WAIVER_HUB_TABS.map(item => `<button type="button" data-action="waiver-hub-tab" data-tab="${item.id}" ${item.id === activeTab ? 'aria-current="page"' : ''}>${item.label}</button>`).join('')}</nav>`;
+}
+
+function teamWaiverPolicyBody() {
   const team = teamSettings();
-  return `<section class="settings-block" aria-label="Waiver policy">
-      <div class="settings-hub-pane-toolbar">
-        <div><p class="muted small">When this team asks members to sign. This does not block Start yet.</p></div>
-        ${button('Save', 'save-waiver', 'primary')}
-      </div>
+  return `<section class="settings-block settings-block--waiver" aria-label="Waiver policy">
+      <p class="muted small waiver-policy-lead">Required waivers block new sessions until the member signs. Policy applies as soon as you select an option.</p>
+      <div class="waiver-policy-options">
       ${TEAM_WAIVER_POLICIES.map(item =>
         `<label class="radio-row"><input type="radio" name="waiver-policy" value="${item.id}" ${team.waiverPolicy === item.id ? 'checked' : ''}><span><strong>${item.label}</strong><small>${item.description}</small></span></label>`
       ).join('')}
+      </div>
+    </section>`;
+}
+
+function teamWaiverBody() {
+  const tab = waiverHubTab();
+  return `${waiverPaneSubnav(tab)}${tab === 'signatures' ? teamWaiverSignaturesBody() : teamWaiverPolicyBody()}`;
+}
+
+function teamWaiverSignaturesBody() {
+  return `<section class="settings-block settings-block--waiver-signatures" aria-label="On-file signatures">
+      <p class="muted small">Members sign when starting a session. Signatures stay in this demo until you reset the station.</p>
+      ${waiverSignaturesRosterMarkup()}
     </section>`;
 }
 
@@ -381,8 +414,16 @@ const teamSettingsActions = {
   'settings-hub-section': el => {
     if (!SETTINGS_RAIL_SECTIONS.some(item => item.id === el.dataset.section)) return;
     state.settingsHubSection = el.dataset.section;
+    if (el.dataset.section === 'waiver' && !state.waiverHubTab) state.waiverHubTab = 'policy';
     render();
     $(`[data-action="settings-hub-section"][data-section="${el.dataset.section}"]`)?.focus();
+  },
+  'waiver-hub-tab': el => {
+    if (state.actor !== 'coach' || state.nav !== 'settings' || state.settingsHubSection !== 'waiver') return;
+    if (!WAIVER_HUB_TABS.some(item => item.id === el.dataset.tab)) return;
+    state.waiverHubTab = el.dataset.tab;
+    render();
+    $(`[data-action="waiver-hub-tab"][data-tab="${el.dataset.tab}"]`)?.focus();
   },
   'settings-unit': el => {
     if (!exportForceUnits[el.dataset.unit] || state.nav !== 'settings') return;
@@ -397,13 +438,6 @@ const teamSettingsActions = {
     const team = teamSettings();
     TEAM_ONBOARDING_FIELDS.forEach(field => { team.onboarding[field.id] = selected.has(field.id); });
     toast('Onboarding preferences saved.');
-  },
-  'save-waiver': () => {
-    if (state.actor !== 'coach' || state.nav !== 'settings' || state.settingsHubSection !== 'waiver') return;
-    const value = $('input[name="waiver-policy"]:checked')?.value;
-    if (!TEAM_WAIVER_POLICIES.some(item => item.id === value)) return;
-    teamSettings().waiverPolicy = value;
-    toast('Waiver policy saved.');
   },
   'save-assessment-workspace': () => {
     if (state.actor !== 'coach' || state.nav !== 'programs' || directoryUI().programs.library !== 'assessments') return;

@@ -38,15 +38,34 @@
 .team-overview-pagination-controls{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .team-overview-pagination-controls .button.is-current-page{background:var(--selected);font-weight:600}
 .team-overview-activity{display:flex;flex-direction:column;min-height:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:14px 12px 8px}
-.team-overview-activity-head h2{font-size:16px;margin-bottom:8px}
+.team-overview-activity-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.team-overview-activity-head h2{font-size:16px;margin:0}
+.team-overview-activity-toolbar{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;justify-content:flex-end}
+.team-overview-activity-filters.segmented{flex-wrap:nowrap;align-self:stretch}
+.team-overview-activity-filters.segmented button{align-self:stretch;display:inline-flex;align-items:center}
+.team-overview-activity-sort{display:flex;align-self:stretch;align-items:stretch}
+.team-overview-activity-sort select{box-sizing:border-box;min-height:46px;height:100%;padding:7px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);font-size:13px;line-height:1.2}
+.team-overview-activity-empty{margin:8px 4px 0}
 .team-overview-activity-list{list-style:none;margin:0;padding:0;overflow:auto;max-height:420px}
 .team-overview-activity-list>li{border-top:1px solid var(--line)}
 .team-overview-activity-list>li:first-child{border-top:0}
-.team-overview-activity-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;border:0;background:none;padding:10px 4px;text-align:left;min-height:52px;color:inherit}
+.team-overview-activity-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;border:0;background:none;padding:12px 6px;text-align:left;min-height:58px;color:inherit}
 .team-overview-activity-row:hover{background:var(--soft)}
-.team-overview-activity-main{display:grid;gap:2px;min-width:0}
+.team-overview-activity-main{display:grid;gap:4px;min-width:0}
 .team-overview-activity-main strong{font-size:13px}
-.team-overview-activity-main small,.team-overview-activity-rel{font-size:11px;color:var(--muted)}
+.team-overview-activity-detail{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0}
+.team-overview-activity-detail small{font-size:11px;color:var(--muted)}
+.team-overview-activity-result{font-size:11px;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.team-overview-activity-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:650;letter-spacing:.03em;line-height:1.2;flex-shrink:0}
+.team-overview-activity-badge--assessment{color:#1a4d8f;background:#e8f1fc}
+.team-overview-activity-badge--training{color:#245a37;background:#e7f4ec}
+.team-overview-activity-badge--notable{color:#5c3d16;background:#f8efd9}
+.team-overview-activity-badge--early{color:#7a3b12;background:#fdeee3}
+:root[data-theme="dark"] .team-overview-activity-badge--assessment{color:#9ec7f5;background:rgba(52,98,155,.28)}
+:root[data-theme="dark"] .team-overview-activity-badge--training{color:#8fd0a8;background:rgba(48,118,76,.28)}
+:root[data-theme="dark"] .team-overview-activity-badge--notable{color:#e8c98a;background:rgba(120,88,36,.28)}
+:root[data-theme="dark"] .team-overview-activity-badge--early{color:#f0b48d;background:rgba(140,72,36,.28)}
+.team-overview-activity-rel{font-size:11px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
 .settings-page .field-label{display:block;font-size:13px;font-weight:600;margin:16px 0 8px}
 .settings-page input[type=text],.settings-page select{width:100%;max-width:420px;height:48px;padding:10px 13px;border:1px solid var(--line);background:var(--surface);border-radius:10px;color:var(--ink)}
 .settings-block{margin-bottom:28px;padding-bottom:8px;border-bottom:1px solid var(--line)}
@@ -54,7 +73,7 @@
 .settings-block h2{font-size:17px;margin-bottom:8px}
 .settings-block .segmented{margin-top:4px}
 .settings-workspace.settings-hub{padding-top:0}
-main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-workspace-layout.settings-hub-layout{display:grid;grid-template-columns:minmax(136px,168px) minmax(0,1fr);gap:0 32px;border:0;border-radius:0;overflow:visible;margin:0;background:transparent;min-height:0;align-items:start;box-sizing:border-box;width:100%}
+main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-workspace-layout.settings-hub-layout{display:grid;grid-template-columns:minmax(136px,168px) minmax(0,1fr);gap:0 32px;border:0;border-radius:0;overflow:visible;margin:0;background:transparent;min-height:0;align-items:stretch;box-sizing:border-box;width:100%;min-width:0}
 .settings-hub-rail{display:flex;flex-direction:column;gap:2px;padding:0;margin:0;background:transparent;border:0;align-self:start;position:sticky;top:12px}
 .settings-rail-caption{margin:0 0 8px;padding:0 0 0 14px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--subtle,var(--muted));line-height:1.2}
 .settings-hub-rail-item{border:0;background:transparent;text-align:left;padding:10px 0 10px 14px;margin:0;border-left:2px solid transparent;border-radius:0;font-size:13px;color:var(--muted);min-height:44px;line-height:1.3;width:100%}
@@ -62,7 +81,7 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .settings-hub-rail-item.is-active{background:transparent;color:var(--ink);font-weight:600;box-shadow:none;border-left-color:var(--ink)}
 .settings-hub-pane{min-width:0;padding:0;display:flex;flex-direction:column;gap:0;border:0;background:transparent}
 .settings-pane-head{margin:0;padding:0}
-.settings-pane-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:4px}
+.settings-pane-head-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px 16px;margin-bottom:4px}
 .settings-pane-head-text{min-width:0}
 .settings-pane-head h1{margin:0;font-size:22px;line-height:1.25;letter-spacing:-.02em;font-weight:650}
 .settings-pane-desc{margin:6px 0 0;font-size:13px;color:var(--muted);line-height:1.45;max-width:52ch}

@@ -29,7 +29,7 @@ const rosterDefaultColumns=['sessions','force','stability','visit','program'];
 const ROSTER_IMPORT_MAX_ROWS=200;
 const ROSTER_IMPORT_HEADERS=['name','email'];
 const ROSTER_SORT_KEYS=new Set(['name','sessions','force','stability','visit','program','clinician','height','weight','activity']);
-function rosterImportTemplateText(){return ROSTER_IMPORT_HEADERS.join(',')+'\r\n';}
+function rosterImportTemplateText(){return ROSTER_IMPORT_HEADERS.join(',')+'\r\nTaylor Brooks,taylor@example.com\r\n';}
 function parseCsvFieldLine(line){
  const cells=[];let cur='',inQuotes=false;
  for(let i=0;i<line.length;i++){
@@ -43,11 +43,16 @@ function parseCsvFieldLine(line){
  return cells.map(cell=>cell.trim());
 }
 function parseRosterImportCSV(text){
- const raw=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(line=>line.trim()!=='');
+ const normalized=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+ const raw=normalized.split('\n').filter(line=>line.trim()!=='');
  if(!raw.length)return {error:'This file is empty.'};
  const headerCells=parseCsvFieldLine(raw[0]);
- if(headerCells.length!==ROSTER_IMPORT_HEADERS.length||headerCells.some((cell,index)=>cell.trim().toLowerCase()!==ROSTER_IMPORT_HEADERS[index]))return {error:'Use the downloaded template.'};
+ if(headerCells.length!==ROSTER_IMPORT_HEADERS.length||headerCells.some((cell,index)=>cell.trim().toLowerCase()!==ROSTER_IMPORT_HEADERS[index])){
+  if(headerCells.length===1&&headerCells[0].includes(';'))return {error:'This file uses semicolons. Save the sheet as comma-separated CSV (UTF-8), or use the downloaded template.'};
+  return {error:'Use the downloaded template.'};
+ }
  const dataLines=raw.slice(1);
+ if(!dataLines.length)return {error:'Add at least one member row under the header.'};
  if(dataLines.length>ROSTER_IMPORT_MAX_ROWS)return {error:'This prototype accepts up to 200 rows.'};
  return {rows:dataLines.map((line,index)=>({line:index+2,name:(parseCsvFieldLine(line)[0]??'').trim(),email:(parseCsvFieldLine(line)[1]??'').trim()}))};
 }
@@ -86,7 +91,7 @@ function rosterImportDialog(){
  }
  if(step==='review'){
   const preview=o.preview||[],ready=preview.filter(row=>row.status==='Ready');
-  const body=preview.length?`<div class="directory-table-scroll roster-import-preview-scroll"><table class="data-table directory-table"><caption class="sr-only">Import preview</caption><thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Status</th><th scope="col">Issue</th></tr></thead><tbody>${preview.map(row=>`<tr><th scope="row">${escapeHTML(row.name||'—')}</th><td>${row.email?escapeHTML(row.email):'<span class="muted">—</span>'}</td><td>${row.status==='Ready'?'<span class="badge neutral">Ready</span>':'<span class="badge amber">Blocked</span>'}</td><td>${row.issue?escapeHTML(row.issue):'<span class="muted">—</span>'}</td></tr>`).join('')}</tbody></table></div>`:`<p class="directory-dialog-intro">No members to import.</p>`;
+  const body=`<div class="directory-table-scroll roster-import-preview-scroll"><table class="data-table directory-table"><caption class="sr-only">Import preview</caption><thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Status</th><th scope="col">Issue</th></tr></thead><tbody>${preview.length?preview.map(row=>`<tr><th scope="row">${escapeHTML(row.name||'—')}</th><td>${row.email?escapeHTML(row.email):'<span class="muted">—</span>'}</td><td>${row.status==='Ready'?'<span class="badge neutral">Ready</span>':'<span class="badge amber">Blocked</span>'}</td><td>${row.issue?escapeHTML(row.issue):'<span class="muted">—</span>'}</td></tr>`).join(''):'<tr><td colspan="4" class="muted">No rows in this file.</td></tr>'}</tbody></table></div>`;
   return `<div class="modal-backdrop"><section class="dialog directory-dialog roster-import-dialog wide" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">Import members</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${rosterImportWizardSteps('review')}${body}<footer class="directory-dialog-footer">${button('Back','roster-import-back')}${button('Import '+ready.length+' members','roster-import-confirm','primary',ready.length?'':'disabled')}</footer></section></div>`;
  }
  const added=o.added??0,skipped=o.skipped??0;

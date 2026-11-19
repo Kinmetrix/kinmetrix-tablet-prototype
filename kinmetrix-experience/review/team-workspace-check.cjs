@@ -1,12 +1,17 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=path.join(__dirname,'../dist'),context=vm.createContext({assert,console,structuredClone,URL,Blob,crypto:require('node:crypto').webcrypto,document:{baseURI:'http://localhost/experience/',addEventListener(){},querySelector(){return null},querySelectorAll(){return []},documentElement:{dataset:{}}},window:{addEventListener(){},scrollTo(){}},localStorage:{getItem(){return null}},matchMedia(){return {matches:false}},setTimeout(){},clearTimeout(){},setInterval(){},clearInterval(){}});
-for(const name of ['workspace','report','photos','profile','reps','setup','live-rules','export','directory','comparison','mode-experience','session-tools','person-programs','team-settings','team-overview','session-plan','device','nav-icons','app']){let source=fs.readFileSync(path.join(root,name+'.js'),'utf8');if(name==='app')source=source.replace(/\nrender\(\);\s*$/,'\n');vm.runInContext(source,context,{filename:name+'.js'});}
+for(const name of ['workspace','report','photos','profile','reps','setup','live-rules','export','directory','comparison','mode-experience','session-tools','person-programs','team-settings','team-overview','session-plan','device','waiver','nav-icons','app']){let source=fs.readFileSync(path.join(root,name+'.js'),'utf8');if(name==='app')source=source.replace(/\nrender\(\);\s*$/,'\n');vm.runInContext(source,context,{filename:name+'.js'});}
 vm.runInContext(`
 render=()=>{};renderOverlay=()=>{};toast=()=>{};
 state.actor='coach';state.clinicianId='sam';state.nav='pulse';state.personId=null;
 const pulse=pulsePage();
 assert.match(pulse,/<h1>Pulse<\\/h1>/);
-assert.match(pulse,/Active users/);
+assert.match(pulse,/Total activity/);
+assert.match(pulse,/Members active/);
+assert.match(pulse,/Training sessions/);
+assert.match(pulse,/Avg peak force/);
+assert.match(pulse,/data-action="pulse-activity-filter"/);
+assert.match(pulse,/id="team-overview-activity-sort"/);
 assert.match(pulse,/<h2>Activity<\\/h2>/);
 assert.doesNotMatch(pulse,/Recent activity/);
 assert.doesNotMatch(pulse,/Find a member/);
@@ -46,7 +51,12 @@ assert.doesNotMatch(settings,/Session plan/);
 state.settingsHubSection='onboarding';
 assert.match(settingsPage(),/New user fields/);
 state.settingsHubSection='waiver';
-assert.match(settingsPage(),/Before a session/);
+state.waiverHubTab='policy';
+assert.match(settingsPage(),/Required before session/);
+assert.doesNotMatch(settingsPage(),/waiver-signature-card/);
+state.waiverHubTab='signatures';
+assert.match(settingsPage(),/data-action="waiver-hub-tab"/);
+assert.match(settingsPage(),/waiver-signature-card|No signed waivers in this demo/);
 state.personId='alex';state.result=historyFixture('strength','9 Nov','alex');state.stage='review';state.guided=false;
 assert.match(sessionPlanReportButton(state.result),/Session plan/);
 openSessionPlan();
