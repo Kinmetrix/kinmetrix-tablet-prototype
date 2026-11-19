@@ -125,21 +125,3 @@
   margin: 0 0 10px;
   font-size: 15px;
 }
-
-.waiver-required-banner {
-  margin: 0 0 20px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 1px solid var(--signal, #c2410c);
-  background: color-mix(in srgb, var(--signal, #c2410c) 8%, transparent);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.waiver-required-banner p {
-  margin: 0;
-  font-size: 14px;
-}

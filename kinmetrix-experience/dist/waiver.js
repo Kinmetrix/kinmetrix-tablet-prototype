@@ -61,11 +61,6 @@ function memberWaiverProfileMarkup() {
   return `<section class="member-waiver-panel" aria-label="Waiver required"><h3>Waiver required</h3><p class="small">A signed waiver is required before assessment or training.</p>${button('Sign waiver', 'open-waiver-sign', 'primary')}</section>`;
 }
 
-function waiverRequiredBannerMarkup() {
-  if (!waiverBlocksCurrent() || state.stage) return '';
-  return `<div class="waiver-required-banner" role="status"><p><strong>Waiver required</strong> — sign before starting a session.</p>${button('Sign waiver', 'open-waiver-sign', 'primary')}</div>`;
-}
-
 function waiverSignDialogMarkup() {
   const p = person();
   const name = p ? escapeHTML(p.name) : 'Member';
