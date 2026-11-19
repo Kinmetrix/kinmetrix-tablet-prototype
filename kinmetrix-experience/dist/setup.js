@@ -131,7 +131,7 @@ function setupTiltRow(angle){
 function setupView(){
  setupModeDefaults();
  if(splitSetupUsesSplitLayout())return isokineticSetupView();
- const cfg=state.setup,kind=setupTiltKind(),angles=currentAngles(),purpose=cfg.purpose==='assessment'?'assessment':'training',invalid=angles.some(angle=>!validTilt(setupTilt(angle)));
+ const cfg=state.setup,kind=setupTiltKind(),angles=currentAngles(),purpose=cfg.purpose==='assessment'?'assessment':'session',invalid=angles.some(angle=>!validTilt(setupTilt(angle)));
  const anyChanged=angles.some(angle=>cfg.tiltOverrides?.[cfg.type]?.[angle]);
  const columns=kind==='fixed'?['Tilt','Pad position']:kind==='travel'?['Start tilt → End tilt','Travel']:kind==='return'?['Start tilt → End tilt','Travel · device moves back']:['Start tilt → Max tilt','Allowed travel'];
  const note=kind==='fixed'?'The pad stays at this tilt for the whole rep.':kind==='travel'?'The pad travels from start tilt to end tilt on each rep.':kind==='return'?'The device moves the pad from start tilt back to end tilt. The person resists.':`All ${angles.length===4?'four':'eight'} use the start and max above unless you change a row.`;

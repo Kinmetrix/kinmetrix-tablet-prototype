@@ -26,7 +26,7 @@ Fixture flavor: email like `coach@example.com` on password login.
 
 ### Athlete / member
 
-Uses the iPad when coached through a session: home, start assessment or training, complete groups/steps, see results.
+Uses the iPad when coached through a session: home, start assessment or session, complete groups/steps, see results.
 
 | Cares about | Typical entry |
 | --- | --- |

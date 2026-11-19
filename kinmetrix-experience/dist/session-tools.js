@@ -3,7 +3,7 @@ function sessionHistoryCategory(record){
  if(record?.programId)return 'program';
  if(record?.purpose==='assessment'&&record?.type==='rom')return 'range-of-motion';
  if(record?.purpose==='assessment')return 'assessment';
- if(record?.purpose==='training')return 'smart-session';
+ if(record?.purpose==='session')return 'smart-session';
  return 'other';
 }
 function historyRecordMatchesFilter(record,filter){

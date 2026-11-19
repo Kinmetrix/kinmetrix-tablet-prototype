@@ -59,7 +59,7 @@ function splitMainFields(forceHelp){
 }
 function isokStopSummary(){const c=state.setup;return `<p class="isok-stop-copy">Movement starts above <strong>${isokForceText(c.challenge)}</strong>. The pad stops if effort stays below this for <strong>${c.challengeHold} s</strong>.</p>`;}
 function isokineticSetupView(){
- const team=isTeamAssessmentSetupContext(),c=state.setup,tab=c.isokTab==='tilts'?'tilts':'session',bad=currentAngles().some(a=>!validTilt(setupTilt(a))),purpose=c.purpose==='assessment'?'assessment':'training',mode=sessionModes[c.type];
+ const team=isTeamAssessmentSetupContext(),c=state.setup,tab=c.isokTab==='tilts'?'tilts':'session',bad=currentAngles().some(a=>!validTilt(setupTilt(a))),purpose=c.purpose==='assessment'?'assessment':'session',mode=sessionModes[c.type];
  const sub=team?'Team defaults for new assessments. Members still review tilts before Begin.':c.continuing?`${escapeHTML(c.programName)} · Session ${c.programSession} of ${c.programTotal}`:c.type==='strength'?setupIsometricModeLine(c):setupModeLine[c.type];
  const title=team?'Assessment protocol · '+mode.name:c.type==='strength'?`Isometric ${purpose}`:`${mode.name} ${purpose}`;
  const tiltTab=setupHasFixedTilt()?'Positions':'Tilts';

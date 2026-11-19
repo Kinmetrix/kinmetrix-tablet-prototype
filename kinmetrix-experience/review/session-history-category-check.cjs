@@ -6,10 +6,10 @@ vm.runInContext(`
 const cases=[
  ['standard assessment',{purpose:'assessment',type:'strength'},'assessment'],
  ['ROM assessment',{purpose:'assessment',type:'rom'},'range-of-motion'],
- ['smart session',{purpose:'training',type:'strength'},'smart-session'],
- ['program visit',{purpose:'training',type:'strength',programId:'prog-1'},'program'],
+ ['smart session',{purpose:'session',type:'strength'},'smart-session'],
+ ['program visit',{purpose:'session',type:'strength',programId:'prog-1'},'program'],
  ['program ROM would still bucket program',{purpose:'assessment',type:'rom',programId:'prog-2'},'program'],
- ['partial legacy',{purpose:'training',type:'isokinetic',partial:true},'smart-session'],
+ ['partial legacy',{purpose:'session',type:'isokinetic',partial:true},'smart-session'],
 ];
 for(const [label,record,expected] of cases){
  assert.equal(sessionHistoryCategory(record),expected,label);

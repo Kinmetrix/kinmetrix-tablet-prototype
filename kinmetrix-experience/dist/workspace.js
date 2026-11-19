@@ -4,17 +4,17 @@ function isIsometricEndurance(cfg){return cfg?.type==='strength'&&isometricHoldS
 function programModeLabel(program){return program?.type==='strength'?isIsometricEndurance(program)?'Isometric · Endurance':'Isometric':sessionModes[program.type].name;}
 function sessionRecordLabel(r){if(r?.type==='strength')return isIsometricEndurance(r.sessionSettings||r)?'Isometric · Endurance':'Isometric';if(r?.type==='rom'&&r?.purpose==='assessment')return 'Range of motion';return protocols[r.type].name;}
 const sessionModes = {
- strength:{name:'Isometric',mechanism:'Fixed position',short:'Push against a fixed position',purposes:['assessment','training'],description:'Measure force or hold time in each direction. In setup, choose timed seconds or Endurance.',steps:['Build effort','Hold steady','Release'],cue:'Position stays fixed',trace:'M12 46L25 46L42 15L86 15L102 46L112 46'},
+ strength:{name:'Isometric',mechanism:'Fixed position',short:'Push against a fixed position',purposes:['assessment','session'],description:'Measure force or hold time in each direction. In setup, choose timed seconds or Endurance.',steps:['Build effort','Hold steady','Release'],cue:'Position stays fixed',trace:'M12 46L25 46L42 15L86 15L102 46L112 46'},
  rom:{name:'Range of motion',mechanism:'Isokinetic assessment',short:'Find your movement limits',purposes:['assessment'],description:'Measure your available range. Your coach reviews the result before applying new working limits.',steps:['Move through range','Reach your limit','Stop automatically or manually'],cue:'Movement stops at your limit',trace:'M12 46L28 46L88 12L112 12'},
- eccentric:{name:'Eccentric',mechanism:'Resisted movement',short:'Resist as the device moves',purposes:['assessment','training'],description:'Measure or practice control while resisting movement in the opposite direction.',steps:['Device moves','You resist','Complete the movement'],cue:'Movement and effort oppose each other',trace:'M12 44L28 15L44 22L60 14L76 23L92 18L112 44'},
- isokinetic:{name:'Isokinetic',mechanism:'Controlled speed',short:'Move at a controlled speed',purposes:['assessment','training'],description:'Practice producing effort through your working range while movement stays at a set speed.',steps:['Begin moving','Keep a steady pace','Complete the range'],cue:'Movement keeps a steady pace',trace:'M12 46L112 12'}
+ eccentric:{name:'Eccentric',mechanism:'Resisted movement',short:'Resist as the device moves',purposes:['assessment','session'],description:'Measure or practice control while resisting movement in the opposite direction.',steps:['Device moves','You resist','Complete the movement'],cue:'Movement and effort oppose each other',trace:'M12 44L28 15L44 22L60 14L76 23L92 18L112 44'},
+ isokinetic:{name:'Isokinetic',mechanism:'Controlled speed',short:'Move at a controlled speed',purposes:['assessment','session'],description:'Practice producing effort through your working range while movement stays at a set speed.',steps:['Begin moving','Keep a steady pace','Complete the range'],cue:'Movement keeps a steady pace',trace:'M12 46L112 12'}
 };
 const sessionModeOrder=['strength','isokinetic','rom','eccentric'];
 const sessionModeKeys=purpose=>sessionModeOrder.filter(key=>sessionModes[key].purposes.includes(purpose));
 const standardExerciseModeKeys=purpose=>sessionModeKeys(purpose).filter(key=>key!=='rom');
 const modePurposeCopy={
  assessment:{strength:'Measure strength at a fixed position, or how long you sustain effort. Choose timed seconds or Endurance in setup.',isokinetic:'Measure strength through your range at a controlled speed.',rom:'Measure your available range. Your coach reviews new limits.',eccentric:'Measure control while resisting the device’s movement.'},
- training:{strength:'Practice holding a target effort against a fixed pad. In setup, choose timed seconds or Endurance.',isokinetic:'Train through your working range at a controlled speed.',eccentric:'Practice resisting the pad as the device moves against you.'}
+ session:{strength:'Practice holding a target effort against a fixed pad. In setup, choose timed seconds or Endurance.',isokinetic:'Train through your working range at a controlled speed.',eccentric:'Practice resisting the pad as the device moves against you.'}
 };
 
 function memberHasSessionData(personId=state.personId){
@@ -109,8 +109,8 @@ function overviewView(){
  const pending=pr.pending&&state.actor==='coach'?`<div class="notice"><span>A new range assessment is ready for review.</span>${button('Review limits','review-pending','small-button')}</div>`:'';
  if(!latest&&waiverBlocksCurrent())return `${pending}<section class="overview-empty" role="status"><h2>Waiver required</h2><p>A signed waiver is required before this member can start an assessment.</p>${button('Sign waiver','open-waiver-sign','primary')}</section>`;
  if(!latest)return `${pending}<section class="overview-empty"><h2>No completed sessions yet</h2><p>Start with an assessment. Results and comparisons will appear here.</p>${button('Start an assessment '+icon('arrow','icon-sm'),'assess','primary')}</section>`;
- const modeName=latest.purpose==='training'&&latest.type==='strength'?'Isometric':protocols[latest.type].name;
- return `${pending}<section class="overview-latest" aria-label="Latest completed session"><header class="overview-latest-head"><div><p class="overview-eyebrow">Latest ${latest.purpose==='assessment'?'assessment':'session'}</p><h2>${modeName}${latest.purpose==='training'?' training':''} · ${latest.positions} directions</h2><p class="overview-when">${sessionStamp(latest)}${latest.clinicianName?' · with '+escapeHTML(latest.clinicianName):''}</p></div>${button('View full report '+icon('chevron','icon-sm'),'overview-open-report','small-button')}</header>
+ const modeName=latest.purpose==='session'&&latest.type==='strength'?'Isometric':protocols[latest.type].name;
+ return `${pending}<section class="overview-latest" aria-label="Latest completed session"><header class="overview-latest-head"><div><p class="overview-eyebrow">Latest ${latest.purpose==='assessment'?'assessment':'session'}</p><h2>${modeName} · ${latest.positions} directions</h2><p class="overview-when">${sessionStamp(latest)}${latest.clinicianName?' · with '+escapeHTML(latest.clinicianName):''}</p></div>${button('View full report '+icon('chevron','icon-sm'),'overview-open-report','small-button')}</header>
  <div class="overview-latest-body"><div class="overview-radial" id="overview-radial">${overviewRadialView(latest)}</div>
  <div class="overview-side ${overviewState(latest).direction===null?'':'has-direction'}"><div class="overview-stats">${overviewStats(latest)}</div><section class="overview-direction" id="overview-direction" aria-label="Reps for the selected direction">${overviewDirectionDetails(latest)}</section>${sessionNoteTop(latest)}</div></div></section>`;
 }
@@ -127,12 +127,12 @@ function sessionPickerView(o){
  const name=escapeHTML(person().name);
  if(o.step==='start')return pickerFrame(o,'New',`Choose what to start for ${name}.`,`<div class="new-task-list">${[
   ['assessment','Assessment','Measure current ability and compare results over time.','assessment'],
-  ['training','Training session','Do a single session with your chosen mode and settings.','training'],
-  ['program','Program','Continue a plan or create a sequence of training sessions.','library']
+  ['session','Session','Do a single session with your chosen mode and settings.','training'],
+  ['program','Program','Continue a plan or create a sequence of sessions.','library']
  ].map(([key,title,copy,symbol])=>`<button class="new-task-row" data-action="choose-session-task" data-task="${key}">${icon(symbol)}<span><strong>${title}</strong><small>${copy}</small></span>${icon('chevron','icon-sm')}</button>`).join('')}</div>`, '', true);
  if(o.step==='programs')return programPickerView(o);
  if(o.step==='create-program')return programCreateView(o);
- const mode=sessionModes[o.mode],isMeasure=o.purpose==='assessment',label=isMeasure?'Assessment':'Training session';
+ const mode=sessionModes[o.mode],isMeasure=o.purpose==='assessment',label=isMeasure?'Assessment':'Session';
  const modeChoices=isMeasure?`<div class="mode-choices mode-choices-grouped" role="group" aria-label="${label} type">
   <p class="mode-group-label">Range of motion</p>
   ${(()=>{const key='rom',m=sessionModes[key];return `<button class="mode-choice ${key===o.mode?'selected':''}" data-action="choose-session-mode" data-mode="${key}" aria-pressed="${key===o.mode}" aria-controls="mode-detail"><span><strong>${m.name}</strong><small>${m.short}</small></span><span class="mode-choice-indicator" aria-hidden="true">${key===o.mode?icon('check','icon-sm'):icon('chevron','icon-sm')}</span></button>`;})()}
@@ -144,7 +144,7 @@ function sessionPickerView(o){
  <section class="mode-detail" id="mode-detail" aria-labelledby="mode-detail-title"><div class="mode-expanded-bar"><button type="button" class="text-button" data-action="collapse-mode-preview">${icon('back','icon-sm')} Back to modes</button><h3 id="expanded-preview-title">${mode.name}</h3></div><div class="mode-detail-heading"><h3 id="mode-detail-title">${mode.name}</h3></div>
  <p class="mode-description">${modePurposeCopy[o.purpose][o.mode]}</p>
  <div class="mode-animation ${o.paused?'is-paused':''}">${movementPreview(o.mode)}<div class="mode-render-controls"><button type="button" data-action="expand-mode-preview" aria-label="Open larger ${mode.name} example" title="Larger example">${icon('expand','icon-sm')}</button><button type="button" data-action="toggle-mode-preview" aria-label="${o.paused?'Play':'Pause'} animation" title="${o.paused?'Play':'Pause'} animation">${icon(o.paused?'play':'pause','icon-sm')}</button></div></div></section></div>`,
- `<div>${button('Cancel','close-modal')}${button((isMeasure?'Set up assessment':'Set up training')+' '+icon('arrow','icon-sm'),'confirm-session-mode','primary')}</div>`);
+ `<div>${button('Cancel','close-modal')}${button((isMeasure?'Set up assessment':'Set up session')+' '+icon('arrow','icon-sm'),'confirm-session-mode','primary')}</div>`);
 
 }
 let modePreviewController=null;
@@ -218,26 +218,26 @@ function memberPrograms(personId=state.personId){
 function activeProgram(){return memberPrograms().find(p=>p.completed<p.total);}
 function programPickerView(o){
  const programs=memberPrograms(),active=programs.filter(p=>p.completed<p.total),complete=programs.filter(p=>p.completed>=p.total);
- return pickerFrame(o,'Programs',`Training plans for ${escapeHTML(person().name)}.`, `<div class="program-picker-content">${active.length?`<div class="program-list">${active.map(p=>`<article class="program-list-row"><div><h3>${escapeHTML(p.name)}</h3><p>${programModeLabel(p)} · ${p.positions} directions · ${p.reps} reps</p><span>Session ${p.completed+1} of ${p.total} · ${programLoadLabel(p)}</span></div>${button('Continue '+icon('play','icon-sm'),'continue-program','primary',`data-program-id="${p.id}" aria-label="Continue ${escapeHTML(p.name)}, session ${p.completed+1} of ${p.total}"`)}</article>`).join('')}</div>`:`<div class="program-empty"><h3>No active programs</h3><p>Create a plan to follow across several training sessions.</p></div>`}
- <button class="new-task-row new-program-row" data-action="new-program">${icon('plus')}<span><strong>Create a new program</strong><small>Choose a training mode, settings, and number of sessions.</small></span>${icon('chevron','icon-sm')}</button>${complete.length?`<p class="program-completed-note">Completed: ${complete.map(p=>escapeHTML(p.name)).join(', ')}</p>`:''}</div>`, '', true);
+ return pickerFrame(o,'Programs',`Programs for ${escapeHTML(person().name)}.`, `<div class="program-picker-content">${active.length?`<div class="program-list">${active.map(p=>`<article class="program-list-row"><div><h3>${escapeHTML(p.name)}</h3><p>${programModeLabel(p)} · ${p.positions} directions · ${p.reps} reps</p><span>Session ${p.completed+1} of ${p.total} · ${programLoadLabel(p)}</span></div>${button('Continue '+icon('play','icon-sm'),'continue-program','primary',`data-program-id="${p.id}" aria-label="Continue ${escapeHTML(p.name)}, session ${p.completed+1} of ${p.total}"`)}</article>`).join('')}</div>`:`<div class="program-empty"><h3>No active programs</h3><p>Create a plan to follow across several sessions.</p></div>`}
+ <button class="new-task-row new-program-row" data-action="new-program">${icon('plus')}<span><strong>Create a new program</strong><small>Choose a mode, settings, and number of sessions.</small></span>${icon('chevron','icon-sm')}</button>${complete.length?`<p class="program-completed-note">Completed: ${complete.map(p=>escapeHTML(p.name)).join(', ')}</p>`:''}</div>`, '', true);
 }
 function captureMemberProgramDraft(prefix='program',draft={}){
  return {...draft,name:$('#'+prefix+'-name')?.value??draft.name??'',type:$('#'+prefix+'-mode')?.value??draft.type??'strength',holdStyle:$('#'+prefix+'-hold-style')?.value==='endurance'?'endurance':'timed',holdSeconds:Number($('#'+prefix+'-hold-seconds')?.value??draft.holdSeconds??6),total:Number($('#'+prefix+'-total')?.value??draft.total??6),positions:Number($('#'+prefix+'-positions')?.value??draft.positions??4),reps:Number($('#'+prefix+'-reps')?.value??draft.reps??3),load:typeof readProgramLoad==='function'?readProgramLoad(prefix):draft.load};
 }
 function programCreateView(o){
  const draft=o.programDraft||{name:'',type:'strength',holdStyle:'timed',holdSeconds:6,total:6,positions:4,reps:3};o.programDraft=draft;
- return pickerFrame(o,'New program',`Create a training plan for ${escapeHTML(person().name)}.`, `<form id="program-form" class="program-form">${programFields(draft,'program',true)}</form>`, `<span>Saved in this demo only</span><div>${button('Back','picker-back')}${button('Create & set up '+icon('arrow','icon-sm'),'create-program','primary')}</div>`,true);
+ return pickerFrame(o,'New program',`Create a program for ${escapeHTML(person().name)}.`, `<form id="program-form" class="program-form">${programFields(draft,'program',true)}</form>`, `<span>Saved in this demo only</span><div>${button('Back','picker-back')}${button('Create & set up '+icon('arrow','icon-sm'),'create-program','primary')}</div>`,true);
 }
 function beginProgram(id){
  const program=memberPrograms().find(p=>p.id===id)||(!id?activeProgram():null);
  if(!program||program.completed>=program.total)return;
- beginSetup('training',program.type,program.id);
+ beginSetup('session',program.type,program.id);
 }
 function createProgram(){
  const form=$('#program-form');if(!form)return;
  const name=$('#program-name');name.setCustomValidity(name.value.trim()?'':'Enter a program name.');if(!form.reportValidity())return;
  const program={id:'program-'+Date.now(),name:name.value.trim(),type:$('#program-mode').value,holdStyle:$('#program-hold-style')?.value==='endurance'?'endurance':'timed',holdSeconds:Number($('#program-hold-seconds')?.value),total:Number($('#program-total').value),positions:Number($('#program-positions').value),reps:Number($('#program-reps').value),completed:0};
- if(!sessionModeKeys('training').includes(program.type))return;
+ if(!sessionModeKeys('session').includes(program.type))return;
  if(program.type!=='strength'){program.holdStyle='timed';delete program.holdSeconds;}
  else if(program.holdStyle==='endurance')delete program.holdSeconds;
  const load=validateProgramLoadForm('program',program.total);if(!load)return;program.load=load;
@@ -255,7 +255,7 @@ const workspaceActions={
  'overview-clear-direction':clearOverviewDirection,
  'overview-open-reps':openOverviewReps,
  'new-session':()=>openSessionPicker(),
- 'choose-session-task':el=>{const o=state.overlay;if(o?.type!=='session-picker')return;const task=el.dataset.task;if(task==='program'){o.step='programs';}else if(['assessment','training'].includes(task)){o.purpose=task;o.mode=o.selections[task]||'strength';o.step='modes';}else return;updatePicker();},
+ 'choose-session-task':el=>{const o=state.overlay;if(o?.type!=='session-picker')return;const task=el.dataset.task;if(task==='program'){o.step='programs';}else if(['assessment','session'].includes(task)){o.purpose=task;o.mode=o.selections[task]||'strength';o.step='modes';}else return;updatePicker();},
  'picker-back':()=>{const o=state.overlay;if(o?.type!=='session-picker')return;const previous=o.step;o.step=previous==='create-program'?'programs':'start';updatePicker(previous==='create-program'?'[data-action="new-program"]':`[data-task="${previous==='programs'?'program':o.purpose}"]`);},
  'new-program':()=>{const o=state.overlay;if(o?.type!=='session-picker')return;o.step='create-program';updatePicker('#program-name');},
  'create-program':createProgram,

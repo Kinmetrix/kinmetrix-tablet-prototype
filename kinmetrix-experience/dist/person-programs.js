@@ -5,7 +5,7 @@ function seedProgramVisits(plan,p){
  return sessions.map((number,index)=>{
   const target=Number((plan.load.start*(1+plan.load.increase/100)**index).toFixed(1));
   const targets=Object.fromEntries([0,90,180,270].map(a=>[a,target]));
-  const record={id:`${plan.id}-visit-${number}`,personId:p.id,programId:plan.id,programName:plan.name,programSession:number,clinicianName:clinicians.find(c=>c.id===p.assigned).name,type:'strength',purpose:'training',positions:4,reps:3,weight:target,partial:false,fixture:true,date:index?'6 Nov':'3 Nov',completedAt:Date.UTC(2026,10,index?6:3,15,30),completed:12,total:12,values:exampleValues('strength',4),sessionSettings:{type:'strength',purpose:'training',positions:4,reps:3,weight:target,targets,programId:plan.id,programName:plan.name,programSession:number,programTotal:6,programLoad:{...plan.load},programSource:null}};
+  const record={id:`${plan.id}-visit-${number}`,personId:p.id,programId:plan.id,programName:plan.name,programSession:number,clinicianName:clinicians.find(c=>c.id===p.assigned).name,type:'strength',purpose:'session',positions:4,reps:3,weight:target,partial:false,fixture:true,date:index?'6 Nov':'3 Nov',completedAt:Date.UTC(2026,10,index?6:3,15,30),completed:12,total:12,values:exampleValues('strength',4),sessionSettings:{type:'strength',purpose:'session',positions:4,reps:3,weight:target,targets,programId:plan.id,programName:plan.name,programSession:number,programTotal:6,programLoad:{...plan.load},programSource:null}};
   record.repRecords=[0,90,180,270].flatMap((angle,i)=>[1,2,3].map(rep=>({angle,rep,seconds:6,value:Number((target*([.96,.9,1.02,.92][i]+index*.025+(rep-2)*.015)).toFixed(1)),method:'Example completed hold'})));
   return record;
  });

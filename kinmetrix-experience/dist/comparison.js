@@ -7,7 +7,7 @@ function historyCompareUI(){
  state.historyCompareUI??={};
  const key=`${state.actor==='coach'?state.clinicianId:'member'}:${state.personId}`;
  const ui=state.historyCompareUI[key]??={view:'list',filter:'all',selected:[],trendGroup:null};
- if(ui.filter==='training')ui.filter='smart-session';
+ if(ui.filter==='training'||ui.filter==='session')ui.filter='smart-session';
  const records=memberHistoryRecords();ui.selected=ui.selected.filter(id=>records.some(r=>r.id===id&&!r.partial));return ui;
 }
 function rosterCompareSelection(){
@@ -16,7 +16,7 @@ function rosterCompareSelection(){
 }
 function comparisonItems(source){
  if(source==='roster')return rosterCompareSelection().map(id=>{const p=visiblePeople().find(p=>p.id===id);return {r:directoryPersonSummary(p).assessment,label:p.name};});
- const selected=historyCompareUI().selected;return memberHistoryRecords().filter(r=>selected.includes(r.id)).map(r=>({r,label:sessionStamp(r)+' · '+(r.purpose==='assessment'?'Assessment':'Training')}));
+ const selected=historyCompareUI().selected;return memberHistoryRecords().filter(r=>selected.includes(r.id)).map(r=>({r,label:sessionStamp(r)+' · '+(r.purpose==='assessment'?'Assessment':'Session')}));
 }
 function comparisonSelectionReason(r,source){
  if(!r||r.partial)return source==='roster'?'No complete Isometric assessment yet.':'Incomplete sessions cannot be compared.';
@@ -39,18 +39,18 @@ function memberHistoryPanel(){
  return `<section class="session-history" aria-label="Session history"><header class="history-panel-heading"><h2>Session history</h2><span class="muted small">${all.length} ${all.length===1?'session':'sessions'}</span></header>
  <div class="history-toolbar"><div class="segmented" role="group" aria-label="History view">${[['list','List'],['grid','Grid'],['trends','Trends']].map(([view,label])=>`<button data-action="history-view" data-view="${view}" class="${ui.view===view?'active':''}" aria-pressed="${ui.view===view}">${label}</button>`).join('')}</div>
  ${ui.view!=='trends'?`<label class="history-filter"><span class="sr-only">Session type</span><select id="history-purpose-filter">${HISTORY_FILTER_OPTIONS.map(([key,label])=>`<option value="${key}" ${ui.filter===key?'selected':''}>${label}</option>`).join('')}</select></label>${comparisonSelectionTools('history')}`:groups.length?`<label class="history-filter history-trend-filter"><span class="sr-only">Trend series</span><select id="history-trend-group">${groups.map(group=>`<option value="${group.key}" ${historyTrendGroup(all).key===group.key?'selected':''}>${group.label}</option>`).join('')}</select></label>`:''}</div>
- ${!all.length?'<div class="history-empty"><h3>No sessions yet</h3><p>Assessments and training sessions will appear here.</p></div>':ui.view==='trends'?historyTrendView(all):ui.view==='grid'?historySelectionGrid(records):historySelectionList(records)}</section>`;
+ ${!all.length?'<div class="history-empty"><h3>No sessions yet</h3><p>Assessments and sessions will appear here.</p></div>':ui.view==='trends'?historyTrendView(all):ui.view==='grid'?historySelectionGrid(records):historySelectionList(records)}</section>`;
 }
 function historySelectionList(records){
  if(!records.length)return '<div class="history-empty"><h3>No matching sessions</h3><p>Choose another session type to see more results.</p></div>';
  const selected=historyCompareUI().selected,scales=historyRadarScales(memberHistoryRecords());
  return `<div class="history-column-labels selectable-history-labels" aria-hidden="true"><span>Session · date & time</span><span>Clinician / note</span><span>Result</span><span></span></div><ul class="session-history-list">${records.map(r=>{
-  const title=sessionRecordLabel(r)+(r.purpose==='assessment'?(r.type==='rom'?' assessment':' assessment'):' training'),m=reportMetric(r),data=r.partial?null:reportData(r),result=data?data[m.field].toFixed(1)+' '+m.unit:'Incomplete';
+  const title=sessionRecordLabel(r)+(r.purpose==='assessment'?(r.type==='rom'?' assessment':' assessment'):' session'),m=reportMetric(r),data=r.partial?null:reportData(r),result=data?data[m.field].toFixed(1)+' '+m.unit:'Incomplete';
   return `<li class="selectable-history-row ${selected.includes(r.id)?'is-selected':''}">${comparisonCheckbox('history',r.id,r,title+', '+sessionStamp(r))}<button class="session-history-row" data-action="history-open-record" data-id="${escapeHTML(r.id)}" aria-label="Open ${escapeHTML(title)}, ${escapeHTML(sessionStamp(r))}. ${data?m.label+' '+result+(r.type==='rom'?'. Working limits '+(r.applied?'applied.':'awaiting review.'):', stability '+Math.round(data.stability)+' percent.'):'Incomplete session.'}"><span class="history-session-main">${historyRadar(r,scales[m.field])}<span class="history-session-label"><strong>${sessionStamp(r)}</strong><small>${title} · ${r.positions} directions · ${r.reps} ${r.reps===1?'rep':'reps'}${r.partial?' · Partial':''}</small></span></span><span class="history-completed"><span>${escapeHTML(r.clinicianName)}</span><small>${sessionNote(r)?.text?'Note · '+escapeHTML(sessionNote(r).text):''}</small></span><span class="history-result"><strong>${result}</strong><small>${data?(isMovementMode(r.type)?modeHistorySecondary(r,data):m.short+' · '+Math.round(data.stability)+'% stable'):r.completed+' / '+r.total+' reps'}${r.applied&&r.type!=='rom'?' · Limits applied':''}</small></span><span class="history-open" aria-hidden="true"><span>View</span>${icon('chevron','icon-sm')}</span></button></li>`;
  }).join('')}</ul>`;
 }
 function historyTrendKey(r){const hold=r.type==='strength'?isometricHoldStyle(r.sessionSettings||r):'';return `${r.type}${hold?':'+hold:''}:${r.purpose}:${r.positions}`;}
-function historyTrendGroups(records){return [...new Map(records.filter(r=>!r.partial).map(r=>[historyTrendKey(r),{key:historyTrendKey(r),label:`${sessionRecordLabel(r)} ${r.purpose==='assessment'?'assessment':'training'} · ${r.positions} directions`}])).values()];}
+function historyTrendGroups(records){return [...new Map(records.filter(r=>!r.partial).map(r=>[historyTrendKey(r),{key:historyTrendKey(r),label:`${sessionRecordLabel(r)} ${r.purpose==='assessment'?'assessment':'session'} · ${r.positions} directions`}])).values()];}
 function historyTrendGroup(records){const groups=historyTrendGroups(records),ui=historyCompareUI();return groups.find(group=>group.key===ui.trendGroup)||groups[0];}
 function historyTrendView(all){
  const group=historyTrendGroup(all);if(!group)return '<div class="history-empty"><h3>No completed sessions yet</h3><p>Trend charts appear after a completed session.</p></div>';

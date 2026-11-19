@@ -33,7 +33,7 @@ function reportState(){
 function reportMetric(r){if(isMovementMode(r.type))return modeReportMetric(r);if(r.type==='strength'&&isIsometricEndurance(r.sessionSettings||r))return {field:'duration',label:'Sustained effort',short:'Endurance',unit:'s'};return r.type==='rom'?{field:'range',label:'Directional range',short:'Range',unit:'%'}:{field:'force',label:'Avg peak force',short:'Force',unit:'kg'};}
 function historyFixture(type='strength',date='9 Nov',personId=state.personId){
  const p=people.find(p=>p.id===personId);
- return {id:'fixture-'+type+'-'+date,personId,clinicianName:clinicians.find(c=>c.id===p.assigned).name,type,purpose:date==='6 Nov'?'training':'assessment',positions:8,reps:3,weight:p.target||12,values:exampleValues(type,8),partial:false,date,completedAt:Date.UTC(2026,10,parseInt(date,10),type==='rom'?16:14,30),completed:24,total:24,applied:type==='rom',fixture:true};
+ return {id:'fixture-'+type+'-'+date,personId,clinicianName:clinicians.find(c=>c.id===p.assigned).name,type,purpose:date==='6 Nov'?'session':'assessment',positions:8,reps:3,weight:p.target||12,values:exampleValues(type,8),partial:false,date,completedAt:Date.UTC(2026,10,parseInt(date,10),type==='rom'?16:14,30),completed:24,total:24,applied:type==='rom',fixture:true};
 }
 function historyRadarScales(records){
  const scales={force:0,duration:0,range:45};

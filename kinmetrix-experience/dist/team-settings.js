@@ -12,7 +12,7 @@ const TEAM_ONBOARDING_FIELDS = [
   {id: 'waiver', label: 'Waiver', on: true}
 ];
 const TEAM_WAIVER_POLICIES = [
-  {id: 'before-session', label: 'Required before session', description: 'Members must sign and show their signature before assessment or training.'},
+  {id: 'before-session', label: 'Required before session', description: 'Members must sign and show their signature before assessment or session.'},
   {id: 'off', label: 'Off', description: 'Do not ask for a waiver on this team.'}
 ];
 const SETTINGS_RAIL_SECTIONS = [
@@ -292,7 +292,7 @@ function sessionTemplatesTableMarkup() {
     <tbody>${rows.map(row => `<tr><th scope="row">${escapeHTML(row.name)}</th><td>${escapeHTML(row.detail)}</td></tr>`).join('')}</tbody>
    </table>
   </div>
-  <p class="directory-footnote">Load presets for training sessions and for follow-up plans after assessment.</p>`;
+  <p class="directory-footnote">Load presets for sessions and for follow-up plans after assessment.</p>`;
 }
 
 function teamSessionWorkspaceMarkup() {

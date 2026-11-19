@@ -274,7 +274,7 @@ function clinicSessionTemplates(){
 function assignedPrograms(){if(state.actor!=='coach')return [];return visiblePeople().flatMap(p=>memberPrograms(p.id).map(program=>({p,program})));}
 const TEMPLATE_LIBRARIES=[
  {id:'assessments',label:'Assessment',description:'Protocol defaults for assessments at the station.'},
- {id:'sessions',label:'Sessions',description:'Reusable load presets for training and for session plans.'},
+ {id:'sessions',label:'Sessions',description:'Reusable load presets for sessions and for session plans.'},
  {id:'programs',label:'Programs',description:'Multi-day plans assigned from this workspace.'}
 ];
 function programHoldTimeField(draft,prefix,field){
@@ -295,7 +295,7 @@ function refreshProgramEditorForm(focusSelector){
  if(focusSelector) $(focusSelector)?.focus({preventScroll:true});
 }
 function programDraftSetupCfg(draft){
- return {purpose:'training',type:draft.type,holdStyle:draft.holdStyle,holdSeconds:draft.holdSeconds,positions:draft.positions,reps:draft.reps,weight:12,angle:0,isokTab:'session',tiltOverrides:{},accepted:true,continuing:false,programLoad:null,forceEdited:false,challenge:1.5,challengeAuto:draft.type==='isokinetic',challengeHold:1,eccSpeed:'slow',eccCap:18};
+ return {purpose:'session',type:draft.type,holdStyle:draft.holdStyle,holdSeconds:draft.holdSeconds,positions:draft.positions,reps:draft.reps,weight:12,angle:0,isokTab:'session',tiltOverrides:{},accepted:true,continuing:false,programLoad:null,forceEdited:false,challenge:1.5,challengeAuto:draft.type==='isokinetic',challengeHold:1,eccSpeed:'slow',eccCap:18};
 }
 function programSetupPreviewMarkup(draft){
  if(!splitSetupTypes.has(draft.type))return '';
@@ -309,7 +309,7 @@ function programSetupPreviewMarkup(draft){
 function programFields(draft,prefix='plan',tracked=false){
  const field=name=>tracked?`data-program-field="${name}"`:'';
  const isometric=draft.type==='strength';
- const grid=`<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><div class="program-basics-layout"><label class="program-field program-field-name">Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-mode-block${isometric?' program-mode-block--isometric':''}"><label class="program-field program-field-mode">Training mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('training').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label>${isometric?programHoldTimeField(draft,prefix,field):''}</div><div class="program-structure-grid"><label class="program-field">Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field">Reps / direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field program-field-sessions">Sessions in plan<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n}</option>`).join('')}</select></label></div></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
+ const grid=`<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><div class="program-basics-layout"><label class="program-field program-field-name">Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-mode-block${isometric?' program-mode-block--isometric':''}"><label class="program-field program-field-mode">Mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('session').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label>${isometric?programHoldTimeField(draft,prefix,field):''}</div><div class="program-structure-grid"><label class="program-field">Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field">Reps / direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field program-field-sessions">Sessions in plan<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n}</option>`).join('')}</select></label></div></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
  const preview=programSetupPreviewMarkup(draft);
  return preview?`<div class="program-editor-split">${grid}${preview}</div>`:grid;
 }
@@ -382,7 +382,7 @@ function saveProgramTemplate(){
  const draft={name:name.value.trim(),type:$('#plan-mode').value,holdStyle:$('#plan-hold-style')?.value==='endurance'?'endurance':'timed',holdSeconds:Number($('#plan-hold-seconds')?.value),total:Number($('#plan-total').value),positions:Number($('#plan-positions').value),reps:Number($('#plan-reps').value)};
  if(draft.type!=='strength'){draft.holdStyle='timed';delete draft.holdSeconds;}
  else if(draft.holdStyle==='endurance')delete draft.holdSeconds;
- if(!sessionModeKeys('training').includes(draft.type)||![2,4,6,8,12].includes(draft.total)||![4,8].includes(draft.positions)||![1,2,3,4,5].includes(draft.reps))return;
+ if(!sessionModeKeys('session').includes(draft.type)||![2,4,6,8,12].includes(draft.total)||![4,8].includes(draft.positions)||![1,2,3,4,5].includes(draft.reps))return;
  const load=validateProgramLoadForm('plan',draft.total);if(!load)return;draft.load=load;
  const templates=clinicProgramTemplates(),existing=templates.find(p=>p.id===state.overlay.id);
  if(existing)Object.assign(existing,draft,{example:false});else templates.unshift({...draft,id:'template-'+Date.now(),example:false});

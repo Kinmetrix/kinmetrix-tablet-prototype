@@ -58,14 +58,14 @@ function waiverSignaturesRosterMarkup() {
 
 function memberWaiverProfileMarkup() {
   if (!waiverBlocksPerson(state.personId)) return '';
-  return `<section class="member-waiver-panel" aria-label="Waiver required"><h3>Waiver required</h3><p class="small">A signed waiver is required before assessment or training.</p>${button('Sign waiver', 'open-waiver-sign', 'primary')}</section>`;
+  return `<section class="member-waiver-panel" aria-label="Waiver required"><h3>Waiver required</h3><p class="small">A signed waiver is required before assessment or session.</p>${button('Sign waiver', 'open-waiver-sign', 'primary')}</section>`;
 }
 
 function waiverSignDialogMarkup() {
   const p = person();
   const name = p ? escapeHTML(p.name) : 'Member';
   return `<div class="modal-backdrop"><section class="dialog waiver-sign-dialog wide" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><div class="dialog-header"><h2 id="dialog-title">Sign waiver</h2><span class="sr-only">Close unavailable until signed</span></div>
-<p>Signing is <strong>required</strong> for ${name} before assessment or training on this team.</p>
+<p>Signing is <strong>required</strong> for ${name} before assessment or session on this team.</p>
 <article class="waiver-terms" aria-label="Terms"><h3>Kinmetrix terms and liability waiver</h3><p>Your use of Kinmetrix products is subject to the clinic’s terms of service and liability waiver. By signing below, you acknowledge that you have read and agree to those terms.</p><p class="small muted">This prototype stores the signature in browser memory only. It is not a legal record.</p></article>
 <div class="waiver-pad-wrap"><canvas id="waiver-sign-canvas" width="600" height="200" aria-label="Draw your signature"></canvas><div class="waiver-pad-bar"><p>Sign above</p>${button('Clear', 'waiver-clear-pad', 'small-button')}${button('Save', 'waiver-save-pad', 'primary', 'id="waiver-save-button" disabled')}</div></div></section></div>`;
 }

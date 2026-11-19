@@ -75,7 +75,7 @@ function mockOnboardingFields() {
 
 function mockWaiverFields() {
   return `<section class="settings-block settings-block--last">
-    <label class="radio-row"><input type="radio" checked disabled> <span><strong>Before a session</strong><small>Members should sign before assessment or training.</small></span></label>
+    <label class="radio-row"><input type="radio" checked disabled> <span><strong>Before a session</strong><small>Members should sign before assessment or session.</small></span></label>
     <label class="radio-row"><input type="radio" disabled> <span><strong>Optional</strong><small>Show the waiver. Do not block the session.</small></span></label>
   </section>`;
 }
@@ -92,7 +92,7 @@ function mockDir2SectionContent(section) {
   }
   if (section === 'waiver') {
     return `<ul class="settings-redesign-choice-list">
-      <li><label class="radio-row"><input type="radio" checked disabled> <span><strong>Before a session</strong><small>Members should sign before assessment or training.</small></span></label></li>
+      <li><label class="radio-row"><input type="radio" checked disabled> <span><strong>Before a session</strong><small>Members should sign before assessment or session.</small></span></label></li>
       <li><label class="radio-row"><input type="radio" disabled> <span><strong>Optional</strong><small>Show the waiver. Do not block the session.</small></span></label></li>
     </ul>`;
   }

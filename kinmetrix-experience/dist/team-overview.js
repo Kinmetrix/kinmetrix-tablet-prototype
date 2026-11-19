@@ -9,7 +9,7 @@ const PULSE_REPORTING_END = Date.UTC(2026, 10, 13, 23, 59, 59, 999);
 const PULSE_PERIOD_DAY_COUNT = {'last-7': 7, 'last-30': 30, 'last-90': 90};
 const PULSE_BRUSH_DAYS = 90;
 let pulseBrushDrag = null;
-const PULSE_ACTIVITY_FILTERS = {all: 'All', assessment: 'Assessments', training: 'Training'};
+const PULSE_ACTIVITY_FILTERS = {all: 'All', assessment: 'Assessments', session: 'Sessions'};
 const PULSE_ACTIVITY_SORTS = {newest: 'Newest first', oldest: 'Oldest first', member: 'Member A–Z'};
 
 function teamOverviewUI() {
@@ -159,7 +159,7 @@ function teamActivityMeta(record, memberRecords) {
   }
   if (programName && programTotal && sessionNum === programTotal) {
     return {
-      purpose: 'training',
+      purpose: 'session',
       badge: {label: 'Program complete', tone: 'notable'},
       kindLabel: `Completed “${programName}”`
     };
@@ -183,16 +183,16 @@ function teamActivityMeta(record, memberRecords) {
   }
   if (programName && sessionNum) {
     return {
-      purpose: 'training',
-      badge: {label: 'Training', tone: 'training'},
+      purpose: 'session',
+      badge: {label: 'Session', tone: 'session'},
       kindLabel: `${programName} · session ${sessionNum}`
     };
   }
-  if (purpose === 'training') {
+  if (purpose === 'session') {
     return {
-      purpose: 'training',
-      badge: {label: 'Training', tone: 'training'},
-      kindLabel: `${proto} training`
+      purpose: 'session',
+      badge: {label: 'Session', tone: 'session'},
+      kindLabel: `${proto} session`
     };
   }
   return {
@@ -227,7 +227,7 @@ function teamOverviewActivityRows(roster, periodKey) {
 }
 
 function pulseKpiSnapshot(rows) {
-  const trainingSessions = rows.filter(row => row.purpose === 'training').length;
+  const trainingSessions = rows.filter(row => row.purpose === 'session').length;
   const membersActive = new Set(rows.map(row => row.memberId)).size;
   return {totalActivity: rows.length, membersActive, trainingSessions};
 }
@@ -248,7 +248,7 @@ function teamOverviewKpis(roster, periodKey) {
   return [
     {id: 'totalActivity', label: 'Total activity', value: current.totalActivity, footnote: 'Completed sessions in the period', previous: previous.totalActivity},
     {id: 'membersActive', label: 'Members active', value: current.membersActive, footnote: 'Members with at least one session', previous: previous.membersActive},
-    {id: 'trainingSessions', label: 'Training sessions', value: current.trainingSessions, footnote: 'Training sessions in the period', previous: previous.trainingSessions}
+    {id: 'trainingSessions', label: 'Sessions', value: current.trainingSessions, footnote: 'Non-assessment sessions in the period', previous: previous.trainingSessions}
   ].map(kpi => ({
     ...kpi,
     deltaLabel: teamKpiDelta(kpi.value, kpi.previous),
@@ -272,7 +272,7 @@ function teamKpiSparkline(id, values) {
 
 function pulseActivityMatchesFilter(row, filter) {
   if (filter === 'assessment') return row.purpose === 'assessment';
-  if (filter === 'training') return row.purpose === 'training';
+  if (filter === 'session') return row.purpose === 'session';
   return true;
 }
 
@@ -296,11 +296,11 @@ function pulseHistoryExtras(personId) {
   if (!person?.baseline) return [];
   return [
     {type: 'strength', purpose: 'assessment', at: Date.UTC(2026, 8, 22, 14, 30), date: '22 Sept'},
-    {type: 'strength', purpose: 'training', at: Date.UTC(2026, 8, 28, 10, 30), date: '28 Sept'},
+    {type: 'strength', purpose: 'session', at: Date.UTC(2026, 8, 28, 10, 30), date: '28 Sept'},
     {type: 'rom', purpose: 'assessment', at: Date.UTC(2026, 9, 5, 11, 30), date: '5 Oct'},
-    {type: 'strength', purpose: 'training', at: Date.UTC(2026, 9, 8, 15, 30), date: '8 Oct'},
+    {type: 'strength', purpose: 'session', at: Date.UTC(2026, 9, 8, 15, 30), date: '8 Oct'},
     {type: 'strength', purpose: 'assessment', at: Date.UTC(2026, 9, 18, 9, 30), date: '18 Oct'},
-    {type: 'strength', purpose: 'training', at: Date.UTC(2026, 9, 22, 10, 30), date: '22 Oct'}
+    {type: 'strength', purpose: 'session', at: Date.UTC(2026, 9, 22, 10, 30), date: '22 Oct'}
   ].map((item, index) => {
     const record = historyFixture(item.type, item.date, personId);
     record.id = `pulse-extra-${personId}-${index}`;
@@ -361,7 +361,7 @@ function pulseModel() {
   const kpis = [
     {id: 'totalActivity', label: 'Total activity', value: current.totalActivity, previous: previous.totalActivity},
     {id: 'membersActive', label: 'Members active', value: current.membersActive, previous: previous.membersActive},
-    {id: 'trainingSessions', label: 'Training sessions', value: current.trainingSessions, previous: previous.trainingSessions}
+    {id: 'trainingSessions', label: 'Sessions', value: current.trainingSessions, previous: previous.trainingSessions}
   ].map(kpi => ({...kpi, deltaLabel: teamKpiDelta(kpi.value, kpi.previous)}));
   const activity = sortPulseActivity(
     currentRows.filter(row => pulseActivityMatchesFilter(row, ui.activityFilter)),
@@ -460,9 +460,9 @@ function pulseKpiDeltaClass(label) {
 }
 
 function pulseMetricLabel(id) {
-  if (id === 'totalActivity') return 'Sessions';
+  if (id === 'totalActivity') return 'Activity';
   if (id === 'membersActive') return 'Members';
-  return 'Training';
+  return 'Sessions';
 }
 
 function pulseMetrics(kpis) {

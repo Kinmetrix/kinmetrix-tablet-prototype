@@ -20,9 +20,9 @@ const smart1=resolveProgramTargets(smart,'alex');assert.equal(smart1.targets[0],
 assert.equal(resolveProgramTargets(smart,'ella').targets[0],null);
 assert.equal(validProgramLoad(programLoad(smart),6),true);
 const assessRecord=smart1.source;
-const visit={id:'smart-visit-1',personId:'alex',programId:'smart-prog',programSession:1,partial:false,type:'strength',purpose:'training',positions:4,reps:1,completedAt:assessRecord.completedAt+86400000,repRecords:[{angle:0,value:30,seconds:6},{angle:90,value:24,seconds:6},{angle:180,value:28,seconds:6},{angle:270,value:22,seconds:6}]};
+const visit={id:'smart-visit-1',personId:'alex',programId:'smart-prog',programSession:1,partial:false,type:'strength',purpose:'session',positions:4,reps:1,completedAt:assessRecord.completedAt+86400000,repRecords:[{angle:0,value:30,seconds:6},{angle:90,value:24,seconds:6},{angle:180,value:28,seconds:6},{angle:270,value:22,seconds:6}]};
 const smart2=resolveProgramTargets({...smart,completed:1,exampleVisits:[visit]},'alex');assert.equal(smart2.targets[0],30.6);assert.equal(smart2.source.programSession,1);
-state.setup={type:'isokinetic',purpose:'training',positions:4,reps:1,weight:12};initializeProgramTargets(dynamic);setupModeDefaults();
+state.setup={type:'isokinetic',purpose:'session',positions:4,reps:1,weight:12};initializeProgramTargets(dynamic);setupModeDefaults();
 activateProgramTarget(90);assert.equal(state.setup.weight,9.4);assert.equal(state.setup.challenge,8.4);
 assert.ok(programTargetsValid());state.setup.positions=8;assert.equal(programTargetsValid(),false);
 const original=historyFixture('strength','9 Nov');state.history.push({...original,id:'new-strength',positions:4,completedAt:Date.UTC(2026,10,10),weight:10});

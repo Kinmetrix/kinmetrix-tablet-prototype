@@ -75,7 +75,7 @@ for(const type of ['rom',{type:'strength',holdStyle:'endurance'},'eccentric','is
  if(setupType==='eccentric')assert.ok(data.directions.every(d=>d.reps.every(rep=>rep.startTilt>rep.endTilt)));
 }
 // Isokinetic preparation keeps the plan and optional tilt editor in sync.
-state.setup={purpose:'training',type:'isokinetic',positions:4,reps:3,weight:12,accepted:true,angle:0,tiltOverrides:{}};
+state.setup={purpose:'session',type:'isokinetic',positions:4,reps:3,weight:12,accepted:true,angle:0,tiltOverrides:{}};
 setupModeDefaults();
 const planBefore=setupView();
 assert.ok(planBefore.includes('12 reps total'));
@@ -102,7 +102,7 @@ assert.equal(isokForce(90),11,'program preview uses the target for each directio
 assert.equal(isokForceText(.5),'0.5 kg','minimum movement threshold stays visible');
 console.log('PASS — isokinetic split setup, workload preview, tilt selection, apply selected range and invalid-range blocking.');
 for(const type of ['strength','eccentric']){
- state.setup={purpose:'training',type,holdStyle:type==='strength'?'timed':undefined,positions:4,reps:2,weight:12,accepted:true,angle:0,tiltOverrides:{}};
+ state.setup={purpose:'session',type,holdStyle:type==='strength'?'timed':undefined,positions:4,reps:2,weight:12,accepted:true,angle:0,tiltOverrides:{}};
  setupModeDefaults();
  const html=setupView();
  assert.ok(html.includes('isok-split'),type+' uses split setup');
@@ -112,11 +112,11 @@ for(const type of ['strength','eccentric']){
  assert.equal(state.setup.isokTab,'tilts');
  assert.ok(setupView().includes('id="tilt-90-'),type+' tilt editor opens from the diagram');
 }
-state.setup={purpose:'training',type:'strength',holdStyle:'timed',positions:4,reps:2,weight:12,accepted:true,angle:90,tiltOverrides:{}};
+state.setup={purpose:'session',type:'strength',holdStyle:'timed',positions:4,reps:2,weight:12,accepted:true,angle:90,tiltOverrides:{}};
 setTiltOverride(90,{start:8});
 actions['tilt-apply-selected']();
 for(const a of currentAngles())assert.equal(setupTilt(a).start,8,'isometric apply-to-all copies pad position');
-state.setup={purpose:'training',type:'eccentric',positions:4,reps:2,weight:12,accepted:true,angle:180,tiltOverrides:{}};
+state.setup={purpose:'session',type:'eccentric',positions:4,reps:2,weight:12,accepted:true,angle:180,tiltOverrides:{}};
 setTiltOverride(180,{start:10,end:30});
 assert.equal(setupIsValid(),false,'eccentric invalid return range blocks start');
 console.log('PASS — isometric and eccentric split setup, diagram tilt editor, and apply-to-all.');
@@ -124,7 +124,7 @@ state.personId='alex';
 beginSetup('assessment','eccentric');
 assert.match(setupView(),/Eccentric assessment/);
 assert.ok(setupView().includes('isok-split'));
-beginSetup('training',memberPrograms('alex')[0].id);
+beginSetup('session',memberPrograms('alex')[0].id);
 assert.ok(setupView().includes('isok-split'));
 console.log('PASS — assessment and program sessions honor chosen mode with split setup.');
 // A safety cap must stop eccentric motion rather than count it as completed travel.

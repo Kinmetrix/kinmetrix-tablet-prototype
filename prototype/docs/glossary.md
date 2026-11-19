@@ -6,8 +6,9 @@ Product vocabulary for the Kinmetrix clinic tablet prototype. Use these terms in
 
 | Term | Definition |
 | --- | --- |
-| **Program** | Ordered set of training Groups for a member. |
-| **Group** | One training session (workout) with multiple Steps. |
+| **Program** | Ordered set of Groups for a member. |
+| **Group** | One session (workout) with multiple Steps. |
+| **Session** | A single non-assessment run (one Group) or a one-off visit with the chosen exercise mode. Contrasts with **assessment**. |
 | **Step** | One exercise at a single rotator angle (one direction) inside a Group. |
 | **Template** | Reusable Program / Group / Step definition used to create member or team content. |
 | **Protocol session** | Assessment configuration (target weight, angles, reps, direction flags). |
