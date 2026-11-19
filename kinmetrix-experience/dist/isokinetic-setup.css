@@ -1,0 +1,65 @@
+/* Isokinetic setup: calm form + direction plan. Existing theme tokens remain authoritative. */
+.isok-setup{max-width:1240px;margin:0 auto;padding:8px 8px 0}
+.isok-setup .setup-heading{padding-bottom:18px;margin-bottom:0}
+.isok-setup .setup-heading h1{font-size:28px}
+.isok-split{display:grid;grid-template-columns:minmax(360px,.95fr) minmax(380px,1.05fr);border-top:1px solid var(--line)}
+.isok-controls{padding:0 36px 22px 0;min-width:0}
+.isok-tabs{display:flex;gap:28px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.isok-tabs button{border:0;border-bottom:2px solid transparent;background:none;color:var(--muted);min-height:55px;padding:0 4px;font-size:16px;font-weight:550}
+.isok-tabs [aria-selected=true]{border-bottom-color:var(--ink);color:var(--ink)}
+.isok-tab-error{font-size:12px;color:var(--red);margin-left:8px}
+.isok-main-fields{display:grid;grid-template-columns:1fr 1fr;gap:26px 20px}
+.isok-main-fields .setup-force-field,.isok-program-source{grid-column:1/-1}
+.isok-setup .setup-label{font-size:14px;margin-bottom:10px}
+.isok-setup .setup-help{font-size:13px;line-height:1.45;max-width:none}
+.isok-setup .segmented{display:inline-flex;min-height:46px}
+.isok-setup .segmented button{min-height:40px;padding:7px 14px;font-size:14px;white-space:nowrap}
+.isok-setup .setup-force-field .weight-input input{font-size:22px;width:112px;height:50px}
+.isok-setup .setup-change{font-size:14px;color:var(--muted)}
+.isok-movement{border-top:1px solid var(--line);margin-top:26px;padding-top:20px}
+.isok-movement h2,.isok-editor-heading h2{font-size:17px;font-weight:620;margin:0 0 8px}
+.isok-movement p{font-size:15px;line-height:1.55;margin:0 0 10px;max-width:49ch}
+.isok-movement .isok-stop-copy{color:var(--muted);font-size:14px}
+.isok-stop-copy strong{color:var(--ink);font-weight:550}
+.isok-thresholds summary{cursor:pointer;min-height:44px;align-content:center;color:var(--muted);font-size:14px;width:fit-content}
+.isok-rule-fields{display:flex;flex-wrap:wrap;gap:20px;padding:10px 0}
+.isok-rule-fields .setup-field{max-width:220px}
+.isok-preview{border-left:1px solid var(--line);padding:22px 0 20px 36px;min-width:0;display:flex;flex-direction:column;align-items:center}
+.isok-preview-heading{width:100%;text-align:center}
+.isok-preview-heading h2{font-size:18px;font-weight:600;margin:0 0 6px}
+.isok-preview-heading p{font-size:14px;color:var(--muted);margin:0}
+.isok-preview-heading strong{display:inline-block;margin-left:12px;padding-left:12px;border-left:1px solid var(--line);color:var(--ink);font-weight:550}
+.isok-radial{width:100%;max-width:360px;aspect-ratio:440/424;position:relative;margin:6px auto 0}
+.isok-radial svg{width:100%;height:100%;display:block}
+.isok-orbit{fill:none;stroke:var(--line);stroke-width:1}
+.isok-spoke{stroke:var(--line);stroke-width:1.3}
+.isok-spoke.selected{stroke:var(--signal);stroke-width:2}
+.isok-node{position:absolute;transform:translate(-50%,-50%);border:1px solid transparent;border-radius:10px;background:var(--surface);color:var(--ink);display:flex;align-items:center;flex-direction:column;justify-content:center;gap:1px;min-width:76px;min-height:67px;padding:5px 8px}
+.isok-node strong{font-size:16px;font-weight:600;line-height:1.2}
+.isok-node>span{font-size:13px;color:var(--muted)}
+.isok-node:hover{border-color:var(--line);background:var(--soft)}
+.isok-node.selected{border-color:var(--signal);color:var(--signal)}
+.isok-rep-marks{display:flex;gap:4px;margin-top:5px;height:6px}
+.isok-rep-marks i{display:block;width:5px;height:5px;border-radius:50%;background:var(--plot-reference)}
+.isok-node.selected .isok-rep-marks i{background:var(--signal)}
+.isok-diagram-help{font-size:13px;color:var(--muted);text-align:center;margin:5px 0 16px}
+.isok-range-summary{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 10px;border:0;background:none;color:var(--muted);font-size:13px;min-height:44px;padding:8px 0}
+.isok-range-summary strong{font-weight:500;color:var(--ink)}
+.isok-panel-intro{font-size:14px;color:var(--muted);margin:0 0 18px;line-height:1.5;max-width:54ch}
+.isok-direction-select{display:block;margin-bottom:18px}.isok-direction-select select{width:100%;min-height:46px;border:1px solid var(--line);border-radius:10px;padding:10px 40px 10px 12px;background-color:var(--surface);color:var(--ink);font-size:15px}
+.isok-tilt-editor{padding-top:20px;margin-top:18px;border-top:1px solid var(--line)}
+.isok-editor-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.isok-editor-heading span{font-size:12px;color:var(--muted)}
+.isok-tilt-fields{display:flex;gap:24px;flex-wrap:wrap}
+.isok-tilt-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.isok-setup .stepper .stepper-value output,.isok-setup .stepper>output.stepper-value{min-width:48px}
+.isok-start{display:flex;gap:24px;align-items:center;border-top:1px solid var(--line);padding:20px 0 12px}
+.isok-commit{margin-right:auto;display:flex;flex-direction:column;gap:4px;font-size:16px}
+.isok-commit strong{font-weight:600}
+.isok-commit>span{font-size:13px;color:var(--muted)}
+.isok-start .check-label{margin:0;font-size:14px}
+.isok-start>.button{min-width:180px;min-height:50px}
+@media(max-width:1050px){.isok-controls{padding-right:22px}.isok-preview{padding-left:22px}.isok-main-fields{grid-template-columns:1fr}.isok-main-fields .setup-field{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.isok-main-fields .setup-help{width:100%}.isok-main-fields .setup-label{margin:0}.isok-main-fields{gap:18px}.isok-tilt-fields{gap:14px}}
+@media(max-width:860px){.isok-setup{padding:0}.isok-split{grid-template-columns:1fr}.isok-controls{padding:0 0 20px}.isok-preview{border-left:0;border-top:1px solid var(--line);padding:22px 0 16px}.isok-start{flex-wrap:wrap;gap:14px}.isok-commit{width:100%}.isok-start>.button{flex:1}.isok-setup .setup-heading h1{font-size:24px}.isok-preview-heading strong{margin-left:8px;padding-left:8px}.isok-tilt-fields{justify-content:space-between}.isok-tabs{margin-bottom:20px}}
+
+@media(min-width:861px) and (max-height:780px){.isok-setup .setup-heading{padding-bottom:12px}.isok-setup .setup-heading h1{font-size:25px}.isok-tabs{margin-bottom:16px}.isok-tabs button{min-height:48px}.isok-main-fields{gap:16px 20px}.isok-main-fields .setup-force-field{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px}.isok-main-fields .setup-force-field .setup-help{grid-column:1/-1;margin:0}.isok-main-fields .setup-force-field .setup-label{margin:0}.isok-movement{margin-top:20px;padding-top:16px}.isok-radial{max-width:330px}.isok-preview{padding-top:16px;padding-bottom:12px}.isok-diagram-help{margin-bottom:6px}.isok-start{padding-top:14px;gap:16px}.isok-tilt-editor{margin-top:12px;padding-top:12px}.isok-panel-intro{margin-bottom:12px}}

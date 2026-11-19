@@ -8,7 +8,7 @@ const context=vm.createContext({assert,console,structuredClone,URL,Blob,crypto:r
  document:{addEventListener(){},querySelector(){return null;},querySelectorAll(){return [];},documentElement:{dataset:{}},baseURI:'http://127.0.0.1/'},
  window:{addEventListener(){},scrollTo(){}},location:{href:'http://127.0.0.1/'},localStorage:{getItem(){return null;}},matchMedia(){return {matches:false};},
  setTimeout(){},clearTimeout(){},setInterval(){},clearInterval(){}});
-for(const name of ['workspace','report','photos','profile','reps','setup','live-rules','export','directory','comparison','mode-experience','session-tools','person-programs','team-settings','team-overview','session-plan','device','waiver','nav-icons','app']){
+for(const name of ['workspace','report','photos','profile','reps','setup','isokinetic-setup','live-rules','export','directory','comparison','mode-experience','session-tools','person-programs','team-settings','team-overview','session-plan','device','waiver','nav-icons','app']){
  let source=fs.readFileSync(path.join(root,name+'.js'),'utf8');
  if(name==='app')source=source.replace(/\nrender\(\);\s*$/,'\n');
  vm.runInContext(source,context,{filename:name+'.js'});
@@ -74,6 +74,33 @@ for(const type of ['rom',{type:'strength',holdStyle:'endurance'},'eccentric','is
  if(setupType==='strength'&&holdStyle==='endurance')assert.ok(data.duration>0);
  if(setupType==='eccentric')assert.ok(data.directions.every(d=>d.reps.every(rep=>rep.startTilt>rep.endTilt)));
 }
+// Isokinetic preparation keeps the plan and optional tilt editor in sync.
+state.setup={purpose:'training',type:'isokinetic',positions:4,reps:3,weight:12,accepted:true,angle:0,tiltOverrides:{}};
+setupModeDefaults();
+const planBefore=setupView();
+assert.ok(planBefore.includes('12 reps total'));
+assert.ok(!planBefore.includes('id="tilt-0-start-plus"'),'tilt controls stay out of the main session view');
+actions['setup-positions']({dataset:{value:'8'}});
+actions['reps-plus']();
+assert.equal(state.setup.accepted,false,'editing the workload requires review again');
+assert.ok(setupView().includes('32 reps total'));
+assert.equal((isokineticDiagram().match(/<i>/g)||[]).length,32);
+actions['isok-direction']({dataset:{angle:'135'}});
+assert.equal(state.setup.isokTab,'tilts');
+assert.ok(setupView().includes('id="tilt-135-start-plus"'));
+assert.match(isokineticDiagram(),/isok-node selected/);
+setTiltOverride(135,{start:12,end:31});
+actions['tilt-apply-selected']();
+for(const a of currentAngles())assert.deepEqual(tiltValues(setupTilt(a)),{start:12,end:31});
+actions['isok-tab']({dataset:{value:'session'}});
+assert.ok(isokineticPreview().includes('12–31° in every direction'));
+setTiltOverride(135,{start:33,end:12});
+assert.equal(setupIsValid(),false,'hidden invalid ranges still block starting');
+assert.match(setupView(),/Tilts<span class="isok-tab-error">Check/);
+state.setup.programLoad={kind:'fixed'};state.setup.targets={0:10,90:11,180:12,270:13};state.setup.positions=4;
+assert.equal(isokForce(90),11,'program preview uses the target for each direction');
+assert.equal(isokForceText(.5),'0.5 kg','minimum movement threshold stays visible');
+console.log('PASS — isokinetic split setup, workload preview, tilt selection, apply selected range and invalid-range blocking.');
 // A safety cap must stop eccentric motion rather than count it as completed travel.
 state.setup={type:'eccentric',weight:12,challenge:3,eccCap:5,eccSpeed:'slow',reps:1};
 const stopped={armed:true,force:6,below:0,progress:.25,tiltNow:26};
