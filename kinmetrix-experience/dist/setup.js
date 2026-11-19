@@ -127,6 +127,7 @@ function setupTiltRow(angle){
 }
 function setupView(){
  setupModeDefaults();
+ if(state.setup.type==='isokinetic')return isokineticSetupView();
  const cfg=state.setup,kind=setupTiltKind(),angles=currentAngles(),purpose=cfg.purpose==='assessment'?'assessment':'training',invalid=angles.some(angle=>!validTilt(setupTilt(angle)));
  const anyChanged=angles.some(angle=>cfg.tiltOverrides?.[cfg.type]?.[angle]);
  const columns=kind==='fixed'?['Tilt','Pad position']:kind==='travel'?['Start tilt → End tilt','Travel']:kind==='return'?['Start tilt → End tilt','Travel · device moves back']:['Start tilt → Max tilt','Allowed travel'];
