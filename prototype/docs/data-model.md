@@ -14,7 +14,7 @@ Team
 
 **Templates** (sidebar) holds:
 
-- **Assessment** — team defaults for assessment **session setup** (mode, arc/tilt, directions, reps, target force) plus optional **follow-up plan** after a completed run—not a template library.
+- **Assessment** — team defaults for assessment **session setup** (mode, arc/tilt, directions, reps, target force)—not a template library. **Session plan** defaults (post-assessment follow-up) live under **Sessions** in the templates hub.
 - **Sessions** — reusable load presets for training and session plans.
 - **Programs** — multi-day program templates assigned to members.
 

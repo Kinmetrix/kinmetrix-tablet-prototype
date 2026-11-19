@@ -142,15 +142,32 @@ function teamAssessmentArcFieldsMarkup(assessment) {
 
 function assessmentWorkspaceTab() {
   const ui = directoryUI().programs;
-  const tab = ui.assessmentTab ?? 'protocol';
-  const allowed = ['protocol', 'rom', 'session-plan'];
+  let tab = ui.assessmentTab ?? 'protocol';
+  if (tab === 'session-plan') {
+    ui.sessionTab = 'session-plan';
+    tab = 'protocol';
+  }
+  const allowed = ['protocol', 'rom'];
   ui.assessmentTab = allowed.includes(tab) ? tab : 'protocol';
   return ui.assessmentTab;
 }
 
 function assessmentWorkspaceSubnav() {
   const tab = assessmentWorkspaceTab();
-  return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Assessment views">${[['protocol', 'Protocol'], ['rom', 'ROM'], ['session-plan', 'Session plan']].map(([key, label]) => `<button type="button" data-action="assessment-tab" data-tab="${key}" ${tab === key ? 'aria-current="page"' : ''}>${label}</button>`).join('')}</nav>`;
+  return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Assessment views">${[['protocol', 'Protocol'], ['rom', 'ROM']].map(([key, label]) => `<button type="button" data-action="assessment-tab" data-tab="${key}" ${tab === key ? 'aria-current="page"' : ''}>${label}</button>`).join('')}</nav>`;
+}
+
+function sessionWorkspaceTab() {
+  const ui = directoryUI().programs;
+  const tab = ui.sessionTab ?? 'templates';
+  const allowed = ['templates', 'session-plan'];
+  ui.sessionTab = allowed.includes(tab) ? tab : 'templates';
+  return ui.sessionTab;
+}
+
+function sessionWorkspaceSubnav() {
+  const tab = sessionWorkspaceTab();
+  return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Session views">${[['templates', 'Templates'], ['session-plan', 'Session plan']].map(([key, label]) => `<button type="button" data-action="session-tab" data-tab="${key}" ${tab === key ? 'aria-current="page"' : ''}>${label}</button>`).join('')}</nav>`;
 }
 
 function teamAssessmentProtocolMarkup() {
@@ -205,8 +222,25 @@ function teamRomWorkspaceMarkup() {
 
 function teamAssessmentWorkspaceMarkup() {
   const tab = assessmentWorkspaceTab();
-  const body = tab === 'session-plan' ? teamFollowUpPlanFieldsMarkup() : tab === 'rom' ? teamRomWorkspaceMarkup() : teamAssessmentProtocolMarkup();
+  const body = tab === 'rom' ? teamRomWorkspaceMarkup() : teamAssessmentProtocolMarkup();
   return `${assessmentWorkspaceSubnav()}${body}`;
+}
+
+function sessionTemplatesTableMarkup() {
+  const rows = clinicSessionTemplates();
+  return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="Session templates">
+   <table class="data-table directory-table"><caption class="sr-only">Session templates</caption>
+    <thead><tr><th scope="col">Session</th><th scope="col">Load</th></tr></thead>
+    <tbody>${rows.map(row => `<tr><th scope="row">${escapeHTML(row.name)}</th><td>${escapeHTML(row.detail)}</td></tr>`).join('')}</tbody>
+   </table>
+  </div>
+  <p class="directory-footnote">Load presets for training sessions and for follow-up plans after assessment.</p>`;
+}
+
+function teamSessionWorkspaceMarkup() {
+  const tab = sessionWorkspaceTab();
+  const body = tab === 'session-plan' ? teamFollowUpPlanFieldsMarkup() : sessionTemplatesTableMarkup();
+  return `${sessionWorkspaceSubnav()}${body}`;
 }
 
 function sessionPlanTemplate(id) {
@@ -362,7 +396,7 @@ function teamFollowUpPlanFieldsMarkup() {
       <select id="plan-weeks">${[4, 5, 6, 7, 8].map(n => `<option value="${n}" ${plan.weeks === n ? 'selected' : ''}>${n}</option>`).join('')}</select>
       <label class="field-label" for="plan-template">Load preset</label>
       <select id="plan-template">${clinicSessionTemplates().map(item => `<option value="${item.id}" ${plan.templateId === item.id ? 'selected' : ''}>${item.name} · ${item.detail}</option>`).join('')}</select>
-      <p class="directory-footnote">${escapeHTML(sessionPlanLine(plan))} · presets from <strong>Sessions</strong> in this hub</p>
+      <p class="directory-footnote">${escapeHTML(sessionPlanLine(plan))} · presets from the <strong>Templates</strong> tab here</p>
     </section>
   </div>`;
 }
@@ -473,15 +507,17 @@ const teamSettingsActions = {
       if (Number.isFinite(challenge)) rom.challenge = challenge;
       team.rom = normalizeTeamRom(rom);
     }
-    const sessionsEl = $('#plan-sessions');
-    if (sessionsEl) {
-      const sessions = Number(sessionsEl.value);
-      const weeks = Number($('#plan-weeks')?.value);
-      const templateId = $('#plan-template')?.value;
-      if (![1, 2, 3, 4, 5].includes(sessions) || ![4, 5, 6, 7, 8].includes(weeks) || !sessionPlanTemplate(templateId)) return;
-      team.sessionPlan = {sessionsPerWeek: sessions, weeks, templateId};
-    }
     render();
     toast('Assessment defaults saved.');
+  },
+  'save-session-workspace': () => {
+    if (state.actor !== 'coach' || state.nav !== 'programs' || directoryUI().programs.library !== 'sessions') return;
+    const sessions = Number($('#plan-sessions')?.value);
+    const weeks = Number($('#plan-weeks')?.value);
+    const templateId = $('#plan-template')?.value;
+    if (![1, 2, 3, 4, 5].includes(sessions) || ![4, 5, 6, 7, 8].includes(weeks) || !sessionPlanTemplate(templateId)) return;
+    teamSettings().sessionPlan = {sessionsPerWeek: sessions, weeks, templateId};
+    render();
+    toast('Session plan defaults saved.');
   }
 };

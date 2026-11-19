@@ -1,7 +1,7 @@
 /* Clinic navigation and plan management. All identities and plans are demo data. */
 function directoryUI(){
  state.directoryUI??={};
- return state.directoryUI[state.clinicianId]??={roster:{query:'',filterKind:'all',filterValue:'all',sort:'name',descending:false},programs:{tab:'templates',query:'',library:null,libraryFocus:'assessments',assessmentTab:'protocol'}};
+ return state.directoryUI[state.clinicianId]??={roster:{query:'',filterKind:'all',filterValue:'all',sort:'name',descending:false},programs:{tab:'templates',query:'',library:null,libraryFocus:'assessments',assessmentTab:'protocol',sessionTab:'templates'}};
 }
 function visitDirectory(page,keepLibrary=false){
  if(state.actor!=='coach')return;
@@ -263,7 +263,7 @@ function clinicSessionTemplates(){
 }
 function assignedPrograms(){if(state.actor!=='coach')return [];return visiblePeople().flatMap(p=>memberPrograms(p.id).map(program=>({p,program})));}
 const TEMPLATE_LIBRARIES=[
- {id:'assessments',label:'Assessment',description:'Protocol defaults and session plan for assessments at the station.'},
+ {id:'assessments',label:'Assessment',description:'Protocol defaults for assessments at the station.'},
  {id:'sessions',label:'Sessions',description:'Reusable load presets for training and for session plans.'},
  {id:'programs',label:'Programs',description:'Multi-day plans assigned from this workspace.'}
 ];
@@ -297,12 +297,14 @@ function templatesHubRail(activeLibraryId){
 }
 function templatesPaneHead(active,library){
  const saveAssessment=library==='assessments'?button('Save','save-assessment-workspace','primary'):'';
+ const saveSessionPlan=library==='sessions'&&sessionWorkspaceTab()==='session-plan'?button('Save','save-session-workspace','primary'):'';
  const createByLibrary={
   sessions:{action:'new-session-template',ariaLabel:'New session template'},
   programs:{action:'new-template',ariaLabel:'New program template'}
  };
  const create=createByLibrary[library];
- const action=saveAssessment||(create?button(icon('plus','icon-sm')+' New template',create.action,'primary',`aria-label="${create.ariaLabel}"`):'');
+ const showCreate=create&&!(library==='sessions'&&sessionWorkspaceTab()==='session-plan');
+ const action=saveAssessment||saveSessionPlan||(showCreate?button(icon('plus','icon-sm')+' New template',create.action,'primary',`aria-label="${create.ariaLabel}"`):'');
  const desc=active.description?`<p class="settings-pane-desc">${escapeHTML(active.description)}</p>`:'';
  return `<header class="settings-pane-head">
   <div class="settings-pane-head-row">
@@ -318,7 +320,7 @@ function templatesPaneSubnav(activeLibraryId){
 }
 function templatesLibraryPane(library){
  if(library==='assessments')return assessmentWorkspaceBody();
- if(library==='sessions')return sessionTemplatesBody();
+ if(library==='sessions')return teamSessionWorkspaceMarkup();
  Object.assign(directoryUI().programs,{library:'programs',tab:directoryUI().programs.tab||'templates'});
  return programLibraryBody();
 }
@@ -339,16 +341,6 @@ function programsPage(){
 }
 function assessmentWorkspaceBody(){
  return teamAssessmentWorkspaceMarkup();
-}
-function sessionTemplatesBody(){
- const rows=clinicSessionTemplates();
- return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="Session templates">
-   <table class="data-table directory-table"><caption class="sr-only">Session templates</caption>
-    <thead><tr><th scope="col">Session</th><th scope="col">Load</th></tr></thead>
-    <tbody>${rows.map(row=>`<tr><th scope="row">${escapeHTML(row.name)}</th><td>${escapeHTML(row.detail)}</td></tr>`).join('')}</tbody>
-   </table>
-  </div>
-  <p class="directory-footnote">Load presets for training and for session plans. Defaults are chosen under Templates → Assessment.</p>`;
 }
 function programLibraryBody(){
  const ui=directoryUI().programs;
@@ -432,10 +424,18 @@ const directoryActions={
  'assessment-tab':el=>{
   if(state.nav!=='programs'||directoryUI().programs.library!=='assessments')return;
   const tab=el.dataset.tab;
-  if(!['protocol','rom','session-plan'].includes(tab))return;
+  if(!['protocol','rom'].includes(tab))return;
   directoryUI().programs.assessmentTab=tab;
   render();
   $(`[data-action="assessment-tab"][data-tab="${tab}"]`)?.focus();
+ },
+ 'session-tab':el=>{
+  if(state.nav!=='programs'||directoryUI().programs.library!=='sessions')return;
+  const tab=el.dataset.tab;
+  if(!['templates','session-plan'].includes(tab))return;
+  directoryUI().programs.sessionTab=tab;
+  render();
+  $(`[data-action="session-tab"][data-tab="${tab}"]`)?.focus();
  },
  'programs-tab':el=>{if(!['templates','assigned'].includes(el.dataset.tab))return;Object.assign(directoryUI().programs,{tab:el.dataset.tab,query:'',library:'programs'});render();$(`[data-tab="${el.dataset.tab}"]`)?.focus();},
  'browse-templates':()=>{Object.assign(directoryUI().programs,{tab:'templates',query:'',library:'programs'});render();},

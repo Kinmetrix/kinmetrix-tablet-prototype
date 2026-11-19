@@ -144,7 +144,7 @@ const GLOBAL_FIND_DESTINATIONS = [
  {kind:'settings',label:'Station',subtitle:'Team name and display options',keywords:'station team name clinic',section:'station'},
  {kind:'settings',label:'Onboarding',subtitle:'Fields collected for new members',keywords:'onboarding new user fields',section:'onboarding'},
  {kind:'settings',label:'Waiver',subtitle:'Policy and on-file signatures',keywords:'waiver consent sign signature',section:'waiver'},
- {kind:'settings',label:'Session plan',subtitle:'Follow-up cadence after assessment',keywords:'session plan follow up cadence',section:'session-plan'}
+ {kind:'template',label:'Session plan',subtitle:'Follow-up cadence after assessment',keywords:'session plan follow up cadence',library:'sessions',sessionTab:'session-plan'}
 ];
 function globalFindModel(){
  const permitted=visiblePeople(),query=state.search.trim().toLowerCase(),terms=query?query.split(/\s+/).filter(Boolean):[];
@@ -163,7 +163,7 @@ function globalFindRows(){
  const {members,destinations,query}=globalFindModel();
  const parts=[];
  if(members.length){parts.push(`<div class="finder-results" role="list" aria-label="Members">${members.map(p=>`<div class="finder-person" role="listitem">${photoAvatar(p)}<button class="finder-person-open" data-action="select-person" data-id="${p.id}"><span class="finder-person-name"><strong>${escapeHTML(p.name)}</strong><small>${escapeHTML(clinicians.find(c=>c.id===p.assigned).name)} · ${state.history.some(h=>h.personId===p.id)?'Last visit Today':p.last?'Last visit '+p.last:'First visit'}</small></span><span class="finder-person-status">${p.last?p.status:''}</span>${icon('chevron')}</button></div>`).join('')}</div>`);}
- if(destinations.length){parts.push(`<section class="finder-group" aria-label="Templates and settings"><h2 class="finder-group-title">Templates and settings</h2><div class="finder-destinations" role="list">${destinations.map(item=>`<button type="button" class="finder-destination" role="listitem" data-action="global-find-open" data-find-kind="${item.kind}" data-find-library="${item.library||''}" data-find-section="${item.section||''}"><span class="finder-destination-main"><strong>${escapeHTML(item.label)}</strong><small>${escapeHTML(item.subtitle)}</small></span>${icon('chevron')}</button>`).join('')}</div></section>`);}
+ if(destinations.length){parts.push(`<section class="finder-group" aria-label="Templates and settings"><h2 class="finder-group-title">Templates and settings</h2><div class="finder-destinations" role="list">${destinations.map(item=>`<button type="button" class="finder-destination" role="listitem" data-action="global-find-open" data-find-kind="${item.kind}" data-find-library="${item.library||''}" data-find-section="${item.section||''}" data-find-session-tab="${item.sessionTab||''}"><span class="finder-destination-main"><strong>${escapeHTML(item.label)}</strong><small>${escapeHTML(item.subtitle)}</small></span>${icon('chevron')}</button>`).join('')}</div></section>`);}
  if(!parts.length&&query)return `<div class="finder-no-results"><h2>No matches for “${escapeHTML(state.search.trim())}”</h2><p>Try a member name, template type, or setting such as onboarding or waiver.</p>${button('Clear search','clear-people-search','small-button')}</div>`;
  if(!parts.length&&!query)return '';
  return parts.join('');
@@ -174,7 +174,7 @@ function showPeopleFinder(){showGlobalFind();}
 function updatePeopleResults(){const model=globalFindModel();const slot=$('#global-find-results');if(slot)slot.innerHTML=globalFindRows();const status=$('#finder-status');if(status)status.textContent=model.label;const clear=$('.finder-clear');if(clear)clear.hidden=!state.search;}
 function openGlobalFindTarget(el){
  const kind=el.dataset.findKind;
- if(kind==='template'){const library=el.dataset.findLibrary||'assessments';visitDirectory('programs');Object.assign(directoryUI().programs,{library,libraryFocus:library==='assessments'?'assessments':library,tab:'templates'});render();return;}
+ if(kind==='template'){const library=el.dataset.findLibrary||'assessments';visitDirectory('programs');const patch={library,libraryFocus:library==='assessments'?'assessments':library,tab:'templates'};if(el.dataset.findSessionTab==='session-plan')patch.sessionTab='session-plan';Object.assign(directoryUI().programs,patch);render();return;}
  if(kind==='settings'){visitSettings(el.dataset.findSection||'station');}
 }
 function memberView(){return memberWorkspaceView();}
