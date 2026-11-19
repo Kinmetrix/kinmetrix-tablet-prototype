@@ -32,12 +32,9 @@ body{padding-bottom:var(--prototype-footer-height)}
 @media print{body{padding-bottom:0}.app-shell,.session-page,.welcome,.people-finder,.member-workspace{min-height:0}}
 
 /* Team logo in the sidebar wordmark (img.brand-mark; square slot). */
-.wordmark-button{display:flex;align-items:center;gap:8px;width:100%;padding:8px 5px;margin:0 0 4px;border:0;border-radius:10px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
-.wordmark-button:hover{background:rgba(255,255,255,.08)}
-.wordmark-button.active{background:rgba(255,255,255,.12)}
-.templates-layered-shell .wordmark-button{color:var(--templates-nav-ink)}
-.templates-layered-shell .wordmark-button:hover{background:rgba(255,255,255,.08)}
-.templates-layered-shell .wordmark-button.active{background:var(--templates-nav-icon-active)}
+.sidebar .nav-button.wordmark-button{border:0;font:inherit;cursor:pointer}
+.sidebar .nav-button.wordmark-button .brand-text{display:none}
+.wordmark-glyph-wrap .brand-mark{width:28px;height:28px;flex:0 0 28px;border-radius:6px;object-fit:cover}
 .wordmark .brand-mark{width:32px;height:32px;flex:0 0 32px;aspect-ratio:1/1;display:block;object-fit:cover;object-position:center;transform:none;border:0;border-radius:4px}
 .wordmark img.brand-mark{background:none}
 .wordmark span.brand-mark{background:var(--ink);-webkit-mask:var(--brand-mark-url,url("assets/kinmetrix.svg")) center/contain no-repeat;mask:var(--brand-mark-url,url("assets/kinmetrix.svg")) center/contain no-repeat}

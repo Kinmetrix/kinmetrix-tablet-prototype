@@ -51,6 +51,18 @@
  overflow:hidden;
 }
 .templates-layered-shell .wordmark .brand-mark{filter:none}
+.templates-layered-shell .sidebar>.nav-team-wordmark{
+ align-self:center;
+ flex-shrink:0;
+ margin:12px 0 10px;
+ width:72px;min-width:72px;
+}
+.templates-layered-shell .nav-team-wordmark .wordmark-glyph-wrap .brand-mark{
+ width:26px;height:26px;flex:0 0 26px;
+ border-radius:7px;
+}
+.templates-layered-shell .nav-team-wordmark.active .wordmark-glyph-wrap{background:var(--templates-nav-icon-active)}
+.templates-layered-shell .nav-team-wordmark:hover .wordmark-glyph-wrap{background:rgba(255,255,255,.08)}
 .templates-layered-shell .side-nav,.templates-layered-shell .side-bottom{align-items:center;gap:4px}
 .templates-layered-shell .nav-button{
   width:72px;min-width:72px;min-height:62px;max-height:none;

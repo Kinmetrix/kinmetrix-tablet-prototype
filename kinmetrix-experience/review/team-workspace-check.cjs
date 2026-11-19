@@ -115,6 +115,8 @@ const staffShell=shell();
 assert.match(staffShell,/team-northside\.svg/);
 assert.doesNotMatch(staffShell,/kinmetrix\.svg/);
 assert.match(staffShell,/data-action="nav-team"/);
+assert.match(staffShell,/nav-team-wordmark/);
+assert.match(staffShell,/nav-label">Team</);
 assert.match(staffShell,/aria-label="Northside clinic/);
 assert.doesNotMatch(staffShell,/data-action="nav-programs"/);
 assert.doesNotMatch(staffShell,/data-action="settings"/);

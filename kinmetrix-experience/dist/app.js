@@ -119,9 +119,8 @@ function fullBrand(){return `<img class="full-brand" src="${assetUrl('assets/kin
 function sidebarWordmark(){
  const team=teamSettings(),mark=assetUrl(team.logo||'assets/team-northside.svg'),name=escapeHTML(team.name);
  const teamActive=state.actor==='coach'&&isTeamHubNav();
- const inner=`<img class="brand-mark" src="${mark}" alt="" width="32" height="32" decoding="async"><span class="brand-text">${name}</span>`;
- if(state.actor==='coach')return `<button type="button" class="wordmark wordmark-button${teamActive?' active':''}" data-action="nav-team" aria-label="${name}. Team policy and libraries" title="Team"${teamActive?' aria-current="page"':''}>${inner}</button>`;
- return `<div class="wordmark" role="img" aria-label="${name}">${inner}</div>`;
+ if(state.actor==='coach')return `<button type="button" class="nav-button wordmark-button nav-team-wordmark${teamActive?' active':''}" data-action="nav-team" aria-label="${name}. Team policy and libraries" title="${name}"${teamActive?' aria-current="page"':''}><span class="nav-glyph-wrap wordmark-glyph-wrap" aria-hidden="true"><img class="brand-mark" src="${mark}" alt="" width="28" height="28" decoding="async"></span><span class="nav-label">Team</span></button>`;
+ return `<div class="wordmark" role="img" aria-label="${name}"><img class="brand-mark" src="${mark}" alt="" width="32" height="32" decoding="async"><span class="brand-text">${name}</span></div>`;
 }
 function brand(full=false){if(full)return fullBrand();return sidebarWordmark();}
 function render(){
