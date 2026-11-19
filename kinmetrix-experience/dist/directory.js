@@ -216,7 +216,11 @@ function rosterCell(row,key){
  if(key==='force')return row.force===null?missing:row.force.toFixed(1)+' kg';
  if(key==='stability')return row.stability===null?missing:Math.round(row.stability)+'%';
  if(key==='visit')return row.visit.label;
- if(key==='program')return row.program?`<strong>${escapeHTML(row.program.name)}</strong><small>${row.program.completed} of ${row.program.total} sessions</small>`:'<span class="muted">No active program</span>';
+ if(key==='program'){
+  if(!row.program)return '<span class="muted">No active program</span>';
+  const progress=`${row.program.completed} of ${row.program.total} sessions`;
+  return `<div class="roster-program-cell"><button type="button" class="program-name-button roster-program-button" data-action="open-roster-program" data-id="${row.p.id}" aria-label="Open ${escapeHTML(row.program.name)} program for ${escapeHTML(row.p.name)}, ${progress}"><strong>${escapeHTML(row.program.name)}</strong></button><small class="muted">${progress}</small></div>`;
+ }
  if(key==='clinician')return escapeHTML(row.clinician.name);
  if(key==='height')return row.details.heightCm?escapeHTML(row.details.heightCm)+' cm':missing;
  if(key==='weight')return row.details.bodyWeightKg?escapeHTML(row.details.bodyWeightKg)+' kg':missing;
@@ -390,6 +394,7 @@ const directoryActions={
  'apply-roster-columns':()=>{if(state.actor!=='coach'||state.overlay?.type!=='roster-columns')return;const ui=rosterUI();ui.columns=$$('input[name="roster-column"]:checked').map(el=>el.value).filter(key=>rosterColumnDefinitions.some(col=>col.key===key));if(!ROSTER_SORT_KEYS.has(ui.sort)||(ui.sort!=='name'&&!ui.columns.includes(ui.sort)))ui.sort='name';state.overlay=null;render();$('[data-action="roster-columns"]')?.focus();},
  'nav-pulse':()=>visitPulse(),'nav-roster':()=>visitDirectory('roster'),'nav-programs':()=>visitTeamHub(null),
  'open-roster-person':el=>openDirectoryPerson(el.dataset.id,'roster'),
+ 'open-roster-program':el=>openDirectoryPerson(el.dataset.id,'roster','programs'),
  'sort-roster':el=>{const ui=rosterUI(),key=el.dataset.sort;if(!ROSTER_SORT_KEYS.has(key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-action="sort-roster"][data-sort="${key}"]`)?.focus({preventScroll:true});},
  'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',filterKind:'all',filterValue:'all',sort:'name',descending:false});refreshRoster({refreshToolbar:true});if(rosterUI().filterOpen)$('#roster-filter-kind')?.focus();else $('#directory-search')?.focus();},
  'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;visitTeamHub(el.dataset.library);$(`[data-action="templates-library"][data-library="${el.dataset.library}"]`)?.focus();},

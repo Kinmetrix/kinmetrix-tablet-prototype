@@ -6,5 +6,7 @@ state.actor='coach';state.clinicianId='sam';state.nav='roster';state.personId=nu
 const roster=rosterPage();
 assert.doesNotMatch(roster,/open-roster-profile/);
 assert.doesNotMatch(roster,/roster-profile-cell/);
+assert.match(roster,/data-action="open-roster-program"/);
+assert.match(roster,/roster-program-cell/);
 `,context);
 console.log('PASS — roster table has no profile column.');
