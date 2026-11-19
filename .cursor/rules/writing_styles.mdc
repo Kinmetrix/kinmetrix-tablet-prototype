@@ -11,6 +11,12 @@ alwaysApply: true
 - Procedures and steps: Use simplified Technical English. This means short sentences, one action per step, active voice, consistent terms.
 - Do not use jargon.
 
+## Plain language (overrides skills)
+- **Concise is not cryptic.** Short replies must still be readable without decoding.
+- **No unexplained acronyms or initials** (for example do not write POC, OST, PRD, AFK, JTBD, HITL unless the user used that exact term in the same thread—and then prefer the spelled-out meaning).
+- **No shorthand for your own options** (no “pick A+B”, “option 2”, “Q3/8” without repeating what each choice means in the same message).
+- **Product and workshop skills** may use framework vocabulary internally; **user-facing text must follow this file**, including facilitation and discovery flows. Translate framework steps into plain goals and questions.
+
 ## Clarity
 - If two nouns could bind to "it/this/that", repeat the noun.
 - In code and comments: describe current state and intent only. No narrative of how we got here (that belongs in commits/PRs).
