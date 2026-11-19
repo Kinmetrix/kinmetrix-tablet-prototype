@@ -26,7 +26,7 @@ function hasMemberWaiver(personId) {
 }
 
 function waiverBlocksPerson(personId) {
-  return waiverPolicyMandatory() && !hasMemberWaiver(personId);
+  return waiverPolicyMandatory() && !hasMemberWaiver(personId) && !memberHasSessionData(personId);
 }
 
 function waiverBlocksCurrent() {
@@ -57,12 +57,7 @@ function waiverSignaturesRosterMarkup() {
 }
 
 function memberWaiverProfileMarkup() {
-  const id = state.personId;
-  if (!id || !waiverPolicyMandatory()) return '';
-  if (hasMemberWaiver(id)) {
-    const w = memberWaiverRecord(id);
-    return `<section class="member-waiver-panel" aria-label="Waiver"><h3>Waiver on file</h3><p class="small muted">Signed ${escapeHTML(formatWaiverSignedAt(w.signedAt))}</p><img src="${w.signatureDataUrl}" alt="Member waiver signature"></section>`;
-  }
+  if (!waiverBlocksPerson(state.personId)) return '';
   return `<section class="member-waiver-panel" aria-label="Waiver required"><h3>Waiver required</h3><p class="small">A signed waiver is required before assessment or training.</p>${button('Sign waiver', 'open-waiver-sign', 'primary')}</section>`;
 }
 
@@ -260,7 +255,7 @@ const waiverActions = {
 function seedDemoMemberWaivers() {
   ensureMemberWaivers();
   const at = '2026-11-01T14:30:00.000Z';
-  for (const id of ['maya', 'daniel', 'noah', 'sofia']) {
+  for (const id of ['maya', 'daniel', 'noah', 'sofia', 'lena']) {
     if (!state.memberWaivers[id]) {
       state.memberWaivers[id] = { signedAt: at, signatureDataUrl: DEMO_WAIVER_SCRIBBLE };
     }

@@ -126,17 +126,6 @@
   font-size: 15px;
 }
 
-.member-waiver-panel img {
-  max-width: 280px;
-  width: 100%;
-  height: auto;
-  max-height: 100px;
-  object-fit: contain;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-}
-
 .waiver-required-banner {
   margin: 0 0 20px;
   padding: 14px 16px;

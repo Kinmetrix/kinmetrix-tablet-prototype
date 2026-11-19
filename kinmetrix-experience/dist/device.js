@@ -31,20 +31,27 @@ function devicePage() {
             <h1>Device</h1>
             <p class="settings-pane-desc">Status for the Kinmetrix unit paired with this shared iPad. Review connection, calibration, and troubleshooting before sessions.</p>
           </div>
-          <div class="settings-pane-head-actions">
-            <span class="station-indicator device-page-status"><span class="status-dot ${ready ? '' : 'offline'}"></span>${ready ? 'Ready for sessions' : 'Unavailable'}</span>
-          </div>
         </div>
       </header>
       <div class="device-page-body">
         <div class="device-page-stack">
           <section class="device-page-card" aria-labelledby="device-connection-title">
             <h2 id="device-connection-title">Connection</h2>
-            <p class="device-page-card-lead">${ready ? 'Linked to this iPad' : 'This iPad is not linked to a ready unit'}</p>
-            <div class="device-page-badges">
-              <span class="badge neutral">Firmware 2.4.1</span>
-              <span class="badge ${ready ? '' : 'amber'}">${linkLabel}</span>
-            </div>
+            ${ready ? '' : `<p class="device-page-card-lead">This iPad is not linked to a ready unit</p>`}
+            <dl class="device-page-meta${ready ? '' : ' device-page-meta--after-lead'}">
+              <div class="device-page-meta-item">
+                <dt>Link</dt>
+                <dd class="device-page-meta-value ${ready ? '' : 'device-page-meta-value--warn'}"><span class="status-dot ${ready ? '' : 'offline'}" aria-hidden="true"></span>${linkLabel}</dd>
+              </div>
+              <div class="device-page-meta-item">
+                <dt>Firmware</dt>
+                <dd class="device-page-meta-value tabular">2.4.1</dd>
+              </div>
+              <div class="device-page-meta-item">
+                <dt>Serial</dt>
+                <dd class="device-page-meta-value tabular">KM-20481</dd>
+              </div>
+            </dl>
             ${ready ? '' : '<p class="directory-footnote device-page-card-note">Sessions that need force or movement data stay blocked while the device is unavailable.</p>'}
           </section>
           <section class="device-page-card" aria-labelledby="device-calibration-title">
@@ -64,15 +71,7 @@ function devicePage() {
           </section>
         </div>
         <aside class="device-unit-card" aria-label="Paired unit">
-          <img src="assets/renders/isokinetic-station-v1.png" width="887" height="887" alt="" decoding="async">
-          <div class="device-unit-card-status">
-            <span class="status-dot ${ready ? '' : 'offline'}" aria-hidden="true"></span>
-            <div>
-              <strong>${ready ? 'Your unit is ready' : 'Unit unavailable'}</strong>
-              <p class="muted small device-unit-card-name">Kinmetrix unit</p>
-              <span class="device-unit-serial">KM-20481</span>
-            </div>
-          </div>
+          <img src="assets/renders/isokinetic-station-v1.png?v=labeled-1" width="585" height="1024" alt="Kinmetrix unit. 1 Arc. 2 Sensor pad. 3 Manual buttons. 4 Seat adjuster. 5 On/off switch. 6 Calibration kit, inside behind the seat leg. 7 iPad. 8 Emergency button." decoding="async">
         </aside>
       </div>
     </div>

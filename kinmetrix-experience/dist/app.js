@@ -43,6 +43,7 @@ const people = [
  {id:'maya',name:'Maya Thompson',initials:'MT',assigned:'sam',color:'lilac',detail:'Performance training',status:'Ready for assessment',last:'8 Nov',target:10,program:false,baseline:true},
  {id:'daniel',name:'Daniel Kim',initials:'DK',assigned:'jordan',color:'blue',detail:'Movement & mobility',status:'Program in progress',last:'7 Nov',target:11,program:true,baseline:true},
  {id:'ella',name:'Ella Wilson',initials:'EW',assigned:'sam',color:'sand',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false},
+ {id:'lena',name:'Lena Ortiz',initials:'LO',assigned:'sam',color:'blue',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false},
  {id:'noah',name:'Noah Williams',initials:'NW',assigned:'jordan',color:'',detail:'Performance training',status:'Program in progress',last:'6 Nov',target:14,program:true,baseline:true},
  {id:'sofia',name:'Sofia Garcia',initials:'SG',assigned:'jordan',color:'lilac',detail:'Movement & mobility',status:'Ready for assessment',last:'5 Nov',target:9,program:false,baseline:true}
 ];
@@ -279,7 +280,7 @@ const actions={
  'show-roster':()=>returnToDirectory(),
  'clear-people-search':()=>{state.search='';$('#roster-search').value='';updatePeopleResults();$('#roster-search').focus();},
  'cancel-pending-protocol':()=>{state.pendingSetup=null;render();},
- 'member-tab':el=>{if(!['overview','history','programs','profile'].includes(el.dataset.tab))return;state.tab=el.dataset.tab;render();window.scrollTo(0,0);$(`[data-action="member-tab"][data-tab="${state.tab}"]`)?.focus({preventScroll:true});},
+ 'member-tab':el=>{if(!['overview','history','programs','profile'].includes(el.dataset.tab))return;if((el.dataset.tab==='history'||el.dataset.tab==='programs')&&!memberHasSessionData())return;state.tab=el.dataset.tab;render();window.scrollTo(0,0);$(`[data-action="member-tab"][data-tab="${state.tab}"]`)?.focus({preventScroll:true});},
  'assess':()=>openSessionPicker('strength','assessment'),'train':()=>openSessionPicker('strength','training'),'continue-program':el=>beginProgram(el.dataset.programId),'start-rom':()=>beginSetup('assessment','rom'),
 
  'setup-type':el=>changeSetupMode(el.dataset.type),'setup-positions':el=>{state.setup.positions=Number(el.dataset.value);if(state.setup.programLoad){const plan=memberPrograms().find(p=>p.id===state.setup.programId);if(plan){const resolved=resolveProgramTargets(plan,state.personId,state.setup.positions);state.setup.targets=resolved.targets;state.setup.programSource=resolved.source;}}if(!currentAngles().includes(state.setup.angle))state.setup.angle=0;resetSetupAcceptance();renderSetupControl('#setup-count-'+el.dataset.value);},
