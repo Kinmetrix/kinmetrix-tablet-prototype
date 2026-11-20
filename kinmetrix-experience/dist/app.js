@@ -66,7 +66,7 @@ function modeIntro(type,purpose){
  if(type==='strength'&&purpose==='session')return {question:'Practice isometric holds.',why:modePurposeCopy.session.strength,how:'Build to the target. Choose timed seconds or Endurance in setup.'};
  return modeGuidance[type];
 }
-const initialState = () => ({nav:'pulse',tab:'overview',personId:null,clinicianId:'sam',actor:'coach',pendingSetup:null,search:'',memberOrigin:'pulse',rosterPolicy:'all',defaultEntry:'coach',deviceReady:true,stage:null,session:null,result:null,profiles:{},memberDetails:{},memberWaivers:{},memberPhotos:{alex:'assets/profiles/alex-v1.png',maya:'assets/profiles/maya-v1.png',daniel:'assets/profiles/daniel-v1.png'},profileDrafts:{},history:[],overlay:null,waiverResume:null,guided:false,showCompare:true,reportDetails:false,setup:{purpose:'assessment',type:'strength',positions:4,reps:3,weight:12,accepted:true}});
+const initialState = () => ({nav:'pulse',tab:'overview',personId:null,clinicianId:'sam',actor:'coach',pendingSetup:null,search:'',helpArticle:false,memberOrigin:'pulse',rosterPolicy:'all',defaultEntry:'coach',deviceReady:true,stage:null,session:null,result:null,profiles:{},memberDetails:{},memberWaivers:{},memberPhotos:{alex:'assets/profiles/alex-v1.png',maya:'assets/profiles/maya-v1.png',daniel:'assets/profiles/daniel-v1.png'},profileDrafts:{},history:[],overlay:null,waiverResume:null,guided:false,showCompare:true,reportDetails:false,setup:{purpose:'assessment',type:'strength',positions:4,reps:3,weight:12,accepted:true}});
 let state=initialState(), timer=null, toastTimer=null, modalReturnFocus=null;
 let theme='light';
 try { theme=localStorage.getItem('kinmetrix-theme')==='dark'?'dark':'light'; } catch {}
@@ -134,9 +134,17 @@ function render(){
  renderOverlay();
  syncRepChartLayout();
  if(state.stage==='live'&&isMovementMode(state.setup.type))modeUpdateLive();
+ if(state.nav==='find'&&!state.helpArticle&&!state.overlay) focusFindInput();
+}
+function focusFindInput(){
+ const input=$('#roster-search');
+ if(!input)return;
+ input.focus({preventScroll:true});
+ const end=input.value.length;
+ try{input.setSelectionRange(end,end);}catch{}
 }
 function staffNavActive(nav,origin){if(isTeamHubNav()||nav==='device')return '';if(nav==='people')return origin==='team'||origin==='programs'?'find':origin||'find';if(nav==='find')return 'find';return nav;}
-function shellMainView(){if(state.nav==='device')return devicePage();if(isTeamHubNav())return teamHubPage();if(state.nav==='pulse')return pulsePage();if(state.nav==='roster')return rosterPage();if(state.nav==='programs')return programsPage();if(state.nav==='find')return globalFindView();return peopleView();}
+function shellMainView(){if(state.nav==='device')return devicePage();if(isTeamHubNav())return teamHubPage();if(state.nav==='pulse')return pulsePage();if(state.nav==='roster')return rosterPage();if(state.nav==='programs')return programsPage();if(state.nav==='find')return state.helpArticle?helpArticleView():globalFindView();return peopleView();}
 function shell(){const c=clinician(),staff=state.actor==='coach',deviceOpen=state.nav==='device',active=staffNavActive(state.nav,state.memberOrigin);const templatesLayered=true;return `<div class="app-shell ${staff?'staff-shell':'member-shell'}${templatesLayered?' templates-layered-shell':''}">
  <aside class="sidebar" aria-label="${staff?'Clinic navigation':'Private member navigation'}">${brand()}<nav class="side-nav" aria-label="Main navigation">
  ${staff?['find','pulse','roster'].map(key=>navItem({pulse:'Pulse',find:'Find',roster:'Roster'}[key],`nav-${key}`,{pulse:'pulse',find:'search',roster:'people'}[key],active===key)).join(''):navItem('My progress','nav-find','user',true,' aria-label="My progress · Private"')}
@@ -158,6 +166,20 @@ const GLOBAL_FIND_DESTINATIONS = [
  {kind:'settings',label:'Waiver',subtitle:'Policy and on-file signatures',keywords:'waiver consent sign signature',section:'waiver'},
  {kind:'template',label:'Session plan',subtitle:'Follow-up cadence after assessment',keywords:'session plan follow up cadence',library:'sessions',sessionTab:'session-plan'}
 ];
+const HELP_ARTICLE={
+ title:'Search the workspace.',
+ paragraphs:[
+  'Search the workspace to find a person in the clinic workspace.',
+  'Matches are listed under the field. Open a person to go to their record.',
+  'This article opens from the Help result when your search matches the title or these words.'
+ ]
+};
+function helpArticleWords(){return `${HELP_ARTICLE.title} ${HELP_ARTICLE.paragraphs.join(' ')}`.toLowerCase().match(/[a-z0-9]+/g)||[];}
+function helpArticleMatches(terms){
+ if(state.pendingSetup||!terms.length)return false;
+ const words=new Set(helpArticleWords());
+ return terms.every(term=>words.has(String(term).toLowerCase().replace(/[^a-z0-9]/g,'')));
+}
 function globalFindModel(){
  const permitted=visiblePeople(),query=state.search.trim().toLowerCase(),terms=query?query.split(/\s+/).filter(Boolean):[];
  const members=query?permitted.filter(p=>terms.every(term=>p.name.toLowerCase().includes(term))):[];
@@ -168,22 +190,30 @@ function globalFindModel(){
  });
  const showDestinations=!!query;
  const destHits=showDestinations?destinations:[];
- const label=query?`${members.length+destHits.length} ${members.length+destHits.length===1?'match':'matches'}`:'';
- return {members,destinations:destHits,query,label};
+ const help=helpArticleMatches(terms);
+ const total=members.length+destHits.length+(help?1:0);
+ const label=query?`${total} ${total===1?'match':'matches'}`:'';
+ return {members,destinations:destHits,help,query,label};
 }
 function globalFindRows(){
- const {members,destinations,query}=globalFindModel();
+ const {members,destinations,help,query}=globalFindModel();
  const parts=[];
  if(members.length){parts.push(`<div class="finder-results" role="list" aria-label="Members">${members.map(p=>`<div class="finder-person" role="listitem">${photoAvatar(p)}<button class="finder-person-open" data-action="select-person" data-id="${p.id}"><span class="finder-person-name"><strong>${escapeHTML(p.name)}</strong><small>${escapeHTML(clinicians.find(c=>c.id===p.assigned).name)} · ${state.history.some(h=>h.personId===p.id)?'Last visit Today':p.last?'Last visit '+p.last:'First visit'}</small></span><span class="finder-person-status">${p.last?p.status:''}</span>${icon('chevron')}</button></div>`).join('')}</div>`);}
+ if(help){parts.push(`<div class="finder-help" role="list" aria-label="Help"><div role="listitem"><button type="button" class="finder-help-open" data-action="open-help-article"><span class="finder-person-name"><strong>${escapeHTML(HELP_ARTICLE.title)}</strong><small>Help</small></span>${icon('chevron')}</button></div></div>`);}
  if(destinations.length){parts.push(`<section class="finder-group" aria-label="Templates and settings"><h2 class="finder-group-title">Templates and settings</h2><div class="finder-destinations" role="list">${destinations.map(item=>`<button type="button" class="finder-destination" role="listitem" data-action="global-find-open" data-find-kind="${item.kind}" data-find-library="${item.library||''}" data-find-section="${item.section||''}" data-find-session-tab="${item.sessionTab||''}"><span class="finder-destination-main"><strong>${escapeHTML(item.label)}</strong><small>${escapeHTML(item.subtitle)}</small></span>${icon('chevron')}</button>`).join('')}</div></section>`);}
  if(!parts.length&&query)return `<div class="finder-no-results"><h2>No matches for “${escapeHTML(state.search.trim())}”</h2><p>Try a member name, template type, or setting such as onboarding or waiver.</p>${button('Clear search','clear-people-search','small-button')}</div>`;
  if(!parts.length&&!query)return '';
  return parts.join('');
 }
-function globalFindView(){const pending=state.pendingSetup,prompt=pending?`Choose who will use ${protocols[pending.type].name.toLowerCase()} ${pending.purpose==='assessment'?'assessment':'session'}.`:'Search the clinic workspace.';const model=globalFindModel();const status=model.label?`<span id="finder-status" role="status" aria-live="polite">${model.label}</span>`:'';const cancelPending=pending?`<button class="text-button" data-action="cancel-pending-protocol">Cancel protocol selection</button>`:'';const finderTools=[status,cancelPending].filter(Boolean).join('');const toolsMarkup=finderTools?`<div class="finder-tools">${finderTools}</div>`:'';return `<main class="people-finder templates-hub staff-single-pane"><div class="settings-hub-pane" aria-label="Find"><section class="finder-content"><div class="finder-heading"><h1>Find</h1><p>${prompt}</p></div><label class="sr-only" for="roster-search">Search clinic</label><div class="search-wrap finder-search">${icon('search')}<input id="roster-search" type="search" placeholder="Members, templates, settings…" value="${escapeHTML(state.search)}" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-controls="global-find-results"><button class="icon-button finder-clear" data-action="clear-people-search" aria-label="Clear search" ${state.search?'':'hidden'}>${icon('close')}</button></div>${toolsMarkup}<div id="global-find-results">${globalFindRows()}</div></section></div></main>`;}
-function showGlobalFind(){state.nav='find';state.memberOrigin='find';state.search='';if(state.actor==='coach'){state.personId=null;}render();window.scrollTo(0,0);}
+function finderHeadingMarkup(pending,prompt){
+ if(pending)return `<div class="finder-heading finder-heading-pending"><h1>${prompt}</h1></div>`;
+ return `<div class="finder-heading"><div class="finder-brand">${fullBrand()}</div><p>${prompt}</p></div>`;
+}
+function globalFindView(){const pending=state.pendingSetup,prompt=pending?`Choose who will use ${protocols[pending.type].name.toLowerCase()} ${pending.purpose==='assessment'?'assessment':'session'}.`:'Search the workspace.';const model=globalFindModel();const idle=!state.search.trim();const status=model.label?`<span id="finder-status" role="status" aria-live="polite">${model.label}</span>`:'';const cancelPending=pending?`<button class="text-button" data-action="cancel-pending-protocol">Cancel protocol selection</button>`:'';const finderTools=[status,cancelPending].filter(Boolean).join('');const toolsMarkup=finderTools?`<div class="finder-tools">${finderTools}</div>`:'';return `<main class="people-finder templates-hub staff-single-pane"><div class="settings-hub-pane ${idle?'is-finder-idle':'is-finder-active'}" aria-label="Find"><section class="finder-content">${finderHeadingMarkup(pending,prompt)}<label class="sr-only" for="roster-search">Search clinic</label><div class="search-wrap finder-search">${icon('search')}<input id="roster-search" type="search" placeholder="Members, templates, settings, docs…" value="${escapeHTML(state.search)}" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-controls="global-find-results"><button class="icon-button finder-clear" data-action="clear-people-search" aria-label="Clear search" ${state.search?'':'hidden'}>${icon('close')}</button></div>${toolsMarkup}<div id="global-find-results">${globalFindRows()}</div></section></div></main>`;}
+function helpArticleView(){return `<main class="people-finder help-article templates-hub staff-single-pane"><div class="settings-hub-pane" aria-label="${escapeHTML(HELP_ARTICLE.title)}"><article class="help-article-sheet"><button type="button" class="text-button help-article-back" data-action="close-help-article">${icon('back')} Back to Find</button><h1>${escapeHTML(HELP_ARTICLE.title)}</h1>${HELP_ARTICLE.paragraphs.map(paragraph=>`<p>${escapeHTML(paragraph)}</p>`).join('')}</article></div></main>`;}
+function showGlobalFind(){state.nav='find';state.memberOrigin='find';state.search='';state.helpArticle=false;if(state.actor==='coach'){state.personId=null;}render();window.scrollTo(0,0);}
 function showPeopleFinder(){showGlobalFind();}
-function updatePeopleResults(){const model=globalFindModel();const slot=$('#global-find-results');if(slot)slot.innerHTML=globalFindRows();const status=$('#finder-status');if(status)status.textContent=model.label;const clear=$('.finder-clear');if(clear)clear.hidden=!state.search;}
+function updatePeopleResults(){const model=globalFindModel();const slot=$('#global-find-results');if(slot)slot.innerHTML=globalFindRows();const status=$('#finder-status');if(status)status.textContent=model.label;const clear=$('.finder-clear');if(clear)clear.hidden=!state.search;const pane=$('.people-finder .settings-hub-pane');if(pane){const idle=!state.search.trim();pane.classList.toggle('is-finder-idle',idle);pane.classList.toggle('is-finder-active',!idle);}}
 function openGlobalFindTarget(el){
  const kind=el.dataset.findKind;
  if(kind==='template'){const library=el.dataset.findLibrary||'assessments';visitTeamHub(library);const patch={library,libraryFocus:library==='assessments'?'assessments':library,tab:'templates'};if(el.dataset.findSessionTab==='session-plan')patch.sessionTab='session-plan';Object.assign(directoryUI().programs,patch);render();return;}
@@ -193,7 +223,7 @@ function memberView(){return memberWorkspaceView();}
 function profileView(){return memberProfileView();}
 function beginSetup(purpose='assessment',type='strength',continuing=false){
  if(!sessionModeKeys(purpose).includes(type))return;
- if(!person()){state.pendingSetup={purpose,type,continuing};state.nav='find';state.memberOrigin='find';state.search='';render();window.scrollTo(0,0);return;}
+ if(!person()){state.pendingSetup={purpose,type,continuing};state.nav='find';state.memberOrigin='find';state.search='';state.helpArticle=false;render();window.scrollTo(0,0);return;}
  if(gateWaiver({kind:'setup',purpose,type,continuing}))return;
  const program=continuing?memberPrograms().find(p=>p.id===continuing):null;
  const teamProto=purpose==='assessment'&&!program&&type!=='rom'?teamAssessmentConfig():null;
@@ -281,6 +311,8 @@ const actions={
  'reset':()=>{stopTimer();for(let i=people.length-1;i>=0;i--)if(people[i].createdInDemo)people.splice(i,1);state=initialState();seedDemoMemberWaivers();render();window.scrollTo(0,0);toast('Demo reset. All people and results are synthetic.');},
  'demo-member':()=>{if(state.stage==='live'){toast('End the active session before changing entry modes.');return;}stopTimer();state.nav='welcome';state.welcomeMode='member';state.personId=null;state.stage=null;state.overlay=null;render();},
  'nav-find':showGlobalFind,
+ 'open-help-article':()=>{if(state.pendingSetup)return;state.helpArticle=true;render();$('.help-article-back')?.focus();},
+ 'close-help-article':()=>{state.helpArticle=false;render();},
  'global-find-open':openGlobalFindTarget,
  'select-person':el=>openDirectoryPerson(el.dataset.id,'find'),
  'show-roster':()=>returnToDirectory(),
@@ -320,5 +352,5 @@ seedDemoMemberWaivers();
 document.addEventListener('click',event=>{const el=event.target.closest('[data-action]');if(!el||el.disabled)return;const action=actions[el.dataset.action];if(action)action(el);});
 document.addEventListener('input',event=>{const el=event.target;if(el.id==='roster-search'){state.search=el.value;updatePeopleResults();}else if(el.id==='working-percent')$('#range-output').textContent=el.value;else if(el.id==='target-weight'){const value=Number(el.value);state.setup.weight=value;state.setup.accepted=false;$('#accept-settings').checked=false;$('#begin-session-button').disabled=true;}});
 document.addEventListener('change',event=>{const el=event.target;if(el.name==='waiver-policy'&&state.actor==='coach'&&isTeamHubNav()&&teamHubResolveCard()==='waiver'&&TEAM_WAIVER_POLICIES.some(item=>item.id===el.value)){teamSettings().waiverPolicy=el.value;render();toast('Waiver policy updated.');}else if(el.id==='accept-settings'){const weight=$('#target-weight');if((weight&&!weight.checkValidity())||!setupIsValid()){if(weight&&!weight.checkValidity())weight.reportValidity();else{const invalid=currentAngles().find(angle=>!validTilt(setupTilt(angle)));if(invalid!==undefined){state.setup.angle=invalid;if(splitSetupUsesSplitLayout())state.setup.isokTab='tilts';const field=setupHasFixedTilt()?'start':'end';renderSetupControl(`#tilt-${invalid}-${field}-plus`);toast('Check the tilt settings before beginning.');}}el.checked=false;state.setup.accepted=false;}else state.setup.accepted=el.checked;$('#begin-session-button').disabled=!state.setup.accepted||!state.deviceReady;}else if(el.id==='clinician-select')$('#demo-pin-hint').textContent='Demo PIN: '+clinicians.find(c=>c.id===el.value).pin+'. This is an interaction preview, not secure authentication.';else if(el.id==='device-ready'){state.deviceReady=el.checked;render();}else if(el.id==='review-confirmation')$('#apply-limits-button').disabled=!el.checked;else if(el.id==='compare-previous'){state.showCompare=el.checked;render();}});
-document.addEventListener('keydown',event=>{if(event.target.id==='roster-search'&&['ArrowDown','Enter'].includes(event.key)){$('.finder-person-open')?.focus();event.preventDefault();return;}const target=event.target.closest('svg [data-action]');if(target&&['Enter',' '].includes(event.key)){event.preventDefault();actions[target.dataset.action]?.(target);return;}if(!state.overlay)return;if(event.key==='Escape'){event.preventDefault();if(state.overlay?.type==='waiver-sign'&&waiverBlocksCurrent()){toast('A signature is required to continue.');return;}closeModal();return;}if(event.key==='Enter'&&(event.target.id==='clinician-pin'||event.target.id==='member-code')){event.preventDefault();actions[event.target.id==='clinician-pin'?'confirm-clinician':'confirm-member-code']();}if(event.key==='Tab'){const elements=$$('button:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]',$('#overlay-root')).filter(el=>el.getClientRects().length&&!el.closest('[inert]'));if(!elements.length)return;const first=elements[0],last=elements.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
+document.addEventListener('keydown',event=>{if(state.helpArticle&&!state.overlay&&event.key==='Escape'){event.preventDefault();state.helpArticle=false;render();return;}if(event.target.id==='roster-search'&&['ArrowDown','Enter'].includes(event.key)){$('.finder-person-open, .finder-help-open')?.focus();event.preventDefault();return;}const target=event.target.closest('svg [data-action]');if(target&&['Enter',' '].includes(event.key)){event.preventDefault();actions[target.dataset.action]?.(target);return;}if(!state.overlay)return;if(event.key==='Escape'){event.preventDefault();if(state.overlay?.type==='waiver-sign'&&waiverBlocksCurrent()){toast('A signature is required to continue.');return;}closeModal();return;}if(event.key==='Enter'&&(event.target.id==='clinician-pin'||event.target.id==='member-code')){event.preventDefault();actions[event.target.id==='clinician-pin'?'confirm-clinician':'confirm-member-code']();}if(event.key==='Tab'){const elements=$$('button:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]',$('#overlay-root')).filter(el=>el.getClientRects().length&&!el.closest('[inert]'));if(!elements.length)return;const first=elements[0],last=elements.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
 render();
