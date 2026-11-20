@@ -45,7 +45,14 @@ const people = [
  {id:'ella',name:'Ella Wilson',initials:'EW',assigned:'sam',color:'sand',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false},
  {id:'lena',name:'Lena Ortiz',initials:'LO',assigned:'sam',color:'blue',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false},
  {id:'noah',name:'Noah Williams',initials:'NW',assigned:'jordan',color:'',detail:'Performance training',status:'Program in progress',last:'6 Nov',target:14,program:true,baseline:true},
- {id:'sofia',name:'Sofia Garcia',initials:'SG',assigned:'jordan',color:'lilac',detail:'Movement & mobility',status:'Ready for assessment',last:'5 Nov',target:9,program:false,baseline:true}
+ {id:'sofia',name:'Sofia Garcia',initials:'SG',assigned:'jordan',color:'lilac',detail:'Movement & mobility',status:'Ready for assessment',last:'5 Nov',target:9,program:false,baseline:true},
+ {id:'marcus',name:'Marcus Lee',initials:'ML',assigned:'sam',color:'blue',detail:'Return to sport',status:'Program in progress',last:'10 Nov',target:13,program:true,baseline:true},
+ {id:'priya',name:'Priya Sharma',initials:'PS',assigned:'sam',color:'',detail:'Performance training',status:'Ready for assessment',last:'4 Nov',target:11,program:false,baseline:true},
+ {id:'james',name:'James O\'Brien',initials:'JO',assigned:'jordan',color:'sand',detail:'Movement & mobility',status:'Program in progress',last:'3 Nov',target:10,program:true,baseline:true},
+ {id:'hannah',name:'Hannah Brooks',initials:'HB',assigned:'jordan',color:'',detail:'Return to strength',status:'Program in progress',last:'11 Nov',target:15,program:true,baseline:true},
+ {id:'oliver',name:'Oliver Martinez',initials:'OM',assigned:'sam',color:'lilac',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false},
+ {id:'zoe',name:'Zoe Bennett',initials:'ZB',assigned:'jordan',color:'blue',detail:'Performance training',status:'Ready for assessment',last:'1 Nov',target:8,program:false,baseline:true},
+ {id:'ethan',name:'Ethan Park',initials:'EP',assigned:'sam',color:'sand',detail:'Movement & mobility',status:'Program in progress',last:'2 Nov',target:11,program:true,baseline:true}
 ];
 const protocols = {
  strength:{name:'Isometric',mode:'Isometric',icon:'isometric',description:'Steady holds across each direction.',instruction:'Build to the target. Hold steady.',end:'Timed hold',unit:'kg',metric:'Avg peak force'},

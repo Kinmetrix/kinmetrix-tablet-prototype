@@ -321,22 +321,34 @@ function teamActivityBadgeMarkup(badge) {
 
 const PULSE_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+function pulseMemberSeed(personId) {
+  let n = 0;
+  for (let i = 0; i < personId.length; i++) n = (n * 33 + personId.charCodeAt(i)) % 997;
+  return n;
+}
+
+function pulseStampLabel(at) {
+  const date = new Date(at);
+  return `${date.getUTCDate()} ${PULSE_MONTHS[date.getUTCMonth()]}`;
+}
+
 function pulseHistoryExtras(personId) {
   const person = people.find(item => item.id === personId);
   if (!person?.baseline) return [];
-  return [
-    {type: 'strength', purpose: 'assessment', at: Date.UTC(2026, 8, 22, 14, 30), date: '22 Sept'},
-    {type: 'strength', purpose: 'session', at: Date.UTC(2026, 8, 28, 10, 30), date: '28 Sept'},
-    {type: 'rom', purpose: 'assessment', at: Date.UTC(2026, 9, 5, 11, 30), date: '5 Oct'},
-    {type: 'strength', purpose: 'session', at: Date.UTC(2026, 9, 8, 15, 30), date: '8 Oct'},
-    {type: 'strength', purpose: 'assessment', at: Date.UTC(2026, 9, 18, 9, 30), date: '18 Oct'},
-    {type: 'strength', purpose: 'session', at: Date.UTC(2026, 9, 22, 10, 30), date: '22 Oct'}
-  ].map((item, index) => {
-    const record = historyFixture(item.type, item.date, personId);
+  const offset = pulseMemberSeed(personId) % 5;
+  const slots = [
+    {type: 'strength', purpose: 'assessment', at: Date.UTC(2026, 7, 19 + offset, 14, 30)},
+    {type: 'strength', purpose: 'session', at: Date.UTC(2026, 8, 6 + (offset % 3), 10, 30)},
+    {type: 'rom', purpose: 'assessment', at: Date.UTC(2026, 8, 26 + (offset % 4), 11, 30)},
+    {type: 'strength', purpose: 'session', at: Date.UTC(2026, 9, 10 + (offset % 2), 15, 30)},
+    {type: 'strength', purpose: 'assessment', at: Date.UTC(2026, 9, 28 + offset, 9, 30)}
+  ];
+  return slots.map((item, index) => {
+    const record = historyFixture(item.type, pulseStampLabel(item.at), personId);
     record.id = `pulse-extra-${personId}-${index}`;
     record.purpose = item.purpose;
     record.completedAt = item.at;
-    record.date = item.date;
+    record.date = pulseStampLabel(item.at);
     return record;
   });
 }
