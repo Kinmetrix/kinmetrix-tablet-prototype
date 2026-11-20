@@ -10,6 +10,12 @@ From this directory: `yarn install` once, then `yarn dev`, and open http://local
 
 After JS changes: `yarn check` (syntax plus `review/` integration checks).
 
+## iPad canvas on the web
+
+In **landscape** at station widths (viewport no wider than **1580px**, or a wide desktop with presentation mode), `experience-stage.js` sets `experience-ipad-viewport` so layout uses **`min(820px, 100dvh)`** (iPad logical height, but shrinks on shorter devices such as iPad Mini **768px**). The sidebar stays full height; **Pulse and other long screens scroll inside the main pane** so the nav is not clipped. If the browser window is **taller than 820px**, the station block is **vertically centered** with gray letterboxing. Portrait uses the normal responsive height. Wide desktops also get `experience-presentation` (centered **1180px**, gray backdrop).
+
+PostHog was not queried in-repo for dominant iPad sizes; revisit `--experience-logical-width` in `dist/experience-stage.css` when analytics are available.
+
 ## Session modes (vocabulary)
 
 **Exercise modes** in the New picker are **Isometric**, **Isokinetic**, **Eccentric**, and **Range of motion** (range of motion is assessment-only). **Endurance is not a mode** — it is a **hold style on Isometric**:

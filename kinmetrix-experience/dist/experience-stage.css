@@ -1,0 +1,179 @@
+:root {
+  --experience-logical-width: 1180px;
+  --experience-logical-height: 820px;
+}
+
+/**
+ * Substitute 100dvh with the iPad logical height so devtools, resize, and wide
+ * presentation share the same station dimensions. Long content scrolls in the
+ * main pane — not clipped at the shell edge.
+ */
+html.experience-ipad-viewport {
+  /* Prototype target 820; shorter iPads (e.g. Mini 768) use the real viewport height. */
+  --experience-vh: min(var(--experience-logical-height), 100dvh);
+  --experience-vw: min(var(--experience-logical-width), 100vw);
+}
+
+body.experience-presentation {
+  background: #e8e8ed;
+}
+
+body.experience-presentation #app {
+  width: var(--experience-vw, var(--experience-logical-width));
+  max-width: calc(100vw - 32px);
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+  background: var(--page);
+}
+
+html.experience-ipad-viewport body {
+  margin: 0;
+  min-height: 100dvh;
+}
+
+/* Viewport taller than 820px logical station — letterbox and center vertically. */
+@media (min-height: 821px) {
+  html.experience-ipad-viewport body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #e8e8ed;
+  }
+
+  html.experience-ipad-viewport #app {
+    flex: 0 0 auto;
+    box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+  }
+
+  html.experience-ipad-viewport #overlay-root {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  html.experience-ipad-viewport #overlay-root > * {
+    pointer-events: auto;
+  }
+}
+
+html.experience-ipad-viewport #app {
+  width: 100%;
+  max-width: var(--experience-vw);
+  max-height: var(--experience-vh);
+  min-height: var(--experience-vh);
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: var(--page);
+}
+
+html.experience-ipad-viewport .app-shell,
+html.experience-ipad-viewport .session-page,
+html.experience-ipad-viewport .welcome,
+html.experience-ipad-viewport .people-finder,
+html.experience-ipad-viewport .member-workspace,
+html.experience-ipad-viewport .team-overview {
+  min-height: calc(var(--experience-vh) - var(--prototype-footer-height)) !important;
+}
+
+html.experience-ipad-viewport .app-shell,
+html.experience-ipad-viewport .session-page {
+  height: calc(var(--experience-vh) - var(--prototype-footer-height)) !important;
+  max-height: calc(var(--experience-vh) - var(--prototype-footer-height)) !important;
+  max-width: var(--experience-vw, var(--experience-logical-width));
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+html.experience-ipad-viewport .sidebar {
+  position: relative;
+  top: auto;
+  align-self: stretch;
+  height: calc(var(--experience-vh) - var(--prototype-footer-height)) !important;
+  max-height: calc(var(--experience-vh) - var(--prototype-footer-height)) !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+html.experience-ipad-viewport .shell-main {
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+html.experience-ipad-viewport .templates-layered-shell {
+  min-height: calc(var(--experience-vh) - var(--prototype-footer-height)) !important;
+  height: calc(var(--experience-vh) - var(--prototype-footer-height)) !important;
+  max-height: calc(var(--experience-vh) - var(--prototype-footer-height)) !important;
+  --templates-card-height: calc(
+    var(--experience-vh) - var(--prototype-footer-height) - var(--templates-shell-inset) * 2
+  );
+}
+
+html.experience-ipad-viewport .templates-layered-shell .sidebar {
+  height: var(--templates-card-height) !important;
+  min-height: var(--templates-card-height) !important;
+  max-height: var(--templates-card-height) !important;
+}
+
+html.experience-ipad-viewport .templates-layered-shell .shell-main {
+  height: var(--templates-card-height) !important;
+  min-height: var(--templates-card-height) !important;
+  max-height: var(--templates-card-height) !important;
+  overflow: hidden;
+}
+
+html.experience-ipad-viewport .templates-layered-shell .shell-main > main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+html.experience-ipad-viewport .people-layout {
+  min-height: calc(var(--experience-vh) - 112px) !important;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+html.experience-ipad-viewport .people-layout .workspace {
+  overflow-y: auto;
+  min-height: 0;
+}
+
+html.experience-ipad-viewport .session-page .session-content,
+html.experience-ipad-viewport .guided .session-content {
+  overflow-y: auto;
+  max-height: calc(var(--experience-vh) - 120px);
+}
+
+@media print {
+  body.experience-presentation {
+    background: var(--surface);
+  }
+
+  body.experience-presentation #app {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    box-shadow: none;
+  }
+
+  html.experience-ipad-viewport .app-shell,
+  html.experience-ipad-viewport .session-page {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
