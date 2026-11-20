@@ -11,7 +11,7 @@ const icons = {
  library:'<path d="m16 3 5 17M4 3v18M9 3v18M14 3v18"/>',
  device:'<rect x="3" y="3" width="18" height="14" rx="3"/><path d="M8 21h8m-4-4v4m-5-10h3l2-3 2 6 2-3h2"/>',
  settings:'<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="currentColor"/><circle cx="16" cy="12" r="2" fill="currentColor"/><circle cx="8" cy="18" r="2" fill="currentColor"/>',
- chevron:'<path d="m9 5 7 7-7 7"/>',down:'<path d="m6 9 6 6 6-6"/>',back:'<path d="m12 19-7-7 7-7m-7 7h15"/>',search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+ chevron:'<path d="m9 5 7 7-7 7"/>',down:'<path d="m6 9 6 6 6-6"/>',calendar:'<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4m8-4v4M4 11h16"/>',back:'<path d="m12 19-7-7 7-7m-7 7h15"/>',search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
  play:'<path d="m8 4 12 8-12 8Z"/>',assessment:'<path d="M4 19V5m0 14h16M8 15l4-7 4 4 4-8"/>',training:'<path d="M7 5v14m10-14v14M3 8v8m18-8v8M7 12h10"/>',history:'<path d="M3 11a9 9 0 1 1 2.7 7M3 4v7h7m2-4v5l4 2"/>',
  check:'<path d="m5 12 4 4L19 6"/>',close:'<path d="m6 6 12 12M6 18 18 6"/>',plus:'<path d="M12 5v14M5 12h14"/>',minus:'<path d="M5 12h14"/>',
  endurance:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6m-3 0v3"/>',rom:'<path d="M4 18a8 8 0 0 1 16 0M12 18l5-9m-13 9h16"/><circle cx="12" cy="18" r="2"/>',eccentric:'<path d="m7 4-4 4 4 4M3 8h11a5 5 0 0 1 5 5v7m-4-4 4 4 4-4"/>',
@@ -135,6 +135,10 @@ function render(){
  syncRepChartLayout();
  if(state.stage==='live'&&isMovementMode(state.setup.type))modeUpdateLive();
  if(state.nav==='find'&&!state.helpArticle&&!state.overlay) focusFindInput();
+ if(state.nav==='pulse'&&typeof teamOverviewUI==='function'){
+  if(typeof pulseRangePickerTeardown==='function'&&!teamOverviewUI().rangePickerOpen) pulseRangePickerTeardown();
+  if(typeof pulseRangePickerAfterRender==='function'&&teamOverviewUI().rangePickerOpen) pulseRangePickerAfterRender();
+ }
 }
 function focusFindInput(){
  const input=$('#roster-search');
@@ -146,8 +150,8 @@ function focusFindInput(){
 function staffNavActive(nav,origin){if(isTeamHubNav()||nav==='device')return '';if(nav==='people')return origin==='team'||origin==='programs'?'find':origin||'find';if(nav==='find')return 'find';return nav;}
 function shellMainView(){if(state.nav==='device')return devicePage();if(isTeamHubNav())return teamHubPage();if(state.nav==='pulse')return pulsePage();if(state.nav==='roster')return rosterPage();if(state.nav==='programs')return programsPage();if(state.nav==='find')return state.helpArticle?helpArticleView():globalFindView();return peopleView();}
 function shell(){const c=clinician(),staff=state.actor==='coach',deviceOpen=state.nav==='device',active=staffNavActive(state.nav,state.memberOrigin);const templatesLayered=true;return `<div class="app-shell ${staff?'staff-shell':'member-shell'}${templatesLayered?' templates-layered-shell':''}">
- <aside class="sidebar" aria-label="${staff?'Clinic navigation':'Private member navigation'}">${brand()}<nav class="side-nav" aria-label="Main navigation">
- ${staff?['find','pulse','roster'].map(key=>navItem({pulse:'Pulse',find:'Find',roster:'Roster'}[key],`nav-${key}`,{pulse:'pulse',find:'search',roster:'people'}[key],active===key)).join(''):navItem('My progress','nav-find','user',true,' aria-label="My progress · Private"')}
+ <aside class="sidebar" aria-label="${staff?'Clinic navigation':'Private member navigation'}">${staff?'':brand()}<nav class="side-nav" aria-label="Main navigation">
+ ${staff?`${brand()}${['find','pulse','roster'].map(key=>navItem({pulse:'Pulse',find:'Find',roster:'Roster'}[key],`nav-${key}`,{pulse:'pulse',find:'search',roster:'people'}[key],active===key)).join('')}`:navItem('My progress','nav-find','user',true,' aria-label="My progress · Private"')}
  </nav><div class="side-bottom" role="group" aria-label="${staff?'Device and clinician':'Device controls'}">
  <button class="nav-button nav-station ${deviceOpen?'active':''}" data-action="nav-device" ${deviceOpen?'aria-current="page"':''} aria-label="Device · ${state.deviceReady?'Ready':'Unavailable'}" title="${state.deviceReady?'Device ready':'Device unavailable'}"><span class="nav-glyph-wrap nav-station-icon">${navGlyph('device',deviceOpen)}<span class="status-dot ${state.deviceReady?'':'offline'}"></span></span><span class="nav-label">${state.deviceReady?'Device':'Offline'}</span></button>
  ${staff?`<button class="nav-button nav-clinician" data-action="switch-clinician" aria-label="Switch clinician · ${c.name} · ${c.role}" title="${c.name} · Switch clinician" aria-haspopup="dialog"><span class="nav-glyph-wrap nav-clinician-glyph">${avatar(c,'mini')}</span><span class="nav-label">${c.name.split(' ')[0]}</span></button>${navItem('Lock','lock-station','lock',false,' aria-label="Lock station"')}`:navItem('Finish','signout','logout',false)}

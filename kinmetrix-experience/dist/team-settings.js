@@ -413,10 +413,25 @@ function visitSettings(section = null) {
   else visitTeamHub(null);
 }
 
-function teamHubCardButton(item) {
-  return `<button type="button" class="team-hub-card" data-action="team-hub-card" data-card="${item.id}">
-    <span class="team-hub-card-text"><strong>${escapeHTML(item.label)}</strong><small>${escapeHTML(teamHubCardHint(item.id) || item.description)}</small></span>
+function teamHubPolicyChip(item) {
+  const hint = teamHubCardHint(item.id) || item.description;
+  return `<button type="button" class="team-hub-policy-chip" data-action="team-hub-card" data-card="${item.id}">
+    <span class="team-hub-policy-chip-body">
+      <span class="team-hub-policy-chip-label">${escapeHTML(item.label)}</span>
+      <strong>${escapeHTML(hint)}</strong>
+    </span>
     ${icon('chevron', 'icon-sm')}
+  </button>`;
+}
+
+function teamHubLibraryTile(item) {
+  const hint = teamHubCardHint(item.id) || item.description;
+  return `<button type="button" class="team-hub-library-tile team-hub-library-tile--${item.id}" data-action="team-hub-card" data-card="${item.id}">
+    <span class="team-hub-library-tile-main">
+      <strong>${escapeHTML(item.label)}</strong>
+      <small>${escapeHTML(item.description)}</small>
+    </span>
+    <span class="team-hub-library-tile-meta">${escapeHTML(hint)}</span>
   </button>`;
 }
 
@@ -430,14 +445,11 @@ function teamHubCardsMarkup() {
       </div>
     </div>
   </header>
-  <div class="team-hub-sections">
-    <section class="team-hub-section" aria-labelledby="team-hub-policy-title">
-      <h2 id="team-hub-policy-title" class="team-hub-section-title">Team policy</h2>
-      <div class="team-hub-card-grid settings-links settings-links--grid-2">${SETTINGS_RAIL_SECTIONS.map(teamHubCardButton).join('')}</div>
-    </section>
+  <div class="team-hub-sections team-hub-sections--deck">
+    <div class="team-hub-policy-ribbon" aria-label="Team policy">${SETTINGS_RAIL_SECTIONS.map(teamHubPolicyChip).join('')}</div>
     <section class="team-hub-section" aria-labelledby="team-hub-libraries-title">
       <h2 id="team-hub-libraries-title" class="team-hub-section-title">Libraries</h2>
-      <div class="team-hub-card-grid settings-links settings-links--grid-2">${TEMPLATE_LIBRARIES.map(teamHubCardButton).join('')}</div>
+      <div class="team-hub-library-deck">${TEMPLATE_LIBRARIES.map(teamHubLibraryTile).join('')}</div>
     </section>
   </div>`;
 }

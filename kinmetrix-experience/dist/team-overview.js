@@ -19,12 +19,20 @@ function teamOverviewUI() {
   if (!TEAM_OVERVIEW_PERIODS[ui.period] && ui.period !== 'custom') ui.period = 'last-30';
   if (!PULSE_ACTIVITY_FILTERS[ui.activityFilter]) ui.activityFilter = 'all';
   if (!PULSE_ACTIVITY_SORTS[ui.activitySort]) ui.activitySort = 'newest';
+  if (ui.activitySearch == null) ui.activitySearch = '';
+  if (ui.activityTypeOpen == null) ui.activityTypeOpen = false;
+  if (ui.activitySortOpen == null) ui.activitySortOpen = false;
+  if (ui.rangePickerOpen == null) ui.rangePickerOpen = false;
   pulseEnsureRange(ui);
   return ui;
 }
 
 function visitPulse() {
   if (state.actor !== 'coach') return;
+  const ui = teamOverviewUI();
+  ui.activityTypeOpen = false;
+  ui.activitySortOpen = false;
+  ui.rangePickerOpen = false;
   state.nav = 'pulse';
   state.personId = null;
   state.pendingSetup = null;
@@ -143,6 +151,21 @@ function teamActivityResultSummary(record) {
   return null;
 }
 
+function teamActivityPulseMetrics(record) {
+  if (record.partial) return {force: null, stability: null};
+  try {
+    const data = reportData(record);
+    const metric = reportMetric(record);
+    const force = metric.field === 'force'
+      ? (teamForceLabel(data.force) || `${data.force.toFixed(1)} kg`)
+      : null;
+    const stability = Number.isFinite(data.stability) ? Math.round(data.stability) : null;
+    return {force, stability};
+  } catch (_) {
+    return {force: null, stability: null};
+  }
+}
+
 function teamActivityMeta(record, memberRecords) {
   const proto = protocols[record.type]?.name || 'Session';
   const programName = record.programName || record.sessionSettings?.programName;
@@ -228,8 +251,9 @@ function teamOverviewActivityRows(roster, periodKey) {
 
 function pulseKpiSnapshot(rows) {
   const trainingSessions = rows.filter(row => row.purpose === 'session').length;
+  const assessments = rows.filter(row => row.purpose === 'assessment').length;
   const membersActive = new Set(rows.map(row => row.memberId)).size;
-  return {totalActivity: rows.length, membersActive, trainingSessions};
+  return {totalActivity: rows.length, membersActive, trainingSessions, assessments};
 }
 
 function teamOverviewKpis(roster, periodKey) {
@@ -274,6 +298,11 @@ function pulseActivityMatchesFilter(row, filter) {
   if (filter === 'assessment') return row.purpose === 'assessment';
   if (filter === 'session') return row.purpose === 'session';
   return true;
+}
+
+function pulseActivityMatchesSearch(row, term) {
+  if (!term) return true;
+  return row.memberName.toLowerCase().includes(term);
 }
 
 function sortPulseActivity(rows, sortKey) {
@@ -331,6 +360,7 @@ function pulseRowsInWindow(roster, start, end) {
         badge: meta.badge,
         purpose: meta.purpose,
         resultSummary: teamActivityResultSummary(record),
+        metrics: teamActivityPulseMetrics(record),
         timeLabel: teamActivityTimeLabel(record),
         at: recordCompletedAt(record)
       });
@@ -361,10 +391,11 @@ function pulseModel() {
   const kpis = [
     {id: 'totalActivity', label: 'Total activity', value: current.totalActivity, previous: previous.totalActivity},
     {id: 'membersActive', label: 'Members active', value: current.membersActive, previous: previous.membersActive},
-    {id: 'trainingSessions', label: 'Sessions', value: current.trainingSessions, previous: previous.trainingSessions}
+    {id: 'trainingSessions', label: 'Sessions', value: current.trainingSessions, previous: previous.trainingSessions},
+    {id: 'assessments', label: 'Assessments', value: current.assessments, previous: previous.assessments}
   ].map(kpi => ({...kpi, deltaLabel: teamKpiDelta(kpi.value, kpi.previous)}));
   const activity = sortPulseActivity(
-    currentRows.filter(row => pulseActivityMatchesFilter(row, ui.activityFilter)),
+    currentRows.filter(row => pulseActivityMatchesFilter(row, ui.activityFilter) && pulseActivityMatchesSearch(row, ui.activitySearch.trim().toLowerCase())),
     ui.activitySort
   );
   return {
@@ -383,7 +414,22 @@ function pulseDateRange(start, end) {
   const from = new Date(pulseMidnight(start));
   const to = new Date(pulseMidnight(end));
   const fmt = date => `${date.getUTCDate()} ${PULSE_MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
-  return `${fmt(from)} – ${fmt(to)}`;
+  return `${fmt(from)} ${fmt(to)}`;
+}
+
+function pulseBrushWindowFlushClass(layout) {
+  const endLeft = layout.left + layout.width;
+  const flushStart = layout.left <= 0.5;
+  const flushEnd = endLeft >= 99.5;
+  return `${flushStart ? ' is-flush-start' : ''}${flushEnd ? ' is-flush-end' : ''}`;
+}
+
+function pulseBrushSyncWindow(windowEl, layout) {
+  if (!windowEl) return;
+  windowEl.style.left = `${layout.left}%`;
+  windowEl.style.width = `${Math.min(layout.width, 100 - layout.left)}%`;
+  windowEl.classList.toggle('is-flush-start', layout.left <= 0.5);
+  windowEl.classList.toggle('is-flush-end', layout.left + layout.width >= 99.5);
 }
 
 function pulseBrushLayout(startI, endI) {
@@ -398,8 +444,168 @@ function pulseBrushLayout(startI, endI) {
     left: (a / PULSE_BRUSH_DAYS) * 100,
     width: ((b - a + 1) / PULSE_BRUSH_DAYS) * 100,
     start, end, span,
-    label: `${pulseDateRange(start, end)} · ${span} ${span === 1 ? 'day' : 'days'}`
+    label: pulseDateRange(start, end)
   };
+}
+
+function pulseInputDate(at) {
+  const date = new Date(pulseMidnight(at));
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(date.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function pulseParseInputDate(value) {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return NaN;
+  const [y, m, d] = value.split('-').map(Number);
+  return Date.UTC(y, m - 1, d);
+}
+
+function pulseRangePickerMonthGrid(rangeStart, rangeEnd) {
+  const view = new Date(pulseMidnight(rangeEnd));
+  const year = view.getUTCFullYear();
+  const month = view.getUTCMonth();
+  const title = `${PULSE_MONTHS[month]} ${year}`;
+  const firstDow = new Date(Date.UTC(year, month, 1)).getUTCDay();
+  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  const rangeStartDay = pulseMidnight(rangeStart);
+  const rangeEndDay = pulseMidnight(rangeEnd);
+  let cells = '';
+  for (let pad = 0; pad < firstDow; pad++) cells += '<span class="pulse-cal-pad" aria-hidden="true"></span>';
+  for (let day = 1; day <= daysInMonth; day++) {
+    const at = Date.UTC(year, month, day);
+    const inRange = at >= rangeStartDay && at <= rangeEndDay;
+    const endpoint = at === rangeStartDay || at === rangeEndDay;
+    cells += `<button type="button" class="pulse-cal-day${inRange ? ' is-in-range' : ''}${endpoint ? ' is-endpoint' : ''}" tabindex="-1" aria-disabled="true">${day}</button>`;
+  }
+  return `<div class="pulse-range-calendar" aria-hidden="true">
+    <div class="pulse-range-calendar-head">
+      <button type="button" class="pulse-cal-nav" tabindex="-1" aria-label="Previous month">${icon('chevron', 'icon-sm pulse-cal-prev')}</button>
+      <strong>${escapeHTML(title)}</strong>
+      <button type="button" class="pulse-cal-nav" tabindex="-1" aria-label="Next month">${icon('chevron', 'icon-sm pulse-cal-next')}</button>
+    </div>
+    <div class="pulse-cal-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+    <div class="pulse-cal-grid">${cells}</div>
+  </div>`;
+}
+
+const PULSE_RANGE_PICKER_GAP = 8;
+const PULSE_RANGE_PICKER_MARGIN = 12;
+let pulseRangePickerLayoutHooked = false;
+
+function pulseRangePickerBounds() {
+  const shell = document.querySelector('.templates-layered-shell .shell-main') || document.querySelector('.shell-main');
+  const margin = PULSE_RANGE_PICKER_MARGIN;
+  if (!shell) {
+    return {left: margin, top: margin, right: window.innerWidth - margin, bottom: window.innerHeight - margin};
+  }
+  const rect = shell.getBoundingClientRect();
+  return {left: rect.left + margin, top: rect.top + margin, right: rect.right - margin, bottom: rect.bottom - margin};
+}
+
+function pulseRangePickerOverflows(picker, bounds) {
+  const rect = picker.getBoundingClientRect();
+  return rect.left < bounds.left - 0.5
+    || rect.top < bounds.top - 0.5
+    || rect.right > bounds.right + 0.5
+    || rect.bottom > bounds.bottom + 0.5;
+}
+
+function pulseRangePickerTeardown() {
+  document.querySelectorAll('#pulse-range-picker').forEach(node => node.remove());
+}
+
+function pulseRangePickerEnsureMounted() {
+  const nodes = [...document.querySelectorAll('#pulse-range-picker')];
+  if (!nodes.length) return null;
+  const picker = nodes.pop();
+  nodes.forEach(node => node.remove());
+  if (picker.parentElement !== document.body) document.body.appendChild(picker);
+  return picker;
+}
+
+function pulseRangePickerFit(picker) {
+  const trigger = document.getElementById('pulse-brush-label');
+  if (!picker || !trigger) return false;
+  const bounds = pulseRangePickerBounds();
+  const maxW = Math.max(200, bounds.right - bounds.left);
+  picker.style.position = 'fixed';
+  picker.style.right = 'auto';
+  picker.style.bottom = 'auto';
+  picker.style.width = `${Math.min(320, maxW)}px`;
+  picker.style.maxHeight = `${Math.max(240, bounds.bottom - bounds.top)}px`;
+  picker.style.overflow = 'auto';
+
+  const triggerRect = trigger.getBoundingClientRect();
+  const gap = PULSE_RANGE_PICKER_GAP;
+  let top = triggerRect.bottom + gap;
+  const pickerH = picker.offsetHeight;
+  if (top + pickerH > bounds.bottom) top = triggerRect.top - gap - pickerH;
+  if (top < bounds.top) top = bounds.top;
+
+  let left = triggerRect.left;
+  const pickerW = picker.offsetWidth;
+  if (left + pickerW > bounds.right) left = bounds.right - pickerW;
+  if (left < bounds.left) left = bounds.left;
+
+  picker.style.top = `${Math.round(top)}px`;
+  picker.style.left = `${Math.round(left)}px`;
+
+  const rect = picker.getBoundingClientRect();
+  if (rect.left < bounds.left) left += bounds.left - rect.left;
+  if (rect.right > bounds.right) left -= rect.right - bounds.right;
+  if (rect.top < bounds.top) top += bounds.top - rect.top;
+  if (rect.bottom > bounds.bottom) top -= rect.bottom - bounds.bottom;
+
+  picker.style.top = `${Math.round(top)}px`;
+  picker.style.left = `${Math.round(left)}px`;
+  return !pulseRangePickerOverflows(picker, bounds);
+}
+
+function pulseRangePickerBindLayout() {
+  if (pulseRangePickerLayoutHooked) return;
+  pulseRangePickerLayoutHooked = true;
+  const refit = () => {
+    if (!teamOverviewUI().rangePickerOpen) return;
+    pulseRangePickerPosition();
+  };
+  window.addEventListener('resize', refit);
+  window.addEventListener('scroll', refit, true);
+}
+
+function pulseRangePickerPosition() {
+  pulseRangePickerBindLayout();
+  const picker = pulseRangePickerEnsureMounted();
+  if (!picker) return;
+  for (let attempt = 0; attempt < 12; attempt++) {
+    if (pulseRangePickerFit(picker)) return;
+  }
+}
+
+function pulseRangePickerAfterRender() {
+  if (!teamOverviewUI().rangePickerOpen) return;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => pulseRangePickerPosition());
+  });
+}
+
+function pulseRangePickerPanel(model) {
+  if (!model.ui.rangePickerOpen) return '';
+  const startVal = pulseInputDate(model.window.start);
+  const endVal = pulseInputDate(model.window.end);
+  return `<div class="pulse-range-picker" id="pulse-range-picker" role="dialog" aria-label="Custom date range">
+    <p class="pulse-range-picker-title">Custom range</p>
+    <div class="pulse-range-picker-fields">
+      <label class="pulse-range-field"><span class="pulse-range-field-label">Start</span><input type="date" id="pulse-range-start" value="${startVal}"></label>
+      <label class="pulse-range-field"><span class="pulse-range-field-label">End</span><input type="date" id="pulse-range-end" value="${endVal}"></label>
+    </div>
+    ${pulseRangePickerMonthGrid(model.window.start, model.window.end)}
+    <div class="pulse-range-picker-actions">
+      <button type="button" class="text-button" data-action="pulse-range-picker-cancel">Cancel</button>
+      <button type="button" class="button small-button primary" data-action="pulse-range-picker-apply">Apply</button>
+    </div>
+  </div>`;
 }
 
 function pulseBrushMonthMarks(domain) {
@@ -424,34 +630,40 @@ function pulseRangeControl(model) {
     const on = index >= layout.a && index <= layout.b;
     return `<span class="${on ? 'is-in' : ''}" style="height:${height}%"></span>`;
   }).join('');
-  return `<div class="pulse-brush">
-    <div class="pulse-brush-head">
-      <p class="pulse-brush-label tabular" id="pulse-brush-label">${escapeHTML(layout.label)}</p>
-      <div class="segmented" role="group" aria-label="Snap to a recent stretch">
-        ${Object.entries(TEAM_OVERVIEW_PERIODS).map(([value, item]) =>
-          `<button type="button" class="${model.ui.period === value ? 'active' : ''}" data-action="pulse-period" data-value="${value}" aria-pressed="${model.ui.period === value}">${item.presetLabel.replace('Last ', '')}</button>`
-        ).join('')}
-      </div>
+  const custom = model.ui.period === 'custom';
+  return `<div class="pulse-range-row" aria-label="Date range for this stretch">
+    <div class="pulse-range-label-anchor">
+      <button type="button" class="pulse-range-label-button tabular" id="pulse-brush-label" data-action="pulse-range-picker-toggle" aria-haspopup="dialog" aria-expanded="${model.ui.rangePickerOpen}" aria-label="Date range, ${escapeHTML(layout.label)}. Choose dates"${model.ui.rangePickerOpen ? ' aria-controls="pulse-range-picker"' : ''}>
+        <span class="pulse-range-label-text">${escapeHTML(layout.label)}</span>
+        ${custom ? '<span class="pulse-brush-custom">Custom</span>' : ''}
+        ${icon('calendar', 'icon-sm')}
+      </button>
+      ${pulseRangePickerPanel(model)}
     </div>
-    <div class="pulse-brush-track" role="group" aria-labelledby="pulse-brush-label">
-      <div class="pulse-brush-bars" aria-hidden="true">${bars}</div>
-      <div class="pulse-brush-window" data-brush="move" style="left:${layout.left}%;width:${layout.width}%"></div>
+    <div class="pulse-brush-track pulse-brush-track--inline" role="group" aria-labelledby="pulse-brush-label" title="Drag to set a custom date range">
+      <div class="pulse-brush-stage">
+        <div class="pulse-brush-bars" aria-hidden="true">${bars}</div>
+      </div>
+      <div class="pulse-brush-window${pulseBrushWindowFlushClass(layout)}" data-brush="move" style="left:${layout.left}%;width:${Math.min(layout.width, 100 - layout.left)}%"></div>
       <button type="button" class="pulse-brush-handle is-start" data-brush="start" style="left:${layout.left}%" aria-label="Start of range"></button>
       <button type="button" class="pulse-brush-handle is-end" data-brush="end" style="left:${layout.left + layout.width}%" aria-label="End of range"></button>
     </div>
-    <div class="pulse-brush-months" aria-hidden="true">${pulseBrushMonthMarks(domain)}</div>
+    <div class="pulse-brush-presets segmented" role="group" aria-label="Snap to a recent stretch">
+      ${Object.entries(TEAM_OVERVIEW_PERIODS).map(([value, item]) =>
+        `<button type="button" class="${model.ui.period === value ? 'active' : ''}" data-action="pulse-period" data-value="${value}" aria-pressed="${model.ui.period === value}">${item.presetLabel.replace('Last ', '')}</button>`
+      ).join('')}
+    </div>
   </div>`;
 }
 
 function pulseHead(model, desc) {
-  return `<header class="settings-pane-head team-overview-head">
+  return `<header class="settings-pane-head team-overview-head pulse-head-compact">
     <div class="settings-pane-head-row team-overview-head-row">
       <div class="settings-pane-head-text">
         <h1>Pulse</h1>
         <p class="settings-pane-desc">${escapeHTML(model.team.name)}. ${escapeHTML(desc)}</p>
       </div>
     </div>
-    ${pulseRangeControl(model)}
   </header>`;
 }
 
@@ -462,44 +674,105 @@ function pulseKpiDeltaClass(label) {
 function pulseMetricLabel(id) {
   if (id === 'totalActivity') return 'Activity';
   if (id === 'membersActive') return 'Members';
+  if (id === 'assessments') return 'Assessments';
   return 'Sessions';
 }
 
-function pulseMetrics(kpis) {
-  return `<dl class="pulse-metrics" aria-label="Team summary">${kpis.map(kpi =>
-    `<div>
-      <dt>${pulseMetricLabel(kpi.id)}</dt>
-      <dd class="tabular">${kpi.value}</dd>
-      <p class="pulse-metrics-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
-    </div>`
-  ).join('')}</dl>`;
+function pulseKpiFootnote(kpi) {
+  if (kpi.id === 'assessments') return 'This stretch';
+  return kpi.deltaLabel;
 }
 
-function pulseActivityList(model) {
+function pulseKpiStrip(kpis) {
+  return `<div class="pulse-kpi-strip" aria-label="Summary for this stretch">${kpis.map(kpi =>
+    `<article class="team-overview-kpi pulse-kpi-strip-card">
+      <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}</span>
+      <span class="team-overview-kpi-value tabular">${kpi.value}</span>
+      <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(pulseKpiFootnote(kpi))}</p>
+    </article>`
+  ).join('')}</div>`;
+}
+
+function pulseActivityFilterButtonLabel(ui) {
+  return ui.activityFilter === 'all' ? 'All' : PULSE_ACTIVITY_FILTERS[ui.activityFilter];
+}
+
+function pulseActivitySortButtonLabel(ui) {
+  if (ui.activitySort === 'newest') return 'Newest';
+  if (ui.activitySort === 'oldest') return 'Oldest';
+  return 'A–Z';
+}
+
+function pulseActivityTypePopover(ui) {
+  if (!ui.activityTypeOpen) return '';
+  const options = Object.entries(PULSE_ACTIVITY_FILTERS).map(([value, label]) =>
+    `<button type="button" class="pulse-activity-filter-option${ui.activityFilter === value ? ' is-selected' : ''}" data-action="pulse-activity-filter" data-value="${value}" role="menuitemradio" aria-checked="${ui.activityFilter === value}">${escapeHTML(label)}</button>`
+  ).join('');
+  return `<div class="pulse-activity-filter-popover" id="pulse-activity-type-popover" role="menu" aria-label="Visit type">${options}</div>`;
+}
+
+function pulseActivitySortPopover(ui) {
+  if (!ui.activitySortOpen) return '';
+  const options = Object.entries(PULSE_ACTIVITY_SORTS).map(([value, label]) =>
+    `<button type="button" class="pulse-activity-filter-option${ui.activitySort === value ? ' is-selected' : ''}" data-action="pulse-activity-sort" data-value="${value}" role="menuitemradio" aria-checked="${ui.activitySort === value}">${escapeHTML(label)}</button>`
+  ).join('');
+  return `<div class="pulse-activity-filter-popover" id="pulse-activity-sort-popover" role="menu" aria-label="Sort visits">${options}</div>`;
+}
+
+function pulseActivityToolbar(ui) {
+  const typeControl = `<div class="pulse-activity-filter-anchor">
+    <button type="button" class="pulse-activity-bar-button${ui.activityFilter !== 'all' ? ' is-active' : ''}" data-action="pulse-activity-type-toggle" aria-haspopup="menu" aria-expanded="${ui.activityTypeOpen}" aria-label="Visit type, ${pulseActivityFilterButtonLabel(ui)}"${ui.activityTypeOpen ? ' aria-controls="pulse-activity-type-popover"' : ''}>
+      <span class="muted">Type</span> ${escapeHTML(pulseActivityFilterButtonLabel(ui))}
+    </button>
+    ${pulseActivityTypePopover(ui)}
+  </div>`;
+  const sortControl = `<div class="pulse-activity-filter-anchor">
+    <button type="button" class="pulse-activity-bar-button${ui.activitySort !== 'newest' ? ' is-active' : ''}" data-action="pulse-activity-sort-toggle" aria-haspopup="menu" aria-expanded="${ui.activitySortOpen}" aria-label="Sort, ${escapeHTML(PULSE_ACTIVITY_SORTS[ui.activitySort])}"${ui.activitySortOpen ? ' aria-controls="pulse-activity-sort-popover"' : ''}>
+      <span class="muted">Sort</span> ${escapeHTML(pulseActivitySortButtonLabel(ui))}
+    </button>
+    ${pulseActivitySortPopover(ui)}
+  </div>`;
+  const search = `<label class="team-overview-search pulse-activity-bar-search">
+    <span class="sr-only">Search by name</span>
+    ${icon('search')}
+    <input id="team-overview-pulse-search" type="search" inputmode="search" autocomplete="off" placeholder="Search" value="${escapeHTML(ui.activitySearch)}">
+  </label>`;
+  return `<header class="pulse-activity-head team-overview-activity-head"><h2>Activity</h2></header>
+    <div class="pulse-activity-bar team-overview-activity-toolbar">${typeControl}${sortControl}${search}</div>`;
+}
+
+function pulseTableOutcomeLabel(item) {
+  const {force, stability} = item.metrics || {force: null, stability: null};
+  if (force == null && stability == null) return '—';
+  const parts = [];
+  if (force != null) parts.push(force);
+  if (stability != null) parts.push(`${stability}%`);
+  return parts.join(' · ');
+}
+
+function pulseActivityVisitBlock(item, avatarMarkup) {
+  const badge = teamActivityBadgeMarkup(item.badge);
+  return `<div class="pulse-visit">${avatarMarkup}<span class="pulse-visit-stack"><strong>${escapeHTML(item.memberName)}</strong><span class="pulse-visit-sub">${badge}<small class="muted">${escapeHTML(item.kindLabel)}</small></span></span></div>`;
+}
+
+function pulseOperationsTable(model) {
   const {ui, activity, activityAll, roster} = model;
   const face = id => roster.find(person => person.id === id) || {initials: '•', name: ''};
-  const filterChips = `<div class="segmented team-overview-activity-filters" role="group" aria-label="Filter activity">${Object.entries(PULSE_ACTIVITY_FILTERS).map(([value, label]) =>
-    `<button type="button" class="${ui.activityFilter === value ? 'active' : ''}" data-action="pulse-activity-filter" data-value="${value}" aria-pressed="${ui.activityFilter === value}">${label}</button>`
-  ).join('')}</div>`;
-  const sortControl = `<label class="team-overview-activity-sort"><span class="sr-only">Sort activity</span>
-    <select id="team-overview-activity-sort">${Object.entries(PULSE_ACTIVITY_SORTS).map(([value, label]) =>
-      `<option value="${value}" ${ui.activitySort === value ? 'selected' : ''}>${label}</option>`
-    ).join('')}</select></label>`;
-  return `<section class="team-overview-activity team-overview-activity--expanded" aria-label="Activity">
-    <header class="team-overview-activity-head">
-      <h2>Activity</h2>
-      <div class="team-overview-activity-toolbar">${filterChips}${sortControl}</div>
-    </header>
-    ${activity.length ? `<ul class="team-overview-activity-list">${activity.map(item =>
-      `<li><button type="button" class="team-overview-activity-row" data-action="open-pulse-person" data-id="${item.memberId}">
-        ${avatar(face(item.memberId), 'mini')}
-        <span class="team-overview-activity-main"><strong>${escapeHTML(item.memberName)}</strong>
-          <span class="team-overview-activity-detail">${teamActivityBadgeMarkup(item.badge)}<small>${escapeHTML(item.kindLabel)}</small></span>
-          ${item.resultSummary ? `<small class="team-overview-activity-result">${escapeHTML(item.resultSummary)}</small>` : ''}
-        </span>
-        <span class="team-overview-activity-rel">${escapeHTML(item.timeLabel)}</span>
-      </button></li>`
-    ).join('')}</ul>` : `<p class="muted team-overview-activity-empty">${activityAll.length ? 'No sessions match this filter.' : 'No sessions in this period.'}</p>`}
+  const list = activity.length ? activity.map(item => {
+    const av = avatar(face(item.memberId), 'mini');
+    const outcome = pulseTableOutcomeLabel(item);
+    return `<li class="pulse-activity-row" data-action="open-pulse-person" data-id="${item.memberId}" data-member-name="${escapeHTML(item.memberName)}" title="${escapeHTML(item.kindLabel)}" tabindex="0" role="link">
+      ${pulseActivityVisitBlock(item, av)}
+      <span class="pulse-outcome tabular">${outcome === '—' ? '<span class="muted">—</span>' : escapeHTML(outcome)}</span>
+      <span class="pulse-when muted tabular">${escapeHTML(item.timeLabel)}</span>
+    </li>`;
+  }).join('') : `<li class="pulse-activity-empty muted">${activityAll.length ? 'No visits match this filter.' : 'No visits in this period.'}</li>`;
+  return `<section class="pulse-operations pulse-operations--trail" aria-label="Station visits">
+    ${pulseActivityToolbar(ui)}
+    <div class="pulse-activity-scroll team-overview-table-wrap">
+      <div class="pulse-activity-cols" role="row"><span class="pulse-col-visit">Visit</span><span class="pulse-col-outcome">Outcome</span><span class="pulse-col-when">When</span></div>
+      <ul class="pulse-activity-list">${list}</ul>
+    </div>
   </section>`;
 }
 
@@ -507,21 +780,52 @@ function pulsePage() {
   if (state.actor !== 'coach') return peopleView();
   const model = pulseModel();
   return `<main class="team-overview team-overview-home templates-hub staff-single-pane pulse-proto">
-    <div class="settings-hub-pane" aria-label="Pulse">
-      ${pulseHead(model, 'The session list for this stretch.')}
-      ${pulseMetrics(model.kpis)}
-      ${pulseActivityList(model)}
+    <div class="settings-hub-pane pulse-layout pulse-layout-table-first" aria-label="Pulse">
+      ${pulseHead(model, 'Clinic activity for this stretch.')}
+      ${pulseKpiStrip(model.kpis)}
+      ${pulseRangeControl(model)}
+      ${pulseOperationsTable(model)}
     </div>
   </main>`;
 }
 
 const teamOverviewActions = {
   'nav-pulse': () => visitPulse(),
+  'pulse-activity-type-toggle': () => {
+    const ui = teamOverviewUI();
+    ui.activityTypeOpen = !ui.activityTypeOpen;
+    if (ui.activityTypeOpen) ui.activitySortOpen = false;
+    render();
+    (ui.activityTypeOpen
+      ? document.querySelector('#pulse-activity-type-popover .pulse-activity-filter-option.is-selected, #pulse-activity-type-popover .pulse-activity-filter-option')
+      : document.querySelector('[data-action="pulse-activity-type-toggle"]'))?.focus({preventScroll: true});
+  },
+  'pulse-activity-sort-toggle': () => {
+    const ui = teamOverviewUI();
+    ui.activitySortOpen = !ui.activitySortOpen;
+    if (ui.activitySortOpen) ui.activityTypeOpen = false;
+    render();
+    (ui.activitySortOpen
+      ? document.querySelector('#pulse-activity-sort-popover .pulse-activity-filter-option.is-selected, #pulse-activity-sort-popover .pulse-activity-filter-option')
+      : document.querySelector('[data-action="pulse-activity-sort-toggle"]'))?.focus({preventScroll: true});
+  },
   'pulse-activity-filter': el => {
     const value = el.dataset.value;
     if (!PULSE_ACTIVITY_FILTERS[value]) return;
-    teamOverviewUI().activityFilter = value;
+    const ui = teamOverviewUI();
+    ui.activityFilter = value;
+    ui.activityTypeOpen = false;
     render();
+    document.querySelector('[data-action="pulse-activity-type-toggle"]')?.focus({preventScroll: true});
+  },
+  'pulse-activity-sort': el => {
+    const value = el.dataset.value;
+    if (!PULSE_ACTIVITY_SORTS[value]) return;
+    const ui = teamOverviewUI();
+    ui.activitySort = value;
+    ui.activitySortOpen = false;
+    render();
+    document.querySelector('[data-action="pulse-activity-sort-toggle"]')?.focus({preventScroll: true});
   },
   'open-pulse-person': el => openDirectoryPerson(el.dataset.id, 'pulse'),
   'pulse-period': el => {
@@ -532,8 +836,44 @@ const teamOverviewActions = {
     ui.period = value;
     ui.rangeStart = preset.start;
     ui.rangeEnd = preset.end;
+    ui.rangePickerOpen = false;
     render();
     document.querySelector(`[data-action="pulse-period"][data-value="${value}"]`)?.focus({preventScroll: true});
+  },
+  'pulse-range-picker-toggle': () => {
+    const ui = teamOverviewUI();
+    ui.rangePickerOpen = !ui.rangePickerOpen;
+    ui.activityTypeOpen = false;
+    ui.activitySortOpen = false;
+    if (!ui.rangePickerOpen) pulseRangePickerTeardown();
+    render();
+    pulseRangePickerAfterRender();
+    (ui.rangePickerOpen ? document.getElementById('pulse-range-start') : document.querySelector('[data-action="pulse-range-picker-toggle"]'))?.focus({preventScroll: true});
+  },
+  'pulse-range-picker-cancel': () => {
+    teamOverviewUI().rangePickerOpen = false;
+    pulseRangePickerTeardown();
+    render();
+    document.querySelector('[data-action="pulse-range-picker-toggle"]')?.focus({preventScroll: true});
+  },
+  'pulse-range-picker-apply': () => {
+    const ui = teamOverviewUI();
+    let start = pulseParseInputDate(document.getElementById('pulse-range-start')?.value);
+    let end = pulseParseInputDate(document.getElementById('pulse-range-end')?.value);
+    if (Number.isFinite(start) && Number.isFinite(end)) {
+      if (start > end) {
+        const swap = start;
+        start = end;
+        end = swap;
+      }
+      ui.rangeStart = start;
+      ui.rangeEnd = end + 86_400_000 - 1;
+    }
+    ui.rangePickerOpen = false;
+    ui.period = 'custom';
+    pulseRangePickerTeardown();
+    render();
+    document.querySelector('[data-action="pulse-range-picker-toggle"]')?.focus({preventScroll: true});
   }
 };
 
@@ -549,13 +889,12 @@ function pulseBrushPaint(startI, endI) {
   const startHandle = document.querySelector('.pulse-brush-handle.is-start');
   const endHandle = document.querySelector('.pulse-brush-handle.is-end');
   const label = document.getElementById('pulse-brush-label');
-  if (windowEl) {
-    windowEl.style.left = `${layout.left}%`;
-    windowEl.style.width = `${layout.width}%`;
-  }
+  const endLeft = layout.left + layout.width;
+  pulseBrushSyncWindow(windowEl, layout);
   if (startHandle) startHandle.style.left = `${layout.left}%`;
-  if (endHandle) endHandle.style.left = `${layout.left + layout.width}%`;
-  if (label) label.textContent = layout.label;
+  if (endHandle) endHandle.style.left = `${endLeft}%`;
+  const labelText = label?.querySelector('.pulse-range-label-text');
+  if (labelText) labelText.textContent = layout.label;
   document.querySelectorAll('.pulse-brush-bars span').forEach((bar, index) => {
     bar.classList.toggle('is-in', index >= layout.a && index <= layout.b);
   });
@@ -568,6 +907,7 @@ function pulseBrushCommit(startI, endI) {
   ui.rangeStart = layout.start;
   ui.rangeEnd = layout.end;
   ui.period = pulsePresetMatching(layout.start, layout.end);
+  ui.rangePickerOpen = false;
   pulseBrushDrag = null;
   render();
 }
@@ -649,6 +989,39 @@ document.addEventListener('pointercancel', () => {
   pulseBrushDrag = null;
 });
 
+document.addEventListener('click', event => {
+  const ui = teamOverviewUI();
+  if (state.nav !== 'pulse') return;
+  if (ui.activityTypeOpen || ui.activitySortOpen) {
+    if (!event.target.closest('.pulse-activity-filter-anchor')) {
+      ui.activityTypeOpen = false;
+      ui.activitySortOpen = false;
+      render();
+    }
+  }
+  if (ui.rangePickerOpen && !event.target.closest('.pulse-range-label-anchor') && !event.target.closest('#pulse-range-picker')) {
+    ui.rangePickerOpen = false;
+    pulseRangePickerTeardown();
+    render();
+  }
+});
+
+document.addEventListener('click', event => {
+  if (state.nav !== 'pulse' || state.stage || state.overlay) return;
+  const el = event.target.closest('#pulse-range-picker [data-action]');
+  if (!el || el.disabled) return;
+  const action = el.dataset.action;
+  if (action !== 'pulse-range-picker-cancel' && action !== 'pulse-range-picker-apply') return;
+  event.stopPropagation();
+  teamOverviewActions[action](el);
+}, true);
+
+document.addEventListener('input', event => {
+  if (event.target.id !== 'team-overview-pulse-search') return;
+  teamOverviewUI().activitySearch = event.target.value;
+  render();
+});
+
 document.addEventListener('change', event => {
   if (event.target.id === 'team-overview-period') {
     const value = event.target.value;
@@ -661,20 +1034,33 @@ document.addEventListener('change', event => {
     render();
     return;
   }
-  if (event.target.id === 'team-overview-activity-sort') {
-    const value = event.target.value;
-    if (!PULSE_ACTIVITY_SORTS[value]) return;
-    teamOverviewUI().activitySort = value;
-    render();
-  }
 });
 
 document.addEventListener('keydown', event => {
+  const ui = teamOverviewUI();
+  if (event.key === 'Escape' && state.nav === 'pulse' && !state.stage && !state.overlay && (ui.activityTypeOpen || ui.activitySortOpen || ui.rangePickerOpen)) {
+    ui.activityTypeOpen = false;
+    ui.activitySortOpen = false;
+    ui.rangePickerOpen = false;
+    pulseRangePickerTeardown();
+    render();
+    document.querySelector('[data-action="pulse-activity-type-toggle"], [data-action="pulse-activity-sort-toggle"], [data-action="pulse-range-picker-toggle"]')?.focus({preventScroll: true});
+    event.preventDefault();
+    return;
+  }
+  if ((event.key === 'Enter' || event.key === ' ') && state.nav === 'pulse' && !state.stage && !state.overlay) {
+    const row = event.target.closest?.('.pulse-activity-row');
+    if (row) {
+      event.preventDefault();
+      openDirectoryPerson(row.dataset.id, 'pulse');
+      return;
+    }
+  }
   if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
   if (state.nav !== 'pulse' || state.stage || state.overlay) return;
   const tag = event.target?.tagName;
   if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || event.target?.isContentEditable) return;
-  const brush = event.target.closest?.('.pulse-brush');
+  const brush = event.target.closest?.('.pulse-range-row, .pulse-brush-track');
   if (brush) {
     event.preventDefault();
     const mode = event.target.dataset.brush || 'move';

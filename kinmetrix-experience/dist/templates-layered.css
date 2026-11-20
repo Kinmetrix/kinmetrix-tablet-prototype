@@ -41,6 +41,8 @@
  height:var(--templates-card-height);
  min-height:var(--templates-card-height);
  max-height:var(--templates-card-height);
+ padding:24px 8px 12px;
+ gap:0;
  background:var(--templates-nav-bg);
  border:1px solid rgba(255,255,255,.08);
  border-right:0;
@@ -51,12 +53,6 @@
  overflow:hidden;
 }
 .templates-layered-shell .wordmark .brand-mark{filter:none}
-.templates-layered-shell .sidebar>.nav-team-wordmark{
- align-self:center;
- flex-shrink:0;
- margin:12px 0 10px;
- width:72px;min-width:72px;
-}
 .templates-layered-shell .nav-team-wordmark .wordmark-glyph-wrap .brand-mark{
  width:26px;height:26px;flex:0 0 26px;
  border-radius:7px;
@@ -79,6 +75,7 @@
 }
 .templates-layered-shell .nav-button.active .nav-glyph-wrap{background:var(--templates-nav-icon-active)}
 .templates-layered-shell .nav-glyph{width:22px;height:22px;flex-shrink:0}
+.templates-layered-shell .nav-button[data-action="signout"] .nav-glyph{transform:rotate(180deg)}
 .templates-layered-shell .nav-label{display:block;max-width:68px}
 .templates-layered-shell .sidebar .nav-clinician{color:var(--templates-nav-ink)}
 .templates-layered-shell .nav-clinician .nav-glyph-wrap{background:transparent}
@@ -289,23 +286,14 @@
  display:flex;flex-direction:column;gap:8px;min-height:0;
 }
 .templates-layered-shell main.team-overview .settings-pane-head{margin-bottom:0}
+.templates-layered-shell main.team-overview.pulse-proto .settings-hub-pane.pulse-layout-table-first{flex:1;min-height:0;gap:12px}
+.templates-layered-shell main.team-overview.pulse-proto .pulse-operations{flex:1;min-height:0}
 .templates-layered-shell main.templates-hub.team-hub-layout{
  flex:1;min-height:0;width:100%;padding:0;max-width:none;margin:0;
  display:flex;flex-direction:column;background:transparent;
 }
 .templates-layered-shell main.templates-hub.team-hub-layout>.settings-hub-pane.team-hub-pane{
  flex:1;width:100%;min-width:0;align-self:stretch;
-}
-.templates-layered-shell .team-hub-card-grid.settings-links--grid-2{
- display:grid;
- grid-template-columns:repeat(2,minmax(0,1fr));
- gap:10px;
-}
-.templates-layered-shell .team-hub-card-grid .team-hub-card{
- min-height:56px;padding:12px 14px;padding-right:40px;position:relative;
-}
-.templates-layered-shell .team-hub-card-grid .team-hub-card>.icon-sm{
- position:absolute;top:12px;right:12px;
 }
 .templates-layered-shell main.directory-page.roster-workspace{
  flex:1;min-height:0;padding:0;max-width:none;margin:0;width:100%;
