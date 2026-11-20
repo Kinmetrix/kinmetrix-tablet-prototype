@@ -1,22 +1,26 @@
 /* Pulse: team KPIs and activity. Loaded after directory.js — exports pulsePage(). */
 const TEAM_OVERVIEW_PERIODS = {
-  'last-7': {rangeLabel: '6 Nov 2026 – 13 Nov 2026', compareLabel: 'Compared with 30 Oct 2026 – 5 Nov 2026', presetLabel: 'Last 7 days'},
-  'last-30': {rangeLabel: '14 Oct 2026 – 13 Nov 2026', compareLabel: 'Compared with 13 Sept 2026 – 13 Oct 2026', presetLabel: 'Last 30 days'},
-  'last-90': {rangeLabel: '15 Aug 2026 – 13 Nov 2026', compareLabel: 'Compared with 17 May 2026 – 14 Aug 2026', presetLabel: 'Last 90 days'}
+  today: {presetLabel: 'Today', ariaLabel: 'Today, current calendar day', title: 'Current calendar day'},
+  'last-1w': {presetLabel: '1w', ariaLabel: 'Last 7 days', title: 'Last 7 days'},
+  'last-1m': {presetLabel: '1m', ariaLabel: 'Last 30 days', title: 'Last 30 days'},
+  'last-3m': {presetLabel: '3m', ariaLabel: 'Last 90 days', title: 'Last 90 days'},
+  all: {presetLabel: 'All', ariaLabel: 'All team activity', title: 'All team activity in the dataset'}
 };
 
 const PULSE_REPORTING_END = Date.UTC(2026, 10, 13, 23, 59, 59, 999);
-const PULSE_PERIOD_DAY_COUNT = {'last-7': 7, 'last-30': 30, 'last-90': 90};
-const PULSE_BRUSH_DAYS = 90;
+const PULSE_PERIOD_DAY_COUNT = {'last-1w': 7, 'last-1m': 30, 'last-3m': 90};
+const PULSE_LEGACY_PERIOD = {'last-7': 'last-1w', 'last-30': 'last-1m', 'last-90': 'last-3m'};
+const PULSE_DAY_MS = 86_400_000;
 let pulseBrushDrag = null;
 const PULSE_ACTIVITY_FILTERS = {all: 'All', assessment: 'Assessments', session: 'Sessions'};
 const PULSE_ACTIVITY_SORTS = {newest: 'Newest first', oldest: 'Oldest first', member: 'Member A–Z'};
 
 function teamOverviewUI() {
   const store = directoryUI();
-  store.pulse ??= store.home ?? {period: 'last-30'};
+  store.pulse ??= store.home ?? {period: 'last-1m'};
   const ui = store.pulse;
-  if (!TEAM_OVERVIEW_PERIODS[ui.period] && ui.period !== 'custom') ui.period = 'last-30';
+  if (PULSE_LEGACY_PERIOD[ui.period]) ui.period = PULSE_LEGACY_PERIOD[ui.period];
+  if (!TEAM_OVERVIEW_PERIODS[ui.period] && ui.period !== 'custom') ui.period = 'last-1m';
   if (!PULSE_ACTIVITY_FILTERS[ui.activityFilter]) ui.activityFilter = 'all';
   if (!PULSE_ACTIVITY_SORTS[ui.activitySort]) ui.activitySort = 'newest';
   if (ui.pulseGrouping !== 'members') ui.pulseGrouping = 'visits';
@@ -62,17 +66,68 @@ function pulseWindowFromRange(start, end) {
   return {start: from, end: rangeEnd, priorStart: from - days * 86_400_000, priorEnd: from - 1, days};
 }
 
+function pulseReportingToday() {
+  const dayStart = pulseMidnight(PULSE_REPORTING_END);
+  return {start: dayStart, end: dayStart + PULSE_DAY_MS - 1, days: 1};
+}
+
+function pulseActivityExtent(roster) {
+  let minAt = Infinity;
+  let maxAt = -Infinity;
+  for (const member of roster) {
+    for (const record of pulseRecords(member.id)) {
+      const at = recordCompletedAt(record);
+      if (at > 0) {
+        minAt = Math.min(minAt, at);
+        maxAt = Math.max(maxAt, at);
+      }
+    }
+  }
+  if (!Number.isFinite(minAt)) {
+    const endDay = pulseMidnight(PULSE_REPORTING_END);
+    const start = endDay - (90 - 1) * PULSE_DAY_MS;
+    return {start, endDay, days: 90};
+  }
+  const start = pulseMidnight(minAt);
+  const endDay = pulseMidnight(maxAt);
+  const days = Math.max(1, Math.round((endDay - start) / PULSE_DAY_MS) + 1);
+  return {start, endDay, days};
+}
+
+function pulseWindowForPreset(period, roster) {
+  const domain = pulseActivityExtent(roster);
+  if (period === 'today') {
+    const today = pulseReportingToday();
+    return {
+      start: today.start,
+      end: today.end,
+      priorStart: today.start - PULSE_DAY_MS,
+      priorEnd: today.start - 1,
+      days: 1
+    };
+  }
+  if (period === 'all') {
+    const rangeEnd = domain.endDay + PULSE_DAY_MS - 1;
+    return pulseWindowFromRange(domain.start, domain.endDay);
+  }
+  const days = PULSE_PERIOD_DAY_COUNT[period];
+  if (days) return pulseWindowFromDays(days);
+  return pulseWindowFromDays(30);
+}
+
 function pulseEnsureRange(ui) {
   if (Number.isFinite(ui.rangeStart) && Number.isFinite(ui.rangeEnd)) return;
-  const preset = pulseWindowFromDays(PULSE_PERIOD_DAY_COUNT[ui.period] ?? 30);
+  const roster = typeof visiblePeople === 'function' ? visiblePeople() : [];
+  const period = ui.period === 'custom' ? 'last-1m' : (ui.period || 'last-1m');
+  const preset = pulseWindowForPreset(period, roster);
   ui.rangeStart = preset.start;
   ui.rangeEnd = preset.end;
 }
 
-function pulsePresetMatching(start, end) {
+function pulsePresetMatching(start, end, roster) {
   const chosen = pulseWindowFromRange(start, end);
-  for (const [key, days] of Object.entries(PULSE_PERIOD_DAY_COUNT)) {
-    const preset = pulseWindowFromDays(days);
+  for (const key of Object.keys(TEAM_OVERVIEW_PERIODS)) {
+    const preset = pulseWindowForPreset(key, roster);
     if (pulseMidnight(preset.start) === chosen.start && pulseMidnight(preset.end) === pulseMidnight(chosen.end)) return key;
   }
   return 'custom';
@@ -83,14 +138,17 @@ function pulsePeriodWindow(ui) {
   return pulseWindowFromRange(ui.rangeStart, ui.rangeEnd);
 }
 
-function pulseBrushDomain() {
-  const end = pulseMidnight(PULSE_REPORTING_END);
-  const start = end - (PULSE_BRUSH_DAYS - 1) * 86_400_000;
-  return {start, end, days: PULSE_BRUSH_DAYS};
+function pulseBrushDomain(roster) {
+  return pulseActivityExtent(roster || (typeof visiblePeople === 'function' ? visiblePeople() : []));
 }
 
-function pulseDayIndex(at, domainStart) {
-  return Math.max(0, Math.min(PULSE_BRUSH_DAYS - 1, Math.round((pulseMidnight(at) - domainStart) / 86_400_000)));
+function pulseBrushDomainEndMs(domain) {
+  return domain.endDay + PULSE_DAY_MS - 1;
+}
+
+function pulseDayIndex(at, domainStart, domainDays) {
+  const days = domainDays ?? pulseBrushDomain().days;
+  return Math.max(0, Math.min(days - 1, Math.round((pulseMidnight(at) - domainStart) / PULSE_DAY_MS)));
 }
 
 function recordCompletedAt(record) {
@@ -122,7 +180,11 @@ function teamKpiTrend(current, previous) {
   });
 }
 
-function teamKpiDelta(current, previous) {
+function teamKpiDelta(current, previous, options) {
+  if (options?.comparePrior === false) {
+    if (current === 0) return 'No activity recorded';
+    return 'All time';
+  }
   if (previous === 0 && current === 0) return 'No sessions in either period';
   if (previous === 0) return `${current} this period · none prior`;
   if (current === previous) return `Unchanged from ${previous}`;
@@ -383,8 +445,8 @@ function pulseRowsInWindow(roster, start, end) {
 }
 
 function pulseBrushSeries(roster) {
-  const domain = pulseBrushDomain();
-  const rows = pulseRowsInWindow(roster, domain.start, domain.end + 86_400_000 - 1);
+  const domain = pulseBrushDomain(roster);
+  const rows = pulseRowsInWindow(roster, domain.start, pulseBrushDomainEndMs(domain));
   const counts = Array(domain.days).fill(0);
   for (const row of rows) {
     counts[pulseDayIndex(row.at, domain.start)]++;
@@ -406,7 +468,10 @@ function pulseModel() {
     {id: 'membersActive', label: 'Active members', value: current.membersActive, previous: previous.membersActive},
     {id: 'trainingSessions', label: 'Sessions', value: current.trainingSessions, previous: previous.trainingSessions},
     {id: 'assessments', label: 'Assessments', value: current.assessments, previous: previous.assessments}
-  ].map(kpi => ({...kpi, deltaLabel: teamKpiDelta(kpi.value, kpi.previous)}));
+  ].map(kpi => ({
+    ...kpi,
+    deltaLabel: teamKpiDelta(kpi.value, kpi.previous, {comparePrior: ui.period !== 'all'})
+  }));
   const activity = sortPulseActivity(
     currentRows.filter(row => pulseActivityMatchesFilter(row, ui.activityFilter) && pulseActivityMatchesSearch(row, ui.activitySearch.trim().toLowerCase())),
     ui.activitySort
@@ -453,17 +518,18 @@ function pulseBrushSyncWindow(windowEl, layout) {
   windowEl.classList.toggle('is-flush-end', layout.left + layout.width >= 99.5);
 }
 
-function pulseBrushLayout(startI, endI) {
+function pulseBrushLayout(startI, endI, domain) {
+  const brushDomain = domain || pulseBrushDomain();
+  const brushDays = brushDomain.days;
   const a = Math.min(startI, endI);
   const b = Math.max(startI, endI);
-  const domain = pulseBrushDomain();
-  const start = domain.start + a * 86_400_000;
-  const end = domain.start + b * 86_400_000 + 86_400_000 - 1;
+  const start = brushDomain.start + a * PULSE_DAY_MS;
+  const end = brushDomain.start + b * PULSE_DAY_MS + PULSE_DAY_MS - 1;
   const span = b - a + 1;
   return {
     a, b,
-    left: (a / PULSE_BRUSH_DAYS) * 100,
-    width: ((b - a + 1) / PULSE_BRUSH_DAYS) * 100,
+    left: (a / brushDays) * 100,
+    width: ((b - a + 1) / brushDays) * 100,
     start, end, span,
     label: pulseDateRange(start, end)
   };
@@ -667,16 +733,15 @@ function pulseBrushLineMarkup(counts, max, layout) {
 
 function pulseRangeControl(model) {
   const domain = model.brush.domain;
-  const startI = pulseDayIndex(model.window.start, domain.start);
-  const endI = pulseDayIndex(model.window.end, domain.start);
-  const layout = pulseBrushLayout(startI, endI);
+  const startI = pulseDayIndex(model.window.start, domain.start, domain.days);
+  const endI = pulseDayIndex(model.window.end, domain.start, domain.days);
+  const layout = pulseBrushLayout(startI, endI, domain);
+  const presetButtons = Object.entries(TEAM_OVERVIEW_PERIODS).map(([value, item]) =>
+    `<button type="button" class="${model.ui.period === value ? 'active' : ''}" data-action="pulse-period" data-value="${value}" aria-pressed="${model.ui.period === value}" aria-label="${escapeHTML(item.ariaLabel)}" title="${escapeHTML(item.title)}">${escapeHTML(item.presetLabel)}</button>`
+  ).join('');
   return `<div class="pulse-range-row" aria-label="Date range for this stretch">
-    <div class="pulse-range-label-anchor">
-      <button type="button" class="pulse-range-label-button tabular" id="pulse-brush-label" data-action="pulse-range-picker-toggle" aria-haspopup="dialog" aria-expanded="${model.ui.rangePickerOpen}" aria-label="Date range, ${escapeHTML(layout.label)}. Choose dates"${model.ui.rangePickerOpen ? ' aria-controls="pulse-range-picker"' : ''}>
-        <span class="pulse-range-label-text">${escapeHTML(layout.label)}</span>
-        ${icon('calendar', 'icon-sm')}
-      </button>
-      ${pulseRangePickerPanel(model)}
+    <div class="pulse-brush-presets segmented" role="group" aria-label="Reporting period presets">
+      ${presetButtons}
     </div>
     <div class="pulse-brush-track pulse-brush-track--inline" role="group" aria-labelledby="pulse-brush-label" title="Drag to set a custom date range">
       <div class="pulse-brush-stage">
@@ -686,10 +751,12 @@ function pulseRangeControl(model) {
       <button type="button" class="pulse-brush-handle is-start" data-brush="start" style="left:${layout.left}%" aria-label="Start of range"></button>
       <button type="button" class="pulse-brush-handle is-end" data-brush="end" style="left:${layout.left + layout.width}%" aria-label="End of range"></button>
     </div>
-    <div class="pulse-brush-presets segmented" role="group" aria-label="Snap to a recent stretch">
-      ${Object.entries(TEAM_OVERVIEW_PERIODS).map(([value, item]) =>
-        `<button type="button" class="${model.ui.period === value ? 'active' : ''}" data-action="pulse-period" data-value="${value}" aria-pressed="${model.ui.period === value}">${item.presetLabel.replace('Last ', '')}</button>`
-      ).join('')}
+    <div class="pulse-range-label-anchor">
+      <button type="button" class="pulse-range-label-button tabular" id="pulse-brush-label" data-action="pulse-range-picker-toggle" aria-haspopup="dialog" aria-expanded="${model.ui.rangePickerOpen}" aria-label="Date range, ${escapeHTML(layout.label)}. Choose dates"${model.ui.rangePickerOpen ? ' aria-controls="pulse-range-picker"' : ''}>
+        <span class="pulse-range-label-text">${escapeHTML(layout.label)}</span>
+        ${icon('calendar', 'icon-sm')}
+      </button>
+      ${pulseRangePickerPanel(model)}
     </div>
   </div>`;
 }
@@ -991,7 +1058,7 @@ const teamOverviewActions = {
     const value = el.dataset.value;
     if (!TEAM_OVERVIEW_PERIODS[value]) return;
     const ui = teamOverviewUI();
-    const preset = pulseWindowFromDays(PULSE_PERIOD_DAY_COUNT[value]);
+    const preset = pulseWindowForPreset(value, visiblePeople());
     ui.period = value;
     ui.rangeStart = preset.start;
     ui.rangeEnd = preset.end;
@@ -1038,12 +1105,14 @@ const teamOverviewActions = {
 
 function pulseBrushIndexFromX(clientX, track) {
   const rect = track.getBoundingClientRect();
+  const brushDays = pulseBrushDomain().days;
   const ratio = (clientX - rect.left) / Math.max(1, rect.width);
-  return Math.max(0, Math.min(PULSE_BRUSH_DAYS - 1, Math.floor(ratio * PULSE_BRUSH_DAYS)));
+  return Math.max(0, Math.min(brushDays - 1, Math.floor(ratio * brushDays)));
 }
 
 function pulseBrushPaint(startI, endI) {
-  const layout = pulseBrushLayout(startI, endI);
+  const domain = pulseBrushDomain();
+  const layout = pulseBrushLayout(startI, endI, domain);
   const windowEl = document.querySelector('.pulse-brush-window');
   const startHandle = document.querySelector('.pulse-brush-handle.is-start');
   const endHandle = document.querySelector('.pulse-brush-handle.is-end');
@@ -1063,11 +1132,12 @@ function pulseBrushPaint(startI, endI) {
 }
 
 function pulseBrushCommit(startI, endI) {
-  const layout = pulseBrushLayout(startI, endI);
+  const domain = pulseBrushDomain();
+  const layout = pulseBrushLayout(startI, endI, domain);
   const ui = teamOverviewUI();
   ui.rangeStart = layout.start;
   ui.rangeEnd = layout.end;
-  ui.period = pulsePresetMatching(layout.start, layout.end);
+  ui.period = pulsePresetMatching(layout.start, layout.end, visiblePeople());
   ui.rangePickerOpen = false;
   pulseBrushDrag = null;
   render();
@@ -1076,13 +1146,14 @@ function pulseBrushCommit(startI, endI) {
 function pulseBrushNudge(mode, step) {
   const ui = teamOverviewUI();
   const domain = pulseBrushDomain();
-  let startI = pulseDayIndex(ui.rangeStart, domain.start);
-  let endI = pulseDayIndex(ui.rangeEnd, domain.start);
+  const brushDays = domain.days;
+  let startI = pulseDayIndex(ui.rangeStart, domain.start, brushDays);
+  let endI = pulseDayIndex(ui.rangeEnd, domain.start, brushDays);
   if (mode === 'start') startI = Math.max(0, Math.min(endI, startI + step));
-  else if (mode === 'end') endI = Math.min(PULSE_BRUSH_DAYS - 1, Math.max(startI, endI + step));
+  else if (mode === 'end') endI = Math.min(brushDays - 1, Math.max(startI, endI + step));
   else {
     const span = endI - startI;
-    startI = Math.max(0, Math.min(PULSE_BRUSH_DAYS - 1 - span, startI + step));
+    startI = Math.max(0, Math.min(brushDays - 1 - span, startI + step));
     endI = startI + span;
   }
   pulseBrushCommit(startI, endI);
@@ -1098,8 +1169,8 @@ document.addEventListener('pointerdown', event => {
   const handle = event.target.closest('[data-brush]');
   const domain = pulseBrushDomain();
   const ui = teamOverviewUI();
-  const startI = pulseDayIndex(ui.rangeStart, domain.start);
-  const endI = pulseDayIndex(ui.rangeEnd, domain.start);
+  const startI = pulseDayIndex(ui.rangeStart, domain.start, domain.days);
+  const endI = pulseDayIndex(ui.rangeEnd, domain.start, domain.days);
   const mode = handle?.dataset.brush || 'select';
   pulseBrushDrag = {pointerId: event.pointerId, mode, origin: index, startI, endI};
   track.classList.add('is-dragging');
@@ -1117,8 +1188,9 @@ document.addEventListener('pointermove', event => {
   else if (drag.mode === 'select') pulseBrushPaint(drag.origin, index);
   else {
     const span = drag.endI - drag.startI;
+    const brushDays = pulseBrushDomain().days;
     let startI = drag.startI + (index - drag.origin);
-    startI = Math.max(0, Math.min(PULSE_BRUSH_DAYS - 1 - span, startI));
+    startI = Math.max(0, Math.min(brushDays - 1 - span, startI));
     pulseBrushPaint(startI, startI + span);
   }
 });
@@ -1137,7 +1209,8 @@ document.addEventListener('pointerup', event => {
     endI = index;
   } else {
     const span = drag.endI - drag.startI;
-    startI = Math.max(0, Math.min(PULSE_BRUSH_DAYS - 1 - span, drag.startI + (index - drag.origin)));
+    const brushDays = pulseBrushDomain().days;
+    startI = Math.max(0, Math.min(brushDays - 1 - span, drag.startI + (index - drag.origin)));
     endI = startI + span;
   }
   track?.classList.remove('is-dragging');
@@ -1188,7 +1261,7 @@ document.addEventListener('change', event => {
     const value = event.target.value;
     if (!TEAM_OVERVIEW_PERIODS[value]) return;
     const ui = teamOverviewUI();
-    const preset = pulseWindowFromDays(PULSE_PERIOD_DAY_COUNT[value]);
+    const preset = pulseWindowForPreset(value, visiblePeople());
     ui.period = value;
     ui.rangeStart = preset.start;
     ui.rangeEnd = preset.end;
