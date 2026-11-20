@@ -30,8 +30,8 @@ button{color:inherit}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
 input{caret-color:var(--action)}
 ::selection{background:var(--selected);color:var(--ink)}
-::-webkit-scrollbar{width:7px;height:7px}
-::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+:not(.pulse-activity-scroll)::-webkit-scrollbar{width:7px;height:7px}
+:not(.pulse-activity-scroll)::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
  a{color:var(--action);text-underline-offset:4px}
  h1,h2,h3,p{margin:0}
 h1{font-size:30px;line-height:1.15;letter-spacing:-.025em;font-weight:650}

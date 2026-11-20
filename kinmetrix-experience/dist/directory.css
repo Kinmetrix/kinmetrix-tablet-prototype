@@ -39,10 +39,11 @@
 .roster-program-cell .roster-program-button{align-self:stretch;justify-content:flex-start;min-height:0;min-width:0;max-width:100%}
 .roster-program-cell .roster-program-button strong{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .roster-program-cell small{display:block;margin-top:0;font-size:11px;line-height:1.5;pointer-events:none}
-.roster-grid .directory-person,
+.roster-grid .directory-person{font-size:13px;font-weight:600;line-height:1.25;color:var(--ink);-webkit-tap-highlight-color:transparent}
+.roster-grid .directory-person span:last-child,
+.roster-grid .directory-person:hover span:last-child{font:inherit;color:inherit;text-decoration:none}
 .roster-grid .roster-program-button,
 .roster-grid .roster-activity-button{color:var(--action);-webkit-tap-highlight-color:transparent}
-.roster-grid .directory-person span:last-child,
 .roster-grid .roster-program-button strong,
 .roster-grid .roster-activity-button{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .roster-grid .roster-program-button strong{font-weight:550}

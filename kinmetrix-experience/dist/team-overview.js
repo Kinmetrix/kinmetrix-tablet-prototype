@@ -271,7 +271,7 @@ function teamOverviewKpis(roster, periodKey) {
   const previous = pulseKpiSnapshot(priorRows);
   return [
     {id: 'totalActivity', label: 'Total activity', value: current.totalActivity, footnote: 'Completed sessions in the period', previous: previous.totalActivity},
-    {id: 'membersActive', label: 'Members active', value: current.membersActive, footnote: 'Members with at least one session', previous: previous.membersActive},
+    {id: 'membersActive', label: 'Active members', value: current.membersActive, footnote: 'Members with at least one session', previous: previous.membersActive},
     {id: 'trainingSessions', label: 'Sessions', value: current.trainingSessions, footnote: 'Non-assessment sessions in the period', previous: previous.trainingSessions}
   ].map(kpi => ({
     ...kpi,
@@ -390,7 +390,7 @@ function pulseModel() {
   const previous = pulseKpiSnapshot(priorRows);
   const kpis = [
     {id: 'totalActivity', label: 'Total activity', value: current.totalActivity, previous: previous.totalActivity},
-    {id: 'membersActive', label: 'Members active', value: current.membersActive, previous: previous.membersActive},
+    {id: 'membersActive', label: 'Active members', value: current.membersActive, previous: previous.membersActive},
     {id: 'trainingSessions', label: 'Sessions', value: current.trainingSessions, previous: previous.trainingSessions},
     {id: 'assessments', label: 'Assessments', value: current.assessments, previous: previous.assessments}
   ].map(kpi => ({...kpi, deltaLabel: teamKpiDelta(kpi.value, kpi.previous)}));
@@ -413,8 +413,16 @@ function pulseMidnight(at) {
 function pulseDateRange(start, end) {
   const from = new Date(pulseMidnight(start));
   const to = new Date(pulseMidnight(end));
-  const fmt = date => `${date.getUTCDate()} ${PULSE_MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
-  return `${fmt(from)} ${fmt(to)}`;
+  const day = date => date.getUTCDate();
+  const month = date => PULSE_MONTHS[date.getUTCMonth()];
+  const year = date => date.getUTCFullYear();
+  if (year(from) === year(to) && from.getUTCMonth() === to.getUTCMonth()) {
+    return `${day(from)}–${day(to)} ${month(to)} ${year(to)}`;
+  }
+  if (year(from) === year(to)) {
+    return `${day(from)} ${month(from)} – ${day(to)} ${month(to)} ${year(to)}`;
+  }
+  return `${day(from)} ${month(from)} ${year(from)} – ${day(to)} ${month(to)} ${year(to)}`;
 }
 
 function pulseBrushWindowFlushClass(layout) {
@@ -619,30 +627,47 @@ function pulseBrushMonthMarks(domain) {
   return marks.join('');
 }
 
+function pulseBrushLinePoints(counts, max) {
+  const n = counts.length || 1;
+  const top = 14;
+  const bottom = 86;
+  return counts.map((count, index) => {
+    const x = ((index + 0.5) / n) * 100;
+    const y = bottom - (max ? count / max : 0) * (bottom - top);
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  }).join(' ');
+}
+
+function pulseBrushLineMarkup(counts, max, layout) {
+  const points = pulseBrushLinePoints(counts, max);
+  const width = Math.min(layout.width, 100 - layout.left);
+  return `<svg class="pulse-brush-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <clipPath id="pulse-brush-line-clip">
+            <rect class="pulse-brush-line-clip" x="${layout.left}" y="0" width="${width}" height="100"></rect>
+          </clipPath>
+        </defs>
+        <polyline class="pulse-brush-line-base" points="${points}"></polyline>
+        <polyline class="pulse-brush-line-in" points="${points}" clip-path="url(#pulse-brush-line-clip)"></polyline>
+      </svg>`;
+}
+
 function pulseRangeControl(model) {
   const domain = model.brush.domain;
   const startI = pulseDayIndex(model.window.start, domain.start);
   const endI = pulseDayIndex(model.window.end, domain.start);
   const layout = pulseBrushLayout(startI, endI);
-  const max = model.brush.max;
-  const bars = model.brush.counts.map((count, index) => {
-    const height = count ? Math.max(36, (count / max) * 100) : 16;
-    const on = index >= layout.a && index <= layout.b;
-    return `<span class="${on ? 'is-in' : ''}" style="height:${height}%"></span>`;
-  }).join('');
-  const custom = model.ui.period === 'custom';
   return `<div class="pulse-range-row" aria-label="Date range for this stretch">
     <div class="pulse-range-label-anchor">
       <button type="button" class="pulse-range-label-button tabular" id="pulse-brush-label" data-action="pulse-range-picker-toggle" aria-haspopup="dialog" aria-expanded="${model.ui.rangePickerOpen}" aria-label="Date range, ${escapeHTML(layout.label)}. Choose dates"${model.ui.rangePickerOpen ? ' aria-controls="pulse-range-picker"' : ''}>
         <span class="pulse-range-label-text">${escapeHTML(layout.label)}</span>
-        ${custom ? '<span class="pulse-brush-custom">Custom</span>' : ''}
         ${icon('calendar', 'icon-sm')}
       </button>
       ${pulseRangePickerPanel(model)}
     </div>
     <div class="pulse-brush-track pulse-brush-track--inline" role="group" aria-labelledby="pulse-brush-label" title="Drag to set a custom date range">
       <div class="pulse-brush-stage">
-        <div class="pulse-brush-bars" aria-hidden="true">${bars}</div>
+        ${pulseBrushLineMarkup(model.brush.counts, model.brush.max, layout)}
       </div>
       <div class="pulse-brush-window${pulseBrushWindowFlushClass(layout)}" data-brush="move" style="left:${layout.left}%;width:${Math.min(layout.width, 100 - layout.left)}%"></div>
       <button type="button" class="pulse-brush-handle is-start" data-brush="start" style="left:${layout.left}%" aria-label="Start of range"></button>
@@ -656,12 +681,11 @@ function pulseRangeControl(model) {
   </div>`;
 }
 
-function pulseHead(model, desc) {
+function pulseHead() {
   return `<header class="settings-pane-head team-overview-head pulse-head-compact">
     <div class="settings-pane-head-row team-overview-head-row">
       <div class="settings-pane-head-text">
         <h1>Pulse</h1>
-        <p class="settings-pane-desc">${escapeHTML(model.team.name)}. ${escapeHTML(desc)}</p>
       </div>
     </div>
   </header>`;
@@ -673,14 +697,9 @@ function pulseKpiDeltaClass(label) {
 
 function pulseMetricLabel(id) {
   if (id === 'totalActivity') return 'Activity';
-  if (id === 'membersActive') return 'Members';
+  if (id === 'membersActive') return 'Active members';
   if (id === 'assessments') return 'Assessments';
   return 'Sessions';
-}
-
-function pulseKpiFootnote(kpi) {
-  if (kpi.id === 'assessments') return 'This stretch';
-  return kpi.deltaLabel;
 }
 
 function pulseKpiStrip(kpis) {
@@ -688,7 +707,7 @@ function pulseKpiStrip(kpis) {
     `<article class="team-overview-kpi pulse-kpi-strip-card">
       <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}</span>
       <span class="team-overview-kpi-value tabular">${kpi.value}</span>
-      <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(pulseKpiFootnote(kpi))}</p>
+      <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
     </article>`
   ).join('')}</div>`;
 }
@@ -781,9 +800,9 @@ function pulsePage() {
   const model = pulseModel();
   return `<main class="team-overview team-overview-home templates-hub staff-single-pane pulse-proto">
     <div class="settings-hub-pane pulse-layout pulse-layout-table-first" aria-label="Pulse">
-      ${pulseHead(model, 'Clinic activity for this stretch.')}
-      ${pulseKpiStrip(model.kpis)}
+      ${pulseHead()}
       ${pulseRangeControl(model)}
+      ${pulseKpiStrip(model.kpis)}
       ${pulseOperationsTable(model)}
     </div>
   </main>`;
@@ -895,9 +914,11 @@ function pulseBrushPaint(startI, endI) {
   if (endHandle) endHandle.style.left = `${endLeft}%`;
   const labelText = label?.querySelector('.pulse-range-label-text');
   if (labelText) labelText.textContent = layout.label;
-  document.querySelectorAll('.pulse-brush-bars span').forEach((bar, index) => {
-    bar.classList.toggle('is-in', index >= layout.a && index <= layout.b);
-  });
+  const clip = document.querySelector('.pulse-brush-line-clip');
+  if (clip) {
+    clip.setAttribute('x', String(layout.left));
+    clip.setAttribute('width', String(Math.min(layout.width, 100 - layout.left)));
+  }
   return layout;
 }
 
