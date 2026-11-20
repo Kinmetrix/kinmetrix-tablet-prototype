@@ -204,7 +204,8 @@
 .templates-layered-shell main.people-finder.templates-hub{
  min-height:0;background:transparent;padding:0;
 }
-.templates-layered-shell main.people-finder.staff-single-pane>.settings-hub-pane{
+.templates-layered-shell main.people-finder.staff-single-pane>.settings-hub-pane,
+.templates-layered-shell main.device-workspace.staff-single-pane>.settings-hub-pane{
  padding:48px;
  background:transparent;
  border:0;
@@ -212,11 +213,20 @@
  box-shadow:none;
  corner-shape:unset;
 }
-:root[data-theme="dark"] .templates-layered-shell main.people-finder.staff-single-pane>.settings-hub-pane{
+:root[data-theme="dark"] .templates-layered-shell main.people-finder.staff-single-pane>.settings-hub-pane,
+:root[data-theme="dark"] .templates-layered-shell main.device-workspace.staff-single-pane>.settings-hub-pane{
  background:transparent;
  border:0;
  box-shadow:none;
 }
+.templates-layered-shell main.device-workspace.templates-hub{
+ min-height:0;background:transparent;padding:0;overflow:hidden;
+}
+.templates-layered-shell main.device-workspace.staff-single-pane>.settings-hub-pane{
+ padding:24px 32px 20px;
+ overflow:hidden;
+}
+.templates-layered-shell main.device-workspace .settings-pane-head{margin-bottom:14px;flex-shrink:0}
 .templates-layered-shell main.people-finder .settings-hub-pane.is-finder-idle{
  justify-content:center;
 }
