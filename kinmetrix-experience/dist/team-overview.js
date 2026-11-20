@@ -745,6 +745,10 @@ function pulseMemberGroups(activity, sortKey) {
   }));
 }
 
+function pulseActivityFiltersActive(ui) {
+  return ui.activityFilter !== 'all' || ui.activitySearch.trim() !== '' || ui.activitySort !== 'newest';
+}
+
 function pulseActivityFilterButtonLabel(ui) {
   return ui.activityFilter === 'all' ? 'All' : PULSE_ACTIVITY_FILTERS[ui.activityFilter];
 }
@@ -784,13 +788,16 @@ function pulseActivityToolbar(ui) {
     </button>
     ${pulseActivitySortPopover(ui)}
   </div>`;
+  const reset = pulseActivityFiltersActive(ui)
+    ? `<button type="button" class="pulse-activity-bar-button pulse-activity-reset" data-action="pulse-activity-reset" aria-label="Reset filters">Reset</button>`
+    : '';
   const search = `<label class="team-overview-search pulse-activity-bar-search">
     <span class="sr-only">Search by name</span>
     ${icon('search')}
     <input id="team-overview-pulse-search" type="search" inputmode="search" autocomplete="off" placeholder="Search" value="${escapeHTML(ui.activitySearch)}">
   </label>`;
   return `<header class="pulse-activity-head team-overview-activity-head"><h2>Activity</h2></header>
-    <div class="pulse-activity-bar team-overview-activity-toolbar">${typeControl}${sortControl}${search}</div>`;
+    <div class="pulse-activity-bar team-overview-activity-toolbar">${typeControl}${sortControl}${reset}${search}</div>`;
 }
 
 function pulseTableOutcomeLabel(item) {
@@ -908,6 +915,16 @@ const teamOverviewActions = {
     (ui.activitySortOpen
       ? document.querySelector('#pulse-activity-sort-popover .pulse-activity-filter-option.is-selected, #pulse-activity-sort-popover .pulse-activity-filter-option')
       : document.querySelector('[data-action="pulse-activity-sort-toggle"]'))?.focus({preventScroll: true});
+  },
+  'pulse-activity-reset': () => {
+    const ui = teamOverviewUI();
+    ui.activityFilter = 'all';
+    ui.activitySort = 'newest';
+    ui.activitySearch = '';
+    ui.activityTypeOpen = false;
+    ui.activitySortOpen = false;
+    render();
+    document.querySelector('[data-action="pulse-activity-type-toggle"]')?.focus({preventScroll: true});
   },
   'pulse-activity-filter': el => {
     const value = el.dataset.value;
