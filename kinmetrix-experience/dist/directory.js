@@ -205,8 +205,8 @@ function rosterModel(){
 function directorySearch(id,label,value,placeholder){return `<div class="search-wrap directory-search">${icon('search')}<label class="sr-only" for="${id}">${label}</label><input id="${id}" type="search" value="${escapeHTML(value)}" placeholder="${placeholder}" autocomplete="off"></div>`;}
 function rosterPage(){
  if(state.actor!=='coach')return peopleView();
- const permitted=visiblePeople(),scope=state.rosterPolicy==='assigned'&&!isAdmin()?'Members assigned to '+clinician().name:'All clinic members';
- return `<main class="directory-page roster-workspace templates-hub staff-single-pane"><div class="settings-hub-pane" aria-label="Roster"><header class="settings-pane-head"><div class="settings-pane-head-row"><div class="settings-pane-head-text"><h1>Roster</h1><p class="settings-pane-desc">${escapeHTML(scope)}</p></div><div class="settings-pane-head-actions">${rosterHeadToolsMarkup()}${button('Import','roster-import-open','small-button')}${button(icon('plus','icon-sm')+' Add person','add-person','primary','aria-haspopup="dialog"')}</div></div></header>
+ const permitted=visiblePeople();
+ return `<main class="directory-page roster-workspace templates-hub staff-single-pane"><div class="settings-hub-pane" aria-label="Roster"><header class="settings-pane-head"><div class="settings-pane-head-row"><div class="settings-pane-head-text"><h1>Roster</h1></div><div class="settings-pane-head-actions">${rosterHeadToolsMarkup()}${button('Import','roster-import-open','small-button')}${button(icon('plus','icon-sm')+' Add person','add-person','primary','aria-haspopup="dialog"')}</div></div></header>
  ${rosterFilterToolbar(permitted)}
  <div id="roster-results">${rosterResults()}</div></div></main>`;
 }
@@ -216,8 +216,8 @@ function rosterCell(row,key){
  if(key==='force')return row.force===null?missing:row.force.toFixed(1)+' kg';
  if(key==='stability')return row.stability===null?missing:Math.round(row.stability)+'%';
  if(key==='visit'){
-  if(!row.visit.recordId)return row.visit.label==='No activity'?'<span class="muted">No activity</span>':escapeHTML(row.visit.label);
-  return `<button type="button" class="program-name-button roster-activity-button" data-action="open-roster-activity" data-id="${row.p.id}" aria-label="Open latest session for ${escapeHTML(row.p.name)}, ${escapeHTML(row.visit.label)}">${escapeHTML(row.visit.label)}</button>`;
+  if(row.visit.label==='No activity')return '<span class="muted">No activity</span>';
+  return `<button type="button" class="program-name-button roster-activity-button" data-action="open-roster-activity" data-id="${row.p.id}" aria-label="Open history for ${escapeHTML(row.p.name)}, last activity ${escapeHTML(row.visit.label)}">${escapeHTML(row.visit.label)}</button>`;
  }
  if(key==='program'){
   if(!row.program)return '<span class="muted">No active program</span>';
@@ -263,17 +263,6 @@ function saveNewPerson(){
 function clinicProgramTemplates(){
  return state.programTemplates??=people.filter(p=>p.program).map(p=>({id:'template-'+p.id,name:p.detail,type:'strength',load:{kind:'incremental',start:p.target||12,increase:5,percent:60},total:6,positions:4,reps:3,example:true}));
 }
-function clinicSessionTemplates(){
- return state.sessionTemplates??=[
-  {id:'light',name:'Light',detail:'50% · 10 reps',percent:50},
-  {id:'strength',name:'Strength',detail:'65% · 8 reps',percent:65},
-  {id:'performance',name:'Performance',detail:'75% · 4 reps',percent:75},
-  {id:'return-to-play',name:'Return to Play',detail:'40% · 12 reps',percent:40},
-  {id:'in-season',name:'In-Season Maintenance',detail:'55% · 10 reps',percent:55},
-  {id:'off-season',name:'Off-Season Build',detail:'70% · 6 reps',percent:70},
-  {id:'deload',name:'Deload',detail:'45% · 10 reps',percent:45}
- ];
-}
 function assignedPrograms(){if(state.actor!=='coach')return [];return visiblePeople().flatMap(p=>memberPrograms(p.id).map(program=>({p,program})));}
 const TEMPLATE_LIBRARIES=[
  {id:'assessments',label:'Assessment',description:'Protocol defaults for assessments at the station.'},
@@ -309,12 +298,73 @@ function programSetupPreviewMarkup(draft){
  state.setup=prevSetup;state.stage=prevStage;
  return html;
 }
+function programAssignPreviewMarkup(draft){
+ return programSetupPreviewMarkup(draft).replace('program-setup-preview','program-setup-preview program-assign-preview');
+}
 function programFields(draft,prefix='plan',tracked=false){
  const field=name=>tracked?`data-program-field="${name}"`:'';
  const isometric=draft.type==='strength';
  const grid=`<div class="program-editor-grid"><fieldset class="program-basics"><legend>Session settings</legend><div class="program-basics-layout"><label class="program-field program-field-name">Program name<input id="${prefix}-name" ${field('name')} type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><div class="program-mode-block${isometric?' program-mode-block--isometric':''}"><label class="program-field program-field-mode">Mode<select id="${prefix}-mode" ${field('type')}>${sessionModeKeys('session').map(key=>`<option value="${key}" ${draft.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label>${isometric?programHoldTimeField(draft,prefix,field):''}</div><div class="program-structure-grid"><label class="program-field">Directions<select id="${prefix}-positions" ${field('positions')}>${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field">Reps / direction<select id="${prefix}-reps" ${field('reps')}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field program-field-sessions">Sessions in plan<select id="${prefix}-total" ${field('total')}>${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n}</option>`).join('')}</select></label></div></div></fieldset>${programProgressionFields(draft,prefix)}</div>`;
  const preview=programSetupPreviewMarkup(draft);
  return preview?`<div class="program-editor-split">${grid}${preview}</div>`:grid;
+}
+const PROGRAM_WIZARD_STEPS=4;
+function programEditorOverlayDraft(o){
+ const template=clinicProgramTemplates().find(p=>p.id===o.id);
+ const seed=template||{name:'',type:'strength',holdStyle:'timed',holdSeconds:6,total:6,positions:4,reps:3,load:{kind:'assessment',percent:60,increase:0,increaseKind:'percent'}};
+ return {...seed,...(o.editorDraft||{}),load:{...programLoad(seed),...(o.editorDraft?.load||{})}};
+}
+function persistProgramWizardDraft(o){
+ if(o?.type!=='program-editor')return;
+ const step=o.wizardStep??0,d=programEditorOverlayDraft(o),prefix='plan';
+ const name=$('#'+prefix+'-name');if(name)d.name=name.value;
+ if(step>=1)d.type=o.editorDraft?.type||d.type||'strength';
+ if(step>=2){
+  const modeEl=$('#'+prefix+'-mode');if(modeEl)d.type=modeEl.value;
+  d.holdStyle=$('#'+prefix+'-hold-style')?.value==='endurance'?'endurance':'timed';
+  d.holdSeconds=Number($('#'+prefix+'-hold-seconds')?.value??d.holdSeconds);
+  d.total=Number($('#'+prefix+'-total')?.value??d.total);
+  d.positions=Number($('#'+prefix+'-positions')?.value??d.positions);
+  d.reps=Number($('#'+prefix+'-reps')?.value??d.reps);
+ }
+ if(step>=3&&typeof readProgramLoad==='function'&&$('#'+prefix+'-load-kind'))d.load=readProgramLoad(prefix);
+ o.editorDraft=d;
+}
+function programWizardModeChoices(draft){
+ return `<div class="mode-choices" role="group" aria-label="Session mode">${sessionModeKeys('session').map(key=>{const m=sessionModes[key],sel=key===(draft.type||'strength');return `<button type="button" class="mode-choice ${sel?'selected':''}" data-action="program-wizard-mode" data-mode="${key}" aria-pressed="${sel}" aria-controls="program-mode-detail">${modeThumbnail(key)}<span><strong>${m.name}</strong><small>${m.short}</small></span><span class="mode-choice-indicator" aria-hidden="true">${sel?icon('check','icon-sm'):icon('chevron','icon-sm')}</span></button>`;}).join('')}</div>`;
+}
+function programWizardModeDetail(draft,o){
+ const modeKey=draft.type||'strength',mode=sessionModes[modeKey],paused=!!o.paused;
+ return `<section class="mode-detail" id="program-mode-detail" aria-labelledby="program-mode-detail-title"><div class="mode-detail-heading"><h3 id="program-mode-detail-title">${mode.name}</h3></div><p class="mode-description">${modePurposeCopy.session[modeKey]}</p><div class="mode-animation ${paused?'is-paused':''}">${movementPreview(modeKey)}<div class="mode-render-controls"><button type="button" data-action="toggle-mode-preview" aria-label="${paused?'Play':'Pause'} animation" title="${paused?'Play':'Pause'} animation">${icon(paused?'play':'pause','icon-sm')}</button></div></div></section>`;
+}
+function programWizardStructureFields(draft,prefix='plan'){
+ const isometric=draft.type==='strength';
+ return `<div class="program-wizard-structure"><h3 class="program-wizard-step-title">Shape the plan</h3><input type="hidden" id="${prefix}-mode" value="${escapeHTML(draft.type||'strength')}">${isometric?programHoldTimeField(draft,prefix,()=>'') :''}<div class="program-structure-grid"><label class="program-field">Directions<select id="${prefix}-positions">${[4,8].map(n=>`<option value="${n}" ${Number(draft.positions)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field">Reps / direction<select id="${prefix}-reps">${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(draft.reps)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="program-field program-field-sessions">Sessions in plan<select id="${prefix}-total">${[2,4,6,8,12].map(n=>`<option value="${n}" ${Number(draft.total)===n?'selected':''}>${n}</option>`).join('')}</select></label></div></div>`;
+}
+function programEditorWizardStepMarkup(step,draft,o){
+ if(step===0)return `<div class="program-wizard-step program-wizard-step--name"><h3 class="program-wizard-step-title">Name the template</h3><label class="program-field program-field-name">Program name<input id="plan-name" type="text" required maxlength="60" autocomplete="off" placeholder="e.g. Endurance practice" value="${escapeHTML(draft.name)}"></label><input type="hidden" id="plan-mode" value="${escapeHTML(draft.type||'strength')}"></div>`;
+ if(step===1)return `<div class="program-wizard-step program-wizard-step--mode session-picker-body">${programWizardModeChoices(draft)}${programWizardModeDetail(draft,o)}</div>`;
+ if(step===2)return `<div class="program-wizard-step program-wizard-step--structure">${programWizardStructureFields(draft)}</div>`;
+ return `<div class="program-wizard-step program-wizard-step--progression"><h3 class="program-wizard-step-title">Set progression</h3>${programProgressionFields(draft,'plan')}</div>`;
+}
+function programEditorWizardBody(o,intro){
+ const draft=programEditorOverlayDraft(o),step=Math.max(0,Math.min(PROGRAM_WIZARD_STEPS-1,o.wizardStep??0)),max=o.maxWizardStep??0,canSave=step===PROGRAM_WIZARD_STEPS-1&&max>=PROGRAM_WIZARD_STEPS-1;
+ const progPct=((step+1)/PROGRAM_WIZARD_STEPS)*100;
+ const isLast=step===PROGRAM_WIZARD_STEPS-1,saveBtn=canSave?`<button type="submit" form="template-form" class="button primary">Save program</button>`:'';
+ const back=step>0?button('Back','program-wizard-back','','type="button"'):'';
+ const forward=isLast?saveBtn:button('Continue','program-wizard-next','primary','type="button"');
+ const cancel=step===0?button('Cancel','close-modal','','type="button"'):'';
+ const footer=`<footer class="directory-dialog-footer program-wizard-footer"><div class="program-wizard-actions">${cancel}${back}${forward}</div></footer>`;
+ return `${intro}<p class="program-wizard-step-label" id="program-wizard-step-label">Step ${step+1} of ${PROGRAM_WIZARD_STEPS}</p><div class="program-wizard-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${PROGRAM_WIZARD_STEPS}" aria-valuenow="${step+1}" aria-labelledby="program-wizard-step-label"><span style="width:${progPct}%"></span></div><form id="template-form" class="program-form program-wizard-form">${programEditorWizardStepMarkup(step,draft,o)}</form>${footer}`;
+}
+function programWizardOpenData(extra={}){
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ return {wizardStep:0,maxWizardStep:0,paused:reduced,...extra,editorDraft:extra.editorDraft};
+}
+function updateProgramWizard(focus){
+ persistProgramWizardDraft(state.overlay);
+ renderOverlay();
+ if(focus) $(focus)?.focus({preventScroll:true});
 }
 function templatesHubRail(activeLibraryId){
  return `<nav class="settings-hub-rail" aria-label="Template libraries">
@@ -330,7 +380,7 @@ function templatesPaneHead(active,library){
   programs:{action:'new-template',ariaLabel:'New program template'}
  };
  const create=createByLibrary[library];
- const showCreate=create&&!(library==='sessions'&&sessionWorkspaceTab()==='session-plan');
+ const showCreate=create&&!(library==='sessions'&&(sessionWorkspaceTab()==='session-plan'||state.sessionTemplateFocusId));
  const action=saveAssessment||saveSessionPlan||(showCreate?button(icon('plus','icon-sm')+' New template',create.action,'primary',`aria-label="${create.ariaLabel}"`):'');
  const desc=active.description?`<p class="settings-pane-desc">${escapeHTML(active.description)}</p>`:'';
  return `<header class="settings-pane-head">
@@ -376,13 +426,22 @@ function programsResults(){
 function directoryDialog(o){
  const template=clinicProgramTemplates().find(p=>p.id===o.id),editing=o.type==='program-editor',draft=o.editorDraft||template||{name:'',type:'strength',holdStyle:'timed',holdSeconds:6,total:6,positions:4,reps:3,load:{kind:'assessment',percent:60,increase:0,increaseKind:'percent'}};
  const title=editing?(template?'Edit program template':'New program template'):'Assign program';
- const content=editing?`<p class="directory-dialog-intro">${template?'Changes apply to future assignments. Existing assigned programs keep their settings.':'Create a reusable template, then assign it to people.'}</p><form id="template-form" class="program-form">${programFields(draft)}</form><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" form="template-form" class="button primary">Save program</button></footer>`:`<p class="directory-dialog-intro"><strong>${escapeHTML(draft.name)}</strong><br>${sessionModes[draft.type].name} · ${draft.total} sessions · ${draft.positions} directions · ${draft.reps} reps</p><form id="assign-program-form"><label class="field-label" for="assign-person">Assign to</label><select id="assign-person" required><option value="">Choose a person</option>${visiblePeople().map(p=>`<option value="${p.id}">${escapeHTML(p.name)}</option>`).join('')}</select><p class="program-form-note">This adds a program to their workspace. No session starts until the settings are reviewed.</p><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" form="assign-program-form" class="button primary">Assign program</button></footer></form>`;
- return `<div class="modal-backdrop"><section class="dialog directory-dialog ${editing?'program-editor-dialog':''}" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">${title}</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${content}</section></div>`;
+ const intro=editing?`<p class="directory-dialog-intro">${template?'Changes apply to future assignments. Existing assigned programs keep their settings.':'Create a reusable template, then assign it to people.'}</p>`:'';
+ const step=o.wizardStep??0,modeStep=editing&&step===1,nameStep=editing&&step===0;
+ const assignPreview=programAssignPreviewMarkup(draft);
+ const assignBody=`<p class="directory-dialog-intro"><strong>${escapeHTML(draft.name)}</strong><br>${sessionModes[draft.type].name} · ${draft.total} sessions · ${draft.positions} directions · ${draft.reps} reps</p><form id="assign-program-form"><label class="field-label" for="assign-person">Assign to</label><select id="assign-person" required><option value="">Choose a person</option>${visiblePeople().map(p=>`<option value="${p.id}">${escapeHTML(p.name)}</option>`).join('')}</select><p class="program-form-note">This adds a program to their workspace. No session starts until the settings are reviewed.</p><footer class="directory-dialog-footer">${button('Cancel','close-modal')}<button type="submit" form="assign-program-form" class="button primary">Assign program</button></footer></form>`;
+ const content=editing?programEditorWizardBody(o,intro):assignPreview?`<div class="program-assign-split">${assignPreview}<div class="program-assign-main">${assignBody}</div></div>`:assignBody;
+ return `<div class="modal-backdrop"><section class="dialog directory-dialog ${editing?'program-editor-dialog program-editor-wizard':''}${nameStep?' program-editor-wizard--name':''}${modeStep?' program-editor-wizard--mode':''}" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">${title}</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${content}</section></div>`;
 }
 function saveProgramTemplate(){
  if(state.actor!=='coach'||state.overlay?.type!=='program-editor')return;
- const form=$('#template-form'),name=$('#plan-name');name.setCustomValidity(name.value.trim()?'':'Enter a program name.');if(!form.reportValidity())return;
- const draft={name:name.value.trim(),type:$('#plan-mode').value,holdStyle:$('#plan-hold-style')?.value==='endurance'?'endurance':'timed',holdSeconds:Number($('#plan-hold-seconds')?.value),total:Number($('#plan-total').value),positions:Number($('#plan-positions').value),reps:Number($('#plan-reps').value)};
+ if((state.overlay.wizardStep??0)!==PROGRAM_WIZARD_STEPS-1||(state.overlay.maxWizardStep??0)<PROGRAM_WIZARD_STEPS-1)return;
+ const form=$('#template-form');
+ persistProgramWizardDraft(state.overlay);
+ const base=programEditorOverlayDraft(state.overlay);
+ if(!base.name?.trim()){toast('Enter a program name.');state.overlay.wizardStep=0;updateProgramWizard('#plan-name');return;}
+ if(!form.reportValidity())return;
+ const draft={name:base.name.trim(),type:base.type,holdStyle:base.holdStyle||'timed',holdSeconds:base.holdSeconds,total:Number(base.total),positions:Number(base.positions),reps:Number(base.reps)};
  if(draft.type!=='strength'){draft.holdStyle='timed';delete draft.holdSeconds;}
  else if(draft.holdStyle==='endurance')delete draft.holdSeconds;
  if(!sessionModeKeys('session').includes(draft.type)||![2,4,6,8,12].includes(draft.total)||![4,8].includes(draft.positions)||![1,2,3,4,5].includes(draft.reps))return;
@@ -412,7 +471,7 @@ const directoryActions={
  'nav-pulse':()=>visitPulse(),'nav-roster':()=>visitDirectory('roster'),'nav-programs':()=>visitTeamHub(null),
  'open-roster-person':el=>openDirectoryPerson(el.dataset.id,'roster'),
  'open-roster-program':el=>openDirectoryPerson(el.dataset.id,'roster','programs'),
- 'open-roster-activity':el=>{if(!openDirectoryPerson(el.dataset.id,'roster','history'))return;const recordId=directoryPersonSummary({id:el.dataset.id}).visit.recordId;if(recordId)openHistoryRecord(recordId);},
+ 'open-roster-activity':el=>openDirectoryPerson(el.dataset.id,'roster','history'),
  'sort-roster':el=>{const ui=rosterUI(),key=el.dataset.sort;if(!ROSTER_SORT_KEYS.has(key))return;ui.descending=ui.sort===key?!ui.descending:false;ui.sort=key;refreshRoster();$(`[data-action="sort-roster"][data-sort="${key}"]`)?.focus({preventScroll:true});},
  'clear-roster-filters':()=>{Object.assign(directoryUI().roster,{query:'',filterKind:'all',filterValue:'all',sort:'name',descending:false});refreshRoster({refreshToolbar:true});if(rosterUI().filterOpen)$('#roster-filter-kind')?.focus();else $('#directory-search')?.focus();},
  'templates-library':el=>{if(!TEMPLATE_LIBRARIES.some(item=>item.id===el.dataset.library))return;visitTeamHub(el.dataset.library);$(`[data-action="templates-library"][data-library="${el.dataset.library}"]`)?.focus();},
@@ -461,9 +520,11 @@ const directoryActions={
  'programs-tab':el=>{if(!['templates','assigned'].includes(el.dataset.tab))return;Object.assign(directoryUI().programs,{tab:el.dataset.tab,query:'',library:'programs'});render();$(`[data-tab="${el.dataset.tab}"]`)?.focus();},
  'browse-templates':()=>{Object.assign(directoryUI().programs,{tab:'templates',query:'',library:'programs'});render();},
  'clear-programs-search':()=>{directoryUI().programs.query='';render();$('#programs-search')?.focus();},
- 'new-session-template':()=>{if(state.actor==='coach')toast('Creating session templates is not in this prototype.');},
- 'new-template':()=>{if(state.actor==='coach')openModal('program-editor');},
- 'edit-template':el=>{if(state.actor==='coach'&&clinicProgramTemplates().some(p=>p.id===el.dataset.id))openModal('program-editor',{id:el.dataset.id});},
+ 'new-template':()=>{if(state.actor==='coach')openModal('program-editor',programWizardOpenData());},
+ 'edit-template':el=>{if(state.actor==='coach'&&clinicProgramTemplates().some(p=>p.id===el.dataset.id)){const t=clinicProgramTemplates().find(p=>p.id===el.dataset.id);openModal('program-editor',programWizardOpenData({id:el.dataset.id,editorDraft:{...t,load:{...programLoad(t)}}}));}},
+ 'program-wizard-back':()=>{const o=state.overlay;if(o?.type!=='program-editor'||(o.wizardStep??0)<=0)return;persistProgramWizardDraft(o);o.wizardStep-=1;updateProgramWizard('#plan-name');},
+ 'program-wizard-next':()=>{const o=state.overlay;if(o?.type!=='program-editor')return;const step=Number(o.wizardStep??0);if(step>=PROGRAM_WIZARD_STEPS-1)return;const form=$('#template-form');if(step===0){const name=$('#plan-name');name?.setCustomValidity(name.value.trim()?'':'Enter a program name.');if(!name?.reportValidity())return;}else if(form&&!form.reportValidity())return;persistProgramWizardDraft(o);o.wizardStep=step+1;o.maxWizardStep=Math.max(Number(o.maxWizardStep??0),o.wizardStep);updateProgramWizard(step===0?'#program-mode-detail-title':step===1?'#plan-positions':'#plan-load-kind');},
+ 'program-wizard-mode':el=>{const o=state.overlay;if(o?.type!=='program-editor'||(o.wizardStep??0)!==1||!sessionModeKeys('session').includes(el.dataset.mode))return;persistProgramWizardDraft(o);o.editorDraft={...programEditorOverlayDraft(o),type:el.dataset.mode};o.paused=matchMedia('(prefers-reduced-motion: reduce)').matches;updateProgramWizard(`[data-action="program-wizard-mode"][data-mode="${el.dataset.mode}"]`);},
  'assign-template':el=>{if(state.actor==='coach'&&clinicProgramTemplates().some(p=>p.id===el.dataset.id))openModal('program-assign',{id:el.dataset.id});},
  'program-member':el=>openDirectoryPerson(el.dataset.id,'programs'),
  'continue-assigned':el=>{if(state.actor!=='coach'||!visiblePeople().some(p=>p.id===el.dataset.id)||!memberPrograms(el.dataset.id).some(p=>p.id===el.dataset.programId&&p.completed<p.total))return;openDirectoryPerson(el.dataset.id,'programs');beginProgram(el.dataset.programId);}
@@ -494,12 +555,12 @@ document.addEventListener('change',event=>{
   syncHoldSecondsVisibility(el);
   el.focus();
  }
- if(el.id==='plan-mode'&&state.overlay?.type==='program-editor')refreshProgramEditorForm('#plan-mode');
+ if((el.id==='plan-hold-style'||el.id==='program-hold-style')&&typeof syncProgramHoldSecondsRow==='function')syncProgramHoldSecondsRow(el.id.replace(/-hold-style$/,''));
  if((el.id==='plan-hold-style'||el.id==='program-hold-style')&&typeof syncProgramHoldSecondsRow==='function')syncProgramHoldSecondsRow(el.id.replace(/-hold-style$/,''));
 });
 document.addEventListener('submit',event=>{
  if(event.target.id==='add-person-form'){event.preventDefault();saveNewPerson();}
- if(event.target.id==='template-form'){event.preventDefault();saveProgramTemplate();}
+ if(event.target.id==='template-form'){event.preventDefault();const o=state.overlay;if(o?.type==='program-editor'&&(o.wizardStep??0)<PROGRAM_WIZARD_STEPS-1){directoryActions['program-wizard-next']();return;}saveProgramTemplate();}
  if(event.target.id==='assign-program-form'){event.preventDefault();assignProgramTemplate();}
 });
 document.addEventListener('click',event=>{

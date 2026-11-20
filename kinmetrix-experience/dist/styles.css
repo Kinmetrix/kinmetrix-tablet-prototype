@@ -111,6 +111,8 @@ small{font-size:13px}
 .button.primary{background:var(--action);color:var(--on-action);border-color:var(--action)}
 .button.primary:hover{background:var(--action-hover)}
 .button.ghost{background:transparent;border-color:transparent}
+.button.tertiary{border-color:transparent;background:transparent;color:var(--muted);font-weight:550}
+.button.tertiary:hover{background:var(--soft);color:var(--ink)}
 .button.danger{color:var(--red);border-color:var(--red-line);background:var(--red-bg)}
 .button.small-button{min-height:42px;padding:8px 13px;font-size:13px}
 .icon-button{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:var(--muted)}

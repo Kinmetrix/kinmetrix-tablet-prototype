@@ -23,7 +23,7 @@ function setupModeDefaults(){
  cfg.challengeHold??=1;
  // Isokinetic follows the existing product habit: challenge sits just under the target unless set by hand.
  if(cfg.type!=='rom'&&Number.isFinite(cfg.weight)&&cfg.weight>=1)cfg.challenge=cfg.challengeAuto?setupAutoChallenge(cfg.weight):Math.max(.5,Math.min(cfg.challenge,cfg.weight-.5));
- if(cfg.repsFor!==cfg.type){if(!cfg.continuing)cfg.reps=({eccentric:2})[cfg.type]||3;cfg.repsFor=cfg.type;}
+ if(cfg.repsFor!==cfg.type){if(!cfg.continuing)cfg.reps=({eccentric:2,rom:1})[cfg.type]||3;cfg.repsFor=cfg.type;}
 }
 function defaultStartingTilt(angle){return [135,180,225].includes(Number(angle))?10:5;}
 function defaultTilt(angle,type=state.setup.type){
@@ -70,8 +70,8 @@ function setupHoldStyleField(){
  return `<div class="setup-field setup-hold-time-field"><span class="setup-label" id="hold-style-label">Hold</span><div class="setup-hold-time-row hold-time-row${style==='endurance'?' hold-time-row--endurance':''}"><div class="segmented" role="group" aria-labelledby="hold-style-label">${[['timed','Timed'],['endurance','Endurance']].map(([key,label])=>`<button type="button" id="setup-hold-${key}" class="${style===key?'active':''}" data-action="setup-hold-style" data-value="${key}" aria-pressed="${style===key}">${label}</button>`).join('')}</div>${style==='timed'?setupIsometricHoldSecondsControl():''}</div>${style==='timed'?`<p class="setup-help" id="hold-seconds-help">Enter seconds (2–15). The rep ends when the timer runs out.</p>`:`<p class="setup-help">No countdown. Release or drop rules end the rep.</p>`}</div>`;
 }
 function resetSetupAcceptance(){
- state.setup.accepted=false;
- const check=$('#accept-settings'),begin=$('#begin-session-button');if(check)check.checked=false;if(begin)begin.disabled=true;
+ const begin=$('#begin-session-button');
+ if(begin)begin.disabled=!state.deviceReady||!setupIsValid();
 }
 function renderSetupControl(selector){render();$(selector)?.focus({preventScroll:true});}
 function changeSetupMode(type){
@@ -109,13 +109,7 @@ function setupModeFields(){
  if(cfg.type==='rom')return `<input id="target-weight" type="hidden" value="${cfg.weight}">`+setupChallengeField('Light push needed before movement counts.');
  return setupForceField()+setupChallengeField(cfg.challengeAuto?'<span id="challenge-auto-note">Auto: 1 kg under target.</span> The pad moves only while they push above this.':'Set by hand. <button class="text-button" data-action="challenge-auto" id="challenge-auto">Back to auto</button>')+setupNumberField('challengeHold','Stop if below for',' s',1,5,1,'The pad stops after this long under the challenge weight.');
 }
-function setupRule(key,on,text,control,fixed=false){return `<div class="setup-rule">${fixed?`<span class="setup-rule-fixed" aria-hidden="true">${icon('check','icon-sm')}</span>`:`<input id="rule-${key}" type="checkbox" data-setup-toggle="${key}" ${on?'checked':''} aria-label="${text}">`}<label ${fixed?'':`for="rule-${key}"`}>${text}</label>${control}</div>`;}
-function setupFinishRules(){
- const cfg=state.setup;
- if(cfg.type==='strength'&&isIsometricEndurance(cfg))return `<section class="setup-rules" aria-labelledby="setup-rules-title"><h2 id="setup-rules-title">Finish the rep when</h2><div class="setup-rule-row">${setupRule('endDrop',true,'Force drops',setupStepper(cfg.endDrop,{id:'setup-endDrop',action:'setup-step',attrs:'data-key="endDrop" data-step="5" data-min="5" data-max="50"',label:'force drop',min:5,max:50,current:cfg.endDrop,unit:'%'})+'<span>below their hold</span>',true)}${setupRule('endCapOn',cfg.endCapOn,'Stop anyway after',setupStepper(cfg.endCap,{id:'setup-endCap',action:'setup-step',attrs:'data-key="endCap" data-step="10" data-min="30" data-max="300"',label:'maximum time',min:30,max:300,current:cfg.endCap,unit:'s'}))}</div><p class="setup-help">Uses the average force for each second. Their hold is the average of the steady seconds, so 10, 10, 10 then 8 ends the rep. The ramp up is not counted. No countdown.</p></section>`;
- if(cfg.type==='rom')return `<section class="setup-rules" aria-labelledby="setup-rules-title"><h2 id="setup-rules-title">Finish the rep when</h2><div class="setup-rule-row">${setupRule('romStillOn',cfg.romStillOn,'No movement for',setupStepper(cfg.romStill,{id:'setup-romStill',action:'setup-step',attrs:'data-key="romStill" data-step="1" data-min="1" data-max="5"',label:'no movement time',min:1,max:5,current:cfg.romStill,unit:'s'}))}${setupRule('romDropOn',cfg.romDropOn,'Force drops by',setupStepper(cfg.romDrop,{id:'setup-romDrop',action:'setup-step',attrs:'data-key="romDrop" data-step="5" data-min="5" data-max="50"',label:'force drop',min:5,max:50,current:cfg.romDrop,unit:'%'}))}</div><p class="setup-help">Whichever happens first, using the average for each second. The coach can always stop a rep by hand. No target force.</p></section>`;
- return '';
-}
+function setupFinishRules(){return '';}
 function setupDirectionGlyph(angle){
  const r=angle*Math.PI/180,x=20+13*Math.sin(r),y=20-13*Math.cos(r);
  return `<svg class="tilt-glyph" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle class="glyph-ring" cx="20" cy="20" r="13"/><path class="glyph-head" d="M20 12.5c-3.6 0-5.6 3-5.6 7.5s2 7.5 5.6 7.5 5.6-3 5.6-7.5-2-7.5-5.6-7.5z"/><path class="glyph-head" d="M18.4 12.9 20 10.6l1.6 2.3"/><circle class="glyph-dot" cx="${x}" cy="${y}" r="4.5"/></svg>`;
@@ -147,7 +141,7 @@ function setupView(){
   <div class="tilt-table" role="table" aria-label="Tilt for each direction"><div class="tilt-head" role="row"><span role="columnheader">Direction</span><span role="columnheader">${columns[0]}</span><span role="columnheader">${columns[1]}</span><span role="columnheader"></span></div>${angles.map(setupTiltRow).join('')}</div>
   <p class="tilt-error" id="tilt-error" role="status" ${invalid?'':'hidden'}>${kind==='return'?'For each direction, the end tilt must be lower than the start tilt.':kind==='fixed'?`Enter a tilt between 0° and ${SETUP_MAX_TILT}°.`:`For each direction, the ${kind==='limit'?'max':'end'} tilt must be higher than the start tilt.`}</p>
  </section>
- <footer class="setup-start"><div class="setup-total"><strong>${cfg.positions*cfg.reps} ${cfg.positions*cfg.reps===1?'rep':'reps'}</strong> · ${cfg.positions} directions × ${cfg.reps} ${cfg.reps===1?'rep':'reps'}<small>${!state.deviceReady?'Device unavailable. Open Device in the sidebar and mark it ready before starting.':setupEndsText()+' · Simulated device'}</small></div><label class="check-label"><input id="accept-settings" type="checkbox" ${cfg.accepted?'checked':''}><span>I’ve reviewed these settings</span></label>${button('Begin session '+icon('play','icon-sm'),'start-session','primary',`${!cfg.accepted||!state.deviceReady||!setupIsValid()?'disabled':''} id="begin-session-button"`)}</footer></div>`;
+ <footer class="setup-start"><div class="setup-total"><strong>${cfg.positions*cfg.reps} ${cfg.positions*cfg.reps===1?'rep':'reps'}</strong> · ${cfg.positions} directions × ${cfg.reps} ${cfg.reps===1?'rep':'reps'}<small>${!state.deviceReady?'Device unavailable. Open Device in the sidebar and mark it ready before starting.':setupEndsText()+' · Simulated device'}</small></div>${button('Begin session '+icon('play','icon-sm'),'start-session','primary',`${!state.deviceReady||!setupIsValid()?'disabled':''} id="begin-session-button"`)}</footer></div>`;
 }
 function setTiltOverride(angle,values){const cfg=state.setup;cfg.tiltOverrides??={};cfg.tiltOverrides[cfg.type]??={};cfg.tiltOverrides[cfg.type][angle]=values;}
 const setupActions={

@@ -152,7 +152,7 @@ function mountModePreview(){
  const root=$('.rendered-isometric,.rendered-isokinetic');if(!root)return;
  const renderer=root.matches('.rendered-isokinetic')?RenderedIsokinetic:RenderedIsometric;
  modePreviewController=renderer.mount(root,{paused:state.overlay?.paused,onPause(){
-  const o=state.overlay;if(o?.type!=='session-picker')return;o.paused=true;
+  const o=state.overlay;const previewHost=o?.type==='session-picker'||(o?.type==='program-editor'&&(o.wizardStep??0)===1);if(!previewHost)return;o.paused=true;
   const control=$('[data-action="toggle-mode-preview"]');if(control){control.innerHTML=icon('play','icon-sm');control.title='Play animation';control.setAttribute('aria-label','Play animation');}
  }});
  if(matchMedia('(max-width:620px)').matches)$('.mode-choice.selected')?.scrollIntoView({block:'nearest',inline:'nearest'});
@@ -205,6 +205,8 @@ function syncHoldSecondsVisibility(selectEl){
  const row=selectEl.closest('.hold-time-row');
  const wrap=row?.querySelector('.hold-seconds-inline');
  if(wrap)wrap.hidden=endurance;
+ const seconds=wrap?.querySelector('input');
+ if(seconds)seconds.disabled=endurance;
  row?.classList.toggle('hold-time-row--endurance',endurance);
 }
 function syncProgramHoldSecondsRow(prefix){syncHoldSecondsVisibility($('#'+prefix+'-hold-style'));}
@@ -261,7 +263,7 @@ const workspaceActions={
  'choose-session-mode':el=>{const o=state.overlay;if(o?.type!=='session-picker'||!sessionModeKeys(o.purpose).includes(el.dataset.mode))return;o.mode=el.dataset.mode;o.selections[o.purpose]=o.mode;o.paused=matchMedia('(prefers-reduced-motion: reduce)').matches;renderOverlay();$(`[data-action="choose-session-mode"][data-mode="${o.mode}"]`).focus();},
  'expand-mode-preview':expandModePreview,
  'collapse-mode-preview':collapseModePreview,
- 'toggle-mode-preview':el=>{const o=state.overlay;if(o?.type!=='session-picker')return;o.paused=!o.paused;$('.mode-animation').classList.toggle('is-paused',o.paused);el.innerHTML=icon(o.paused?'play':'pause','icon-sm');el.title=(o.paused?'Play':'Pause')+' animation';el.setAttribute('aria-label',(o.paused?'Play':'Pause')+' animation');modePreviewController?.setPlaying(!o.paused);},
+ 'toggle-mode-preview':el=>{const o=state.overlay;const wizard=o?.type==='program-editor'&&(o.wizardStep??0)===1;if(o?.type!=='session-picker'&&!wizard)return;o.paused=!o.paused;$('.mode-animation').classList.toggle('is-paused',o.paused);el.innerHTML=icon(o.paused?'play':'pause','icon-sm');el.title=(o.paused?'Play':'Pause')+' animation';el.setAttribute('aria-label',(o.paused?'Play':'Pause')+' animation');modePreviewController?.setPlaying(!o.paused);},
  'confirm-session-mode':()=>{const o=state.overlay;if(o?.type!=='session-picker'||!sessionModeKeys(o.purpose).includes(o.mode))return;beginSetup(o.purpose,o.mode);const heading=$('.session-title h1');heading?.setAttribute('tabindex','-1');heading?.focus();}
 };
 document.addEventListener('input',event=>{const field=event.target.dataset.programField,o=state.overlay;if(field&&o?.step==='create-program'){o.programDraft[field]=event.target.value;event.target.setCustomValidity('');}});

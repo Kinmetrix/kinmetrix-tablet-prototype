@@ -1,0 +1,29 @@
+.session-template-editor-dialog{max-width:min(640px,calc(100vw - 32px));max-height:min(90dvh,760px);display:flex;flex-direction:column;overflow:hidden;padding:0}
+.session-template-editor-dialog .dialog-header{flex-shrink:0;padding:22px 26px 0;margin-bottom:0}
+.session-template-editor-dialog>.directory-dialog-intro{flex-shrink:0;margin:8px 26px 16px}
+.session-template-form{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 26px 22px;margin:0}
+.session-template-form textarea{width:100%;min-height:72px;margin-top:9px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;resize:vertical;box-sizing:border-box}
+.session-template-form label.check-label.session-template-enabled{display:flex;align-items:center;gap:10px;width:auto;margin:4px 0 20px;min-height:44px;padding:0;cursor:pointer;font-weight:550;line-height:1.25}
+.session-template-form label.check-label.session-template-enabled input[type="checkbox"]{display:block;width:19px;height:19px;min-height:19px;margin:0;padding:0;flex:0 0 19px;align-self:center;accent-color:var(--action)}
+.session-template-properties{margin:0;padding:0;border:0}
+.session-template-properties legend{font-size:15px;font-weight:600;margin:0 0 14px;padding:0}
+.session-template-properties .program-field-mode{margin-bottom:16px}
+.session-template-properties .program-structure-grid{margin-top:4px}
+.session-template-properties label.session-template-metric{display:block;font-size:13px;font-weight:550;line-height:1.3}
+.session-template-properties .session-template-unit-input{margin:9px 0 0;width:100%;gap:10px}
+.session-template-properties .session-template-unit-input input{flex:1;min-width:0;width:auto;min-height:48px;margin-top:0;height:48px;text-align:left;padding:10px 12px;font-size:15px;font-weight:400;border-radius:8px}
+.session-template-properties .session-template-unit-input>span{flex-shrink:0;font-size:14px;font-weight:550;color:var(--muted)}
+.session-template-form .directory-dialog-footer{position:sticky;bottom:0;flex-shrink:0;display:flex;gap:10px;justify-content:flex-end;margin:20px -26px 0;padding:16px 26px 0;border-top:1px solid var(--line);background:linear-gradient(to bottom,transparent 0,var(--surface) 12px)}
+.session-template-desc{display:block;margin-top:4px;color:var(--muted);font-weight:400}
+.session-template-actions{display:flex;flex-wrap:wrap;gap:6px}
+.session-template-steps-head{margin-bottom:20px}
+.session-template-steps-head h2{font-size:22px;margin:0}
+.session-template-steps-grid td,.session-template-steps-grid th{font-size:13px}
+@media(max-width:860px){
+ .session-template-editor-dialog{max-height:calc(100dvh - 28px);border-radius:16px}
+ .session-template-editor-dialog .dialog-header{padding:18px 20px 0}
+ .session-template-editor-dialog>.directory-dialog-intro{margin:6px 20px 14px}
+ .session-template-form{padding:0 20px 18px}
+ .session-template-form .directory-dialog-footer{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}
+ .session-template-properties .program-structure-grid{grid-template-columns:1fr}
+}

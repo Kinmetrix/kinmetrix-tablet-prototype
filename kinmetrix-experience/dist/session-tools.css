@@ -117,3 +117,38 @@
 }
 
 .program-editor-dialog .directory-dialog-footer{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}
+
+/* Program template wizard — one step per viewport, progress bar, sticky footer */
+.program-editor-wizard{max-width:913px;display:flex;flex-direction:column;min-height:min(520px,calc(100dvh - 120px));max-height:min(663px,calc(100dvh - 48px));overflow:hidden;padding:0}
+.program-editor-wizard .dialog-header{flex-shrink:0;padding:22px 26px 0;margin:0;border:0}
+.program-editor-wizard .dialog-header h2{font-size:23px}
+.program-editor-wizard .directory-dialog-intro{flex-shrink:0;margin:0 26px 10px;line-height:1.55}
+.dialog.program-editor-dialog.program-editor-wizard--name{max-width:min(560px,calc(100vw - 48px));width:100%;min-height:0;height:auto}
+.program-editor-wizard--name .program-wizard-progress{margin-bottom:22px}
+.program-editor-wizard--name .program-form.program-wizard-form{flex:0 1 auto;padding:22px 32px 28px}
+.program-editor-wizard--mode{max-width:1000px}
+.program-wizard-step-label{margin:0 26px 8px;font-size:13px;font-weight:600;color:var(--muted)}
+.program-wizard-progress{flex-shrink:0;height:4px;margin:0 26px 16px;background:var(--line);border-radius:2px}
+.program-wizard-progress>span{display:block;height:100%;background:var(--ink);border-radius:2px;transition:width .2s ease-out}
+.program-editor-wizard .program-form.program-wizard-form{flex:1;min-height:0;display:flex;flex-direction:column;overflow:visible;margin:0;padding:0 26px 12px}
+.program-editor-wizard--mode .program-form.program-wizard-form{overflow:hidden}
+.program-wizard-step:not(.session-picker-body){flex:1;min-height:0;display:flex;flex-direction:column;overflow:visible;padding:6px 6px 8px;margin:-6px -6px 0}
+.program-wizard-step--name{justify-content:flex-start;align-self:stretch;width:100%;padding:6px 6px 10px;margin:0}
+.program-wizard-step--name .program-wizard-step-title{max-width:28ch}
+.program-wizard-step--name .program-field-name{display:block;max-width:min(22rem,100%)}
+.program-wizard-step--name .program-field-name input{width:100%;max-width:22rem}
+.program-wizard-step-title{margin:0 0 16px;font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.program-wizard-step--mode.session-picker-body{display:grid;grid-template-columns:42% minmax(0,1fr);min-height:min(400px,42vh);height:100%;padding:0;margin:0 -26px;align-content:stretch}
+.program-wizard-step--mode .mode-choices{justify-content:center}
+.program-wizard-step--mode .mode-detail{padding:23px 26px 20px;min-width:0;display:grid;grid-template-rows:auto auto minmax(0,1fr);min-height:0;height:100%}
+.program-wizard-step--mode .mode-detail-heading{margin-bottom:0}
+.program-wizard-step--mode .mode-description{margin:12px 0 14px;min-height:0;max-width:54ch}
+.program-wizard-step--mode .mode-animation{position:relative;min-height:0;height:100%;background:#fff;border-radius:10px}
+.program-wizard-step--mode .mode-detail :is(.rendered-isometric,.rendered-isokinetic){display:flex;flex-direction:column;height:100%;min-height:0}
+.program-wizard-step--mode .mode-detail .rendered-scene{flex:1;min-height:200px;height:auto;max-height:none}
+.program-wizard-step--progression{overflow-x:visible;overflow-y:auto;padding:6px 6px 10px;margin:-6px -6px 0;-webkit-overflow-scrolling:touch}
+.program-editor-wizard .program-wizard-form :is(input,select,textarea){scroll-margin:8px}
+.program-editor-wizard .program-wizard-footer.directory-dialog-footer{flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;gap:16px;margin:0;padding:16px 26px 22px;border-top:1px solid var(--line)}
+.program-wizard-actions{display:flex;align-items:center;gap:10px}
+.program-wizard-actions .button.primary{margin-left:2px}
+.program-wizard-footer .button:disabled{opacity:.45;cursor:not-allowed}

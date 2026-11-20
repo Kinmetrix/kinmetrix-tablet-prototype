@@ -711,9 +711,14 @@ function pulseKpiIsSelected(ui, id) {
   return false;
 }
 
+function pulseKpiShowsSelected(ui, id) {
+  if (id === 'totalActivity') return false;
+  return pulseKpiIsSelected(ui, id);
+}
+
 function pulseKpiStrip(kpis, ui) {
   return `<div class="pulse-kpi-strip" aria-label="Summary for this stretch">${kpis.map(kpi => {
-    const selected = pulseKpiIsSelected(ui, kpi.id);
+    const selected = pulseKpiShowsSelected(ui, kpi.id);
     return `<button type="button" class="team-overview-kpi pulse-kpi-strip-card pulse-kpi-strip-button${selected ? ' is-selected' : ''}" data-action="pulse-kpi" data-value="${kpi.id}" aria-pressed="${selected}">
       <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}</span>
       <span class="team-overview-kpi-value tabular">${kpi.value}</span>
@@ -746,7 +751,7 @@ function pulseMemberGroups(activity, sortKey) {
 }
 
 function pulseActivityFiltersActive(ui) {
-  return ui.activityFilter !== 'all' || ui.activitySearch.trim() !== '' || ui.activitySort !== 'newest';
+  return ui.pulseGrouping === 'members' || ui.activityFilter !== 'all' || ui.activitySearch.trim() !== '' || ui.activitySort !== 'newest';
 }
 
 function pulseActivityFilterButtonLabel(ui) {
@@ -789,7 +794,7 @@ function pulseActivityToolbar(ui) {
     ${pulseActivitySortPopover(ui)}
   </div>`;
   const reset = pulseActivityFiltersActive(ui)
-    ? `<button type="button" class="pulse-activity-bar-button pulse-activity-reset" data-action="pulse-activity-reset" aria-label="Reset filters">Reset</button>`
+    ? `<button type="button" class="button tertiary pulse-activity-reset" data-action="pulse-activity-reset" aria-label="Reset filters">Reset</button>`
     : '';
   const search = `<label class="team-overview-search pulse-activity-bar-search">
     <span class="sr-only">Search by name</span>
@@ -830,16 +835,14 @@ function pulseActivityRowMarkup(item, options = {}) {
   </li>`;
 }
 
-function pulseOperationsTable(model) {
+function pulseActivityListMarkup(model) {
   const {ui, activity, activityAll, roster} = model;
   const face = id => roster.find(person => person.id === id) || {initials: '•', name: ''};
   const empty = `<li class="pulse-activity-empty muted">${activityAll.length ? 'No visits match this filter.' : 'No visits in this period.'}</li>`;
-  let list;
-  if (!activity.length) {
-    list = empty;
-  } else if (ui.pulseGrouping === 'members') {
+  if (!activity.length) return empty;
+  if (ui.pulseGrouping === 'members') {
     const groups = pulseMemberGroups(activity, ui.activitySort);
-    list = groups.map(group => {
+    return groups.map(group => {
       const av = avatar(face(group.memberId), 'mini');
       const countLabel = group.visits.length === 1 ? '1 visit' : `${group.visits.length} visits`;
       const head = `<div class="pulse-member-head" data-action="open-pulse-person" data-id="${group.memberId}" data-member-name="${escapeHTML(group.memberName)}" tabindex="0" role="link">
@@ -855,12 +858,38 @@ function pulseOperationsTable(model) {
         <ul class="pulse-member-visits" aria-label="Visits for ${escapeHTML(group.memberName)}">${visits}</ul>
       </li>`;
     }).join('');
-  } else {
-    list = activity.map(item => {
-      const av = avatar(face(item.memberId), 'mini');
-      return pulseActivityRowMarkup(item, {avatarMarkup: av});
-    }).join('');
   }
+  return activity.map(item => {
+    const av = avatar(face(item.memberId), 'mini');
+    return pulseActivityRowMarkup(item, {avatarMarkup: av});
+  }).join('');
+}
+
+function pulseActivityResetMarkup(ui) {
+  return pulseActivityFiltersActive(ui)
+    ? `<button type="button" class="button tertiary pulse-activity-reset" data-action="pulse-activity-reset" aria-label="Reset filters">Reset</button>`
+    : '';
+}
+
+function refreshPulseActivity() {
+  const model = pulseModel();
+  const list = document.querySelector('.pulse-activity-list');
+  if (list) list.innerHTML = pulseActivityListMarkup(model);
+  const toolbar = document.querySelector('.team-overview-activity-toolbar');
+  if (!toolbar) return;
+  const reset = toolbar.querySelector('.pulse-activity-reset');
+  const wantsReset = pulseActivityFiltersActive(model.ui);
+  if (wantsReset && !reset) {
+    const search = toolbar.querySelector('.pulse-activity-bar-search');
+    if (search) search.insertAdjacentHTML('beforebegin', pulseActivityResetMarkup(model.ui));
+  } else if (!wantsReset && reset) {
+    reset.remove();
+  }
+}
+
+function pulseOperationsTable(model) {
+  const {ui} = model;
+  const list = pulseActivityListMarkup(model);
   return `<section class="pulse-operations pulse-operations--trail" aria-label="Station visits">
     ${pulseActivityToolbar(ui)}
     <div class="pulse-activity-scroll team-overview-table-wrap">
@@ -918,6 +947,7 @@ const teamOverviewActions = {
   },
   'pulse-activity-reset': () => {
     const ui = teamOverviewUI();
+    ui.pulseGrouping = 'visits';
     ui.activityFilter = 'all';
     ui.activitySort = 'newest';
     ui.activitySearch = '';
@@ -1138,7 +1168,7 @@ document.addEventListener('click', event => {
 document.addEventListener('input', event => {
   if (event.target.id !== 'team-overview-pulse-search') return;
   teamOverviewUI().activitySearch = event.target.value;
-  render();
+  refreshPulseActivity();
 });
 
 document.addEventListener('change', event => {

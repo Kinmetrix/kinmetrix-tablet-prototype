@@ -3,6 +3,21 @@
 .isok-setup--team .setup-heading{padding-bottom:12px}
 .isok-team-save-note{margin:16px 0 0;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);max-width:52ch}
 .assessment-workspace--split .isok-setup{max-width:none;padding:0}
+.assessment-workspace--split .isok-split{grid-template-columns:minmax(0,3fr) minmax(200px,2fr);width:100%}
+.assessment-workspace--split .isok-controls{padding-right:20px;width:100%;box-sizing:border-box}
+.assessment-workspace--split .isok-main-fields{grid-template-columns:1fr;gap:18px;width:100%}
+.assessment-workspace--split .isok-main-fields .setup-field{display:grid;grid-template-columns:minmax(148px,200px) minmax(0,1fr);gap:10px 24px;align-items:center;width:100%}
+.assessment-workspace--split .isok-main-fields .setup-field .setup-label{margin-bottom:0}
+.assessment-workspace--split .isok-main-fields .setup-field .setup-help{grid-column:1/-1;margin:0}
+.assessment-workspace--split .isok-main-fields .setup-force-field{display:grid;grid-template-columns:minmax(148px,200px) minmax(0,1fr);align-items:center}
+.assessment-workspace--split .isok-main-fields .setup-force-field .weight-input{justify-self:start;margin:0}
+.assessment-workspace--split .isok-main-fields .setup-hold-time-field{align-items:start}
+.assessment-workspace--split .isok-main-fields .setup-hold-time-field .setup-hold-time-row{grid-column:2;width:100%;max-width:none}
+.assessment-workspace--split .isok-preview{padding-left:16px;padding-right:0;align-items:center}
+.assessment-workspace--split .isok-radial{max-width:min(100%,240px)}
+.assessment-workspace--split .isok-node{min-width:68px;min-height:60px;padding:4px 6px}
+.assessment-workspace--split .isok-node strong{font-size:15px}
+.assessment-workspace--split .isok-preview-heading h2{font-size:17px}
 .program-editor-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.85fr);gap:24px;align-items:start}
 .program-setup-preview{border:1px solid var(--line);border-radius:12px;padding:12px 12px 8px;background:var(--soft)}
 .program-setup-preview-label{font-size:13px;color:var(--muted);margin:0 0 8px}
@@ -10,10 +25,14 @@
 .program-setup-preview .isok-preview-heading p{font-size:13px}
 .program-setup-preview .isok-radial{max-width:280px;margin-inline:0}
 .program-setup-preview .isok-range-summary{justify-content:flex-start}
+.program-assign-split{display:grid;grid-template-columns:minmax(200px,240px) minmax(0,1fr);gap:20px;align-items:start}
+.program-assign-preview{align-self:start}
+.program-assign-main{min-width:0}
+@media(max-width:700px){.program-assign-split{grid-template-columns:1fr}.program-assign-preview{max-width:280px}}
 @media(max-width:900px){.program-editor-split{grid-template-columns:1fr}}
 .isok-setup .setup-heading{padding-bottom:18px;margin-bottom:0}
 .isok-setup .setup-heading h1{font-size:28px}
-.isok-split{display:grid;grid-template-columns:minmax(360px,.95fr) minmax(380px,1.05fr);border-top:1px solid var(--line)}
+.isok-split{display:grid;grid-template-columns:minmax(380px,1.08fr) minmax(280px,.88fr);border-top:1px solid var(--line)}
 .isok-controls{padding:0 36px 22px 0;min-width:0}
 .isok-tabs{display:flex;gap:28px;border-bottom:1px solid var(--line);margin-bottom:24px}
 .isok-tabs button{border:0;border-bottom:2px solid transparent;background:none;color:var(--muted);min-height:55px;padding:0 4px;font-size:16px;font-weight:550}
@@ -27,6 +46,11 @@
 .isok-setup .segmented button{min-height:40px;padding:7px 14px;font-size:14px;white-space:nowrap}
 .isok-setup .setup-force-field .weight-input input{font-size:22px;width:112px;height:50px}
 .isok-setup .setup-change{font-size:14px;color:var(--muted)}
+.isok-setup .setup-hold-time-row{flex-wrap:wrap;row-gap:12px;max-width:100%;align-items:center}
+.isok-setup .setup-hold-seconds-row{margin:0;flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;max-width:100%}
+.isok-setup .setup-hold-seconds-row .weight-input{display:flex;margin:0;flex:0 0 auto}
+.isok-setup .setup-hold-time-row .segmented{flex:0 0 auto}
+.isok-setup .setup-hold-seconds-row .weight-input input{width:72px;height:44px;font-size:17px}
 .isok-movement{border-top:1px solid var(--line);margin-top:26px;padding-top:20px}
 .isok-movement h2,.isok-editor-heading h2{font-size:17px;font-weight:620;margin:0 0 8px}
 .isok-movement p{font-size:15px;line-height:1.55;margin:0 0 10px;max-width:49ch}

@@ -117,7 +117,7 @@
 .program-completed-note{font-size:12px;line-height:1.5;color:var(--muted);padding:12px 0}
 .program-form{padding:24px 26px}
 .program-form label{display:block;font-size:13px;font-weight:550}
-.program-form input,.program-form select{display:block;margin-top:9px;width:100%;min-height:48px;font-size:15px;font-weight:400;color:var(--ink);border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 12px}
+.program-form input:not([type="checkbox"]):not([type="radio"]),.program-form select,.program-form textarea{display:block;margin-top:9px;width:100%;min-height:48px;font-size:15px;font-weight:400;color:var(--ink);border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 12px}
 .program-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:24px}
 .session-picker .program-basics-layout{margin-top:4px}
 .session-picker .program-structure-grid{border-top:0;padding-top:0}

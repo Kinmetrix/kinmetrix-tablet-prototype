@@ -179,6 +179,54 @@ function leaveTeamAssessmentEditor() {
   if (state.stage === 'team-assessment-edit') state.stage = null;
 }
 
+function syncTeamRomEditor() {
+  const ui = directoryUI().programs;
+  const rom = teamRomConfig();
+  state.stage = 'team-assessment-edit';
+  state.setup = {
+    purpose: 'assessment',
+    type: 'rom',
+    positions: rom.positions,
+    reps: 1,
+    weight: 8,
+    angle: ui.teamAngle ?? 0,
+    isokTab: ui.teamTab ?? 'session',
+    tiltOverrides: {},
+    accepted: true,
+    continuing: false,
+    programLoad: null,
+    forceEdited: false,
+    challenge: rom.challenge,
+    challengeFor: 'rom',
+    romStillOn: rom.romStillOn,
+    romStill: rom.romStill,
+    romDropOn: rom.romDropOn,
+    romDrop: rom.romDrop,
+    romStart: 0,
+    romMax: SETUP_MAX_TILT
+  };
+  setupModeDefaults();
+}
+
+function ensureTeamRomEditor() {
+  if (state.stage === 'team-assessment-edit' && state.setup?.type === 'rom') {
+    setupModeDefaults();
+    return;
+  }
+  syncTeamRomEditor();
+}
+
+function persistTeamRomFromSetup(cfg = state.setup) {
+  const rom = teamRomConfig();
+  rom.positions = cfg.positions;
+  rom.challenge = cfg.challenge;
+  rom.romStillOn = cfg.romStillOn;
+  rom.romDropOn = cfg.romDropOn;
+  rom.romStill = cfg.romStill;
+  rom.romDrop = cfg.romDrop;
+  teamSettings().rom = normalizeTeamRom(rom);
+}
+
 function teamAssessmentConfig() {
   return teamSettings().assessment;
 }
@@ -257,25 +305,8 @@ function teamRomRuleRow(key, on, label, control) {
 }
 
 function teamRomWorkspaceMarkup() {
-  const rom = teamRomConfig();
-  const unit = exportForceUnits[teamSettings().forceUnit]?.short || 'kg';
-  const directions = `<div class="segmented" role="group" aria-label="Directions">${[4, 8].map(n => `<button type="button" class="${rom.positions === n ? 'active' : ''}" data-action="team-rom-positions" data-value="${n}" aria-pressed="${rom.positions === n}">${n}</button>`).join('')}</div>`;
-  const stillStep = setupStepper(rom.romStill, {id: 'team-rom-still', action: 'team-rom-step', attrs: 'data-key="romStill" data-step="1" data-min="1" data-max="5"', label: 'no movement time', min: 1, max: 5, current: rom.romStill, unit: 's'});
-  const dropStep = setupStepper(rom.romDrop, {id: 'team-rom-drop', action: 'team-rom-step', attrs: 'data-key="romDrop" data-step="5" data-min="5" data-max="50"', label: 'force drop', min: 5, max: 50, current: rom.romDrop, unit: '%'});
-  const challenge = `<div class="weight-input assessment-weight-input"><input id="team-rom-challenge" type="number" min="0.5" max="5" step="0.5" value="${rom.challenge}" inputmode="decimal" aria-label="Challenge weight"><span>${unit}</span></div>`;
-  return `<div class="assessment-workspace">
-    <p class="assessment-workspace-lead">Team defaults for range of motion assessments. No target force or reps per direction.</p>
-    <section class="assessment-protocol-panel" aria-labelledby="team-rom-title">
-      <h2 id="team-rom-title" class="sr-only">Range of motion defaults</h2>
-      <p class="assessment-arc-kind"><strong>Range of motion</strong> · ${escapeHTML(setupModeLine.rom)}</p>
-      ${assessmentProtocolRow('Directions', directions)}
-      ${assessmentProtocolRow('Challenge weight', challenge, 'Light push needed before movement counts.')}
-      <h3 class="assessment-subheading">Finish the rep when</h3>
-      ${teamRomRuleRow('romStill', rom.romStillOn, 'No movement for', stillStep)}
-      ${teamRomRuleRow('romDrop', rom.romDropOn, 'Force drops by', dropStep)}
-      <p class="muted small">Whichever happens first. Coaches can always stop a rep by hand.</p>
-    </section>
-  </div>`;
+  ensureTeamRomEditor();
+  return `<div class="assessment-workspace assessment-workspace--split">${isokineticSetupView()}</div>`;
 }
 
 function teamAssessmentWorkspaceMarkup() {
@@ -284,20 +315,9 @@ function teamAssessmentWorkspaceMarkup() {
   return `${assessmentWorkspaceSubnav()}${body}`;
 }
 
-function sessionTemplatesTableMarkup() {
-  const rows = clinicSessionTemplates();
-  return `<div class="directory-table-scroll" tabindex="0" role="region" aria-label="Session templates">
-   <table class="data-table directory-table"><caption class="sr-only">Session templates</caption>
-    <thead><tr><th scope="col">Session</th><th scope="col">Load</th></tr></thead>
-    <tbody>${rows.map(row => `<tr><th scope="row">${escapeHTML(row.name)}</th><td>${escapeHTML(row.detail)}</td></tr>`).join('')}</tbody>
-   </table>
-  </div>
-  <p class="directory-footnote">Load presets for sessions and for follow-up plans after assessment.</p>`;
-}
-
 function teamSessionWorkspaceMarkup() {
   const tab = sessionWorkspaceTab();
-  const body = tab === 'session-plan' ? teamFollowUpPlanFieldsMarkup() : sessionTemplatesTableMarkup();
+  const body = tab === 'session-plan' ? teamFollowUpPlanFieldsMarkup() : sessionTemplatesWorkspaceBody();
   return `${sessionWorkspaceSubnav()}${body}`;
 }
 
@@ -366,14 +386,14 @@ function teamHubCardHint(cardId) {
     return policy?.label || 'Waiver policy';
   }
   if (cardId === 'assessments') return 'Protocol, ROM, and session plan defaults';
-  if (cardId === 'sessions') return `${clinicSessionTemplates().length} load presets`;
+  if (cardId === 'sessions') return `${clinicSessionTemplates().length} templates`;
   if (cardId === 'programs') return `${clinicProgramTemplates().length} templates · ${assignedPrograms().length} assigned`;
   return '';
 }
 
 function visitTeamHub(card = null) {
   if (state.actor !== 'coach') return;
-  if (card !== 'assessments' || assessmentWorkspaceTab() !== 'protocol') leaveTeamAssessmentEditor();
+  if (card !== 'assessments') leaveTeamAssessmentEditor();
   state.nav = 'team';
   state.settingsSection = null;
   state.personId = null;
@@ -384,6 +404,7 @@ function visitTeamHub(card = null) {
     state.settingsHubSection = 'waiver';
     state.waiverHubTab = 'signatures';
   } else if (card && isTeamHubCardId(card)) {
+    if (card !== 'sessions') state.sessionTemplateFocusId = null;
     state.teamHubCard = card;
     if (TEAM_HUB_POLICY_IDS.has(card)) {
       state.settingsHubSection = card;
@@ -396,6 +417,7 @@ function visitTeamHub(card = null) {
     }
   } else {
     state.teamHubCard = null;
+    state.sessionTemplateFocusId = null;
     directoryUI().programs.library = null;
   }
   rosterUI().filterOpen = false;
@@ -463,7 +485,7 @@ function teamHubDetailHead(activeItem, cardId) {
     programs: {action: 'new-template', ariaLabel: 'New program template'}
   };
   const create = createByLibrary[library];
-  const showCreate = create && !(library === 'sessions' && sessionWorkspaceTab() === 'session-plan');
+  const showCreate = create && !(library === 'sessions' && (sessionWorkspaceTab() === 'session-plan' || state.sessionTemplateFocusId));
   const action = cardId === 'station'
     ? button('Save settings', 'save-settings', 'primary')
     : saveAssessment || saveSessionPlan || (showCreate ? button(icon('plus', 'icon-sm') + ' New template', create.action, 'primary', `aria-label="${create.ariaLabel}"`) : '');
@@ -707,12 +729,11 @@ const teamSettingsActions = {
       }
       persistTeamAssessmentFromSetup();
     } else if (tab === 'rom') {
-      const rom = teamRomConfig();
-      rom.romStillOn = $('#team-rom-romStill-on')?.checked !== false;
-      rom.romDropOn = $('#team-rom-romDrop-on')?.checked !== false;
-      const challenge = Number($('#team-rom-challenge')?.value);
-      if (Number.isFinite(challenge)) rom.challenge = challenge;
-      team.rom = normalizeTeamRom(rom);
+      if (state.stage === 'team-assessment-edit' && state.setup?.type === 'rom' && !setupIsValid()) {
+        toast('Check limit settings before saving.');
+        return;
+      }
+      persistTeamRomFromSetup();
     }
     render();
     toast('Assessment defaults saved.');
