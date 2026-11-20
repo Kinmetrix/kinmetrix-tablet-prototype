@@ -880,8 +880,10 @@ function pulseActivityToolbar(ui) {
     ${icon('search')}
     <input id="team-overview-pulse-search" type="search" inputmode="search" autocomplete="off" placeholder="Search" value="${escapeHTML(ui.activitySearch)}">
   </label>`;
-  return `<header class="pulse-activity-head team-overview-activity-head"><h2>Activity</h2></header>
-    <div class="pulse-activity-bar team-overview-activity-toolbar">${typeControl}${sortControl}${reset}${search}</div>`;
+  return `<header class="pulse-activity-head team-overview-activity-head">
+    <h2>Activity</h2>
+    <div class="pulse-activity-bar team-overview-activity-toolbar">${typeControl}${sortControl}${reset}${search}</div>
+  </header>`;
 }
 
 function pulseTableOutcomeLabel(item) {
