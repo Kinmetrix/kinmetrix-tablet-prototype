@@ -19,6 +19,7 @@ function teamOverviewUI() {
   if (!TEAM_OVERVIEW_PERIODS[ui.period] && ui.period !== 'custom') ui.period = 'last-30';
   if (!PULSE_ACTIVITY_FILTERS[ui.activityFilter]) ui.activityFilter = 'all';
   if (!PULSE_ACTIVITY_SORTS[ui.activitySort]) ui.activitySort = 'newest';
+  if (ui.pulseGrouping !== 'members') ui.pulseGrouping = 'visits';
   if (ui.activitySearch == null) ui.activitySearch = '';
   if (ui.activityTypeOpen == null) ui.activityTypeOpen = false;
   if (ui.activitySortOpen == null) ui.activitySortOpen = false;
@@ -702,14 +703,46 @@ function pulseMetricLabel(id) {
   return 'Sessions';
 }
 
-function pulseKpiStrip(kpis) {
-  return `<div class="pulse-kpi-strip" aria-label="Summary for this stretch">${kpis.map(kpi =>
-    `<article class="team-overview-kpi pulse-kpi-strip-card">
+function pulseKpiIsSelected(ui, id) {
+  if (id === 'totalActivity') return ui.pulseGrouping === 'visits';
+  if (id === 'membersActive') return ui.pulseGrouping === 'members';
+  if (id === 'trainingSessions') return ui.activityFilter === 'session';
+  if (id === 'assessments') return ui.activityFilter === 'assessment';
+  return false;
+}
+
+function pulseKpiStrip(kpis, ui) {
+  return `<div class="pulse-kpi-strip" aria-label="Summary for this stretch">${kpis.map(kpi => {
+    const selected = pulseKpiIsSelected(ui, kpi.id);
+    return `<button type="button" class="team-overview-kpi pulse-kpi-strip-card pulse-kpi-strip-button${selected ? ' is-selected' : ''}" data-action="pulse-kpi" data-value="${kpi.id}" aria-pressed="${selected}">
       <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}</span>
       <span class="team-overview-kpi-value tabular">${kpi.value}</span>
       <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
-    </article>`
-  ).join('')}</div>`;
+    </button>`;
+  }).join('')}</div>`;
+}
+
+function pulseMemberGroups(activity, sortKey) {
+  const buckets = new Map();
+  for (const row of activity) {
+    if (!buckets.has(row.memberId)) buckets.set(row.memberId, []);
+    buckets.get(row.memberId).push(row);
+  }
+  let memberIds = [...buckets.keys()];
+  if (sortKey === 'member') {
+    memberIds.sort((a, b) => buckets.get(a)[0].memberName.localeCompare(buckets.get(b)[0].memberName));
+  } else {
+    const firstIndex = new Map();
+    activity.forEach((row, index) => {
+      if (!firstIndex.has(row.memberId)) firstIndex.set(row.memberId, index);
+    });
+    memberIds.sort((a, b) => firstIndex.get(a) - firstIndex.get(b));
+  }
+  return memberIds.map(id => ({
+    memberId: id,
+    memberName: buckets.get(id)[0].memberName,
+    visits: buckets.get(id)
+  }));
 }
 
 function pulseActivityFilterButtonLabel(ui) {
@@ -774,18 +807,53 @@ function pulseActivityVisitBlock(item, avatarMarkup) {
   return `<div class="pulse-visit">${avatarMarkup}<span class="pulse-visit-stack"><strong>${escapeHTML(item.memberName)}</strong><span class="pulse-visit-sub">${badge}<small class="muted">${escapeHTML(item.kindLabel)}</small></span></span></div>`;
 }
 
+function pulseActivityVisitBlockNested(item) {
+  const badge = teamActivityBadgeMarkup(item.badge);
+  return `<div class="pulse-visit pulse-visit--nested"><span class="pulse-visit-stack"><span class="pulse-visit-sub">${badge}<small class="muted">${escapeHTML(item.kindLabel)}</small></span></span></div>`;
+}
+
+function pulseActivityRowMarkup(item, options = {}) {
+  const {nested = false, avatarMarkup = ''} = options;
+  const outcome = pulseTableOutcomeLabel(item);
+  const visit = nested ? pulseActivityVisitBlockNested(item) : pulseActivityVisitBlock(item, avatarMarkup);
+  return `<li class="pulse-activity-row${nested ? ' pulse-activity-row--nested' : ''}" data-action="open-pulse-person" data-id="${item.memberId}" data-member-name="${escapeHTML(item.memberName)}" title="${escapeHTML(item.kindLabel)}" tabindex="0" role="link">
+    ${visit}
+    <span class="pulse-outcome tabular">${outcome === '—' ? '<span class="muted">—</span>' : escapeHTML(outcome)}</span>
+    <span class="pulse-when muted tabular">${escapeHTML(item.timeLabel)}</span>
+  </li>`;
+}
+
 function pulseOperationsTable(model) {
   const {ui, activity, activityAll, roster} = model;
   const face = id => roster.find(person => person.id === id) || {initials: '•', name: ''};
-  const list = activity.length ? activity.map(item => {
-    const av = avatar(face(item.memberId), 'mini');
-    const outcome = pulseTableOutcomeLabel(item);
-    return `<li class="pulse-activity-row" data-action="open-pulse-person" data-id="${item.memberId}" data-member-name="${escapeHTML(item.memberName)}" title="${escapeHTML(item.kindLabel)}" tabindex="0" role="link">
-      ${pulseActivityVisitBlock(item, av)}
-      <span class="pulse-outcome tabular">${outcome === '—' ? '<span class="muted">—</span>' : escapeHTML(outcome)}</span>
-      <span class="pulse-when muted tabular">${escapeHTML(item.timeLabel)}</span>
-    </li>`;
-  }).join('') : `<li class="pulse-activity-empty muted">${activityAll.length ? 'No visits match this filter.' : 'No visits in this period.'}</li>`;
+  const empty = `<li class="pulse-activity-empty muted">${activityAll.length ? 'No visits match this filter.' : 'No visits in this period.'}</li>`;
+  let list;
+  if (!activity.length) {
+    list = empty;
+  } else if (ui.pulseGrouping === 'members') {
+    const groups = pulseMemberGroups(activity, ui.activitySort);
+    list = groups.map(group => {
+      const av = avatar(face(group.memberId), 'mini');
+      const countLabel = group.visits.length === 1 ? '1 visit' : `${group.visits.length} visits`;
+      const head = `<div class="pulse-member-head" data-action="open-pulse-person" data-id="${group.memberId}" data-member-name="${escapeHTML(group.memberName)}" tabindex="0" role="link">
+        ${av}
+        <span class="pulse-member-head-text">
+          <strong>${escapeHTML(group.memberName)}</strong>
+          <span class="muted">${countLabel}</span>
+        </span>
+      </div>`;
+      const visits = group.visits.map(item => pulseActivityRowMarkup(item, {nested: true})).join('');
+      return `<li class="pulse-member-group">
+        ${head}
+        <ul class="pulse-member-visits" aria-label="Visits for ${escapeHTML(group.memberName)}">${visits}</ul>
+      </li>`;
+    }).join('');
+  } else {
+    list = activity.map(item => {
+      const av = avatar(face(item.memberId), 'mini');
+      return pulseActivityRowMarkup(item, {avatarMarkup: av});
+    }).join('');
+  }
   return `<section class="pulse-operations pulse-operations--trail" aria-label="Station visits">
     ${pulseActivityToolbar(ui)}
     <div class="pulse-activity-scroll team-overview-table-wrap">
@@ -802,7 +870,7 @@ function pulsePage() {
     <div class="settings-hub-pane pulse-layout pulse-layout-table-first" aria-label="Pulse">
       ${pulseHead()}
       ${pulseRangeControl(model)}
-      ${pulseKpiStrip(model.kpis)}
+      ${pulseKpiStrip(model.kpis, model.ui)}
       ${pulseOperationsTable(model)}
     </div>
   </main>`;
@@ -810,6 +878,19 @@ function pulsePage() {
 
 const teamOverviewActions = {
   'nav-pulse': () => visitPulse(),
+  'pulse-kpi': el => {
+    const value = el.dataset.value;
+    const ui = teamOverviewUI();
+    if (value === 'totalActivity') ui.pulseGrouping = 'visits';
+    else if (value === 'membersActive') ui.pulseGrouping = 'members';
+    else if (value === 'trainingSessions') ui.activityFilter = 'session';
+    else if (value === 'assessments') ui.activityFilter = 'assessment';
+    else return;
+    ui.activityTypeOpen = false;
+    ui.activitySortOpen = false;
+    render();
+    document.querySelector(`[data-action="pulse-kpi"][data-value="${value}"]`)?.focus({preventScroll: true});
+  },
   'pulse-activity-type-toggle': () => {
     const ui = teamOverviewUI();
     ui.activityTypeOpen = !ui.activityTypeOpen;

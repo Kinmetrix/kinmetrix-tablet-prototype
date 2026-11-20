@@ -17,6 +17,7 @@
  --templates-library-rail-pane-gap:8px;
  --templates-library-item-gap:4px;
  --templates-shell-gap:8px;
+ --templates-status-ready:#2d8a56;
  --templates-nav-icon-active:rgba(255,255,255,.16);
  max-width:none;margin:0;
  padding:var(--templates-shell-inset);
@@ -27,6 +28,7 @@
  min-height:calc(100dvh - var(--prototype-footer-height));
 }
 :root[data-theme="dark"] .templates-layered-shell{
+ --templates-status-ready:#6fcf97;
  --templates-shell-bg:#2a2a2e;
  --templates-nav-bg:#0a0a0a;
  --templates-nav-active-bg:#1f1f22;
@@ -81,7 +83,9 @@
 .templates-layered-shell .nav-clinician .nav-glyph-wrap{background:transparent}
 .templates-layered-shell .nav-clinician:hover .nav-glyph-wrap{background:rgba(255,255,255,.08)}
 .templates-layered-shell .nav-clinician .avatar{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.12);color:var(--templates-nav-ink)}
-.templates-layered-shell .nav-station-icon .status-dot{box-shadow:0 0 0 3px var(--templates-nav-bg)}
+.templates-layered-shell .nav-station-icon .status-dot:not(.offline),
+.templates-layered-shell .device-page-meta-value .status-dot:not(.offline){background:var(--templates-status-ready)}
+.templates-layered-shell .nav-station-icon .status-dot{right:5px;bottom:5px;box-shadow:0 0 0 2px var(--templates-nav-bg)}
 .templates-layered-shell .nav-clinician-glyph .avatar{width:28px;height:28px;font-size:11px}
 .templates-layered-shell.app-shell{
  display:grid;
