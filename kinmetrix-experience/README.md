@@ -4,7 +4,7 @@ Interactive browser exploration for a landscape iPad. Built from the product bri
 
 ## Run locally
 
-From this directory: `yarn install` once, then `yarn dev`, and open http://localhost:4173. No build step (`serve` is fetched on first `dev` via npx). Alternatively: `python3 -m http.server 4173 --directory dist`. The 3D study uses a locally vendored Three.js runtime. Reload or **Reset demo** clears in-memory changes.
+From this directory: `yarn install` once, then `yarn dev`, and open http://localhost:4173. No build step (`serve` is fetched on first `dev` via npx). Alternatively: `python3 -m http.server 4173 --directory dist`. The 3D study uses a locally vendored Three.js runtime. Reload the page clears in-memory changes.
 
 **Settings redesign compare** (design review): http://localhost:4173/settings-links-compare.html — three interactive hub directions (prototype only). Archived card/pattern lab: `dist/archive/settings-links-card-pattern-lab.html`.
 
@@ -21,7 +21,7 @@ Choose **Timed** vs **Endurance** in session setup, program templates (when mode
 
 ## Explore
 
-Use **Settings** at the bottom of the sidebar to choose Light or Dark appearance; the prototype bar also provides a quick theme switch. This preference persists locally without changing the active session. Mode selection explains each option’s purpose; radials are prominent throughout preparation, live work, and review.
+Use **Settings** at the bottom of the sidebar to choose Light or Dark appearance. This preference persists locally without changing the active session. Mode selection explains each option’s purpose; radials are prominent throughout preparation, live work, and review.
 
 - The sidebar owns global navigation: **Find**, **Pulse**, **Roster**, and **Templates** above; **Device**, **Settings**, the clinician avatar switcher, and **Lock** below (icon above label, Slack-style active squircle). The wordmark shows the **team logo** from station settings. There is no duplicate top bar. On narrow screens the rail becomes a bottom bar; the team mark stays visible in the layered shell.
 - Start in Find with no member preselected. The idle Find screen stays minimal—heading, prompt, and search—until you type. Search by name, or use Roster for the full table. Selecting a result opens that member’s workspace.
@@ -38,7 +38,7 @@ Use **Settings** at the bottom of the sidebar to choose Light or Dark appearance
 - Profile shows height, body weight, handedness, activity level, activity/sport, and goals. Clinicians can Edit, Save, or Cancel; members have a read-only view. These edits and drafts remain in browser memory, separate from assessed limits and session target force.
 - Use Ella to explore a first assessment without a baseline.
 - Switch clinicians: Sam **1111**, Jordan **2222**, clinic admin Casey **9999**. Casey can configure roster scope and default entry.
-- **Try member entry** opens a private sign-in preview. Member demo code **2468** opens Alex; phone approval is simulated.
+- Use **Lock** to return to the station sign-in screen. Member demo code **2468** opens Alex; phone approval is simulated.
 
 - Session setup has one row per direction. Edit tilt in the row, use **Apply Forward to all**, and change mode from the title. **Isometric · Endurance** and **Range of motion** have **Finish the rep when** rules; Eccentric has speed and a force cap. Live reps end by those rules (simulated). Every mode has a **Challenge weight**: reps start counting only above it, and in Isokinetic it follows the target automatically (1 kg under) and the pad stops if effort stays below it. Earlier setup mockups are in `mockups/`.
 

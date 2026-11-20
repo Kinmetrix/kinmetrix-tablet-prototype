@@ -166,7 +166,6 @@ function openSessionPicker(mode=null,purpose=null){
 function syncModalSurface(){
  const open=!!state.overlay;
  $('#app').inert=open;
- $('.prototype-bar').inert=open;
  document.body.classList.toggle('modal-open',open);
 }
 function updatePicker(focusSelector='#dialog-title'){
