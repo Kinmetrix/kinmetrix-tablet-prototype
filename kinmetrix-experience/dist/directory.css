@@ -34,6 +34,7 @@
 .roster-grid .program-name-button,
 .roster-grid .roster-activity-button{min-height:0}
 .roster-grid .photo-avatar-button{min-width:30px;min-height:30px}
+.roster-grid .directory-identity>.avatar{margin:0}
 .roster-program-cell{display:flex;flex-direction:column;align-items:flex-start;gap:1px;white-space:normal;max-width:180px}
 .roster-program-cell .roster-program-button{align-self:stretch;justify-content:flex-start;min-height:0;min-width:0;max-width:100%}
 .roster-program-cell .roster-program-button strong{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
