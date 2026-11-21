@@ -294,11 +294,11 @@
 .templates-layered-shell main.directory-page.roster-workspace .settings-pane-head-row,
 .templates-layered-shell main.team-overview.pulse-proto .settings-pane-head-row{margin-bottom:0}
 .templates-layered-shell main.directory-page.roster-workspace .settings-hub-pane,
-.templates-layered-shell main.team-overview.pulse-proto .settings-hub-pane.pulse-layout-table-first{
+.templates-layered-shell main.team-overview.pulse-proto .settings-hub-pane.pulse-layout{
  --staff-pane-head-block:48px;
  --staff-head-controls-gap:12px;
 }
-.templates-layered-shell main.team-overview.pulse-proto .settings-hub-pane.pulse-layout-table-first{
+.templates-layered-shell main.team-overview.pulse-proto .settings-hub-pane.pulse-layout{
  gap:var(--staff-head-controls-gap);
 }
 .templates-layered-shell main.directory-page.roster-workspace .settings-hub-pane{gap:0}
@@ -311,7 +311,7 @@
  margin-bottom:var(--staff-head-controls-gap);
 }
 .templates-layered-shell main.team-overview.pulse-proto .settings-pane-head{margin-bottom:0}
-.templates-layered-shell main.team-overview.pulse-proto .settings-hub-pane.pulse-layout-table-first{flex:1;min-height:0}
+.templates-layered-shell main.team-overview.pulse-proto .settings-hub-pane.pulse-layout{flex:1;min-height:0}
 .templates-layered-shell main.team-overview.pulse-proto .pulse-operations{flex:1;min-height:0}
 .templates-layered-shell main.templates-hub.team-hub-layout{
  flex:1;min-height:0;width:100%;padding:0;max-width:none;margin:0;

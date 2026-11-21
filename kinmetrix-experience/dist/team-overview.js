@@ -14,10 +14,13 @@ const PULSE_DAY_MS = 86_400_000;
 let pulseBrushDrag = null;
 const PULSE_ACTIVITY_FILTERS = {all: 'All', assessment: 'Assessments', session: 'Sessions'};
 const PULSE_ACTIVITY_SORTS = {newest: 'Newest first', oldest: 'Oldest first', member: 'Member A–Z'};
+const PULSE_MEDIAN_SORTS = {largest: 'Largest Δ', newest: 'Newest first', oldest: 'Oldest first', member: 'Member A–Z'};
+const PULSE_CHART_BUCKETS = {day: 'Day', week: 'Week', month: 'Month'};
+const PULSE_CHART_BUCKET_LIMITS = {min: 2, max: 40};
 
 function teamOverviewUI() {
   const store = directoryUI();
-  store.pulse ??= store.home ?? {period: 'last-1m'};
+  if (!store.pulse) store.pulse = {period: 'last-1m'};
   const ui = store.pulse;
   if (PULSE_LEGACY_PERIOD[ui.period]) ui.period = PULSE_LEGACY_PERIOD[ui.period];
   if (!TEAM_OVERVIEW_PERIODS[ui.period] && ui.period !== 'custom') ui.period = 'last-1m';
@@ -28,8 +31,499 @@ function teamOverviewUI() {
   if (ui.activityTypeOpen == null) ui.activityTypeOpen = false;
   if (ui.activitySortOpen == null) ui.activitySortOpen = false;
   if (ui.rangePickerOpen == null) ui.rangePickerOpen = false;
+  if (!ui.pulseScreen) ui.pulseScreen = 'hub';
+  if (!PULSE_MEDIAN_SORTS[ui.medianForceSort]) ui.medianForceSort = 'largest';
+  if (ui.activityChartBucketOpen == null) ui.activityChartBucketOpen = false;
   pulseEnsureRange(ui);
+  const chartWindow = pulsePeriodWindow(ui);
+  if (!PULSE_CHART_BUCKETS[ui.activityChartBucket] || !pulseChartBucketEnabled(chartWindow, ui.activityChartBucket)) {
+    ui.activityChartBucket = pulseDefaultChartBucket(chartWindow);
+  }
   return ui;
+}
+
+const PULSE_KPI_SCREENS = {totalActivity: 'activity', membersActive: 'members', medianForceChange: 'medianForce'};
+
+function pulseKpiScreenForId(id) {
+  return PULSE_KPI_SCREENS[id] || null;
+}
+
+function pulseRecordForRow(row) {
+  const colon = row.id.indexOf(':');
+  if (colon < 0) return null;
+  const recordId = row.id.slice(colon + 1);
+  return pulseRecords(row.memberId).find(record => record.id === recordId) || null;
+}
+
+function pulseReportPreviousSession(record) {
+  if (record.partial) return null;
+  const time = record.completedAt ?? Number(record.id?.replace('session-', ''));
+  const hold = record.type === 'strength' ? isometricHoldStyle(record.sessionSettings || record) : '';
+  return pulseRecords(record.personId)
+    .filter(previous =>
+      previous.id !== record.id &&
+      !previous.partial &&
+      previous.type === record.type &&
+      previous.purpose === record.purpose &&
+      previous.positions === record.positions &&
+      previous.reps === record.reps &&
+      (record.type !== 'strength' || isometricHoldStyle(previous.sessionSettings || previous) === hold) &&
+      (previous.completedAt ?? Number(previous.id?.replace('session-', ''))) < time
+    )
+    .sort((a, b) =>
+      (b.completedAt ?? Number(b.id.replace('session-', ''))) -
+      (a.completedAt ?? Number(a.id.replace('session-', '')))
+    )[0] || null;
+}
+
+function pulseRowForceDelta(row) {
+  const record = pulseRecordForRow(row);
+  if (!record || record.type !== 'strength' || record.partial) return null;
+  if (reportMetric(record).field !== 'force') return null;
+  const prior = pulseReportPreviousSession(record);
+  if (!prior) return null;
+  const currentForce = reportData(record).force;
+  const priorForce = reportData(prior).force;
+  if (!Number.isFinite(currentForce) || !Number.isFinite(priorForce)) return null;
+  const delta = Number((currentForce - priorForce).toFixed(2));
+  return Number(Math.max(-2.5, Math.min(2.5, delta)).toFixed(2));
+}
+
+function pulseComparableForceDeltas(rows) {
+  const deltas = [];
+  for (const row of rows) {
+    const delta = pulseRowForceDelta(row);
+    if (delta != null) deltas.push(delta);
+  }
+  return deltas;
+}
+
+function pulseMedianValue(values) {
+  if (!values.length) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function teamKpiDeltaForce(current, previous, options) {
+  if (options?.comparePrior === false) return 'Comparable isometric visits';
+  if (current == null && previous == null) return 'No comparable visits';
+  if (current == null) return 'No comparable visits this period';
+  if (previous == null) return 'No comparable visits in prior period';
+  const diff = current - previous;
+  if (Math.abs(diff) < 0.05) return 'Unchanged vs prior';
+  const sign = diff > 0 ? '+' : '−';
+  const pct = previous !== 0 ? (diff / Math.abs(previous)) * 100 : 0;
+  return `${sign}${Math.abs(diff).toFixed(1)} kg (${sign}${Math.abs(pct).toFixed(0)}%) vs prior`;
+}
+
+function pulseMedianForceDisplay(kg) {
+  if (kg == null || !Number.isFinite(kg)) return '—';
+  const sign = kg >= 0 ? '+' : '−';
+  return `${sign}${Math.abs(kg).toFixed(1)} kg`;
+}
+
+function pulseForceDeltaLabel(kg) {
+  if (kg == null || !Number.isFinite(kg)) return '—';
+  if (Math.abs(kg) < 0.05) return '±0.0 kg';
+  const sign = kg >= 0 ? '+' : '−';
+  return `${sign}${Math.abs(kg).toFixed(1)} kg`;
+}
+
+function pulseForceDeltaClass(kg) {
+  if (kg == null || Math.abs(kg) < 0.05) return 'is-flat';
+  return kg > 0 ? 'is-up' : 'is-down';
+}
+
+function pulsePerformanceCounts(rows) {
+  const counts = {up: 0, flat: 0, down: 0, total: 0};
+  for (const row of rows) {
+    const delta = pulseRowForceDelta(row);
+    if (delta == null) continue;
+    counts.total++;
+    const bucket = pulseForceDeltaClass(delta);
+    if (bucket === 'is-up') counts.up++;
+    else if (bucket === 'is-down') counts.down++;
+    else counts.flat++;
+  }
+  return counts;
+}
+
+function pulsePerformanceTrend(current, prior, comparePrior) {
+  if (!comparePrior) return null;
+  if (!current.total && !prior.total) return {label: 'No comparable visits', class: '', dir: 'flat'};
+  if (!prior.total) return {label: 'No prior data', class: '', dir: 'flat'};
+  if (!current.total) return {label: 'No visits this period', class: '', dir: 'flat'};
+  const curShare = current.up / current.total;
+  const priShare = prior.up / prior.total;
+  const diffPp = (curShare - priShare) * 100;
+  if (Math.abs(diffPp) < 0.5) return {label: '0%', class: '', dir: 'flat'};
+  const up = diffPp > 0;
+  const sign = up ? '+' : '−';
+  return {label: `${sign}${Math.abs(diffPp).toFixed(0)}%`, class: up ? 'is-up' : 'is-down', dir: up ? 'up' : 'down'};
+}
+
+function pulseChartBucketStart(at, mode) {
+  const day = pulseMidnight(at);
+  if (mode === 'day') return day;
+  if (mode === 'week') {
+    const dow = new Date(day).getUTCDay();
+    return day - ((dow + 6) % 7) * PULSE_DAY_MS;
+  }
+  const date = new Date(day);
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1);
+}
+
+function pulseChartBucketKeys(window, mode) {
+  const startDay = pulseMidnight(window.start);
+  const endDay = pulseMidnight(window.end);
+  const keys = [];
+  if (mode === 'day') {
+    for (let at = startDay; at <= endDay; at += PULSE_DAY_MS) keys.push(at);
+    return keys;
+  }
+  if (mode === 'week') {
+    let at = pulseChartBucketStart(startDay, 'week');
+    if (at < startDay) at += 7 * PULSE_DAY_MS;
+    while (at <= endDay) {
+      keys.push(at);
+      at += 7 * PULSE_DAY_MS;
+    }
+    return keys;
+  }
+  let at = pulseChartBucketStart(startDay, 'month');
+  while (at <= endDay) {
+    keys.push(at);
+    const date = new Date(at);
+    at = Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
+  }
+  return keys;
+}
+
+function pulseChartBucketCount(window, mode) {
+  return pulseChartBucketKeys(window, mode).length;
+}
+
+function pulseChartBucketEnabled(window, mode) {
+  if (!PULSE_CHART_BUCKETS[mode]) return false;
+  const count = pulseChartBucketCount(window, mode);
+  return count >= PULSE_CHART_BUCKET_LIMITS.min && count <= PULSE_CHART_BUCKET_LIMITS.max;
+}
+
+function pulseDefaultChartBucket(window) {
+  const prefs = window.days <= 14 ? ['day', 'week', 'month'] : window.days <= 90 ? ['week', 'day', 'month'] : ['month', 'week', 'day'];
+  for (const mode of prefs) {
+    if (pulseChartBucketEnabled(window, mode)) return mode;
+  }
+  for (const mode of Object.keys(PULSE_CHART_BUCKETS)) {
+    if (pulseChartBucketCount(window, mode) >= 1) return mode;
+  }
+  return 'day';
+}
+
+function pulseActivityChartSeries(rows, window, mode) {
+  const keys = pulseChartBucketKeys(window, mode);
+  const map = new Map(keys.map(key => [key, {key, session: 0, assessment: 0}]));
+  for (const row of rows) {
+    if (row.at < window.start || row.at > window.end) continue;
+    const key = pulseChartBucketStart(row.at, mode);
+    const bucket = map.get(key);
+    if (!bucket) continue;
+    if (row.purpose === 'assessment') bucket.assessment++;
+    else bucket.session++;
+  }
+  const buckets = keys.map(key => {
+    const item = map.get(key);
+    return {...item, total: item.session + item.assessment};
+  });
+  const maxTotal = Math.max(1, ...buckets.map(bucket => bucket.total));
+  return {buckets, maxTotal, mode};
+}
+
+function pulseChartBucketTitle(key, mode) {
+  const date = new Date(key);
+  const month = PULSE_MONTHS[date.getUTCMonth()];
+  if (mode === 'month') return `${month} ${date.getUTCFullYear()}`;
+  if (mode === 'week') return `Week of ${date.getUTCDate()} ${month}`;
+  return `${date.getUTCDate()} ${month}`;
+}
+
+function pulseChartAxisLabel(key, mode, index, total) {
+  const date = new Date(key);
+  if (mode === 'month') {
+    const every = total > 24 ? 3 : total > 12 ? 2 : 1;
+    if (index % every) return '';
+    return PULSE_MONTHS[date.getUTCMonth()];
+  }
+  if (mode === 'week') {
+    const every = total > 20 ? 2 : 1;
+    if (index % every) return '';
+    return `${date.getUTCDate()} ${PULSE_MONTHS[date.getUTCMonth()]}`;
+  }
+  const every = total > 20 ? Math.ceil(total / 10) : total > 14 ? 2 : 1;
+  if (index % every) return '';
+  return String(date.getUTCDate());
+}
+
+function pulseActivityChartBucketPopover(ui, window) {
+  if (!ui.activityChartBucketOpen) return '';
+  const options = Object.entries(PULSE_CHART_BUCKETS).map(([value, label]) => {
+    const enabled = pulseChartBucketEnabled(window, value);
+    return `<button type="button" class="pulse-activity-filter-option${ui.activityChartBucket === value ? ' is-selected' : ''}" data-action="pulse-chart-bucket" data-value="${value}" role="menuitemradio" aria-checked="${ui.activityChartBucket === value}"${enabled ? '' : ' disabled aria-disabled="true"'}>${escapeHTML(label)}</button>`;
+  }).join('');
+  return `<div class="pulse-activity-filter-popover" id="pulse-chart-bucket-popover" role="menu" aria-label="Group dates by">${options}</div>`;
+}
+
+function pulseActivityChartTooltipMarkup(bucket, mode) {
+  const title = pulseChartBucketTitle(bucket.key, mode);
+  return `<p class="pulse-activity-chart-tooltip-title">${escapeHTML(title)}</p>
+    <ul class="pulse-activity-chart-tooltip-list">
+      <li><span class="pulse-activity-chart-tooltip-swatch pulse-activity-chart-tooltip-swatch--session" aria-hidden="true"></span>Sessions<span class="tabular">${bucket.session}</span></li>
+      <li><span class="pulse-activity-chart-tooltip-swatch pulse-activity-chart-tooltip-swatch--assessment" aria-hidden="true"></span>Assessments<span class="tabular">${bucket.assessment}</span></li>
+    </ul>`;
+}
+
+function pulseChartYTicks(maxTotal) {
+  if (maxTotal <= 1) return [1, 0];
+  if (maxTotal <= 4) return [maxTotal, 0];
+  const mid = Math.max(1, Math.round(maxTotal / 2));
+  return mid === maxTotal ? [maxTotal, Math.ceil(maxTotal / 2), 0] : [maxTotal, mid, 0];
+}
+
+function pulseActivityChartCard(model) {
+  const {ui, window, activityAll} = model;
+  const mode = ui.activityChartBucket;
+  const series = pulseActivityChartSeries(activityAll, window, mode);
+  let peakIndex = -1;
+  let peakTotal = 0;
+  series.buckets.forEach((bucket, index) => {
+    if (bucket.total > peakTotal) {
+      peakTotal = bucket.total;
+      peakIndex = index;
+    }
+  });
+  const bars = series.buckets.map((bucket, index) => {
+    const total = bucket.total;
+    const sessionH = total ? (bucket.session / series.maxTotal) * 100 : 0;
+    const assessmentH = total ? (bucket.assessment / series.maxTotal) * 100 : 0;
+    const label = pulseChartAxisLabel(bucket.key, mode, index, series.buckets.length);
+    const tooltip = pulseActivityChartTooltipMarkup(bucket, mode);
+    const peak = index === peakIndex && total > 0;
+    return `<div class="pulse-activity-chart-bar-col" role="listitem">
+      <button type="button" class="pulse-activity-chart-bar${total ? '' : ' is-empty'}${peak ? ' is-peak' : ''}" data-pulse-chart-index="${index}" aria-label="${escapeHTML(pulseChartBucketTitle(bucket.key, mode))}, ${bucket.session} sessions, ${bucket.assessment} assessments">
+        <span class="pulse-activity-chart-bar-stack">
+          ${assessmentH > 0 ? `<span class="pulse-activity-chart-seg pulse-activity-chart-seg--assessment" style="height:${assessmentH.toFixed(2)}%"></span>` : ''}
+          ${sessionH > 0 ? `<span class="pulse-activity-chart-seg pulse-activity-chart-seg--session" style="height:${sessionH.toFixed(2)}%"></span>` : ''}
+        </span>
+      </button>
+      <span class="pulse-activity-chart-x-label tabular">${escapeHTML(label)}</span>
+      <template>${tooltip}</template>
+    </div>`;
+  }).join('');
+  const bucketControl = `<div class="pulse-activity-filter-anchor">
+    <button type="button" class="pulse-activity-bar-button pulse-activity-chart-bucket-button" data-action="pulse-chart-bucket-toggle" aria-haspopup="menu" aria-expanded="${ui.activityChartBucketOpen}" aria-label="Group dates by, ${escapeHTML(PULSE_CHART_BUCKETS[mode])}"${ui.activityChartBucketOpen ? ' aria-controls="pulse-chart-bucket-popover"' : ''}>
+      <span class="muted">Group by</span> ${escapeHTML(PULSE_CHART_BUCKETS[mode])}
+    </button>
+    ${pulseActivityChartBucketPopover(ui, window)}
+  </div>`;
+  const yTicks = pulseChartYTicks(series.maxTotal);
+  const yMarkup = yTicks.map(tick => `<span class="tabular">${tick}</span>`).join('');
+  const yClass = yTicks.length === 2 ? ' pulse-activity-chart-y--compact' : '';
+  const colCount = series.buckets.length;
+  const barsAttrs = colCount <= 18 ? ` data-cols="${colCount}" style="--pulse-chart-cols:${colCount}"` : '';
+  const legend = `<ul class="pulse-activity-chart-legend">
+    <li><span class="pulse-activity-chart-legend-swatch pulse-activity-chart-legend-swatch--session"></span>Sessions</li>
+    <li><span class="pulse-activity-chart-legend-swatch pulse-activity-chart-legend-swatch--assessment"></span>Assessments</li>
+  </ul>`;
+  return `<section class="pulse-activity-chart-card" aria-label="Activity over time">
+    <header class="pulse-activity-chart-head">
+      <h2 class="pulse-activity-chart-title">Activity over time</h2>
+      ${bucketControl}
+    </header>
+    <div class="pulse-activity-chart-body">
+      <div class="pulse-activity-chart-y${yClass}" aria-hidden="true">${yMarkup}</div>
+      <div class="pulse-activity-chart-plot">
+        <div class="pulse-activity-chart-grid" aria-hidden="true"></div>
+        <div class="pulse-activity-chart-bars"${barsAttrs}>${bars}</div>
+        <div class="pulse-activity-chart-tooltip" id="pulse-activity-chart-tooltip" role="tooltip" hidden></div>
+      </div>
+    </div>
+    <footer class="pulse-activity-chart-foot">${legend}</footer>
+  </section>`;
+}
+
+let pulseActivityChartTooltipHooked = false;
+
+function pulseActivityChartHideTooltip() {
+  const tip = document.getElementById('pulse-activity-chart-tooltip');
+  if (!tip) return;
+  tip.hidden = true;
+  tip.innerHTML = '';
+}
+
+function pulseActivityChartShowTooltip(bar, clientX, clientY) {
+  const tip = document.getElementById('pulse-activity-chart-tooltip');
+  const template = bar.closest('.pulse-activity-chart-bar-col')?.querySelector('template');
+  if (!tip || !template) return;
+  tip.innerHTML = template.innerHTML;
+  tip.hidden = false;
+  const plot = bar.closest('.pulse-activity-chart-plot');
+  if (!plot) return;
+  const plotRect = plot.getBoundingClientRect();
+  let left = clientX - plotRect.left;
+  let top = clientY - plotRect.top - 8;
+  tip.style.left = `${Math.max(8, Math.min(plotRect.width - 8, left))}px`;
+  tip.style.top = `${Math.max(8, top)}px`;
+}
+
+function pulseActivityChartBindTooltip() {
+  if (pulseActivityChartTooltipHooked) return;
+  pulseActivityChartTooltipHooked = true;
+  document.addEventListener('pointerover', event => {
+    if (state.nav !== 'pulse' || teamOverviewUI().pulseScreen !== 'hub') return;
+    const bar = event.target.closest?.('.pulse-activity-chart-bar');
+    if (!bar || bar.classList.contains('is-empty')) {
+      if (!event.target.closest?.('.pulse-activity-chart-bar')) pulseActivityChartHideTooltip();
+      return;
+    }
+    pulseActivityChartShowTooltip(bar, event.clientX, event.clientY);
+  });
+  document.addEventListener('pointermove', event => {
+    if (state.nav !== 'pulse') return;
+    const bar = event.target.closest?.('.pulse-activity-chart-bar');
+    if (!bar || bar.classList.contains('is-empty')) return;
+    pulseActivityChartShowTooltip(bar, event.clientX, event.clientY);
+  });
+  document.addEventListener('pointerleave', event => {
+    const plot = event.target.closest?.('.pulse-activity-chart-plot');
+    if (plot && !plot.contains(event.relatedTarget)) pulseActivityChartHideTooltip();
+  });
+  document.addEventListener('focusin', event => {
+    const bar = event.target.closest?.('.pulse-activity-chart-bar');
+    if (!bar || bar.classList.contains('is-empty')) return;
+    const rect = bar.getBoundingClientRect();
+    pulseActivityChartShowTooltip(bar, rect.left + rect.width / 2, rect.top);
+  });
+  document.addEventListener('focusout', event => {
+    const plot = event.target.closest?.('.pulse-activity-chart-plot');
+    if (plot && !plot.contains(event.relatedTarget)) pulseActivityChartHideTooltip();
+  });
+}
+
+pulseActivityChartBindTooltip();
+
+function pulsePerformanceBarSegment(id, value) {
+  if (!value) return '';
+  return `<span class="pulse-perf-bar-seg pulse-perf-bar-seg--${id}" style="flex-grow:${value}"></span>`;
+}
+
+function pulsePerformanceBarMarkup(counts) {
+  if (!counts.total) return '';
+  return `<div class="pulse-perf-bar-track">${pulsePerformanceBarSegment('up', counts.up)}${pulsePerformanceBarSegment('flat', counts.flat)}${pulsePerformanceBarSegment('down', counts.down)}</div>`;
+}
+
+function pulsePerformanceLegendRow(id, label, count, total) {
+  const value = total ? String(count) : '—';
+  return `<li class="pulse-perf-legend-item">
+    <div class="pulse-perf-legend-head">
+      <span class="pulse-perf-legend-pill pulse-perf-legend-pill--${id}" aria-hidden="true"></span>
+      <span class="pulse-perf-legend-label">${escapeHTML(label)}</span>
+    </div>
+    <span class="pulse-perf-legend-value tabular">${escapeHTML(value)}</span>
+  </li>`;
+}
+
+function pulseMemberPerformanceCard(model) {
+  const counts = model.performance?.current || pulsePerformanceCounts(model.activityAll);
+  const aria = counts.total
+    ? `${counts.up} gaining, ${counts.flat} flat, ${counts.down} down, of ${counts.total} comparable visits`
+    : 'No comparable isometric visits in this period.';
+  const meta = counts.total
+    ? `<p class="pulse-perf-meta muted tabular">${counts.total} comparable visits</p>`
+    : '';
+  const body = counts.total
+    ? `<div class="pulse-perf-body">
+        <div class="pulse-perf-bar" role="img" aria-label="${escapeHTML(aria)}">
+          ${pulsePerformanceBarMarkup(counts)}
+        </div>
+        <ul class="pulse-perf-legend" aria-label="Force change breakdown">
+          ${pulsePerformanceLegendRow('up', 'Gaining', counts.up, counts.total)}
+          ${pulsePerformanceLegendRow('flat', 'Flat', counts.flat, counts.total)}
+          ${pulsePerformanceLegendRow('down', 'Down', counts.down, counts.total)}
+        </ul>
+      </div>`
+    : `<p class="pulse-perf-empty muted">${escapeHTML(aria)}</p>`;
+  return `<section class="pulse-perf-card" aria-label="Member performance">
+    <header class="pulse-perf-head">
+      <h2 class="pulse-perf-title">Member performance</h2>
+      ${meta || ''}
+    </header>
+    ${body}
+  </section>`;
+}
+
+const PULSE_MEMBER_LINEUP_MAX = 6;
+
+function pulseActiveMemberSummaries(rows, roster) {
+  const counts = new Map();
+  for (const row of rows) {
+    counts.set(row.memberId, (counts.get(row.memberId) || 0) + 1);
+  }
+  const face = id => roster.find(person => person.id === id) || {id, name: '—', initials: '•'};
+  return [...counts.entries()]
+    .map(([memberId, sessions]) => ({memberId, sessions, person: face(memberId)}))
+    .sort((a, b) => b.sessions - a.sessions || a.person.name.localeCompare(b.person.name));
+}
+
+function pulseMemberFirstName(name) {
+  const parts = String(name || '').trim().split(/\s+/);
+  return parts[0] || name;
+}
+
+function pulseSessionCountLabel(count) {
+  return count === 1 ? '1 session' : `${count} sessions`;
+}
+
+function pulseActiveMembersLineupCard(model) {
+  const kpi = model.kpis.find(item => item.id === 'membersActive');
+  const total = kpi?.value ?? 0;
+  const summaries = pulseActiveMemberSummaries(model.activityAll, model.roster);
+  const shown = summaries.slice(0, PULSE_MEMBER_LINEUP_MAX);
+  const overflow = Math.max(0, summaries.length - shown.length);
+  const viewAll = total
+    ? `<button type="button" class="pulse-lineup-viewall" data-action="pulse-kpi" data-value="membersActive">View all ${total}</button>`
+    : '';
+  const meta = total
+    ? `<p class="pulse-perf-meta muted">At least one session in range · ${viewAll}</p>`
+    : `<p class="pulse-perf-meta muted">No sessions in this range</p>`;
+  const chips = shown.map(({memberId, sessions, person}) => {
+    const av = avatar(person, 'mini');
+    return `<button type="button" class="pulse-member-chip" role="listitem" data-action="open-pulse-person" data-id="${escapeHTML(memberId)}" data-member-name="${escapeHTML(person.name)}" aria-label="${escapeHTML(person.name)}, ${sessions} sessions in range">
+      ${av}
+      <span class="pulse-member-chip__name">${escapeHTML(pulseMemberFirstName(person.name))}</span>
+      <span class="pulse-member-chip__meta muted tabular">${escapeHTML(pulseSessionCountLabel(sessions))}</span>
+    </button>`;
+  }).join('');
+  const more = overflow > 0
+    ? `<button type="button" class="pulse-member-chip pulse-member-chip--more" role="listitem" data-action="pulse-kpi" data-value="membersActive" aria-label="View ${overflow} more active members">+${overflow}</button>`
+    : '';
+  const body = total
+    ? `<div class="pulse-member-lineup" role="list">${chips}${more}</div>`
+    : `<p class="pulse-perf-empty muted">No members with sessions in this range.</p>`;
+  return `<section class="pulse-active-members-card" aria-label="Active members">
+    <header class="pulse-perf-head">
+      <h2 class="pulse-perf-title">Active members</h2>
+      ${meta}
+    </header>
+    ${body}
+  </section>`;
+}
+
+function pulseHubBottomRow(model) {
+  return `<div class="pulse-bottom-row">
+    ${pulseMemberPerformanceCard(model)}
+    ${pulseActiveMembersLineupCard(model)}
+  </div>`;
 }
 
 function visitPulse() {
@@ -38,6 +532,7 @@ function visitPulse() {
   ui.activityTypeOpen = false;
   ui.activitySortOpen = false;
   ui.rangePickerOpen = false;
+  ui.pulseScreen = 'hub';
   state.nav = 'pulse';
   state.personId = null;
   state.pendingSetup = null;
@@ -334,8 +829,7 @@ function teamOverviewKpis(roster, periodKey) {
   const previous = pulseKpiSnapshot(priorRows);
   return [
     {id: 'totalActivity', label: 'Total activity', value: current.totalActivity, footnote: 'Completed sessions in the period', previous: previous.totalActivity},
-    {id: 'membersActive', label: 'Active members', value: current.membersActive, footnote: 'Members with at least one session', previous: previous.membersActive},
-    {id: 'trainingSessions', label: 'Sessions', value: current.trainingSessions, footnote: 'Non-assessment sessions in the period', previous: previous.trainingSessions}
+    {id: 'membersActive', label: 'Active members', value: current.membersActive, footnote: 'Members with at least one session', previous: previous.membersActive}
   ].map(kpi => ({
     ...kpi,
     deltaLabel: teamKpiDelta(kpi.value, kpi.previous),
@@ -376,6 +870,20 @@ function sortPulseActivity(rows, sortKey) {
   return list;
 }
 
+function sortPulseMedianForce(rows, sortKey) {
+  const list = [...rows];
+  if (sortKey === 'largest') {
+    list.sort((a, b) => Math.abs(b.forceDelta) - Math.abs(a.forceDelta) || b.at - a.at || a.memberName.localeCompare(b.memberName));
+  } else if (sortKey === 'oldest') {
+    list.sort((a, b) => a.at - b.at || a.memberName.localeCompare(b.memberName));
+  } else if (sortKey === 'member') {
+    list.sort((a, b) => a.memberName.localeCompare(b.memberName) || b.at - a.at);
+  } else {
+    list.sort((a, b) => b.at - a.at || a.memberName.localeCompare(b.memberName));
+  }
+  return list;
+}
+
 function teamActivityBadgeMarkup(badge) {
   if (!badge) return '';
   return `<span class="team-overview-activity-badge team-overview-activity-badge--${badge.tone}">${escapeHTML(badge.label)}</span>`;
@@ -403,7 +911,9 @@ function pulseHistoryExtras(personId) {
     {type: 'strength', purpose: 'session', at: Date.UTC(2026, 8, 6 + (offset % 3), 10, 30)},
     {type: 'rom', purpose: 'assessment', at: Date.UTC(2026, 8, 26 + (offset % 4), 11, 30)},
     {type: 'strength', purpose: 'session', at: Date.UTC(2026, 9, 10 + (offset % 2), 15, 30)},
-    {type: 'strength', purpose: 'assessment', at: Date.UTC(2026, 9, 28 + offset, 9, 30)}
+    {type: 'strength', purpose: 'assessment', at: Date.UTC(2026, 9, 28 + offset, 9, 30)},
+    {type: 'strength', purpose: 'assessment', at: Date.UTC(2026, 10, 12, 11, offset % 45)},
+    {type: 'strength', purpose: 'assessment', at: Date.UTC(2026, 10, 13, 9, 30 + offset)}
   ];
   return slots.map((item, index) => {
     const record = historyFixture(item.type, pulseStampLabel(item.at), personId);
@@ -415,8 +925,23 @@ function pulseHistoryExtras(personId) {
   });
 }
 
+function pulseDemoForceDriftKg(record) {
+  if (record.type !== 'strength' || record.partial) return null;
+  if (reportMetric(record).field !== 'force') return null;
+  const at = recordCompletedAt(record);
+  if (!at) return null;
+  const epoch = pulseMidnight(Date.UTC(2026, 8, 1));
+  const days = Math.max(0, Math.round((pulseMidnight(at) - epoch) / PULSE_DAY_MS));
+  return Number((0.15 + days * 0.21).toFixed(2));
+}
+
 function pulseRecords(personId) {
   return [...teamOverviewRecords(personId), ...pulseHistoryExtras(personId)]
+    .map(record => {
+      const drift = pulseDemoForceDriftKg(record);
+      if (drift == null) return record;
+      return {...record, pulseForceDriftKg: drift};
+    })
     .sort((a, b) => recordCompletedAt(b) - recordCompletedAt(a));
 }
 
@@ -463,21 +988,40 @@ function pulseModel() {
   const priorRows = pulseRowsInWindow(roster, window.priorStart, window.priorEnd);
   const current = pulseKpiSnapshot(currentRows);
   const previous = pulseKpiSnapshot(priorRows);
+  const currentForceDeltas = pulseComparableForceDeltas(currentRows);
+  const priorForceDeltas = pulseComparableForceDeltas(priorRows);
+  const medianForce = pulseMedianValue(currentForceDeltas);
+  const medianForcePrior = pulseMedianValue(priorForceDeltas);
+  const comparePrior = ui.period !== 'all';
   const kpis = [
     {id: 'totalActivity', label: 'Total activity', value: current.totalActivity, previous: previous.totalActivity},
     {id: 'membersActive', label: 'Active members', value: current.membersActive, previous: previous.membersActive},
-    {id: 'trainingSessions', label: 'Sessions', value: current.trainingSessions, previous: previous.trainingSessions},
-    {id: 'assessments', label: 'Assessments', value: current.assessments, previous: previous.assessments}
+    {
+      id: 'medianForceChange',
+      label: 'Median force change',
+      value: medianForce,
+      displayValue: pulseMedianForceDisplay(medianForce),
+      previous: medianForcePrior
+    }
   ].map(kpi => ({
     ...kpi,
-    deltaLabel: teamKpiDelta(kpi.value, kpi.previous, {comparePrior: ui.period !== 'all'})
+    deltaLabel: kpi.id === 'medianForceChange'
+      ? teamKpiDeltaForce(kpi.value, kpi.previous, {comparePrior})
+      : teamKpiDelta(kpi.value, kpi.previous, {comparePrior})
   }));
   const activity = sortPulseActivity(
     currentRows.filter(row => pulseActivityMatchesFilter(row, ui.activityFilter) && pulseActivityMatchesSearch(row, ui.activitySearch.trim().toLowerCase())),
     ui.activitySort
   );
+  const performanceCurrent = pulsePerformanceCounts(currentRows);
+  const performancePrior = pulsePerformanceCounts(priorRows);
+  const performance = {
+    current: performanceCurrent,
+    prior: performancePrior,
+    trend: pulsePerformanceTrend(performanceCurrent, performancePrior, comparePrior)
+  };
   return {
-    ui, roster, period, window, kpis, activityAll: currentRows, activity,
+    ui, roster, period, window, kpis, activityAll: currentRows, activity, performance,
     brush: pulseBrushSeries(roster),
     team: teamSettings()
   };
@@ -772,35 +1316,30 @@ function pulseHead() {
 }
 
 function pulseKpiDeltaClass(label) {
-  return label.startsWith('+') ? 'is-up' : label.startsWith('-') ? 'is-down' : '';
+  if (label.startsWith('+')) return 'is-up';
+  if (label.startsWith('-') || label.startsWith('−')) return 'is-down';
+  return '';
 }
 
 function pulseMetricLabel(id) {
   if (id === 'totalActivity') return 'Activity';
   if (id === 'membersActive') return 'Active members';
-  if (id === 'assessments') return 'Assessments';
-  return 'Sessions';
-}
-
-function pulseKpiIsSelected(ui, id) {
-  if (id === 'totalActivity') return ui.pulseGrouping === 'visits';
-  if (id === 'membersActive') return ui.pulseGrouping === 'members';
-  if (id === 'trainingSessions') return ui.activityFilter === 'session';
-  if (id === 'assessments') return ui.activityFilter === 'assessment';
-  return false;
+  if (id === 'medianForceChange') return 'Median force change';
+  return id;
 }
 
 function pulseKpiShowsSelected(ui, id) {
-  if (id === 'totalActivity') return false;
-  return pulseKpiIsSelected(ui, id);
+  const screen = pulseKpiScreenForId(id);
+  return screen ? (ui.pulseScreen || 'hub') === screen : false;
 }
 
 function pulseKpiStrip(kpis, ui) {
   return `<div class="pulse-kpi-strip" aria-label="Summary for this stretch">${kpis.map(kpi => {
     const selected = pulseKpiShowsSelected(ui, kpi.id);
+    const display = kpi.displayValue ?? kpi.value;
     return `<button type="button" class="team-overview-kpi pulse-kpi-strip-card pulse-kpi-strip-button${selected ? ' is-selected' : ''}" data-action="pulse-kpi" data-value="${kpi.id}" aria-pressed="${selected}">
       <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}</span>
-      <span class="team-overview-kpi-value tabular">${kpi.value}</span>
+      <span class="team-overview-kpi-value tabular">${escapeHTML(String(display))}</span>
       <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
     </button>`;
   }).join('')}</div>`;
@@ -829,8 +1368,19 @@ function pulseMemberGroups(activity, sortKey) {
   }));
 }
 
+function pulseSortCatalog(ui) {
+  return ui.pulseScreen === 'medianForce' ? PULSE_MEDIAN_SORTS : PULSE_ACTIVITY_SORTS;
+}
+
+function pulseSortValue(ui) {
+  return ui.pulseScreen === 'medianForce' ? ui.medianForceSort : ui.activitySort;
+}
+
 function pulseActivityFiltersActive(ui) {
-  return ui.pulseGrouping === 'members' || ui.activityFilter !== 'all' || ui.activitySearch.trim() !== '' || ui.activitySort !== 'newest';
+  if (ui.pulseScreen === 'medianForce') {
+    return ui.medianForceSort !== 'largest' || ui.activitySearch.trim() !== '';
+  }
+  return ui.activityFilter !== 'all' || ui.activitySearch.trim() !== '' || ui.activitySort !== 'newest';
 }
 
 function pulseActivityFilterButtonLabel(ui) {
@@ -838,8 +1388,10 @@ function pulseActivityFilterButtonLabel(ui) {
 }
 
 function pulseActivitySortButtonLabel(ui) {
-  if (ui.activitySort === 'newest') return 'Newest';
-  if (ui.activitySort === 'oldest') return 'Oldest';
+  const sortKey = pulseSortValue(ui);
+  if (sortKey === 'largest') return 'Largest Δ';
+  if (sortKey === 'newest') return 'Newest';
+  if (sortKey === 'oldest') return 'Oldest';
   return 'A–Z';
 }
 
@@ -853,21 +1405,47 @@ function pulseActivityTypePopover(ui) {
 
 function pulseActivitySortPopover(ui) {
   if (!ui.activitySortOpen) return '';
-  const options = Object.entries(PULSE_ACTIVITY_SORTS).map(([value, label]) =>
-    `<button type="button" class="pulse-activity-filter-option${ui.activitySort === value ? ' is-selected' : ''}" data-action="pulse-activity-sort" data-value="${value}" role="menuitemradio" aria-checked="${ui.activitySort === value}">${escapeHTML(label)}</button>`
+  const catalog = pulseSortCatalog(ui);
+  const selected = pulseSortValue(ui);
+  const options = Object.entries(catalog).map(([value, label]) =>
+    `<button type="button" class="pulse-activity-filter-option${selected === value ? ' is-selected' : ''}" data-action="pulse-activity-sort" data-value="${value}" role="menuitemradio" aria-checked="${selected === value}">${escapeHTML(label)}</button>`
   ).join('');
   return `<div class="pulse-activity-filter-popover" id="pulse-activity-sort-popover" role="menu" aria-label="Sort visits">${options}</div>`;
 }
 
-function pulseActivityToolbar(ui) {
-  const typeControl = `<div class="pulse-activity-filter-anchor">
+function pulseBreadcrumb(items) {
+  const list = items.map(item => {
+    if (item.action) {
+      return `<li class="pulse-breadcrumb-item"><button type="button" class="pulse-breadcrumb-link" data-action="${item.action}">${escapeHTML(item.label)}</button></li>`;
+    }
+    return `<li class="pulse-breadcrumb-item"><span class="pulse-breadcrumb-current" aria-current="page">${escapeHTML(item.label)}</span></li>`;
+  }).join('');
+  return `<nav class="pulse-breadcrumb" aria-label="Breadcrumb"><ol class="pulse-breadcrumb-list">${list}</ol></nav>`;
+}
+
+function pulseScreenBreadcrumb(currentLabel) {
+  return pulseBreadcrumb([
+    {label: 'Pulse', action: 'pulse-screen-hub'},
+    {label: currentLabel}
+  ]);
+}
+
+function pulseSubScreenHead(title) {
+  return `<header class="pulse-screen-head pulse-sub-screen-head">${pulseScreenBreadcrumb(title)}</header>`;
+}
+
+function pulseActivityToolbar(ui, options = {}) {
+  const {showTitle = true, hideType = false} = options;
+  const sortKey = pulseSortValue(ui);
+  const sortDefault = ui.pulseScreen === 'medianForce' ? 'largest' : 'newest';
+  const typeControl = hideType ? '' : `<div class="pulse-activity-filter-anchor">
     <button type="button" class="pulse-activity-bar-button${ui.activityFilter !== 'all' ? ' is-active' : ''}" data-action="pulse-activity-type-toggle" aria-haspopup="menu" aria-expanded="${ui.activityTypeOpen}" aria-label="Visit type, ${pulseActivityFilterButtonLabel(ui)}"${ui.activityTypeOpen ? ' aria-controls="pulse-activity-type-popover"' : ''}>
       <span class="muted">Type</span> ${escapeHTML(pulseActivityFilterButtonLabel(ui))}
     </button>
     ${pulseActivityTypePopover(ui)}
   </div>`;
   const sortControl = `<div class="pulse-activity-filter-anchor">
-    <button type="button" class="pulse-activity-bar-button${ui.activitySort !== 'newest' ? ' is-active' : ''}" data-action="pulse-activity-sort-toggle" aria-haspopup="menu" aria-expanded="${ui.activitySortOpen}" aria-label="Sort, ${escapeHTML(PULSE_ACTIVITY_SORTS[ui.activitySort])}"${ui.activitySortOpen ? ' aria-controls="pulse-activity-sort-popover"' : ''}>
+    <button type="button" class="pulse-activity-bar-button${sortKey !== sortDefault ? ' is-active' : ''}" data-action="pulse-activity-sort-toggle" aria-haspopup="menu" aria-expanded="${ui.activitySortOpen}" aria-label="Sort, ${escapeHTML(pulseSortCatalog(ui)[sortKey])}"${ui.activitySortOpen ? ' aria-controls="pulse-activity-sort-popover"' : ''}>
       <span class="muted">Sort</span> ${escapeHTML(pulseActivitySortButtonLabel(ui))}
     </button>
     ${pulseActivitySortPopover(ui)}
@@ -880,8 +1458,9 @@ function pulseActivityToolbar(ui) {
     ${icon('search')}
     <input id="team-overview-pulse-search" type="search" inputmode="search" autocomplete="off" placeholder="Search" value="${escapeHTML(ui.activitySearch)}">
   </label>`;
-  return `<header class="pulse-activity-head team-overview-activity-head">
-    <h2>Activity</h2>
+  const title = showTitle ? '<h2>Activity</h2>' : '';
+  return `<header class="pulse-activity-head team-overview-activity-head${showTitle ? '' : ' pulse-activity-head--toolbar-only'}">
+    ${title}
     <div class="pulse-activity-bar team-overview-activity-toolbar">${typeControl}${sortControl}${reset}${search}</div>
   </header>`;
 }
@@ -916,12 +1495,11 @@ function pulseActivityRowMarkup(item, options = {}) {
   </li>`;
 }
 
-function pulseActivityListMarkup(model) {
+function pulseActivityListGrouped(model) {
   const {ui, activity, activityAll, roster} = model;
   const face = id => roster.find(person => person.id === id) || {initials: '•', name: ''};
   const empty = `<li class="pulse-activity-empty muted">${activityAll.length ? 'No visits match this filter.' : 'No visits in this period.'}</li>`;
   if (!activity.length) return empty;
-  if (ui.pulseGrouping === 'members') {
     const groups = pulseMemberGroups(activity, ui.activitySort);
     return groups.map(group => {
       const av = avatar(face(group.memberId), 'mini');
@@ -939,7 +1517,15 @@ function pulseActivityListMarkup(model) {
         <ul class="pulse-member-visits" aria-label="Visits for ${escapeHTML(group.memberName)}">${visits}</ul>
       </li>`;
     }).join('');
-  }
+}
+
+function pulseActivityListMarkup(model, options = {}) {
+  const {ui, activity, activityAll, roster} = model;
+  const groupByMembers = options.groupByMembers ?? (ui.pulseScreen === 'members' || ui.pulseGrouping === 'members');
+  if (groupByMembers) return pulseActivityListGrouped(model);
+  const face = id => roster.find(person => person.id === id) || {initials: '•', name: ''};
+  const empty = `<li class="pulse-activity-empty muted">${activityAll.length ? 'No visits match this filter.' : 'No visits in this period.'}</li>`;
+  if (!activity.length) return empty;
   return activity.map(item => {
     const av = avatar(face(item.memberId), 'mini');
     return pulseActivityRowMarkup(item, {avatarMarkup: av});
@@ -955,7 +1541,12 @@ function pulseActivityResetMarkup(ui) {
 function refreshPulseActivity() {
   const model = pulseModel();
   const list = document.querySelector('.pulse-activity-list');
-  if (list) list.innerHTML = pulseActivityListMarkup(model);
+  if (list) {
+    const markup = model.ui.pulseScreen === 'medianForce'
+      ? pulseMedianForceListMarkup(model)
+      : pulseActivityListMarkup(model);
+    list.innerHTML = markup;
+  }
   const toolbar = document.querySelector('.team-overview-activity-toolbar');
   if (!toolbar) return;
   const reset = toolbar.querySelector('.pulse-activity-reset');
@@ -968,11 +1559,14 @@ function refreshPulseActivity() {
   }
 }
 
-function pulseOperationsTable(model) {
+function pulseOperationsTable(model, options = {}) {
   const {ui} = model;
-  const list = pulseActivityListMarkup(model);
-  return `<section class="pulse-operations pulse-operations--trail" aria-label="Station visits">
-    ${pulseActivityToolbar(ui)}
+  const list = pulseActivityListMarkup(model, {
+    groupByMembers: options.groupByMembers
+  });
+  const sectionLabel = options.groupByMembers ? 'Active members and visits' : 'Station visits';
+  return `<section class="pulse-operations pulse-operations--trail${options.groupByMembers ? ' pulse-operations--by-member' : ''}" aria-label="${sectionLabel}">
+    ${pulseActivityToolbar(ui, options)}
     <div class="pulse-activity-scroll team-overview-table-wrap">
       <div class="pulse-activity-cols" role="row"><span class="pulse-col-visit">Visit</span><span class="pulse-col-outcome">Outcome</span><span class="pulse-col-when">When</span></div>
       <ul class="pulse-activity-list">${list}</ul>
@@ -980,15 +1574,93 @@ function pulseOperationsTable(model) {
   </section>`;
 }
 
+function pulseMedianForceRows(model) {
+  const {ui, activityAll} = model;
+  const term = ui.activitySearch.trim().toLowerCase();
+  const rows = activityAll
+    .map(row => ({...row, forceDelta: pulseRowForceDelta(row)}))
+    .filter(row => row.forceDelta != null && pulseActivityMatchesSearch(row, term));
+  return sortPulseMedianForce(rows, ui.medianForceSort);
+}
+
+function pulseMedianForceRowMarkup(item, avatarMarkup) {
+  const outcome = pulseTableOutcomeLabel(item);
+  const visit = pulseActivityVisitBlock(item, avatarMarkup);
+  const delta = pulseForceDeltaLabel(item.forceDelta);
+  const deltaClass = pulseForceDeltaClass(item.forceDelta);
+  return `<li class="pulse-activity-row" data-action="open-pulse-person" data-id="${item.memberId}" data-member-name="${escapeHTML(item.memberName)}" title="${escapeHTML(item.kindLabel)}" tabindex="0" role="link">
+    ${visit}
+    <span class="pulse-outcome tabular">${outcome === '—' ? '<span class="muted">—</span>' : escapeHTML(outcome)}</span>
+    <span class="pulse-force-delta tabular ${deltaClass}">${escapeHTML(delta)}</span>
+    <span class="pulse-when muted tabular">${escapeHTML(item.timeLabel)}</span>
+  </li>`;
+}
+
+function pulseMedianForceListMarkup(model) {
+  const {roster} = model;
+  const rows = pulseMedianForceRows(model);
+  const face = id => roster.find(person => person.id === id) || {initials: '•', name: ''};
+  if (!rows.length) {
+    return `<li class="pulse-activity-empty muted">${model.activityAll.length ? 'No comparable isometric visits match this filter.' : 'No comparable visits in this period.'}</li>`;
+  }
+  return rows.map(item => {
+    const av = avatar(face(item.memberId), 'mini');
+    return pulseMedianForceRowMarkup(item, av);
+  }).join('');
+}
+
+function pulseMedianForceTable(model) {
+  const {ui} = model;
+  const list = pulseMedianForceListMarkup(model);
+  return `<section class="pulse-operations pulse-operations--trail pulse-operations--median-force" aria-label="Comparable isometric visits">
+    ${pulseActivityToolbar(ui, {showTitle: false, hideType: true})}
+    <div class="pulse-activity-scroll team-overview-table-wrap">
+      <div class="pulse-activity-cols" role="row"><span class="pulse-col-visit">Visit</span><span class="pulse-col-outcome">Outcome</span><span class="pulse-col-delta">Δ force</span><span class="pulse-col-when">When</span></div>
+      <ul class="pulse-activity-list">${list}</ul>
+    </div>
+  </section>`;
+}
+
+function pulseActivityScreen(model) {
+  return `${pulseSubScreenHead('Activity')}${pulseOperationsTable(model, {showTitle: false})}`;
+}
+
+function pulseMembersScreen(model) {
+  return `${pulseSubScreenHead('Active members')}${pulseOperationsTable(model, {showTitle: false, groupByMembers: true})}`;
+}
+
+function pulseMedianForceScreen(model) {
+  return `${pulseSubScreenHead('Median force change')}${pulseMedianForceTable(model)}`;
+}
+
+function pulseScreenBody(model) {
+  const screen = model.ui.pulseScreen || 'hub';
+  if (screen === 'activity') return pulseActivityScreen(model);
+  if (screen === 'members') return pulseMembersScreen(model);
+  if (screen === 'medianForce') return pulseMedianForceScreen(model);
+  return '';
+}
+
 function pulsePage() {
   if (state.actor !== 'coach') return peopleView();
   const model = pulseModel();
+  const screen = model.ui.pulseScreen || 'hub';
+  if (screen === 'activity' || screen === 'members' || screen === 'medianForce') {
+    const paneLabel = screen === 'members' ? 'Active members' : screen === 'medianForce' ? 'Median force change' : 'Activity';
+    return `<main class="team-overview team-overview-home templates-hub staff-single-pane pulse-proto pulse-proto--activity-screen">
+      <div class="settings-hub-pane pulse-layout pulse-layout-table-first" aria-label="${paneLabel}">
+        ${pulseScreenBody(model)}
+      </div>
+    </main>`;
+  }
   return `<main class="team-overview team-overview-home templates-hub staff-single-pane pulse-proto">
-    <div class="settings-hub-pane pulse-layout pulse-layout-table-first" aria-label="Pulse">
+    <div class="settings-hub-pane pulse-layout" aria-label="Pulse">
       ${pulseHead()}
       ${pulseRangeControl(model)}
       ${pulseKpiStrip(model.kpis, model.ui)}
-      ${pulseOperationsTable(model)}
+      ${pulseActivityChartCard(model)}
+      ${pulseHubBottomRow(model)}
+      ${pulseScreenBody(model)}
     </div>
   </main>`;
 }
@@ -997,16 +1669,24 @@ const teamOverviewActions = {
   'nav-pulse': () => visitPulse(),
   'pulse-kpi': el => {
     const value = el.dataset.value;
+    const screen = pulseKpiScreenForId(value);
+    if (!screen) return;
     const ui = teamOverviewUI();
-    if (value === 'totalActivity') ui.pulseGrouping = 'visits';
-    else if (value === 'membersActive') ui.pulseGrouping = 'members';
-    else if (value === 'trainingSessions') ui.activityFilter = 'session';
-    else if (value === 'assessments') ui.activityFilter = 'assessment';
-    else return;
+    ui.pulseScreen = screen;
     ui.activityTypeOpen = false;
     ui.activitySortOpen = false;
+    ui.activityChartBucketOpen = false;
     render();
     document.querySelector(`[data-action="pulse-kpi"][data-value="${value}"]`)?.focus({preventScroll: true});
+  },
+  'pulse-screen-hub': () => {
+    const ui = teamOverviewUI();
+    ui.pulseScreen = 'hub';
+    ui.activityTypeOpen = false;
+    ui.activitySortOpen = false;
+    ui.activityChartBucketOpen = false;
+    render();
+    document.querySelector('[data-action="pulse-kpi"]')?.focus({preventScroll: true});
   },
   'pulse-activity-type-toggle': () => {
     const ui = teamOverviewUI();
@@ -1031,11 +1711,12 @@ const teamOverviewActions = {
     ui.pulseGrouping = 'visits';
     ui.activityFilter = 'all';
     ui.activitySort = 'newest';
+    ui.medianForceSort = 'largest';
     ui.activitySearch = '';
     ui.activityTypeOpen = false;
     ui.activitySortOpen = false;
     render();
-    document.querySelector('[data-action="pulse-activity-type-toggle"]')?.focus({preventScroll: true});
+    document.querySelector('[data-action="pulse-activity-type-toggle"], [data-action="pulse-activity-sort-toggle"]')?.focus({preventScroll: true});
   },
   'pulse-activity-filter': el => {
     const value = el.dataset.value;
@@ -1048,12 +1729,38 @@ const teamOverviewActions = {
   },
   'pulse-activity-sort': el => {
     const value = el.dataset.value;
-    if (!PULSE_ACTIVITY_SORTS[value]) return;
     const ui = teamOverviewUI();
-    ui.activitySort = value;
+    const catalog = pulseSortCatalog(ui);
+    if (!catalog[value]) return;
+    if (ui.pulseScreen === 'medianForce') ui.medianForceSort = value;
+    else ui.activitySort = value;
     ui.activitySortOpen = false;
     render();
     document.querySelector('[data-action="pulse-activity-sort-toggle"]')?.focus({preventScroll: true});
+  },
+  'pulse-chart-bucket-toggle': () => {
+    const ui = teamOverviewUI();
+    ui.activityChartBucketOpen = !ui.activityChartBucketOpen;
+    if (ui.activityChartBucketOpen) {
+      ui.activityTypeOpen = false;
+      ui.activitySortOpen = false;
+    }
+    render();
+    (ui.activityChartBucketOpen
+      ? document.querySelector('#pulse-chart-bucket-popover .pulse-activity-filter-option:not([disabled])')
+      : document.querySelector('[data-action="pulse-chart-bucket-toggle"]'))?.focus({preventScroll: true});
+  },
+  'pulse-chart-bucket': el => {
+    if (el.disabled) return;
+    const value = el.dataset.value;
+    if (!PULSE_CHART_BUCKETS[value]) return;
+    const ui = teamOverviewUI();
+    const window = pulsePeriodWindow(ui);
+    if (!pulseChartBucketEnabled(window, value)) return;
+    ui.activityChartBucket = value;
+    ui.activityChartBucketOpen = false;
+    render();
+    document.querySelector('[data-action="pulse-chart-bucket-toggle"]')?.focus({preventScroll: true});
   },
   'open-pulse-person': el => openDirectoryPerson(el.dataset.id, 'pulse'),
   'pulse-period': el => {
@@ -1228,10 +1935,11 @@ document.addEventListener('pointercancel', () => {
 document.addEventListener('click', event => {
   const ui = teamOverviewUI();
   if (state.nav !== 'pulse') return;
-  if (ui.activityTypeOpen || ui.activitySortOpen) {
+  if (ui.activityTypeOpen || ui.activitySortOpen || ui.activityChartBucketOpen) {
     if (!event.target.closest('.pulse-activity-filter-anchor')) {
       ui.activityTypeOpen = false;
       ui.activitySortOpen = false;
+      ui.activityChartBucketOpen = false;
       render();
     }
   }
@@ -1274,13 +1982,14 @@ document.addEventListener('change', event => {
 
 document.addEventListener('keydown', event => {
   const ui = teamOverviewUI();
-  if (event.key === 'Escape' && state.nav === 'pulse' && !state.stage && !state.overlay && (ui.activityTypeOpen || ui.activitySortOpen || ui.rangePickerOpen)) {
+  if (event.key === 'Escape' && state.nav === 'pulse' && !state.stage && !state.overlay && (ui.activityTypeOpen || ui.activitySortOpen || ui.activityChartBucketOpen || ui.rangePickerOpen)) {
     ui.activityTypeOpen = false;
     ui.activitySortOpen = false;
+    ui.activityChartBucketOpen = false;
     ui.rangePickerOpen = false;
     pulseRangePickerTeardown();
     render();
-    document.querySelector('[data-action="pulse-activity-type-toggle"], [data-action="pulse-activity-sort-toggle"], [data-action="pulse-range-picker-toggle"]')?.focus({preventScroll: true});
+    document.querySelector('[data-action="pulse-activity-type-toggle"], [data-action="pulse-activity-sort-toggle"], [data-action="pulse-chart-bucket-toggle"], [data-action="pulse-range-picker-toggle"]')?.focus({preventScroll: true});
     event.preventDefault();
     return;
   }
