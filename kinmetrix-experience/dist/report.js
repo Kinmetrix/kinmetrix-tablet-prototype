@@ -11,6 +11,22 @@ const reportPairDefinitions=[
  {name:'Back-left ↔ back-right',a:225,b:135}
 ];
 function mean(numbers){return numbers.reduce((sum,n)=>sum+n,0)/numbers.length;}
+function reportApplyPulseDrift(r, analysis) {
+ const drift = r.pulseForceDriftKg;
+ if (!Number.isFinite(drift) || drift === 0) return analysis;
+ const directions = analysis.directions.map(d => ({...d, force: Number((d.force + drift).toFixed(1))}));
+ const pairs = analysis.pairs.map(p => ({
+  ...p,
+  first: Number((p.first + drift).toFixed(1)),
+  second: Number((p.second + drift).toFixed(1))
+ }));
+ return {
+  ...analysis,
+  directions,
+  pairs,
+  force: Number(mean(directions.map(d => d.force)).toFixed(1))
+ };
+}
 function reportData(r){
  if(isMovementMode(r.type))return modeReportData(r);
  if(r.analysis)return r.analysis;
@@ -23,7 +39,9 @@ function reportData(r){
  });
  const pairs=reportPairDefinitions.filter(p=>directions.some(d=>d.angle===p.a)&&directions.some(d=>d.angle===p.b)).map(p=>{const a=directions.find(d=>d.angle===p.a),b=directions.find(d=>d.angle===p.b);return {...p,first:a.force,second:b.force,percent:Math.round(Math.min(a.force,b.force)/Math.max(a.force,b.force)*100)};});
  const frontBack=mean(directions.filter(d=>[0,180].includes(d.angle)).map(d=>d.force)),leftRight=mean(directions.filter(d=>[90,270].includes(d.angle)).map(d=>d.force));
- r.analysis={directions,pairs,force:mean(directions.map(d=>d.force)),stability:mean(directions.map(d=>d.stability)),duration:mean(directions.map(d=>d.duration)),range:mean(directions.map(d=>d.range)),ratio:frontBack/leftRight,exampleScore:r.positions===8?'4 / 6':null};
+ let analysis={directions,pairs,force:mean(directions.map(d=>d.force)),stability:mean(directions.map(d=>d.stability)),duration:mean(directions.map(d=>d.duration)),range:mean(directions.map(d=>d.range)),ratio:frontBack/leftRight,exampleScore:r.positions===8?'4 / 6':null};
+ analysis=reportApplyPulseDrift(r, analysis);
+ r.analysis=analysis;
  return r.analysis;
 }
 function reportState(){
@@ -57,7 +75,7 @@ function reportPreviousSession(r){
  if(r.partial)return null;
  const time=r.completedAt??Number(r.id?.replace('session-',''));
  const hold=r.type==='strength'?isometricHoldStyle(r.sessionSettings||r):'';
- return [...state.history,...reportFixtureHistory()].filter(previous=>previous.personId===r.personId&&previous.id!==r.id&&!previous.partial&&previous.type===r.type&&previous.purpose===r.purpose&&previous.positions===r.positions&&previous.reps===r.reps&&(r.type!=='strength'||isometricHoldStyle(previous.sessionSettings||previous)===hold)&&(previous.completedAt??Number(previous.id?.replace('session-','')))<time).sort((a,b)=>(b.completedAt??Number(b.id.replace('session-','')))-(a.completedAt??Number(a.id.replace('session-',''))))[0]||null;
+ return [...state.history,...reportFixtureHistory(r.personId)].filter(previous=>previous.personId===r.personId&&previous.id!==r.id&&!previous.partial&&previous.type===r.type&&previous.purpose===r.purpose&&previous.positions===r.positions&&previous.reps===r.reps&&(r.type!=='strength'||isometricHoldStyle(previous.sessionSettings||previous)===hold)&&(previous.completedAt??Number(previous.id?.replace('session-','')))<time).sort((a,b)=>(b.completedAt??Number(b.id.replace('session-','')))-(a.completedAt??Number(a.id.replace('session-',''))))[0]||null;
 }
 function reportCanCompare(r){return !!reportPreviousSession(r);}
 function reportPairMatch(data){return data.pairs.length?mean(data.pairs.map(pair=>pair.percent)):null;}
