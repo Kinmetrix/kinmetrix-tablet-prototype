@@ -36,8 +36,11 @@ function teamOverviewUI() {
   if (ui.activityChartBucketOpen == null) ui.activityChartBucketOpen = false;
   pulseEnsureRange(ui);
   const chartWindow = pulsePeriodWindow(ui);
-  if (!PULSE_CHART_BUCKETS[ui.activityChartBucket] || !pulseChartBucketEnabled(chartWindow, ui.activityChartBucket)) {
+  if (!PULSE_CHART_BUCKETS[ui.activityChartBucket]) {
     ui.activityChartBucket = pulseDefaultChartBucket(chartWindow);
+  } else if (!pulseChartBucketEnabled(chartWindow, ui.activityChartBucket)) {
+    if (ui.period === 'custom') pulseClampRangeForChartBucket(ui, ui.activityChartBucket);
+    else ui.activityChartBucket = pulseDefaultChartBucket(chartWindow);
   }
   return ui;
 }
@@ -210,8 +213,57 @@ function pulseChartBucketEnabled(window, mode) {
   return count >= PULSE_CHART_BUCKET_LIMITS.min && count <= PULSE_CHART_BUCKET_LIMITS.max;
 }
 
+function pulseClampRangeForChartBucket(ui, mode) {
+  if (!PULSE_CHART_BUCKETS[mode]) return;
+  pulseEnsureRange(ui);
+  const roster = typeof visiblePeople === 'function' ? visiblePeople() : [];
+  const domain = pulseActivityExtent(roster);
+  const domainStart = domain.start;
+  const domainEndDay = domain.endDay;
+  const domainEnd = domainEndDay + PULSE_DAY_MS - 1;
+  let start = pulseMidnight(ui.rangeStart);
+  let endDay = pulseMidnight(ui.rangeEnd);
+  let end = endDay + PULSE_DAY_MS - 1;
+  const {min, max} = PULSE_CHART_BUCKET_LIMITS;
+  const countFor = () => pulseChartBucketCount(pulseWindowFromRange(start, end), mode);
+  let guard = 0;
+  while (countFor() > max && guard++ < 10_000) {
+    if (start < endDay) {
+      start += PULSE_DAY_MS;
+      continue;
+    }
+    if (endDay > domainStart) {
+      endDay -= PULSE_DAY_MS;
+      end = endDay + PULSE_DAY_MS - 1;
+      continue;
+    }
+    break;
+  }
+  guard = 0;
+  while (countFor() < min && guard++ < 10_000) {
+    let grew = false;
+    if (endDay < domainEndDay) {
+      endDay += PULSE_DAY_MS;
+      end = endDay + PULSE_DAY_MS - 1;
+      grew = true;
+    } else if (start > domainStart) {
+      start -= PULSE_DAY_MS;
+      grew = true;
+    }
+    if (!grew) break;
+  }
+  if (start < domainStart) start = domainStart;
+  if (endDay > domainEndDay) {
+    endDay = domainEndDay;
+    end = domainEnd;
+  }
+  ui.rangeStart = start;
+  ui.rangeEnd = end;
+  ui.period = pulsePresetMatching(start, end, roster);
+}
+
 function pulseDefaultChartBucket(window) {
-  const prefs = window.days <= 14 ? ['day', 'week', 'month'] : window.days <= 90 ? ['week', 'day', 'month'] : ['month', 'week', 'day'];
+  const prefs = ['day', 'week', 'month'];
   for (const mode of prefs) {
     if (pulseChartBucketEnabled(window, mode)) return mode;
   }
@@ -267,10 +319,9 @@ function pulseChartAxisLabel(key, mode, index, total) {
 
 function pulseActivityChartBucketPopover(ui, window) {
   if (!ui.activityChartBucketOpen) return '';
-  const options = Object.entries(PULSE_CHART_BUCKETS).map(([value, label]) => {
-    const enabled = pulseChartBucketEnabled(window, value);
-    return `<button type="button" class="pulse-activity-filter-option${ui.activityChartBucket === value ? ' is-selected' : ''}" data-action="pulse-chart-bucket" data-value="${value}" role="menuitemradio" aria-checked="${ui.activityChartBucket === value}"${enabled ? '' : ' disabled aria-disabled="true"'}>${escapeHTML(label)}</button>`;
-  }).join('');
+  const options = Object.entries(PULSE_CHART_BUCKETS).map(([value, label]) =>
+    `<button type="button" class="pulse-activity-filter-option${ui.activityChartBucket === value ? ' is-selected' : ''}" data-action="pulse-chart-bucket" data-value="${value}" role="menuitemradio" aria-checked="${ui.activityChartBucket === value}">${escapeHTML(label)}</button>`
+  ).join('');
   return `<div class="pulse-activity-filter-popover" id="pulse-chart-bucket-popover" role="menu" aria-label="Group dates by">${options}</div>`;
 }
 
@@ -349,6 +400,7 @@ function pulseActivityChartCard(model) {
       </div>
     </div>
     <footer class="pulse-activity-chart-foot">${legend}</footer>
+    ${pulseBrushRow(model)}
   </section>`;
 }
 
@@ -463,6 +515,12 @@ function pulseMemberPerformanceCard(model) {
 }
 
 const PULSE_MEMBER_LINEUP_MAX = 6;
+const PULSE_SMALL_ROSTER_MAX = 4;
+
+function pulseMemberFirstName(name) {
+  const parts = String(name || '').trim().split(/\s+/);
+  return parts[0] || name;
+}
 
 function pulseActiveMemberSummaries(rows, roster) {
   const counts = new Map();
@@ -475,43 +533,67 @@ function pulseActiveMemberSummaries(rows, roster) {
     .sort((a, b) => b.sessions - a.sessions || a.person.name.localeCompare(b.person.name));
 }
 
-function pulseMemberFirstName(name) {
-  const parts = String(name || '').trim().split(/\s+/);
-  return parts[0] || name;
+function pulseOpenAnalysisRecord(personId, recordId) {
+  const record = pulseRecords(personId).find(item => item.id === recordId);
+  if (!record || state.actor !== 'coach') return;
+  state.personId = personId;
+  state.result = record;
+  state.stage = 'review';
+  state.reportReturnTab = 'overview';
+  state.memberOrigin = 'pulse';
+  state.showCompare = reportCanCompare(record);
+  state.reportDetails = false;
+  render();
+  window.scrollTo(0, 0);
 }
 
-function pulseSessionCountLabel(count) {
-  return count === 1 ? '1 session' : `${count} sessions`;
+function pulseActiveMembersMeta(total, rosterSize) {
+  if (!total) return '<p class="pulse-perf-meta muted">No sessions in this range</p>';
+  if (rosterSize <= PULSE_SMALL_ROSTER_MAX && total < rosterSize) {
+    return `<p class="pulse-perf-meta muted tabular">${total} of ${rosterSize} in range</p>`;
+  }
+  return `<p class="pulse-perf-meta muted tabular">${total} in range</p>`;
 }
 
 function pulseActiveMembersLineupCard(model) {
   const kpi = model.kpis.find(item => item.id === 'membersActive');
   const total = kpi?.value ?? 0;
+  const rosterSize = model.roster.length;
+  const smallRoster = rosterSize > 0 && rosterSize <= PULSE_SMALL_ROSTER_MAX;
   const summaries = pulseActiveMemberSummaries(model.activityAll, model.roster);
-  const shown = summaries.slice(0, PULSE_MEMBER_LINEUP_MAX);
-  const overflow = Math.max(0, summaries.length - shown.length);
-  const viewAll = total
-    ? `<button type="button" class="pulse-lineup-viewall" data-action="pulse-kpi" data-value="membersActive">View all ${total}</button>`
-    : '';
-  const meta = total
-    ? `<p class="pulse-perf-meta muted">At least one session in range · ${viewAll}</p>`
-    : `<p class="pulse-perf-meta muted">No sessions in this range</p>`;
+  const reserveOverflow = !smallRoster && total > PULSE_MEMBER_LINEUP_MAX;
+  const faceCap = reserveOverflow ? PULSE_MEMBER_LINEUP_MAX - 1 : PULSE_MEMBER_LINEUP_MAX;
+  const shown = smallRoster ? summaries : summaries.slice(0, faceCap);
+  const overflow = smallRoster ? 0 : Math.max(0, total - shown.length);
+  const activeIds = new Set(shown.map(item => item.memberId));
+  const quiet = smallRoster
+    ? model.roster.filter(person => !activeIds.has(person.id))
+    : [];
   const chips = shown.map(({memberId, sessions, person}) => {
-    const av = avatar(person, 'mini');
+    const name = escapeHTML(pulseMemberFirstName(person.name));
     return `<button type="button" class="pulse-member-chip" role="listitem" data-action="open-pulse-person" data-id="${escapeHTML(memberId)}" data-member-name="${escapeHTML(person.name)}" aria-label="${escapeHTML(person.name)}, ${sessions} sessions in range">
-      ${av}
-      <span class="pulse-member-chip__name">${escapeHTML(pulseMemberFirstName(person.name))}</span>
-      <span class="pulse-member-chip__meta muted tabular">${escapeHTML(pulseSessionCountLabel(sessions))}</span>
+      ${avatar(person)}
+      <span class="pulse-member-chip__name">${name}</span>
     </button>`;
   }).join('');
-  const more = overflow > 0
-    ? `<button type="button" class="pulse-member-chip pulse-member-chip--more" role="listitem" data-action="pulse-kpi" data-value="membersActive" aria-label="View ${overflow} more active members">+${overflow}</button>`
+  const quietChips = quiet.map(person => {
+    const name = escapeHTML(pulseMemberFirstName(person.name));
+    return `<button type="button" class="pulse-member-chip pulse-member-chip--quiet" role="listitem" data-action="open-pulse-person" data-id="${escapeHTML(person.id)}" data-member-name="${escapeHTML(person.name)}" aria-label="${escapeHTML(person.name)}, no sessions in range">
+      ${avatar(person)}
+      <span class="pulse-member-chip__name">${name}</span>
+    </button>`;
+  }).join('');
+  const moreChip = overflow > 0
+    ? `<button type="button" class="pulse-member-chip pulse-member-chip--more tabular" role="listitem" data-action="pulse-kpi" data-value="membersActive" aria-label="View all ${total} active members, ${overflow} more not shown"><span class="pulse-member-chip__more-mark" aria-hidden="true">+${overflow}</span><span class="pulse-member-chip__name">View all</span></button>`
     : '';
-  const body = total
-    ? `<div class="pulse-member-lineup" role="list">${chips}${more}</div>`
+  const lineupCount = shown.length + quiet.length + (overflow > 0 ? 1 : 0);
+  const hasLineup = lineupCount > 0;
+  const meta = hasLineup ? pulseActiveMembersMeta(total, rosterSize) : '';
+  const body = hasLineup
+    ? `<div class="pulse-member-lineup" role="list">${chips}${quietChips}${moreChip}</div>`
     : `<p class="pulse-perf-empty muted">No members with sessions in this range.</p>`;
   return `<section class="pulse-active-members-card" aria-label="Active members">
-    <header class="pulse-perf-head">
+    <header class="pulse-perf-head pulse-active-members-head">
       <h2 class="pulse-perf-title">Active members</h2>
       ${meta}
     </header>
@@ -524,6 +606,22 @@ function pulseHubBottomRow(model) {
     ${pulseMemberPerformanceCard(model)}
     ${pulseActiveMembersLineupCard(model)}
   </div>`;
+}
+
+function pulseActivityRadarScales(items) {
+  const records = items.map(item => pulseRecordForRow(item)).filter(Boolean);
+  return historyRadarScales(records);
+}
+
+function pulseActivityRadarCell(item, scales) {
+  const record = pulseRecordForRow(item);
+  if (!record) {
+    return '<span class="pulse-activity-radar pulse-activity-radar--empty muted" aria-hidden="true">—</span>';
+  }
+  const metric = reportMetric(record);
+  const radarMax = scales[metric.field] || (metric.field === 'range' ? 45 : 5);
+  const stamp = item.timeLabel || sessionStamp(record);
+  return `<button type="button" class="pulse-activity-radar" data-action="pulse-open-analysis" data-person-id="${escapeHTML(item.memberId)}" data-record-id="${escapeHTML(record.id)}" aria-label="Open ${escapeHTML(item.memberName)} report, ${escapeHTML(stamp)}">${historyRadar(record, radarMax)}</button>`;
 }
 
 function visitPulse() {
@@ -1275,42 +1373,62 @@ function pulseBrushLineMarkup(counts, max, layout) {
       </svg>`;
 }
 
-function pulseRangeControl(model) {
+function pulseBrushLayoutFromModel(model) {
   const domain = model.brush.domain;
   const startI = pulseDayIndex(model.window.start, domain.start, domain.days);
   const endI = pulseDayIndex(model.window.end, domain.start, domain.days);
-  const layout = pulseBrushLayout(startI, endI, domain);
-  const presetButtons = Object.entries(TEAM_OVERVIEW_PERIODS).map(([value, item]) =>
+  return pulseBrushLayout(startI, endI, domain);
+}
+
+function pulseBrushPresetsMarkup(model) {
+  return Object.entries(TEAM_OVERVIEW_PERIODS).map(([value, item]) =>
     `<button type="button" class="${model.ui.period === value ? 'active' : ''}" data-action="pulse-period" data-value="${value}" aria-pressed="${model.ui.period === value}" aria-label="${escapeHTML(item.ariaLabel)}" title="${escapeHTML(item.title)}">${escapeHTML(item.presetLabel)}</button>`
   ).join('');
-  return `<div class="pulse-range-row" aria-label="Date range for this stretch">
-    <div class="pulse-brush-presets segmented" role="group" aria-label="Reporting period presets">
-      ${presetButtons}
+}
+
+function pulseBrushTrackMarkup(model, layout) {
+  return `<div class="pulse-brush-track pulse-brush-track--inline" role="group" aria-labelledby="pulse-brush-label" title="Drag to set a custom date range">
+    <div class="pulse-brush-stage">
+      ${pulseBrushLineMarkup(model.brush.counts, model.brush.max, layout)}
     </div>
-    <div class="pulse-brush-track pulse-brush-track--inline" role="group" aria-labelledby="pulse-brush-label" title="Drag to set a custom date range">
-      <div class="pulse-brush-stage">
-        ${pulseBrushLineMarkup(model.brush.counts, model.brush.max, layout)}
-      </div>
-      <div class="pulse-brush-window${pulseBrushWindowFlushClass(layout)}" data-brush="move" style="left:${layout.left}%;width:${Math.min(layout.width, 100 - layout.left)}%"></div>
-      <button type="button" class="pulse-brush-handle is-start" data-brush="start" style="left:${layout.left}%" aria-label="Start of range"></button>
-      <button type="button" class="pulse-brush-handle is-end" data-brush="end" style="left:${layout.left + layout.width}%" aria-label="End of range"></button>
-    </div>
-    <div class="pulse-range-label-anchor">
-      <button type="button" class="pulse-range-label-button tabular" id="pulse-brush-label" data-action="pulse-range-picker-toggle" aria-haspopup="dialog" aria-expanded="${model.ui.rangePickerOpen}" aria-label="Date range, ${escapeHTML(layout.label)}. Choose dates"${model.ui.rangePickerOpen ? ' aria-controls="pulse-range-picker"' : ''}>
-        <span class="pulse-range-label-text">${escapeHTML(layout.label)}</span>
-        ${icon('calendar', 'icon-sm')}
-      </button>
-      ${pulseRangePickerPanel(model)}
-    </div>
+    <div class="pulse-brush-window${pulseBrushWindowFlushClass(layout)}" data-brush="move" style="left:${layout.left}%;width:${Math.min(layout.width, 100 - layout.left)}%"></div>
+    <button type="button" class="pulse-brush-handle is-start" data-brush="start" style="left:${layout.left}%" aria-label="Start of range"></button>
+    <button type="button" class="pulse-brush-handle is-end" data-brush="end" style="left:${layout.left + layout.width}%" aria-label="End of range"></button>
   </div>`;
 }
 
-function pulseHead() {
+function pulseRangeLabelMarkup(model, layout) {
+  return `<div class="pulse-range-label-anchor">
+    <button type="button" class="pulse-range-label-button tabular" id="pulse-brush-label" data-action="pulse-range-picker-toggle" aria-haspopup="dialog" aria-expanded="${model.ui.rangePickerOpen}" aria-label="Date range, ${escapeHTML(layout.label)}. Choose dates"${model.ui.rangePickerOpen ? ' aria-controls="pulse-range-picker"' : ''}>
+      <span class="pulse-range-label-text">${escapeHTML(layout.label)}</span>
+      ${icon('calendar', 'icon-sm')}
+    </button>
+    ${pulseRangePickerPanel(model)}
+  </div>`;
+}
+
+function pulseRangeHeaderControls(model) {
+  const layout = pulseBrushLayoutFromModel(model);
+  return `<div class="pulse-range-header" aria-label="Date range for this stretch">
+    <div class="pulse-brush-presets segmented" role="group" aria-label="Reporting period presets">
+      ${pulseBrushPresetsMarkup(model)}
+    </div>
+    ${pulseRangeLabelMarkup(model, layout)}
+  </div>`;
+}
+
+function pulseBrushRow(model) {
+  const layout = pulseBrushLayoutFromModel(model);
+  return `<div class="pulse-brush-row" aria-label="Adjust reporting period">${pulseBrushTrackMarkup(model, layout)}</div>`;
+}
+
+function pulseHead(model) {
   return `<header class="settings-pane-head team-overview-head pulse-head-compact">
     <div class="settings-pane-head-row team-overview-head-row">
       <div class="settings-pane-head-text">
         <h1>Pulse</h1>
       </div>
+      ${pulseRangeHeaderControls(model)}
     </div>
   </header>`;
 }
@@ -1428,25 +1546,18 @@ function pulseActivitySortPopover(ui) {
   return `<div class="pulse-activity-filter-popover" id="pulse-activity-sort-popover" role="menu" aria-label="Sort visits">${options}</div>`;
 }
 
-function pulseBreadcrumb(items) {
-  const list = items.map(item => {
-    if (item.action) {
-      return `<li class="pulse-breadcrumb-item"><button type="button" class="pulse-breadcrumb-link" data-action="${item.action}">${escapeHTML(item.label)}</button></li>`;
-    }
-    return `<li class="pulse-breadcrumb-item"><span class="pulse-breadcrumb-current" aria-current="page">${escapeHTML(item.label)}</span></li>`;
-  }).join('');
-  return `<nav class="pulse-breadcrumb" aria-label="Breadcrumb"><ol class="pulse-breadcrumb-list">${list}</ol></nav>`;
-}
-
-function pulseScreenBreadcrumb(currentLabel) {
-  return pulseBreadcrumb([
-    {label: 'Pulse', action: 'pulse-screen-hub'},
-    {label: currentLabel}
-  ]);
-}
-
-function pulseSubScreenHead(title) {
-  return `<header class="pulse-screen-head pulse-sub-screen-head">${pulseScreenBreadcrumb(title)}</header>`;
+function pulseSubScreenHead(model, title) {
+  return `<header class="settings-pane-head team-overview-head pulse-head-compact pulse-sub-screen-head">
+    <div class="settings-pane-head-row team-overview-head-row pulse-sub-screen-head-row">
+      <div class="settings-pane-head-text pulse-screen-head">
+        <button type="button" class="icon-button pulse-scope-chip" data-action="pulse-screen-hub" aria-label="Back to Pulse" title="Back to Pulse">
+          ${icon('back', 'icon-sm')}
+        </button>
+        <h1>${escapeHTML(title)}</h1>
+      </div>
+      ${pulseRangeHeaderControls(model)}
+    </div>
+  </header>`;
 }
 
 function pulseActivityToolbar(ui, options = {}) {
@@ -1500,10 +1611,12 @@ function pulseActivityVisitBlockNested(item) {
 }
 
 function pulseActivityRowMarkup(item, options = {}) {
-  const {nested = false, avatarMarkup = ''} = options;
+  const {nested = false, avatarMarkup = '', scales = null} = options;
   const outcome = pulseTableOutcomeLabel(item);
   const visit = nested ? pulseActivityVisitBlockNested(item) : pulseActivityVisitBlock(item, avatarMarkup);
-  return `<li class="pulse-activity-row${nested ? ' pulse-activity-row--nested' : ''}" data-action="open-pulse-person" data-id="${item.memberId}" data-member-name="${escapeHTML(item.memberName)}" title="${escapeHTML(item.kindLabel)}" tabindex="0" role="link">
+  const radar = scales ? pulseActivityRadarCell(item, scales) : '';
+  return `<li class="pulse-activity-row${nested ? ' pulse-activity-row--nested' : ''}${scales ? ' pulse-activity-row--with-radar' : ''}" data-action="open-pulse-person" data-id="${item.memberId}" data-member-name="${escapeHTML(item.memberName)}" title="${escapeHTML(item.kindLabel)}" tabindex="0" role="link">
+    ${radar}
     ${visit}
     <span class="pulse-outcome tabular">${outcome === '—' ? '<span class="muted">—</span>' : escapeHTML(outcome)}</span>
     <span class="pulse-when muted tabular">${escapeHTML(item.timeLabel)}</span>
@@ -1541,9 +1654,10 @@ function pulseActivityListMarkup(model, options = {}) {
   const face = id => roster.find(person => person.id === id) || {initials: '•', name: ''};
   const empty = `<li class="pulse-activity-empty muted">${activityAll.length ? 'No visits match this filter.' : 'No visits in this period.'}</li>`;
   if (!activity.length) return empty;
+  const scales = pulseActivityRadarScales(activity);
   return activity.map(item => {
     const av = avatar(face(item.memberId), 'mini');
-    return pulseActivityRowMarkup(item, {avatarMarkup: av});
+    return pulseActivityRowMarkup(item, {avatarMarkup: av, scales});
   }).join('');
 }
 
@@ -1576,14 +1690,17 @@ function refreshPulseActivity() {
 
 function pulseOperationsTable(model, options = {}) {
   const {ui} = model;
+  const groupByMembers = !!options.groupByMembers;
   const list = pulseActivityListMarkup(model, {
-    groupByMembers: options.groupByMembers
+    groupByMembers
   });
-  const sectionLabel = options.groupByMembers ? 'Active members and visits' : 'Station visits';
-  return `<section class="pulse-operations pulse-operations--trail${options.groupByMembers ? ' pulse-operations--by-member' : ''}" aria-label="${sectionLabel}">
+  const sectionLabel = groupByMembers ? 'Active members and visits' : 'Station visits';
+  const radarCol = groupByMembers ? '' : '<span class="pulse-col-radar">Shape</span>';
+  const trailClass = groupByMembers ? '' : ' pulse-operations--with-radar';
+  return `<section class="pulse-operations pulse-operations--trail${groupByMembers ? ' pulse-operations--by-member' : ''}${trailClass}" aria-label="${sectionLabel}">
     ${pulseActivityToolbar(ui, options)}
     <div class="pulse-activity-scroll team-overview-table-wrap">
-      <div class="pulse-activity-cols" role="row"><span class="pulse-col-visit">Visit</span><span class="pulse-col-outcome">Outcome</span><span class="pulse-col-when">When</span></div>
+      <div class="pulse-activity-cols" role="row">${radarCol}<span class="pulse-col-visit">Visit</span><span class="pulse-col-outcome">Outcome</span><span class="pulse-col-when">When</span></div>
       <ul class="pulse-activity-list">${list}</ul>
     </div>
   </section>`;
@@ -1637,15 +1754,15 @@ function pulseMedianForceTable(model) {
 }
 
 function pulseActivityScreen(model) {
-  return `${pulseSubScreenHead('Activity')}${pulseOperationsTable(model, {showTitle: false})}`;
+  return `${pulseSubScreenHead(model, 'Activity')}${pulseOperationsTable(model, {showTitle: false})}`;
 }
 
 function pulseMembersScreen(model) {
-  return `${pulseSubScreenHead('Active members')}${pulseOperationsTable(model, {showTitle: false, groupByMembers: true})}`;
+  return `${pulseSubScreenHead(model, 'Active members')}${pulseOperationsTable(model, {showTitle: false, groupByMembers: true})}`;
 }
 
 function pulseMedianForceScreen(model) {
-  return `${pulseSubScreenHead('Median force change')}${pulseMedianForceTable(model)}`;
+  return `${pulseSubScreenHead(model, 'Median force change')}${pulseMedianForceTable(model)}`;
 }
 
 function pulseScreenBody(model) {
@@ -1670,11 +1787,12 @@ function pulsePage() {
   }
   return `<main class="team-overview team-overview-home templates-hub staff-single-pane pulse-proto">
     <div class="settings-hub-pane pulse-layout" aria-label="Pulse">
-      ${pulseHead()}
-      ${pulseRangeControl(model)}
-      ${pulseKpiStrip(model.kpis, model.ui)}
-      ${pulseActivityChartCard(model)}
-      ${pulseHubBottomRow(model)}
+      ${pulseHead(model)}
+      <div class="pulse-hub-card">
+        ${pulseKpiStrip(model.kpis, model.ui)}
+        ${pulseActivityChartCard(model)}
+        ${pulseHubBottomRow(model)}
+      </div>
       ${pulseScreenBody(model)}
     </div>
   </main>`;
@@ -1762,22 +1880,21 @@ const teamOverviewActions = {
     }
     render();
     (ui.activityChartBucketOpen
-      ? document.querySelector('#pulse-chart-bucket-popover .pulse-activity-filter-option:not([disabled])')
+      ? document.querySelector('#pulse-chart-bucket-popover .pulse-activity-filter-option')
       : document.querySelector('[data-action="pulse-chart-bucket-toggle"]'))?.focus({preventScroll: true});
   },
   'pulse-chart-bucket': el => {
-    if (el.disabled) return;
     const value = el.dataset.value;
     if (!PULSE_CHART_BUCKETS[value]) return;
     const ui = teamOverviewUI();
-    const window = pulsePeriodWindow(ui);
-    if (!pulseChartBucketEnabled(window, value)) return;
     ui.activityChartBucket = value;
+    pulseClampRangeForChartBucket(ui, value);
     ui.activityChartBucketOpen = false;
     render();
     document.querySelector('[data-action="pulse-chart-bucket-toggle"]')?.focus({preventScroll: true});
   },
   'open-pulse-person': el => openDirectoryPerson(el.dataset.id, 'pulse'),
+  'pulse-open-analysis': el => pulseOpenAnalysisRecord(el.dataset.personId, el.dataset.recordId),
   'pulse-period': el => {
     const value = el.dataset.value;
     if (!TEAM_OVERVIEW_PERIODS[value]) return;
@@ -1786,6 +1903,10 @@ const teamOverviewActions = {
     ui.period = value;
     ui.rangeStart = preset.start;
     ui.rangeEnd = preset.end;
+    const window = pulseWindowFromRange(ui.rangeStart, ui.rangeEnd);
+    if (!pulseChartBucketEnabled(window, ui.activityChartBucket)) {
+      ui.activityChartBucket = pulseDefaultChartBucket(window);
+    }
     ui.rangePickerOpen = false;
     render();
     document.querySelector(`[data-action="pulse-period"][data-value="${value}"]`)?.focus({preventScroll: true});
@@ -1990,6 +2111,10 @@ document.addEventListener('change', event => {
     ui.period = value;
     ui.rangeStart = preset.start;
     ui.rangeEnd = preset.end;
+    const window = pulseWindowFromRange(ui.rangeStart, ui.rangeEnd);
+    if (!pulseChartBucketEnabled(window, ui.activityChartBucket)) {
+      ui.activityChartBucket = pulseDefaultChartBucket(window);
+    }
     render();
     return;
   }

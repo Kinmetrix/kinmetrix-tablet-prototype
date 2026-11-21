@@ -179,7 +179,7 @@
 }
 .templates-layered-shell main.templates-hub .settings-hub-pane{
  margin:0;
- padding:28px 32px 24px;
+ padding:14px 16px 12px;
  background:var(--surface);
  border:1px solid rgba(0,0,0,.06);
  border-radius:var(--templates-card-corner);
@@ -208,7 +208,7 @@
 }
 .templates-layered-shell main.people-finder.staff-single-pane>.settings-hub-pane,
 .templates-layered-shell main.device-workspace.staff-single-pane>.settings-hub-pane{
- padding:48px;
+ padding:24px;
  background:transparent;
  border:0;
  border-radius:0;
@@ -225,7 +225,7 @@
  min-height:0;background:transparent;padding:0;overflow:hidden;
 }
 .templates-layered-shell main.device-workspace.staff-single-pane>.settings-hub-pane{
- padding:24px 32px 20px;
+ padding:12px 16px 10px;
  overflow:hidden;
 }
 .templates-layered-shell main.device-workspace .settings-pane-head{margin-bottom:14px;flex-shrink:0}
@@ -337,7 +337,7 @@
  .templates-layered-shell main.templates-hub.settings-hub-layout.settings-workspace-layout{min-height:0;padding:0;grid-template-columns:minmax(0,1fr)}
  .templates-layered-shell main.templates-hub.settings-hub-layout.settings-workspace-layout>.settings-hub-pane{grid-column:1}
  .templates-layered-shell main.templates-hub .settings-hub-pane{
-  border-radius:0;border:0;box-shadow:none;min-height:0;padding:24px 18px 30px;
+  border-radius:0;border:0;box-shadow:none;min-height:0;padding:12px 9px 15px;
  }
  .templates-layered-shell main.templates-hub .settings-hub-rail{display:none}
 }
