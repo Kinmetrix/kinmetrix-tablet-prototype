@@ -46,6 +46,8 @@
     #kinmetrix-draft .km-main h2 { font-size: 21px; line-height: 1.3; font-weight: 400; letter-spacing: -.4px; }
     #kinmetrix-draft .km-headline { margin-bottom: 32px; }
     #kinmetrix-draft .km-headline-home { max-width: 316px; }
+    #kinmetrix-draft .km-headline .km-subtle { margin-top: 10px; max-width: 316px; }
+    #kinmetrix-draft .km-home-preview { display: inline-flex; margin-top: 28px; min-height: 44px; align-items: center; font-size: 14px; }
     #kinmetrix-draft .km-intro { font-size: 25px; line-height: 1.34; letter-spacing: -.55px; }
     #kinmetrix-draft .km-subtle { color: var(--km-muted); font-size: 14px; line-height: 1.5; }
     #kinmetrix-draft .km-tag { display: inline-flex; align-items: center; background: var(--km-tag); color: var(--km-ink); padding: 4px 8px; border-radius: 5px; font-size: 11px; line-height: 1.4; font-weight: 500; letter-spacing: .2px; white-space: nowrap; }
@@ -518,10 +520,13 @@ body { background: var(--page); }
   <section id="km-first" class="km-frame" data-auth-state="guest">
     <div class="km-phone" data-selected-tab="Home">
       <header class="km-top"><span class="km-brand">Kinmetrix</span><span data-template="km-home-arc-template"></span></header>
-      <main class="km-main">
-        <div class="km-headline km-headline-home"><h1>Sessions from your visits show up here.</h1></div>
-        <div data-template="km-home-card-template"></div>
-        <div class="km-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-session">View sample</a><a class="km-button cursor-interaction" href="#km-nearby">Find a location</a></div>
+      <main class="km-main km-home-empty">
+        <div class="km-headline km-headline-home">
+          <h1>No sessions yet</h1>
+          <p class="km-subtle">After a visit at a Kinmetrix location, finished session summaries appear here.</p>
+        </div>
+        <div class="km-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-nearby">Find a location</a></div>
+        <a class="km-text-link km-home-preview cursor-interaction" href="#km-session">See a sample session</a>
         <div class="km-account-link"><a class="km-text-link cursor-interaction" href="#km-signin-home">I already have an account</a></div>
       </main>
     </div>
@@ -538,7 +543,7 @@ body { background: var(--page); }
           <dl class="km-measures"><div class="km-measure"><dt>Average peak<br>force</dt><dd>128 <small>N</small></dd></div><div class="km-measure"><dt>Stability</dt><dd>91<small>%</small></dd></div><div class="km-measure"><dt>Symmetry</dt><dd>96<small>%</small></dd></div></dl>
         </section>
         <div data-template="km-direction-template"></div>
-        <p class="km-after-visit">Yours looks like this after a visit.</p>
+        <p class="km-after-visit">After a visit, a session looks like this.</p>
       </main>
     </div>
   </section>
@@ -588,7 +593,11 @@ body { background: var(--page); }
   <section id="km-progress" class="km-frame" hidden>
     <div class="km-phone" data-selected-tab="Progress">
       <header class="km-top"><span class="km-brand">Kinmetrix</span></header>
-      <main class="km-main"><h1>Progress</h1><p class="km-intro km-progress-intro">A trend starts at your second visit.</p><div data-template="km-chart-template"></div></main>
+      <main class="km-main km-home-empty">
+        <h1>Progress</h1>
+        <p class="km-intro km-progress-intro">Trends appear after your second visit.</p>
+        <p class="km-subtle">Complete a visit to start tracking change over time.</p>
+      </main>
     </div>
   </section>
 
@@ -726,10 +735,16 @@ body { background: var(--page); }
   <section id="km-signed-home" class="km-frame" data-auth-state="signed" hidden>
     <div class="km-phone" data-selected-tab="Home">
       <header class="km-top"><span class="km-brand">Kinmetrix</span><span data-template="km-home-arc-template"></span></header>
-      <main class="km-main">
-        <div class="km-headline km-headline-home"><h1>Sessions from your visits show up here.</h1></div>
-        <div data-template="km-home-card-template"></div>
-        <div class="km-actions"><a class="km-button km-button-primary cursor-interaction" href="#km-session">View sample</a><a class="km-button cursor-interaction" href="#km-nearby">Find a location</a></div>
+      <main class="km-main km-home-empty">
+        <div class="km-headline km-headline-home">
+          <h1>No sessions yet</h1>
+          <p class="km-subtle">Sign in on the device at a location. When the visit is done, sessions appear here.</p>
+        </div>
+        <div class="km-actions">
+          <a class="km-button km-button-primary cursor-interaction" href="#km-arc-home">Sign in on the device</a>
+          <a class="km-button cursor-interaction" href="#km-nearby">Find a location</a>
+        </div>
+        <a class="km-text-link km-home-preview cursor-interaction" href="#km-session">See a sample session</a>
       </main>
     </div>
   </section>
