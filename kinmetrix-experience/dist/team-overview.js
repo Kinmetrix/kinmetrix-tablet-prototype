@@ -1333,12 +1333,27 @@ function pulseKpiShowsSelected(ui, id) {
   return screen ? (ui.pulseScreen || 'hub') === screen : false;
 }
 
+function pulseKpiDetailLabel(id) {
+  const screen = pulseKpiScreenForId(id);
+  if (screen === 'activity') return 'activity';
+  if (screen === 'members') return 'active members';
+  if (screen === 'medianForce') return 'median force change';
+  return 'detail';
+}
+
+function pulseKpiButtonAriaLabel(kpi) {
+  const label = pulseMetricLabel(kpi.id);
+  const display = kpi.displayValue ?? kpi.value;
+  const detail = pulseKpiDetailLabel(kpi.id);
+  return `${label}, ${display}. ${kpi.deltaLabel}. View ${detail}.`;
+}
+
 function pulseKpiStrip(kpis, ui) {
   return `<div class="pulse-kpi-strip" aria-label="Summary for this stretch">${kpis.map(kpi => {
     const selected = pulseKpiShowsSelected(ui, kpi.id);
     const display = kpi.displayValue ?? kpi.value;
-    return `<button type="button" class="team-overview-kpi pulse-kpi-strip-card pulse-kpi-strip-button${selected ? ' is-selected' : ''}" data-action="pulse-kpi" data-value="${kpi.id}" aria-pressed="${selected}">
-      <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}</span>
+    return `<button type="button" class="team-overview-kpi pulse-kpi-strip-card pulse-kpi-strip-button${selected ? ' is-selected' : ''}" data-action="pulse-kpi" data-value="${kpi.id}" aria-pressed="${selected}" aria-label="${escapeHTML(pulseKpiButtonAriaLabel(kpi))}">
+      <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}${icon('chevron', 'icon-sm pulse-kpi-strip-go')}</span>
       <span class="team-overview-kpi-value tabular">${escapeHTML(String(display))}</span>
       <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
     </button>`;

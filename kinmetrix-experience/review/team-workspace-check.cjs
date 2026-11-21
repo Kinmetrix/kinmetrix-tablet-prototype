@@ -7,6 +7,9 @@ state.actor='coach';state.clinicianId='sam';state.nav='pulse';state.personId=nul
 const pulse=pulsePage();
 assert.match(pulse,/<h1>Pulse<\\/h1>/);
 assert.match(pulse,/data-action="pulse-kpi"/);
+assert.match(pulse,/pulse-kpi-strip-button/);
+assert.match(pulse,/pulse-kpi-strip-go/);
+assert.match(pulse,/aria-label="Activity, [^"]+\\. View activity\\."/);
 assert.doesNotMatch(pulse,/data-value="trainingSessions"/);
 assert.doesNotMatch(pulse,/data-value="assessments"/);
 assert.match(pulse,/data-value="medianForceChange"/);
