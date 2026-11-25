@@ -122,7 +122,7 @@ pulseUi.activityFilter='all';
 assert.doesNotMatch(pulsePage(),/data-action="pulse-activity-reset"/);
 pulseUi.pulseScreen='medianForce';
 const pulseMedian=pulsePage();
-assert.match(pulseMedian,/<h1>Median force change<\\/h1>/);
+assert.match(pulseMedian,/<h1>Strength trend<\\/h1>/);
 assert.match(pulseMedian,/pulse-col-delta/);
 assert.match(pulseMedian,/pulse-force-delta/);
 assert.doesNotMatch(pulseMedian,/pulse-kpi-detail-chart/);

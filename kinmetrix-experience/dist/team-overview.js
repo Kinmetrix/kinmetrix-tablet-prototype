@@ -1282,7 +1282,7 @@ function pulseModel() {
     {id: 'membersTotal', label: 'Total members', value: members.length, ...pulseNewMembersDelta(members.length, newMembers, comparePrior)},
     {
       id: 'medianForceChange',
-      label: 'Median force change',
+      label: 'Strength trend',
       value: medianForce,
       displayValue: pulseMedianForceDisplay(medianForce),
       deltaLabel: teamKpiDeltaForce(medianForce, medianForcePrior, {comparePrior})
@@ -1623,7 +1623,7 @@ function pulseKpiDeltaClass(label) {
 function pulseMetricLabel(id) {
   if (id === 'totalActivity') return 'Activity';
   if (id === 'membersTotal') return 'Total members';
-  if (id === 'medianForceChange') return 'Median force change';
+  if (id === 'medianForceChange') return 'Strength trend';
   return id;
 }
 
@@ -1636,7 +1636,7 @@ function pulseKpiDetailLabel(id) {
   const screen = pulseKpiScreenForId(id);
   if (screen === 'activity') return 'activity';
   if (screen === 'members') return 'members';
-  if (screen === 'medianForce') return 'median force change';
+  if (screen === 'medianForce') return 'strength trend';
   return 'detail';
 }
 
@@ -1952,7 +1952,7 @@ function pulseMembersScreen(model) {
 }
 
 function pulseMedianForceScreen(model) {
-  return `${pulseSubScreenHead(model, 'Median force change')}${pulseMedianForceTable(model)}`;
+  return `${pulseSubScreenHead(model, 'Strength trend')}${pulseMedianForceTable(model)}`;
 }
 
 function pulseScreenBody(model) {
@@ -1968,7 +1968,7 @@ function pulsePage() {
   const model = pulseModel();
   const screen = model.ui.pulseScreen || 'hub';
   if (screen === 'activity' || screen === 'members' || screen === 'medianForce') {
-    const paneLabel = screen === 'members' ? 'Members' : screen === 'medianForce' ? 'Median force change' : 'Activity';
+    const paneLabel = screen === 'members' ? 'Members' : screen === 'medianForce' ? 'Strength trend' : 'Activity';
     return `<main class="team-overview team-overview-home templates-hub staff-single-pane pulse-proto pulse-proto--activity-screen">
       <div class="settings-hub-pane pulse-layout pulse-layout-table-first" aria-label="${paneLabel}">
         ${pulseScreenBody(model)}
