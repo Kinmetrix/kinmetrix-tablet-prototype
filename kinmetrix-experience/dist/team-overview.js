@@ -58,6 +58,7 @@ function teamOverviewUI() {
 }
 
 const PULSE_KPI_SCREENS = {totalActivity: 'activity', membersActive: 'members', medianForceChange: 'medianForce'};
+const PULSE_PERF_BUCKET_LABELS = {up: 'Up', flat: 'Flat', down: 'Down'};
 
 function pulseKpiScreenForId(id) {
   return PULSE_KPI_SCREENS[id] || null;
@@ -489,6 +490,74 @@ function pulsePerformanceBarMarkup(counts) {
   return `<div class="pulse-perf-bar-track">${pulsePerformanceBarSegment('up', counts.up)}${pulsePerformanceBarSegment('flat', counts.flat)}${pulsePerformanceBarSegment('down', counts.down)}</div>`;
 }
 
+function pulsePerformancePieMarkup(counts) {
+  if (!counts?.total) return '';
+  const slices = [
+    {id: 'up', count: counts.up},
+    {id: 'flat', count: counts.flat},
+    {id: 'down', count: counts.down}
+  ].filter(slice => slice.count > 0);
+  if (!slices.length) return '';
+  const cx = 28;
+  const cy = 28;
+  const r = 27;
+  let body = '';
+  if (slices.length === 1) {
+    body = `<circle class="pulse-kpi-pie-slice pulse-kpi-pie-slice--${slices[0].id}" cx="${cx}" cy="${cy}" r="${r}"/>`;
+  } else {
+    let angle = -Math.PI / 2;
+    const dividers = [];
+    const paths = slices.map(slice => {
+      const sweep = (slice.count / counts.total) * Math.PI * 2;
+      const endAngle = angle + sweep;
+      const x1 = cx + r * Math.cos(angle);
+      const y1 = cy + r * Math.sin(angle);
+      const x2 = cx + r * Math.cos(endAngle);
+      const y2 = cy + r * Math.sin(endAngle);
+      const largeArc = sweep > Math.PI ? 1 : 0;
+      const d = `M ${cx} ${cy} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
+      dividers.push(`<line class="pulse-kpi-pie-divider" x1="${cx}" y1="${cy}" x2="${x1.toFixed(2)}" y2="${y1.toFixed(2)}"/>`);
+      angle = endAngle;
+      return `<path class="pulse-kpi-pie-slice pulse-kpi-pie-slice--${slice.id}" d="${d}"/>`;
+    }).join('');
+    body = `${paths}${dividers.join('')}`;
+  }
+  return `<svg class="pulse-kpi-pie" viewBox="0 0 56 56" width="52" height="52" aria-hidden="true">${body}</svg>`;
+}
+
+function pulsePerformanceMiniStackRow(id, count, total) {
+  const label = PULSE_PERF_BUCKET_LABELS[id];
+  const value = total ? String(count) : '—';
+  return `<span class="pulse-kpi-mini-row">
+    <span class="pulse-perf-legend-pill pulse-perf-legend-pill--${id}" aria-hidden="true"></span>
+    <span class="pulse-perf-legend-label">${escapeHTML(label)}</span>
+    <span class="pulse-perf-legend-value tabular">${escapeHTML(value)}</span>
+  </span>`;
+}
+
+function pulseKpiMedianForceCompactBody(kpi) {
+  const perf = kpi.performance;
+  if (!perf?.total) {
+    return `<span class="pulse-kpi-strip-main">
+      <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}${icon('chevron', 'icon-sm pulse-kpi-strip-go')}</span>
+      <span class="team-overview-kpi-value tabular">${escapeHTML(String(kpi.displayValue ?? kpi.value))}</span>
+      <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
+    </span>`;
+  }
+  const stack = `<span class="pulse-kpi-mini-stack" aria-hidden="true">${pulsePerformanceMiniStackRow('up', perf.up, perf.total)}${pulsePerformanceMiniStackRow('flat', perf.flat, perf.total)}${pulsePerformanceMiniStackRow('down', perf.down, perf.total)}</span>`;
+  return `<span class="pulse-kpi-strip-compact">
+    <span class="pulse-kpi-strip-main">
+      <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}${icon('chevron', 'icon-sm pulse-kpi-strip-go')}</span>
+      <span class="team-overview-kpi-value tabular">${escapeHTML(String(kpi.displayValue ?? kpi.value))}</span>
+      <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
+    </span>
+    <span class="pulse-kpi-strip-compact-right">
+      <span class="pulse-kpi-strip-visual">${pulsePerformancePieMarkup(perf)}</span>
+      ${stack}
+    </span>
+  </span>`;
+}
+
 function pulsePerformanceLegendRow(id, label, count, total) {
   const value = total ? String(count) : '—';
   return `<li class="pulse-perf-legend-item">
@@ -503,7 +572,7 @@ function pulsePerformanceLegendRow(id, label, count, total) {
 function pulseMemberPerformanceCard(model) {
   const counts = model.performance?.current || pulsePerformanceCounts(model.activityAll);
   const aria = counts.total
-    ? `${counts.up} gaining, ${counts.flat} flat, ${counts.down} down, of ${counts.total} comparable visits`
+    ? `${counts.up} up, ${counts.flat} flat, ${counts.down} down, of ${counts.total} comparable visits`
     : 'No comparable isometric visits in this period.';
   const meta = counts.total
     ? `<p class="pulse-perf-meta muted tabular">${counts.total} comparable visits</p>`
@@ -514,9 +583,9 @@ function pulseMemberPerformanceCard(model) {
           ${pulsePerformanceBarMarkup(counts)}
         </div>
         <ul class="pulse-perf-legend" aria-label="Force change breakdown">
-          ${pulsePerformanceLegendRow('up', 'Gaining', counts.up, counts.total)}
-          ${pulsePerformanceLegendRow('flat', 'Flat', counts.flat, counts.total)}
-          ${pulsePerformanceLegendRow('down', 'Down', counts.down, counts.total)}
+          ${pulsePerformanceLegendRow('up', PULSE_PERF_BUCKET_LABELS.up, counts.up, counts.total)}
+          ${pulsePerformanceLegendRow('flat', PULSE_PERF_BUCKET_LABELS.flat, counts.flat, counts.total)}
+          ${pulsePerformanceLegendRow('down', PULSE_PERF_BUCKET_LABELS.down, counts.down, counts.total)}
         </ul>
       </div>`
     : `<p class="pulse-perf-empty muted">${escapeHTML(aria)}</p>`;
@@ -1274,6 +1343,8 @@ function pulseModel() {
   const medianForce = pulseMedianValue(currentForceDeltas);
   const medianForcePrior = pulseMedianValue(priorForceDeltas);
   const comparePrior = ui.period !== 'all';
+  const performanceCurrent = pulsePerformanceCounts(currentRows);
+  const performancePrior = pulsePerformanceCounts(priorRows);
   const kpis = [
     {id: 'totalActivity', label: 'Total activity', value: current.totalActivity, previous: previous.totalActivity},
     {id: 'membersActive', label: 'Active members', value: current.membersActive, previous: previous.membersActive},
@@ -1282,7 +1353,8 @@ function pulseModel() {
       label: 'Median force change',
       value: medianForce,
       displayValue: pulseMedianForceDisplay(medianForce),
-      previous: medianForcePrior
+      previous: medianForcePrior,
+      performance: performanceCurrent
     }
   ].map(kpi => ({
     ...kpi,
@@ -1294,8 +1366,6 @@ function pulseModel() {
     currentRows.filter(row => pulseActivityMatchesFilter(row, ui.activityFilter) && pulseActivityMatchesSearch(row, ui.activitySearch.trim().toLowerCase())),
     ui.activitySort
   );
-  const performanceCurrent = pulsePerformanceCounts(currentRows);
-  const performancePrior = pulsePerformanceCounts(priorRows);
   const performance = {
     current: performanceCurrent,
     prior: performancePrior,
@@ -1646,17 +1716,30 @@ function pulseKpiButtonAriaLabel(kpi) {
   const label = pulseMetricLabel(kpi.id);
   const display = kpi.displayValue ?? kpi.value;
   const detail = pulseKpiDetailLabel(kpi.id);
-  return `${label}, ${display}. ${kpi.deltaLabel}. View ${detail}.`;
+  const deltaPart = kpi.deltaLabel ? ` ${kpi.deltaLabel}.` : '';
+  const perfPart = kpi.performance?.total
+    ? ` ${kpi.performance.up} up, ${kpi.performance.flat} flat, ${kpi.performance.down} down.`
+    : '';
+  return `${label}, ${display}.${deltaPart}${perfPart} View ${detail}.`;
+}
+
+function pulseKpiStripCardBody(kpi) {
+  if (kpi.id === 'medianForceChange') return pulseKpiMedianForceCompactBody(kpi);
+  const display = kpi.displayValue ?? kpi.value;
+  return `<span class="pulse-kpi-strip-main">
+    <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}${icon('chevron', 'icon-sm pulse-kpi-strip-go')}</span>
+    <span class="team-overview-kpi-value tabular">${escapeHTML(String(display))}</span>
+    <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
+  </span>`;
 }
 
 function pulseKpiStrip(kpis, ui) {
   return `<div class="pulse-kpi-strip" aria-label="Summary for this stretch">${kpis.map(kpi => {
     const selected = pulseKpiShowsSelected(ui, kpi.id);
-    const display = kpi.displayValue ?? kpi.value;
-    return `<button type="button" class="team-overview-kpi pulse-kpi-strip-card pulse-kpi-strip-button${selected ? ' is-selected' : ''}" data-action="pulse-kpi" data-value="${kpi.id}" aria-pressed="${selected}" aria-label="${escapeHTML(pulseKpiButtonAriaLabel(kpi))}">
-      <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}${icon('chevron', 'icon-sm pulse-kpi-strip-go')}</span>
-      <span class="team-overview-kpi-value tabular">${escapeHTML(String(display))}</span>
-      <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
+    const compact = kpi.id === 'medianForceChange' && kpi.performance?.total;
+    const cardClass = `team-overview-kpi pulse-kpi-strip-card pulse-kpi-strip-button${selected ? ' is-selected' : ''}${compact ? ' pulse-kpi-strip-button--compact' : ''}`;
+    return `<button type="button" class="${cardClass}" data-action="pulse-kpi" data-value="${kpi.id}" aria-pressed="${selected}" aria-label="${escapeHTML(pulseKpiButtonAriaLabel(kpi))}">
+      ${pulseKpiStripCardBody(kpi)}
     </button>`;
   }).join('')}</div>`;
 }

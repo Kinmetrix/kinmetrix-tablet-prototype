@@ -309,6 +309,8 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 }
 
 .templates-layered-shell main.team-overview.pulse-proto{overflow:hidden;font-size:13px}
+.pulse-proto{--pulse-perf-up:#5cb87a;--pulse-perf-down:#e07b7b;--pulse-perf-flat:color-mix(in srgb,var(--muted) 42%,#fff)}
+:root[data-theme="dark"] .pulse-proto{--pulse-perf-up:#6ecf8e;--pulse-perf-down:#f0a0a0;--pulse-perf-flat:color-mix(in srgb,var(--muted) 50%,var(--surface))}
 .templates-layered-shell main.team-overview.pulse-proto .settings-hub-pane{overflow:hidden}
 .pulse-layout{display:flex;flex-direction:column;flex:1;min-height:0}
 .pulse-head-compact{margin:0;flex-shrink:0}
@@ -346,6 +348,28 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .pulse-kpi-strip-label{display:inline-flex;align-items:center;gap:4px;max-width:100%;font-size:12px;font-weight:500;color:var(--muted)}
 .pulse-kpi-strip .team-overview-kpi-value{font-size:30px;font-weight:600;letter-spacing:-.02em}
 .pulse-kpi-strip .team-overview-kpi-delta{font-size:12px;font-weight:400}
+.pulse-kpi-strip-main{display:grid;gap:4px;min-width:0}
+.pulse-kpi-strip-compact{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-width:0}
+.pulse-kpi-strip-compact-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.pulse-kpi-strip-visual{display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pulse-kpi-pie{display:block;width:52px;height:52px}
+.pulse-kpi-pie-slice{stroke:none}
+.pulse-kpi-pie-divider{stroke:var(--surface);stroke-width:1.5;stroke-linecap:butt}
+.pulse-kpi-pie-slice--up{fill:var(--pulse-perf-up)}
+.pulse-kpi-pie-slice--flat{fill:var(--pulse-perf-flat)}
+.pulse-kpi-pie-slice--down{fill:var(--pulse-perf-down)}
+.pulse-kpi-mini-stack{display:grid;gap:4px;min-width:0}
+.pulse-kpi-mini-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:5px;font-size:11px;line-height:1.1}
+.pulse-kpi-mini-row .pulse-perf-legend-pill{width:5px;height:10px}
+.pulse-kpi-mini-row .pulse-perf-legend-label{font-size:11px}
+.pulse-kpi-mini-row .pulse-perf-legend-value{font-size:12px;text-align:right}
+.pulse-kpi-strip-button--compact{align-content:center}
+@media (hover: hover) and (pointer: fine){
+ .pulse-kpi-strip-button:hover .pulse-kpi-pie-divider{stroke:var(--soft)}
+}
+.pulse-kpi-strip-button:active .pulse-kpi-pie-divider{stroke:var(--selected)}
+.pulse-kpi-strip-button.is-selected .pulse-kpi-pie-divider{stroke:color-mix(in srgb,var(--signal) 11%,var(--surface))}
+.pulse-kpi-pie-divider{transition:stroke 150ms ease}
 .pulse-activity-chart-card{
  --pulse-chart-session:#5cb87a;--pulse-chart-assessment:#5b9fd6;--pulse-range-control-h:48px;--pulse-chart-x-band:calc(6px + 14px);
  align-self:stretch;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px 16px 14px;flex:1 1 0;min-height:0;margin-top:0;display:flex;flex-direction:column;
@@ -395,8 +419,7 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .pulse-activity-chart-tooltip-swatch{width:10px;height:10px;border-radius:3px}
 .pulse-activity-chart-tooltip-swatch--session{background:#8fd0a8}
 .pulse-activity-chart-tooltip-swatch--assessment{background:#9ec7f5}
-.pulse-perf-card{--pulse-perf-up:#5cb87a;--pulse-perf-down:#e07b7b;--pulse-perf-flat:color-mix(in srgb,var(--muted) 42%,#fff);width:fit-content;max-width:100%;align-self:flex-start;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:14px 16px;flex-shrink:0;margin-top:0}
-:root[data-theme="dark"] .pulse-perf-card{--pulse-perf-up:#6ecf8e;--pulse-perf-down:#f0a0a0;--pulse-perf-flat:color-mix(in srgb,var(--muted) 50%,var(--surface))}
+.pulse-perf-card{width:fit-content;max-width:100%;align-self:flex-start;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:14px 16px;flex-shrink:0;margin-top:0}
 .pulse-perf-head{margin-bottom:12px;display:grid;gap:2px}
 .pulse-perf-title{margin:0;font-size:16px;font-weight:600;line-height:1.2}
 .pulse-perf-meta{margin:0;font-size:12px;line-height:1.3}
