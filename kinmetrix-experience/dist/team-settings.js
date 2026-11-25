@@ -574,7 +574,7 @@ function teamAssessmentEmilSyncSegThumbs(root = document) {
 }
 
 function teamAssessmentEmilAfterRender() {
-  if (!document.querySelector('.assessment-emil-page')) return;
+  if (!isTeamHubNav() || teamHubResolveCard() !== 'assessments' || assessmentWorkspaceView() !== 'editor') return;
   teamAssessmentEmilSyncSegThumbs();
   document.querySelectorAll('.assessment-emil-step.press, .assessment-emil-seg .press').forEach((btn) => {
     if (btn.dataset.emilPressBound) return;
@@ -604,168 +604,6 @@ function teamAssessmentRomRulesMarkup() {
     <div class="assessment-rom-rule">
       <label class="check-label"><input type="checkbox" id="setup-romDropOn" data-setup-toggle="romDropOn" ${c.romDropOn ? 'checked' : ''}><span><strong>Force drop</strong><small>Stops when push releases</small></span></label>
       ${drop}
-    </div>
-  </div>`;
-}
-
-function teamAssessmentPadSummary() {
-  const angles = currentAngles();
-  const changed = angles.filter((a) => setupTilt(a).changed).length;
-  if (!changed) return 'All defaults';
-  return `${changed} direction${changed === 1 ? '' : 's'} changed`;
-}
-
-function teamAssessmentEmilRepExplainer() {
-  const c = state.setup;
-  if (c.type === 'rom') return '';
-  let how = 'Build to the target and hold. The pad stays fixed.';
-  let end = '';
-  if (c.type === 'isokinetic') {
-    how = 'Push against the pad as it moves through the set tilt range. The rep ends at the end tilt.';
-  } else if (c.type === 'eccentric') {
-    how = 'Resist as the device moves the pad from start tilt back to end tilt. The pad reaches end tilt to end the rep.';
-  } else if (isIsometricEndurance(c)) {
-    how = 'Hold as long as possible. Release or drop rules end the rep.';
-  } else if (c.type === 'strength' && isometricHoldStyle(c) === 'timed') {
-    end = `Each rep ends after <strong>${c.holdSeconds} s</strong> on the timer.`;
-  }
-  return `<div class="assessment-emil-rep-explainer"><h3>During each rep</h3><p>${how}</p>${end ? `<p>${end}</p>` : ''}</div>`;
-}
-
-function teamAssessmentEmilPreviewRadial() {
-  const c = state.setup;
-  const angles = currentAngles();
-  const active = c.isokTab === 'tilts' ? c.angle : null;
-  const vb = 360;
-  const ring = 128;
-  const cx = 180;
-  const cy = 180;
-  const spokes = angles.map((a) => {
-    const rad = a * Math.PI / 180;
-    const sin = Math.sin(rad);
-    const cos = -Math.cos(rad);
-    const inner = 44;
-    const outer = ring - 30;
-    const tilt = setupTilt(a);
-    const cls = ['assessment-emil-spoke', a === active ? 'is-active' : '', tilt.changed ? 'is-adjusted' : ''].filter(Boolean).join(' ');
-    return `<line class="${cls}" x1="${cx + sin * inner}" y1="${cy + cos * inner}" x2="${cx + sin * outer}" y2="${cy + cos * outer}"/>`;
-  }).join('');
-  const nodes = angles.map((a) => {
-    const rad = a * Math.PI / 180;
-    const dist = ring * 0.88;
-    const left = ((cx + Math.sin(rad) * dist) / vb) * 100;
-    const top = ((cy - Math.cos(rad) * dist) / vb) * 100;
-    const tilt = setupTilt(a);
-    const reps = setupTiltKind() === 'limit' ? 1 : c.reps;
-    const dots = Array.from({length: reps}, () => '<i></i>').join('');
-    const padLabel = setupHasFixedTilt() ? `pad ${setupTiltText(a)}` : setupTiltText(a);
-    const cls = ['assessment-emil-node', a === active ? 'is-active' : '', tilt.changed ? 'is-adjusted' : ''].filter(Boolean).join(' ');
-    return `<button type="button" class="${cls} press" style="left:${left}%;top:${top}%" data-action="isok-direction" data-angle="${a}" aria-pressed="${a === active}"><span class="assessment-emil-node-press"><strong class="assessment-emil-node-angle">${a}°</strong><span class="assessment-emil-node-dots" aria-hidden="true">${dots}</span><span class="assessment-emil-node-tilt">${escapeHTML(padLabel)}</span></span></button>`;
-  }).join('');
-  const settingsSelected = active === null;
-  return `<div class="assessment-emil-radial" role="group" aria-label="Directions. Tap a direction to set its pad position.">
-    <svg class="assessment-emil-radial-art" viewBox="0 0 360 360" aria-hidden="true">
-      <circle class="assessment-emil-ring" cx="${cx}" cy="${cy}" r="${ring}"/>
-      <g>${spokes}</g>
-      ${personOrientation(180, 180, 1.05)}
-    </svg>
-    <button type="button" class="assessment-emil-radial-center press${settingsSelected ? ' is-active' : ''}" data-action="isok-tab" data-value="session" aria-pressed="${settingsSelected}" aria-label="Session settings"></button>
-    ${nodes}
-  </div>`;
-}
-
-function teamAssessmentEmilPreviewCard() {
-  const c = state.setup;
-  const total = c.positions * c.reps;
-  const kind = setupTiltKind();
-  const dirs = `${c.positions} direction${c.positions === 1 ? '' : 's'}`;
-  const reps = kind === 'limit' ? '' : ` × <span>${c.reps} rep${c.reps === 1 ? '' : 's'}</span>`;
-  const totalLine = kind === 'limit' ? '' : `<strong id="sum-total">${total} reps</strong>`;
-  return `<section class="assessment-emil-preview" aria-labelledby="preview-title">
-    <header class="assessment-emil-preview-head">
-      <h2 id="preview-title">Your session</h2>
-      <p class="assessment-emil-preview-sum"><span>${dirs}</span>${reps} ${totalLine}</p>
-    </header>
-    ${teamAssessmentEmilPreviewRadial()}
-    <button type="button" class="assessment-emil-pad-row press" data-action="assessment-pad-focus">
-      <span>Pad position</span>
-      <strong>${teamAssessmentPadSummary()}</strong>
-      ${icon('chevron', 'icon-sm')}
-    </button>
-    ${teamAssessmentEmilRepExplainer()}
-  </section>`;
-}
-
-function teamAssessmentEmilSettingsColumn() {
-  const c = state.setup;
-  const forceHelp = c.type === 'rom' ? 'Light push needed before movement counts.' : 'Starting target when no member baseline exists.';
-  if (c.isokTab === 'tilts') {
-    return `<div class="assessment-emil-settings-col">
-      <div class="assessment-emil-tilt-nav">${button(icon('back', 'icon-sm') + ' Session settings', 'isok-tab', 'assessment-emil-text-btn press', 'data-value="session" id="assessment-radial-settings-back"')}</div>
-      ${isokTiltPanel()}
-    </div>`;
-  }
-  const body = c.type === 'rom'
-    ? `${teamAssessmentEmilRomSettingsMarkup(forceHelp)}${teamAssessmentRomRulesMarkup()}`
-    : teamAssessmentEmilSettingsMarkup(forceHelp);
-  return `<div class="assessment-emil-settings-col">${body}</div>`;
-}
-
-function teamAssessmentEmilProtocolSplit() {
-  return `<div class="assessment-emil-split">${teamAssessmentEmilPreviewCard()}${teamAssessmentEmilSettingsColumn()}</div>`;
-}
-
-function teamAssessmentEmilViewSeg() {
-  const tab = assessmentWorkspaceTab();
-  const buttons = [['protocol', 'Protocol'], ['rom', 'ROM']].map(([key, label]) => teamAssessmentEmilSegButton({
-    id: `assessment-tab-${key}`,
-    action: 'assessment-tab',
-    value: key,
-    label,
-    checked: tab === key
-  }));
-  return teamAssessmentEmilSegMarkup({id: 'assessment-view-seg', widthClass: 'assessment-emil-seg-top', buttons, ariaLabel: 'Assessment views'});
-}
-
-function teamAssessmentEmilToolbar() {
-  return `<header class="assessment-emil-toolbar" id="assessment-emil-toolbar">
-    ${button(icon('back', 'icon-sm') + ' Assessment', 'assessment-back-chooser', 'assessment-emil-back press', 'aria-label="Back to assessment types"')}
-  <div class="assessment-emil-toolbar-center">${teamAssessmentEmilViewSeg()}</div>
-  <div class="assessment-emil-toolbar-end">${button('Save', 'save-assessment-workspace', 'assessment-emil-save press')}</div>
-  </header>`;
-}
-
-function teamAssessmentEmilPageHead(tab) {
-  const isRom = tab === 'rom';
-  const title = isRom ? 'Range of motion' : 'Assessment protocol';
-  const lede = isRom
-    ? 'Comfortable start and max limits in each direction.'
-    : 'Team defaults for new assessments. Members still review pad positions before Begin.';
-  return `<div class="assessment-emil-page-head">
-    <p class="assessment-emil-crumb">Team <span aria-hidden="true">›</span> Libraries <span aria-hidden="true">›</span> Assessment</p>
-    <h1>${title}</h1>
-    <p class="assessment-emil-lede">${lede}</p>
-  </div>`;
-}
-
-function teamAssessmentEmilRomPane() {
-  return `<section class="assessment-emil-pane" aria-label="Range of motion">${teamAssessmentEmilProtocolSplit()}</section>`;
-}
-
-function teamAssessmentEmilProtocolPane() {
-  return `<section class="assessment-emil-pane" aria-label="Protocol">${teamAssessmentEmilProtocolSplit()}</section>`;
-}
-
-function teamAssessmentEmilEditorMarkup() {
-  const tab = assessmentWorkspaceTab();
-  if (tab === 'rom') ensureTeamRomEditor();
-  else ensureTeamAssessmentEditor();
-  const pane = tab === 'rom' ? teamAssessmentEmilRomPane() : teamAssessmentEmilProtocolPane();
-  return `<div class="assessment-emil-page">
-    ${teamAssessmentEmilToolbar()}
-    <div class="assessment-emil-scroller" id="assessment-emil-scroller">
-      ${teamAssessmentEmilPageHead(tab)}
-      ${pane}
     </div>
   </div>`;
 }
@@ -840,8 +678,14 @@ function teamAssessmentRadialInspector() {
   </aside>`;
 }
 
+function teamAssessmentRadialMarkup() {
+  if (assessmentWorkspaceTab() === 'rom') ensureTeamRomEditor();
+  else ensureTeamAssessmentEditor();
+  return `<div class="assessment-workspace assessment-workspace--radial">${teamAssessmentRadialStage()}${teamAssessmentRadialInspector()}</div>`;
+}
+
 function teamAssessmentWorkspaceMarkup() {
-  return assessmentWorkspaceView() === 'editor' ? teamAssessmentEmilEditorMarkup() : teamAssessmentChooserMarkup();
+  return assessmentWorkspaceView() === 'editor' ? teamAssessmentRadialMarkup() : teamAssessmentChooserMarkup();
 }
 
 function teamSessionWorkspaceMarkup() {
@@ -1009,8 +853,7 @@ function teamHubCardsMarkup() {
 function teamHubDetailHead(activeItem, cardId) {
   const library = isTeamHubLibraryId(cardId) ? cardId : null;
   const assessmentEditor = cardId === 'assessments' && assessmentWorkspaceView() === 'editor';
-  if (assessmentEditor) return '';
-  const assessmentTab = null;
+  const assessmentTab = assessmentEditor ? assessmentWorkspaceTab() : null;
   const saveAssessment = library === 'assessments' && assessmentEditor ? button('Save', 'save-assessment-workspace', 'primary') : '';
   const saveSessionPlan = library === 'sessions' && sessionWorkspaceTab() === 'session-plan' ? button('Save', 'save-session-workspace', 'primary') : '';
   const createByLibrary = {
@@ -1255,17 +1098,6 @@ const teamSettingsActions = {
   'assessment-mode': el => {
     if (!isTeamHubNav() || teamHubResolveCard() !== 'assessments' || assessmentWorkspaceView() !== 'editor') return;
     changeSetupMode(el.dataset.value);
-  },
-  'assessment-pad-focus': () => {
-    if (!isTeamHubNav() || teamHubResolveCard() !== 'assessments' || assessmentWorkspaceView() !== 'editor') return;
-    const angles = currentAngles();
-    const target = angles.find((a) => setupTilt(a).changed) ?? angles[0];
-    state.setup.angle = target;
-    state.setup.isokTab = 'tilts';
-    directoryUI().programs.teamAngle = target;
-    directoryUI().programs.teamTab = 'tilts';
-    render();
-    $(`[data-action="isok-direction"][data-angle="${target}"]`)?.focus({preventScroll:true});
   },
   'settings-hub-section': el => {
     if (!SETTINGS_RAIL_SECTIONS.some(item => item.id === el.dataset.section)) return;

@@ -509,10 +509,8 @@ const directoryActions={
   ui.assessmentTab=tab;
   ui.assessmentView='editor';
   ui.teamTab='session';
-  if(tab==='rom'){if(typeof ensureTeamRomEditor==='function')ensureTeamRomEditor();}
-  else{if(typeof ensureTeamAssessmentEditor==='function')ensureTeamAssessmentEditor();}
   render();
-  $(`[data-action="assessment-tab"][data-tab="${tab}"]`)?.focus({preventScroll:true});
+  $('#assessment-radial-settings')?.focus();
  },
  'session-tab':el=>{
   if(!isTeamHubNav()||teamHubResolveCard()!=='sessions')return;
