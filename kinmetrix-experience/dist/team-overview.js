@@ -581,7 +581,9 @@ function pulseActiveMembersLineupCard(model) {
       <span class="pulse-member-chip__count muted tabular">${count}</span>
     </button>`;
   }).join('');
-  const meta = total ? `<p class="pulse-perf-meta muted tabular">${total} in range</p>` : '';
+  const meta = total
+    ? `<p class="pulse-perf-meta muted tabular">${total} in range · <button type="button" class="pulse-lineup-viewall" data-action="pulse-kpi" data-value="membersTotal">View all</button></p>`
+    : '';
   const body = total
     ? `<div class="pulse-member-lineup" role="list">${chips}</div>`
     : `<p class="pulse-perf-empty muted">No members with sessions in this range.</p>`;
