@@ -24,7 +24,7 @@ assert.match(pulse,/Member performance/);
 assert.match(pulse,/pulse-active-members-card/);
 assert.match(pulse,/<h2 class="pulse-perf-title">Most active<\\/h2>/);
 assert.match(pulse,/pulse-active-members-head/);
-assert.ok((pulse.match(/class="pulse-member-chip"/g)||[]).length<=3,'most active shows at most 3 members');
+assert.equal((pulse.match(/class="pulse-member-chip"/g)||[]).length,3,'most active shows the top 3 members');
 assert.match(pulse,/<span class="pulse-member-chip__count muted tabular">\\d+ sessions?<\\/span>/);
 assert.doesNotMatch(pulse,/pulse-member-chip--quiet/);
 const tiedSummaries=pulseActiveMemberSummaries([{memberId:'a',at:1},{memberId:'b',at:5},{memberId:'a',at:2},{memberId:'b',at:3}],[{id:'a',name:'Ann'},{id:'b',name:'Bo'}]);
