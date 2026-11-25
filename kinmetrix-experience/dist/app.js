@@ -146,6 +146,7 @@ function render(){
   if(typeof pulseRangePickerTeardown==='function'&&!teamOverviewUI().rangePickerOpen) pulseRangePickerTeardown();
   if(typeof pulseRangePickerAfterRender==='function'&&teamOverviewUI().rangePickerOpen) pulseRangePickerAfterRender();
  }
+ if(typeof teamAssessmentEmilAfterRender==='function') teamAssessmentEmilAfterRender();
 }
 function focusFindInput(){
  const input=$('#roster-search');
