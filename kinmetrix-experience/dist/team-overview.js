@@ -341,6 +341,109 @@ function pulseChartYTicks(maxTotal) {
   return mid === maxTotal ? [maxTotal, Math.ceil(maxTotal / 2), 0] : [maxTotal, mid, 0];
 }
 
+function pulseKpiTrendBucketMode(window) {
+  return pulseDefaultChartBucket(window);
+}
+
+function pulseKpiSparklineValues(kpiId, model) {
+  const {window, activityAll} = model;
+  const mode = pulseKpiTrendBucketMode(window);
+  const keys = pulseChartBucketKeys(window, mode);
+  if (!keys.length) return [];
+  if (kpiId === 'totalActivity') {
+    const series = pulseActivityChartSeries(activityAll, window, mode);
+    return series.buckets.map(bucket => bucket.total);
+  }
+  if (kpiId === 'membersActive') {
+    const byKey = new Map(keys.map(key => [key, new Set()]));
+    for (const row of activityAll) {
+      if (row.at < window.start || row.at > window.end) continue;
+      const key = pulseChartBucketStart(row.at, mode);
+      byKey.get(key)?.add(row.memberId);
+    }
+    return keys.map(key => byKey.get(key)?.size ?? 0);
+  }
+  if (kpiId === 'medianForceChange') {
+    return keys.map(key => {
+      const bucketRows = activityAll.filter(row => {
+        if (row.at < window.start || row.at > window.end) return false;
+        return pulseChartBucketStart(row.at, mode) === key;
+      });
+      const deltas = pulseComparableForceDeltas(bucketRows);
+      const median = pulseMedianValue(deltas);
+      return median == null ? 0 : median;
+    });
+  }
+  return [];
+}
+
+function pulseSparklineSvg(values, options = {}) {
+  const {width = 88, height = 28, signed = false, className = 'pulse-kpi-sparkline', ariaLabel = 'Trend'} = options;
+  if (!values.length) {
+    return `<span class="pulse-kpi-sparkline pulse-kpi-sparkline--empty muted" aria-hidden="true">—</span>`;
+  }
+  const pad = 2;
+  const innerW = width - pad * 2;
+  const innerH = height - pad * 2;
+  let min;
+  let max;
+  if (signed) {
+    const peak = Math.max(0.001, ...values.map(value => Math.abs(value ?? 0)));
+    min = -peak;
+    max = peak;
+  } else {
+    min = 0;
+    max = Math.max(1, ...values.map(value => value ?? 0));
+  }
+  const range = max - min || 1;
+  const points = values.map((value, index) => {
+    const x = pad + (values.length === 1 ? innerW / 2 : (index / (values.length - 1)) * innerW);
+    const v = value ?? 0;
+    const y = pad + innerH * (1 - (v - min) / range);
+    return `${index ? 'L' : 'M'}${x.toFixed(2)},${y.toFixed(2)}`;
+  }).join(' ');
+  const baseline = signed ? pad + innerH * (1 - (0 - min) / range) : null;
+  const midline = signed
+    ? `<line class="pulse-kpi-sparkline-mid" x1="${pad}" y1="${baseline.toFixed(2)}" x2="${width - pad}" y2="${baseline.toFixed(2)}"/>`
+    : '';
+  return `<svg class="${className}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHTML(ariaLabel)}">${midline}<path d="${points}"/></svg>`;
+}
+
+function pulseKpiSparklineMarkup(kpi) {
+  const values = kpi.sparkline || [];
+  if (!values.length) return '';
+  const signed = kpi.id === 'medianForceChange';
+  const label = `Trend for ${pulseMetricLabel(kpi.id)}`;
+  return pulseSparklineSvg(values, {signed, ariaLabel: label});
+}
+
+function pulseKpiDetailTrendCard(model, kpiId) {
+  const values = pulseKpiSparklineValues(kpiId, model);
+  const titles = {
+    membersActive: 'Active members over time',
+    medianForceChange: 'Median force change over time'
+  };
+  const title = titles[kpiId] || 'Trend';
+  const signed = kpiId === 'medianForceChange';
+  const chart = pulseSparklineSvg(values, {width: 640, height: 120, signed, className: 'pulse-kpi-detail-sparkline', ariaLabel: title});
+  return `<section class="pulse-kpi-detail-chart-card" aria-label="${escapeHTML(title)}">
+    <header class="pulse-kpi-detail-chart-head"><h2>${escapeHTML(title)}</h2></header>
+  <div class="pulse-kpi-detail-chart-wrap">${chart}</div>
+  </section>`;
+}
+
+function pulseKpiSubScreenChart(model) {
+  const screen = model.ui.pulseScreen;
+  if (screen === 'activity') return pulseActivityChartCard(model);
+  if (screen === 'members') return pulseKpiDetailTrendCard(model, 'membersActive');
+  if (screen === 'medianForce') return pulseKpiDetailTrendCard(model, 'medianForceChange');
+  return '';
+}
+
+function pulseActivityShowRadar(ui) {
+  return ui.activitySearch.trim().length > 0;
+}
+
 function pulseActivityChartCard(model) {
   const {ui, window, activityAll} = model;
   const mode = ui.activityChartBucket;
@@ -1106,6 +1209,9 @@ function pulseModel() {
     deltaLabel: kpi.id === 'medianForceChange'
       ? teamKpiDeltaForce(kpi.value, kpi.previous, {comparePrior})
       : teamKpiDelta(kpi.value, kpi.previous, {comparePrior})
+  })).map(kpi => ({
+    ...kpi,
+    sparkline: pulseKpiSparklineValues(kpi.id, {window, activityAll: currentRows})
   }));
   const activity = sortPulseActivity(
     currentRows.filter(row => pulseActivityMatchesFilter(row, ui.activityFilter) && pulseActivityMatchesSearch(row, ui.activitySearch.trim().toLowerCase())),
@@ -1472,6 +1578,7 @@ function pulseKpiStrip(kpis, ui) {
     const display = kpi.displayValue ?? kpi.value;
     return `<button type="button" class="team-overview-kpi pulse-kpi-strip-card pulse-kpi-strip-button${selected ? ' is-selected' : ''}" data-action="pulse-kpi" data-value="${kpi.id}" aria-pressed="${selected}" aria-label="${escapeHTML(pulseKpiButtonAriaLabel(kpi))}">
       <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}${icon('chevron', 'icon-sm pulse-kpi-strip-go')}</span>
+      ${pulseKpiSparklineMarkup(kpi)}
       <span class="team-overview-kpi-value tabular">${escapeHTML(String(display))}</span>
       <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
     </button>`;
@@ -1654,7 +1761,7 @@ function pulseActivityListMarkup(model, options = {}) {
   const face = id => roster.find(person => person.id === id) || {initials: '•', name: ''};
   const empty = `<li class="pulse-activity-empty muted">${activityAll.length ? 'No visits match this filter.' : 'No visits in this period.'}</li>`;
   if (!activity.length) return empty;
-  const scales = pulseActivityRadarScales(activity);
+  const scales = pulseActivityShowRadar(ui) ? pulseActivityRadarScales(activity) : null;
   return activity.map(item => {
     const av = avatar(face(item.memberId), 'mini');
     return pulseActivityRowMarkup(item, {avatarMarkup: av, scales});
@@ -1695,8 +1802,9 @@ function pulseOperationsTable(model, options = {}) {
     groupByMembers
   });
   const sectionLabel = groupByMembers ? 'Active members and visits' : 'Station visits';
-  const radarCol = groupByMembers ? '' : '<span class="pulse-col-radar">Shape</span>';
-  const trailClass = groupByMembers ? '' : ' pulse-operations--with-radar';
+  const showRadar = !groupByMembers && pulseActivityShowRadar(ui);
+  const radarCol = showRadar ? '<span class="pulse-col-radar">Shape</span>' : '';
+  const trailClass = showRadar ? ' pulse-operations--with-radar' : '';
   return `<section class="pulse-operations pulse-operations--trail${groupByMembers ? ' pulse-operations--by-member' : ''}${trailClass}" aria-label="${sectionLabel}">
     ${pulseActivityToolbar(ui, options)}
     <div class="pulse-activity-scroll team-overview-table-wrap">
@@ -1754,15 +1862,15 @@ function pulseMedianForceTable(model) {
 }
 
 function pulseActivityScreen(model) {
-  return `${pulseSubScreenHead(model, 'Activity')}${pulseOperationsTable(model, {showTitle: false})}`;
+  return `${pulseSubScreenHead(model, 'Activity')}${pulseKpiSubScreenChart(model)}${pulseOperationsTable(model, {showTitle: false})}`;
 }
 
 function pulseMembersScreen(model) {
-  return `${pulseSubScreenHead(model, 'Active members')}${pulseOperationsTable(model, {showTitle: false, groupByMembers: true})}`;
+  return `${pulseSubScreenHead(model, 'Active members')}${pulseKpiSubScreenChart(model)}${pulseOperationsTable(model, {showTitle: false, groupByMembers: true})}`;
 }
 
 function pulseMedianForceScreen(model) {
-  return `${pulseSubScreenHead(model, 'Median force change')}${pulseMedianForceTable(model)}`;
+  return `${pulseSubScreenHead(model, 'Median force change')}${pulseKpiSubScreenChart(model)}${pulseMedianForceTable(model)}`;
 }
 
 function pulseScreenBody(model) {

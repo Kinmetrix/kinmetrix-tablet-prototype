@@ -2,7 +2,11 @@
 .session-template-editor-dialog .dialog-header{flex-shrink:0;padding:22px 26px 0;margin-bottom:0}
 .session-template-editor-dialog>.directory-dialog-intro{flex-shrink:0;margin:8px 26px 16px}
 .session-template-form{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 26px 22px;margin:0}
-.session-template-form textarea{width:100%;min-height:72px;margin-top:9px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;resize:vertical;box-sizing:border-box}
+.session-template-form .form-section-card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:0 0 16px;background:var(--surface)}
+.session-template-form .form-section-card__title{margin:0 0 14px;font-size:15px;font-weight:600}
+.session-template-form .program-field{display:block;font-size:13px;font-weight:550;line-height:1.3;margin:0 0 14px}
+.session-template-form .program-field input[type="text"],.session-template-form .program-field select{display:block;width:100%;margin-top:9px;min-height:48px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-weight:400;box-sizing:border-box;background:var(--surface);color:var(--ink)}
+.session-template-form textarea{width:100%;min-height:72px;margin-top:9px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-weight:400;resize:vertical;box-sizing:border-box}
 .session-template-form label.check-label.session-template-enabled{display:flex;align-items:center;gap:10px;width:auto;margin:4px 0 20px;min-height:44px;padding:0;cursor:pointer;font-weight:550;line-height:1.25}
 .session-template-form label.check-label.session-template-enabled input[type="checkbox"]{display:block;width:19px;height:19px;min-height:19px;margin:0;padding:0;flex:0 0 19px;align-self:center;accent-color:var(--action)}
 .session-template-properties{margin:0;padding:0;border:0}

@@ -142,7 +142,7 @@ function sessionTemplatePropertyFields(draft, prefix = 'stmpl') {
   const step = draft.step || {};
   const type = step.type || 'isokinetic';
   const isometric = type === 'strength';
-  return `<fieldset class="session-template-properties"><legend>Default step</legend>
+  return `<fieldset class="session-template-properties">
     <label class="program-field program-field-mode">Mode
       <select id="${prefix}-mode">${SESSION_STEP_MODES.map(key => `<option value="${key}" ${type === key ? 'selected' : ''}>${sessionModes[key].name}</option>`).join('')}</select>
     </label>
@@ -181,11 +181,21 @@ function sessionTemplateEditorDialog(o) {
   const title = existing ? (metaOnly ? 'Edit session template' : 'Edit session template') : 'New session template';
   const intro = `<p class="directory-dialog-intro">${existing ? 'Changes apply to future session plans and protocol intensity pickers.' : 'Name the template and set the default step. Add more steps from the list after saving.'}</p>`;
   const properties = metaOnly ? '' : sessionTemplatePropertyFields(draft);
-  const form = `<form id="session-template-form" class="program-form session-template-form">
+  const basics = `<section class="form-section-card" aria-labelledby="stmpl-section-basics">
+    <h3 class="form-section-card__title" id="stmpl-section-basics">Basics</h3>
     <label class="program-field program-field-name">Name<input id="stmpl-name" type="text" required maxlength="80" autocomplete="off" placeholder="e.g. Game day primer" value="${escapeHTML(draft.name)}"></label>
     <label class="program-field">Description<textarea id="stmpl-description" rows="2" maxlength="240" placeholder="Optional">${escapeHTML(draft.description)}</textarea></label>
     <label class="check-label session-template-enabled"><input id="stmpl-active" type="checkbox" ${draft.is_active ? 'checked' : ''}>Enabled</label>
+  </section>`;
+  const stepSection = properties
+    ? `<section class="form-section-card" aria-labelledby="stmpl-section-step">
+    <h3 class="form-section-card__title" id="stmpl-section-step">Default step</h3>
     ${properties}
+  </section>`
+    : '';
+  const form = `<form id="session-template-form" class="program-form session-template-form">
+    ${basics}
+    ${stepSection}
     <footer class="directory-dialog-footer">${button('Cancel', 'close-modal')}${button(existing ? 'Save changes' : 'Create template', 'save-session-template', 'primary', 'type="submit" form="session-template-form"')}</footer>
   </form>`;
   return `<div class="modal-backdrop"><section class="dialog directory-dialog session-template-editor-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header class="dialog-header"><h2 id="dialog-title">${title}</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${intro}${form}</section></div>`;
