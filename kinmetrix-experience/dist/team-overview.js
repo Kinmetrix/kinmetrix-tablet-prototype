@@ -480,16 +480,6 @@ function pulseActivityChartBindTooltip() {
 
 pulseActivityChartBindTooltip();
 
-function pulsePerformanceBarSegment(id, value) {
-  if (!value) return '';
-  return `<span class="pulse-perf-bar-seg pulse-perf-bar-seg--${id}" style="flex-grow:${value}"></span>`;
-}
-
-function pulsePerformanceBarMarkup(counts) {
-  if (!counts.total) return '';
-  return `<div class="pulse-perf-bar-track">${pulsePerformanceBarSegment('up', counts.up)}${pulsePerformanceBarSegment('flat', counts.flat)}${pulsePerformanceBarSegment('down', counts.down)}</div>`;
-}
-
 let pulsePerformancePieSeq = 0;
 
 function pulsePerformanceBarTileGradient(prefix, id) {
@@ -596,46 +586,6 @@ function pulseKpiMedianForceCompactBody(kpi) {
   </span>`;
 }
 
-function pulsePerformanceLegendRow(id, label, count, total) {
-  const value = total ? String(count) : '—';
-  return `<li class="pulse-perf-legend-item">
-    <div class="pulse-perf-legend-head">
-      <span class="pulse-perf-legend-pill pulse-perf-legend-pill--${id}" aria-hidden="true"></span>
-      <span class="pulse-perf-legend-label">${escapeHTML(label)}</span>
-    </div>
-    <span class="pulse-perf-legend-value tabular">${escapeHTML(value)}</span>
-  </li>`;
-}
-
-function pulseMemberPerformanceCard(model) {
-  const counts = model.performance?.current || pulsePerformanceCounts(model.activityAll);
-  const aria = counts.total
-    ? `${counts.up} up, ${counts.flat} flat, ${counts.down} down, of ${counts.total} comparable visits`
-    : 'No comparable isometric visits in this period.';
-  const meta = counts.total
-    ? `<p class="pulse-perf-meta muted tabular">${counts.total} comparable visits</p>`
-    : '';
-  const body = counts.total
-    ? `<div class="pulse-perf-body">
-        <div class="pulse-perf-bar" role="img" aria-label="${escapeHTML(aria)}">
-          ${pulsePerformanceBarMarkup(counts)}
-        </div>
-        <ul class="pulse-perf-legend" aria-label="Force change breakdown">
-          ${pulsePerformanceLegendRow('up', PULSE_PERF_BUCKET_LABELS.up, counts.up, counts.total)}
-          ${pulsePerformanceLegendRow('flat', PULSE_PERF_BUCKET_LABELS.flat, counts.flat, counts.total)}
-          ${pulsePerformanceLegendRow('down', PULSE_PERF_BUCKET_LABELS.down, counts.down, counts.total)}
-        </ul>
-      </div>`
-    : `<p class="pulse-perf-empty muted">${escapeHTML(aria)}</p>`;
-  return `<section class="pulse-perf-card" aria-label="Member performance">
-    <header class="pulse-perf-head">
-      <h2 class="pulse-perf-title">Member performance</h2>
-      ${meta || ''}
-    </header>
-    ${body}
-  </section>`;
-}
-
 const PULSE_MEMBER_LINEUP_MAX = 6;
 const PULSE_SMALL_ROSTER_MAX = 4;
 
@@ -725,10 +675,7 @@ function pulseActiveMembersLineupCard(model) {
 }
 
 function pulseHubBottomRow(model) {
-  return `<div class="pulse-bottom-row">
-    ${pulseMemberPerformanceCard(model)}
-    ${pulseActiveMembersLineupCard(model)}
-  </div>`;
+  return `<div class="pulse-bottom-row">${pulseActiveMembersLineupCard(model)}</div>`;
 }
 
 function pulseActivityRadarScales(items) {
