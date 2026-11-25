@@ -490,6 +490,42 @@ function pulsePerformanceBarMarkup(counts) {
   return `<div class="pulse-perf-bar-track">${pulsePerformanceBarSegment('up', counts.up)}${pulsePerformanceBarSegment('flat', counts.flat)}${pulsePerformanceBarSegment('down', counts.down)}</div>`;
 }
 
+let pulsePerformancePieSeq = 0;
+
+function pulsePerformanceBarTileGradient(prefix, id) {
+  const base = `var(--pulse-perf-${id})`;
+  const light = `color-mix(in srgb, var(--pulse-perf-${id}) 82%, #fff)`;
+  const gid = `${prefix}-grad-${id}`;
+  return `<linearGradient id="${gid}" x1="0" y1="0" x2="8" y2="8" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="${light}"/>
+    <stop offset="0.25" stop-color="${light}"/>
+    <stop offset="0.25" stop-color="${base}" stop-opacity="0"/>
+    <stop offset="0.5" stop-color="${base}" stop-opacity="0"/>
+    <stop offset="0.5" stop-color="${light}"/>
+    <stop offset="0.75" stop-color="${light}"/>
+    <stop offset="0.75" stop-color="${base}" stop-opacity="0"/>
+    <stop offset="1" stop-color="${base}" stop-opacity="0"/>
+  </linearGradient>`;
+}
+
+function pulsePerformancePiePatternDefs(prefix) {
+  const ids = ['up', 'flat', 'down'];
+  const gradients = ids.map(id => pulsePerformanceBarTileGradient(prefix, id)).join('');
+  const patterns = ids
+    .map(
+      id => `<pattern id="${prefix}-pat-${id}" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="var(--pulse-perf-${id})"/>
+      <rect width="8" height="8" fill="url(#${prefix}-grad-${id})"/>
+    </pattern>`
+    )
+    .join('');
+  return `<defs>${gradients}${patterns}</defs>`;
+}
+
+function pulsePerformancePieFill(prefix, id) {
+  return `url(#${prefix}-pat-${id})`;
+}
+
 function pulsePerformancePieMarkup(counts) {
   if (!counts?.total) return '';
   const slices = [
@@ -498,12 +534,14 @@ function pulsePerformancePieMarkup(counts) {
     {id: 'down', count: counts.down}
   ].filter(slice => slice.count > 0);
   if (!slices.length) return '';
+  const prefix = `pulse-perf-pie-${++pulsePerformancePieSeq}`;
   const cx = 28;
   const cy = 28;
   const r = 27;
   let body = '';
   if (slices.length === 1) {
-    body = `<circle class="pulse-kpi-pie-slice pulse-kpi-pie-slice--${slices[0].id}" cx="${cx}" cy="${cy}" r="${r}"/>`;
+    const id = slices[0].id;
+    body = `<circle class="pulse-kpi-pie-slice pulse-kpi-pie-slice--${id}" cx="${cx}" cy="${cy}" r="${r}" fill="${pulsePerformancePieFill(prefix, id)}"/>`;
   } else {
     let angle = -Math.PI / 2;
     const dividers = [];
@@ -518,11 +556,11 @@ function pulsePerformancePieMarkup(counts) {
       const d = `M ${cx} ${cy} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
       dividers.push(`<line class="pulse-kpi-pie-divider" x1="${cx}" y1="${cy}" x2="${x1.toFixed(2)}" y2="${y1.toFixed(2)}"/>`);
       angle = endAngle;
-      return `<path class="pulse-kpi-pie-slice pulse-kpi-pie-slice--${slice.id}" d="${d}"/>`;
+      return `<path class="pulse-kpi-pie-slice pulse-kpi-pie-slice--${slice.id}" d="${d}" fill="${pulsePerformancePieFill(prefix, slice.id)}"/>`;
     }).join('');
     body = `${paths}${dividers.join('')}`;
   }
-  return `<svg class="pulse-kpi-pie" viewBox="0 0 56 56" width="52" height="52" aria-hidden="true">${body}</svg>`;
+  return `<svg class="pulse-kpi-pie" viewBox="0 0 56 56" width="52" height="52" aria-hidden="true">${pulsePerformancePiePatternDefs(prefix)}${body}</svg>`;
 }
 
 function pulsePerformanceMiniStackRow(id, count, total) {
