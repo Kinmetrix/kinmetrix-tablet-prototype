@@ -47,7 +47,7 @@ const people = [
  {id:'noah',name:'Noah Williams',initials:'NW',assigned:'jordan',color:'',detail:'Performance training',status:'Program in progress',last:'6 Nov',target:14,program:true,baseline:true},
  {id:'sofia',name:'Sofia Garcia',initials:'SG',assigned:'jordan',color:'lilac',detail:'Movement & mobility',status:'Ready for assessment',last:'5 Nov',target:9,program:false,baseline:true},
  {id:'marcus',name:'Marcus Lee',initials:'ML',assigned:'sam',color:'blue',detail:'Return to sport',status:'Program in progress',last:'10 Nov',target:13,program:true,baseline:true},
- {id:'priya',name:'Priya Sharma',initials:'PS',assigned:'sam',color:'',detail:'Performance training',status:'Ready for assessment',last:'4 Nov',target:11,program:false,baseline:true},
+ {id:'priya',name:'Priya Sharma',initials:'PS',assigned:'sam',color:'',detail:'Performance training',status:'Ready for assessment',last:'4 Nov',target:11,program:false,baseline:true,existingAccount:true},
  {id:'james',name:'James O\'Brien',initials:'JO',assigned:'jordan',color:'sand',detail:'Movement & mobility',status:'Program in progress',last:'3 Nov',target:10,program:true,baseline:true},
  {id:'hannah',name:'Hannah Brooks',initials:'HB',assigned:'jordan',color:'',detail:'Return to strength',status:'Program in progress',last:'11 Nov',target:15,program:true,baseline:true},
  {id:'oliver',name:'Oliver Martinez',initials:'OM',assigned:'sam',color:'lilac',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false},
@@ -73,7 +73,7 @@ function modeIntro(type,purpose){
  if(type==='strength'&&purpose==='session')return {question:'Practice isometric holds.',why:modePurposeCopy.session.strength,how:'Build to the target. Choose timed seconds or Endurance in setup.'};
  return modeGuidance[type];
 }
-const initialState = () => ({nav:'pulse',tab:'overview',personId:null,clinicianId:'sam',actor:'coach',pendingSetup:null,search:'',helpArticle:false,memberOrigin:'pulse',rosterPolicy:'all',defaultEntry:'coach',deviceReady:true,stage:null,session:null,result:null,profiles:{},memberDetails:{},memberWaivers:{},memberPhotos:{alex:'assets/profiles/alex-v1.png',maya:'assets/profiles/maya-v1.png',daniel:'assets/profiles/daniel-v1.png'},profileDrafts:{},history:[],overlay:null,waiverResume:null,guided:false,showCompare:true,reportDetails:false,setup:{purpose:'assessment',type:'strength',positions:4,reps:3,weight:12,accepted:true}});
+const initialState = () => ({nav:'pulse',tab:'overview',personId:null,clinicianId:'sam',actor:'coach',pendingSetup:null,search:'',helpArticle:false,memberOrigin:'pulse',rosterPolicy:'all',defaultEntry:'coach',deviceReady:true,stage:null,session:null,result:null,profiles:{},memberDetails:{},memberWaivers:{},memberPhotos:{alex:'assets/profiles/alex-v1.png',maya:'assets/profiles/maya-v1.png',daniel:'assets/profiles/daniel-v1.png'},profileDrafts:{},history:[],pulseEvents:[],pulseEventsSeeded:false,overlay:null,waiverResume:null,guided:false,showCompare:true,reportDetails:false,setup:{purpose:'assessment',type:'strength',positions:4,reps:3,weight:12,accepted:true}});
 let state=initialState(), timer=null, toastTimer=null, modalReturnFocus=null;
 let theme='light';
 try { theme=localStorage.getItem('kinmetrix-theme')==='dark'?'dark':'light'; } catch {}

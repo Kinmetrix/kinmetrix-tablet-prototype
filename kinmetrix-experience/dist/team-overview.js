@@ -12,8 +12,16 @@ const PULSE_PERIOD_DAY_COUNT = {'last-1w': 7, 'last-1m': 30, 'last-3m': 90};
 const PULSE_LEGACY_PERIOD = {'last-7': 'last-1w', 'last-30': 'last-1m', 'last-90': 'last-3m'};
 const PULSE_DAY_MS = 86_400_000;
 let pulseBrushDrag = null;
-const PULSE_ACTIVITY_FILTERS = {all: 'All', assessment: 'Assessments', session: 'Sessions'};
+const PULSE_ACTIVITY_FILTERS = {
+  all: 'All',
+  assessment: 'Assessments',
+  session: 'Sessions',
+  user_created: 'User created',
+  user_joined: 'User joined',
+  program_completed: 'Program completed'
+};
 const PULSE_ACTIVITY_SORTS = {newest: 'Newest first', oldest: 'Oldest first', member: 'Member A–Z'};
+const PULSE_MEMBERS_SORTS = {active: 'Most active', newest: 'Newest first', oldest: 'Oldest first', member: 'Member A–Z'};
 const PULSE_MEDIAN_SORTS = {largest: 'Largest Δ', newest: 'Newest first', oldest: 'Oldest first', member: 'Member A–Z'};
 const PULSE_CHART_BUCKETS = {day: 'Day', week: 'Week', month: 'Month'};
 const PULSE_CHART_BUCKET_LIMITS = {min: 2, max: 40};
@@ -25,7 +33,11 @@ function teamOverviewUI() {
   if (PULSE_LEGACY_PERIOD[ui.period]) ui.period = PULSE_LEGACY_PERIOD[ui.period];
   if (!TEAM_OVERVIEW_PERIODS[ui.period] && ui.period !== 'custom') ui.period = 'last-1m';
   if (!PULSE_ACTIVITY_FILTERS[ui.activityFilter]) ui.activityFilter = 'all';
-  if (!PULSE_ACTIVITY_SORTS[ui.activitySort]) ui.activitySort = 'newest';
+  if (ui.pulseScreen === 'members') {
+    if (!PULSE_MEMBERS_SORTS[ui.activitySort]) ui.activitySort = 'active';
+  } else if (!PULSE_ACTIVITY_SORTS[ui.activitySort]) {
+    ui.activitySort = 'newest';
+  }
   if (ui.pulseGrouping !== 'members') ui.pulseGrouping = 'visits';
   if (ui.activitySearch == null) ui.activitySearch = '';
   if (ui.activityTypeOpen == null) ui.activityTypeOpen = false;
@@ -52,6 +64,7 @@ function pulseKpiScreenForId(id) {
 }
 
 function pulseRecordForRow(row) {
+  if (!pulseIsVisitRow(row)) return null;
   const colon = row.id.indexOf(':');
   if (colon < 0) return null;
   const recordId = row.id.slice(colon + 1);
@@ -80,6 +93,7 @@ function pulseReportPreviousSession(record) {
 }
 
 function pulseRowForceDelta(row) {
+  if (!pulseIsVisitRow(row)) return null;
   const record = pulseRecordForRow(row);
   if (!record || record.type !== 'strength' || record.partial) return null;
   if (reportMetric(record).field !== 'force') return null;
@@ -278,11 +292,12 @@ function pulseActivityChartSeries(rows, window, mode) {
   const map = new Map(keys.map(key => [key, {key, session: 0, assessment: 0}]));
   for (const row of rows) {
     if (row.at < window.start || row.at > window.end) continue;
+    if (!pulseIsVisitRow(row)) continue;
     const key = pulseChartBucketStart(row.at, mode);
     const bucket = map.get(key);
     if (!bucket) continue;
     if (row.purpose === 'assessment') bucket.assessment++;
-    else bucket.session++;
+    else if (row.purpose === 'session') bucket.session++;
   }
   const buckets = keys.map(key => {
     const item = map.get(key);
@@ -525,6 +540,7 @@ function pulseMemberFirstName(name) {
 function pulseActiveMemberSummaries(rows, roster) {
   const counts = new Map();
   for (const row of rows) {
+    if (!pulseIsVisitRow(row)) continue;
     counts.set(row.memberId, (counts.get(row.memberId) || 0) + 1);
   }
   const face = id => roster.find(person => person.id === id) || {id, name: '—', initials: '•'};
@@ -906,9 +922,10 @@ function teamOverviewActivityRows(roster, periodKey) {
 }
 
 function pulseKpiSnapshot(rows) {
-  const trainingSessions = rows.filter(row => row.purpose === 'session').length;
-  const assessments = rows.filter(row => row.purpose === 'assessment').length;
-  const membersActive = new Set(rows.map(row => row.memberId)).size;
+  const visits = rows.filter(pulseIsVisitRow);
+  const trainingSessions = visits.filter(row => row.purpose === 'session').length;
+  const assessments = visits.filter(row => row.purpose === 'assessment').length;
+  const membersActive = new Set(visits.map(row => row.memberId)).size;
   return {totalActivity: rows.length, membersActive, trainingSessions, assessments};
 }
 
@@ -949,9 +966,17 @@ function teamKpiSparkline(id, values) {
   return `<svg class="team-kpi-spark" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" aria-hidden="true"><polyline fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${points}"/></svg>`;
 }
 
+function pulseIsVisitRow(row) {
+  return !row.activityType;
+}
+
 function pulseActivityMatchesFilter(row, filter) {
-  if (filter === 'assessment') return row.purpose === 'assessment';
-  if (filter === 'session') return row.purpose === 'session';
+  if (filter === 'all') return true;
+  if (filter === 'assessment') return row.purpose === 'assessment' && pulseIsVisitRow(row);
+  if (filter === 'session') return row.purpose === 'session' && pulseIsVisitRow(row);
+  if (filter === 'user_created') return row.activityType === 'user_created';
+  if (filter === 'user_joined') return row.activityType === 'user_joined';
+  if (filter === 'program_completed') return row.activityType === 'program_completed';
   return true;
 }
 
@@ -1043,6 +1068,164 @@ function pulseRecords(personId) {
     .sort((a, b) => recordCompletedAt(b) - recordCompletedAt(a));
 }
 
+function pulseEnsureEventStore() {
+  if (!Array.isArray(state.pulseEvents)) state.pulseEvents = [];
+}
+
+function pulseMembershipKindForPerson(person) {
+  if (person.existingAccount) return 'user_joined';
+  if (!person.baseline || person.detail === 'New member' || person.createdInDemo) return 'user_created';
+  return null;
+}
+
+function pulseEmitMembershipEvent(person, kind, at = Date.now()) {
+  if (!person?.id || (kind !== 'user_created' && kind !== 'user_joined')) return;
+  pulseEnsureEventStore();
+  state.pulseEvents = state.pulseEvents.filter(
+    event => !(event.memberId === person.id && (event.type === 'user_created' || event.type === 'user_joined'))
+  );
+  state.pulseEvents.push({
+    id: `membership-${person.id}`,
+    type: kind,
+    memberId: person.id,
+    at,
+    actorId: state.clinicianId
+  });
+}
+
+function pulseProgramCompletionAt(plan, personId) {
+  if (!plan || plan.completed < plan.total) return null;
+  const visits = [
+    ...(plan.exampleVisits || []),
+    ...state.history.filter(record => record.personId === personId && record.programId === plan.id)
+  ];
+  const finalVisit = visits
+    .filter(record => !record.partial && record.programSession === plan.total)
+    .sort((a, b) => recordCompletedAt(b) - recordCompletedAt(a))[0];
+  return finalVisit ? recordCompletedAt(finalVisit) : null;
+}
+
+function pulseEmitProgramCompleted(plan, personId, at) {
+  if (!plan || plan.completed < plan.total) return;
+  pulseEnsureEventStore();
+  const completedAt = at ?? pulseProgramCompletionAt(plan, personId) ?? Date.now();
+  const id = `program-complete-${plan.id}`;
+  if (state.pulseEvents.some(event => event.id === id)) return;
+  state.pulseEvents.push({
+    id,
+    type: 'program_completed',
+    memberId: personId,
+    programId: plan.id,
+    programName: plan.name,
+    at: completedAt,
+    actorId: state.clinicianId
+  });
+}
+
+function pulseSeedDemoLifecycleEvents(roster) {
+  pulseEnsureEventStore();
+  if (state.pulseEventsSeeded) return;
+  state.pulseEventsSeeded = true;
+  const demoMembership = [
+    {memberId: 'ella', type: 'user_created', at: Date.UTC(2026, 9, 28, 10, 0), actorId: 'sam'},
+    {memberId: 'lena', type: 'user_created', at: Date.UTC(2026, 10, 5, 14, 0), actorId: 'sam'},
+    {memberId: 'oliver', type: 'user_created', at: Date.UTC(2026, 10, 11, 9, 0), actorId: 'sam'},
+    {memberId: 'priya', type: 'user_joined', at: Date.UTC(2026, 10, 2, 16, 0), actorId: 'sam'}
+  ];
+  for (const event of demoMembership) {
+    if (!roster.some(person => person.id === event.memberId)) continue;
+    if (state.pulseEvents.some(existing => existing.id === `membership-${event.memberId}`)) continue;
+    state.pulseEvents.push({id: `membership-${event.memberId}`, ...event});
+  }
+  for (const member of roster) {
+    for (const plan of memberPrograms(member.id)) {
+      if (plan.completed < plan.total) continue;
+      pulseEmitProgramCompleted(plan, member.id);
+    }
+  }
+}
+
+function pulseLifecycleEventCatalog(roster) {
+  pulseSeedDemoLifecycleEvents(roster);
+  const events = [...state.pulseEvents];
+  const seenPrograms = new Set(events.filter(event => event.type === 'program_completed').map(event => event.id));
+  for (const member of roster) {
+    for (const plan of memberPrograms(member.id)) {
+      if (plan.completed < plan.total) continue;
+      const id = `program-complete-${plan.id}`;
+      if (seenPrograms.has(id)) continue;
+      const at = pulseProgramCompletionAt(plan, member.id);
+      if (!at) continue;
+      events.push({
+        id,
+        type: 'program_completed',
+        memberId: member.id,
+        programId: plan.id,
+        programName: plan.name,
+        at,
+        actorId: member.assigned
+      });
+    }
+  }
+  return events;
+}
+
+function pulseLifecycleMeta(event) {
+  const actor = clinicians.find(item => item.id === event.actorId) || clinician();
+  const actorName = actor?.name || 'Staff';
+  if (event.type === 'user_created') {
+    return {
+      activityType: 'user_created',
+      purpose: 'lifecycle',
+      kindLabel: `${actorName} created this account`,
+      badge: {label: 'User created', tone: 'membership'}
+    };
+  }
+  if (event.type === 'user_joined') {
+    return {
+      activityType: 'user_joined',
+      purpose: 'lifecycle',
+      kindLabel: `${actorName} added them to the team`,
+      badge: {label: 'User joined', tone: 'membership'}
+    };
+  }
+  if (event.type === 'program_completed') {
+    const name = event.programName || 'Program';
+    return {
+      activityType: 'program_completed',
+      purpose: 'lifecycle',
+      kindLabel: `Completed “${name}”`,
+      badge: {label: 'Program completed', tone: 'notable'}
+    };
+  }
+  return null;
+}
+
+function pulseLifecycleRows(roster, start, end) {
+  const rows = [];
+  for (const event of pulseLifecycleEventCatalog(roster)) {
+    if (event.at < start || event.at > end) continue;
+    const member = roster.find(person => person.id === event.memberId) || people.find(person => person.id === event.memberId);
+    if (!member) continue;
+    const meta = pulseLifecycleMeta(event);
+    if (!meta) continue;
+    rows.push({
+      id: `${member.id}:pulse-${event.id}`,
+      memberId: member.id,
+      memberName: member.name,
+      activityType: meta.activityType,
+      kindLabel: meta.kindLabel,
+      badge: meta.badge,
+      purpose: meta.purpose,
+      resultSummary: null,
+      metrics: {force: null, stability: null},
+      timeLabel: pulseStampLabel(event.at),
+      at: event.at
+    });
+  }
+  return rows;
+}
+
 function pulseRowsInWindow(roster, start, end) {
   const rows = [];
   for (const member of roster) {
@@ -1064,12 +1247,12 @@ function pulseRowsInWindow(roster, start, end) {
       });
     }
   }
-  return rows;
+  return [...rows, ...pulseLifecycleRows(roster, start, end)];
 }
 
 function pulseBrushSeries(roster) {
   const domain = pulseBrushDomain(roster);
-  const rows = pulseRowsInWindow(roster, domain.start, pulseBrushDomainEndMs(domain));
+  const rows = pulseRowsInWindow(roster, domain.start, pulseBrushDomainEndMs(domain)).filter(pulseIsVisitRow);
   const counts = Array(domain.days).fill(0);
   for (const row of rows) {
     counts[pulseDayIndex(row.at, domain.start)]++;
@@ -1485,7 +1668,13 @@ function pulseMemberGroups(activity, sortKey) {
     buckets.get(row.memberId).push(row);
   }
   let memberIds = [...buckets.keys()];
-  if (sortKey === 'member') {
+  if (sortKey === 'active') {
+    memberIds.sort(
+      (a, b) =>
+        buckets.get(b).filter(pulseIsVisitRow).length - buckets.get(a).filter(pulseIsVisitRow).length ||
+        buckets.get(a)[0].memberName.localeCompare(buckets.get(b)[0].memberName)
+    );
+  } else if (sortKey === 'member') {
     memberIds.sort((a, b) => buckets.get(a)[0].memberName.localeCompare(buckets.get(b)[0].memberName));
   } else {
     const firstIndex = new Map();
@@ -1502,7 +1691,9 @@ function pulseMemberGroups(activity, sortKey) {
 }
 
 function pulseSortCatalog(ui) {
-  return ui.pulseScreen === 'medianForce' ? PULSE_MEDIAN_SORTS : PULSE_ACTIVITY_SORTS;
+  if (ui.pulseScreen === 'medianForce') return PULSE_MEDIAN_SORTS;
+  if (ui.pulseScreen === 'members') return PULSE_MEMBERS_SORTS;
+  return PULSE_ACTIVITY_SORTS;
 }
 
 function pulseSortValue(ui) {
@@ -1513,7 +1704,8 @@ function pulseActivityFiltersActive(ui) {
   if (ui.pulseScreen === 'medianForce') {
     return ui.medianForceSort !== 'largest' || ui.activitySearch.trim() !== '';
   }
-  return ui.activityFilter !== 'all' || ui.activitySearch.trim() !== '' || ui.activitySort !== 'newest';
+  const sortDefault = ui.pulseScreen === 'members' ? 'active' : 'newest';
+  return ui.activityFilter !== 'all' || ui.activitySearch.trim() !== '' || ui.activitySort !== sortDefault;
 }
 
 function pulseActivityFilterButtonLabel(ui) {
@@ -1523,6 +1715,7 @@ function pulseActivityFilterButtonLabel(ui) {
 function pulseActivitySortButtonLabel(ui) {
   const sortKey = pulseSortValue(ui);
   if (sortKey === 'largest') return 'Largest Δ';
+  if (sortKey === 'active') return 'Most active';
   if (sortKey === 'newest') return 'Newest';
   if (sortKey === 'oldest') return 'Oldest';
   return 'A–Z';
@@ -1563,7 +1756,7 @@ function pulseSubScreenHead(model, title) {
 function pulseActivityToolbar(ui, options = {}) {
   const {showTitle = true, hideType = false} = options;
   const sortKey = pulseSortValue(ui);
-  const sortDefault = ui.pulseScreen === 'medianForce' ? 'largest' : 'newest';
+  const sortDefault = ui.pulseScreen === 'medianForce' ? 'largest' : ui.pulseScreen === 'members' ? 'active' : 'newest';
   const typeControl = hideType ? '' : `<div class="pulse-activity-filter-anchor">
     <button type="button" class="pulse-activity-bar-button${ui.activityFilter !== 'all' ? ' is-active' : ''}" data-action="pulse-activity-type-toggle" aria-haspopup="menu" aria-expanded="${ui.activityTypeOpen}" aria-label="Visit type, ${pulseActivityFilterButtonLabel(ui)}"${ui.activityTypeOpen ? ' aria-controls="pulse-activity-type-popover"' : ''}>
       <span class="muted">Type</span> ${escapeHTML(pulseActivityFilterButtonLabel(ui))}
@@ -1806,6 +1999,7 @@ const teamOverviewActions = {
     if (!screen) return;
     const ui = teamOverviewUI();
     ui.pulseScreen = screen;
+    if (screen === 'members') ui.activitySort = 'active';
     ui.activityTypeOpen = false;
     ui.activitySortOpen = false;
     ui.activityChartBucketOpen = false;
@@ -1843,7 +2037,7 @@ const teamOverviewActions = {
     const ui = teamOverviewUI();
     ui.pulseGrouping = 'visits';
     ui.activityFilter = 'all';
-    ui.activitySort = 'newest';
+    ui.activitySort = ui.pulseScreen === 'members' ? 'active' : 'newest';
     ui.medianForceSort = 'largest';
     ui.activitySearch = '';
     ui.activityTypeOpen = false;

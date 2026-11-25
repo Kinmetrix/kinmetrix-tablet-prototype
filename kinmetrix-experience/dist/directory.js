@@ -122,6 +122,7 @@ function confirmRosterImport(){
   const member={id:'person-'+crypto.randomUUID(),name,initials,assigned:state.clinicianId,color:'',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false,createdInDemo:true};
   people.push(member);
   if(row.email.trim())state.memberDetails[member.id]={...(state.memberDetails[member.id]||{}),email:row.email.trim()};
+  if(typeof pulseEmitMembershipEvent==='function')pulseEmitMembershipEvent(member,'user_created',Date.now());
  }
  state.overlay={type:'roster-import',step:'result',added:valid.length,skipped};
  render();
@@ -255,7 +256,7 @@ function saveNewPerson(){
  if(!form.reportValidity()||!newPersonClinicians().some(c=>c.id===assigned))return;
  const words=name.split(' '),initials=[words[0],...(words.length>1?[words.at(-1)]:[])].map(word=>Array.from(word)[0]).join('').toLocaleUpperCase();
  const member={id:'person-'+crypto.randomUUID(),name,initials,assigned,color:'',detail:'New member',status:'First visit',last:null,target:null,program:false,baseline:false,createdInDemo:true};
- people.push(member);if(state.overlay.photo)state.memberPhotos[member.id]=state.overlay.photo;if(email)state.memberDetails[member.id]={...(state.memberDetails[member.id]||{}),email};state.overlay=null;
+ people.push(member);if(state.overlay.photo)state.memberPhotos[member.id]=state.overlay.photo;if(email)state.memberDetails[member.id]={...(state.memberDetails[member.id]||{}),email};if(typeof pulseEmitMembershipEvent==='function')pulseEmitMembershipEvent(member,'user_created',Date.now());state.overlay=null;
  Object.assign(directoryUI().roster,{query:'',filterKind:'all',filterValue:'all'});
  openDirectoryPerson(member.id,'roster','profile');
  $('.member-identity h1')?.setAttribute('tabindex','-1');$('.member-identity h1')?.focus({preventScroll:true});toast(name+' added.');

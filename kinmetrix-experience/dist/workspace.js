@@ -213,7 +213,11 @@ function syncProgramHoldSecondsRow(prefix){syncHoldSecondsVisibility($('#'+prefi
 function memberPrograms(personId=state.personId){
  state.programs??={};
  const p=people.find(p=>p.id===personId);if(!p)return [];
- if(!state.programs[p.id]){state.programs[p.id]=p.program?[{id:'program-'+p.id,templateId:'template-'+p.id,name:p.detail,type:'strength',load:{kind:'incremental',start:p.target||12,increase:5,percent:60},total:6,completed:2,positions:4,reps:3}]:[];state.programs[p.id].forEach(plan=>plan.exampleVisits=seedProgramVisits(plan,p));}
+ if(!state.programs[p.id]){
+  state.programs[p.id]=p.program?[{id:'program-'+p.id,templateId:'template-'+p.id,name:p.detail,type:'strength',load:{kind:'incremental',start:p.target||12,increase:5,percent:60},total:6,completed:2,positions:4,reps:3}]:[];
+  if(p.id==='marcus')state.programs[p.id].push({id:'program-marcus-done',name:'Preseason strength',type:'strength',load:{kind:'incremental',start:12,increase:5,percent:60},total:3,completed:3,positions:4,reps:3});
+  state.programs[p.id].forEach(plan=>plan.exampleVisits=seedProgramVisits(plan,p));
+ }
  return state.programs[p.id];
 }
 function activeProgram(){return memberPrograms().find(p=>p.completed<p.total);}
@@ -248,7 +252,10 @@ function completedProgramSession(record,cfg){
  if(!cfg.programId)return;
  record.programId=cfg.programId;record.programName=cfg.programName;record.programSession=cfg.programSession;
  const program=memberPrograms().find(p=>p.id===cfg.programId);
- if(!record.partial&&program&&program.completed+1===cfg.programSession)program.completed=Math.min(program.total,program.completed+1);
+ if(!record.partial&&program&&program.completed+1===cfg.programSession){
+  program.completed=Math.min(program.total,program.completed+1);
+  if(program.completed>=program.total&&typeof pulseEmitProgramCompleted==='function')pulseEmitProgramCompleted(program,state.personId,record.completedAt);
+ }
 }
 const workspaceActions={
  'overview-direction':el=>selectOverviewDirection(Number(el.dataset.index)),
