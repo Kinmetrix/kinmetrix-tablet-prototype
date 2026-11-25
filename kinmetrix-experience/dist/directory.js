@@ -266,7 +266,7 @@ function clinicProgramTemplates(){
 }
 function assignedPrograms(){if(state.actor!=='coach')return [];return visiblePeople().flatMap(p=>memberPrograms(p.id).map(program=>({p,program})));}
 const TEMPLATE_LIBRARIES=[
- {id:'assessments',label:'Assessment',description:'Protocol defaults for assessments at the station.'},
+ {id:'assessments',label:'Assessment',description:'Protocol and range of motion defaults for assessments at the station.'},
  {id:'sessions',label:'Sessions',description:'Reusable load presets for sessions and for session plans.'},
  {id:'programs',label:'Programs',description:'Multi-day plans assigned from this workspace.'}
 ];
@@ -505,10 +505,12 @@ const directoryActions={
   if(!isTeamHubNav()||teamHubResolveCard()!=='assessments')return;
   const tab=el.dataset.tab;
   if(!['protocol','rom'].includes(tab))return;
-  if(tab!=='protocol')leaveTeamAssessmentEditor();
-  directoryUI().programs.assessmentTab=tab;
+  const ui=directoryUI().programs;
+  ui.assessmentTab=tab;
+  ui.assessmentView='editor';
+  ui.teamTab='session';
   render();
-  $(`[data-action="assessment-tab"][data-tab="${tab}"]`)?.focus();
+  $('#assessment-radial-settings')?.focus();
  },
  'session-tab':el=>{
   if(!isTeamHubNav()||teamHubResolveCard()!=='sessions')return;

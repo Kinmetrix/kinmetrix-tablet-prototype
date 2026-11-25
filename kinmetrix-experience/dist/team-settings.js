@@ -269,9 +269,10 @@ function assessmentWorkspaceTab() {
   return ui.assessmentTab;
 }
 
-function assessmentWorkspaceSubnav() {
-  const tab = assessmentWorkspaceTab();
-  return `<nav class="settings-pane-subtabs settings-pane-subtabs--secondary" aria-label="Assessment views">${[['protocol', 'Protocol'], ['rom', 'ROM']].map(([key, label]) => `<button type="button" data-action="assessment-tab" data-tab="${key}" ${tab === key ? 'aria-current="page"' : ''}>${label}</button>`).join('')}</nav>`;
+function assessmentWorkspaceView() {
+  const ui = directoryUI().programs;
+  ui.assessmentView = ui.assessmentView === 'editor' ? 'editor' : 'chooser';
+  return ui.assessmentView;
 }
 
 function sessionWorkspaceTab() {
@@ -288,31 +289,188 @@ function sessionWorkspaceSubnav() {
 }
 
 function ensureTeamAssessmentEditor() {
-  if (state.stage === 'team-assessment-edit' && state.setup?.purpose === 'assessment') {
+  if (state.stage === 'team-assessment-edit' && state.setup?.purpose === 'assessment' && state.setup?.type !== 'rom') {
     setupModeDefaults();
     return;
   }
   syncTeamAssessmentEditor();
 }
 
-function teamAssessmentProtocolMarkup() {
-  ensureTeamAssessmentEditor();
-  return `<div class="assessment-workspace assessment-workspace--split">${isokineticSetupView()}</div>`;
+function assessmentChooserMiniRadial(positions) {
+  const count = positions === 8 ? 8 : 4;
+  const angles = Array.from({length: count}, (_, i) => i * 360 / count);
+  const xy = a => [59 + Math.sin(a * Math.PI / 180) * 38, 59 - Math.cos(a * Math.PI / 180) * 38];
+  const spokes = angles.map(a => {
+    const p = xy(a);
+    return `<line x1="59" y1="59" x2="${p[0].toFixed(1)}" y2="${p[1].toFixed(1)}"/>`;
+  }).join('');
+  const nodes = angles.map(a => {
+    const p = xy(a);
+    return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4.5"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 118 118" aria-hidden="true"><circle class="assessment-chooser-orbit" cx="59" cy="59" r="38"/>${spokes}${nodes}</svg>`;
 }
 
-function teamRomRuleRow(key, on, label, control) {
-  return `<div class="assessment-protocol-row assessment-rom-rule"><div class="assessment-protocol-row__text"><label class="check-label"><input type="checkbox" id="team-rom-${key}-on" data-team-rom-toggle="${key}" ${on ? 'checked' : ''}>${label}</label></div><div class="assessment-protocol-row__control">${control}</div></div>`;
+function teamAssessmentChooserMarkup() {
+  const a = teamAssessmentConfig();
+  const rom = teamRomConfig();
+  const mode = sessionModes[a.activeMode] || sessionModes.strength;
+  const hold = a.activeMode === 'strength'
+    ? (a.holdStyle === 'endurance' ? 'Endurance' : `${a.holdSeconds}s timed`)
+    : mode.name;
+  const romStops = [rom.romStillOn ? `Still ${rom.romStill}s` : '', rom.romDropOn ? `${rom.romDrop}% drop` : ''].filter(Boolean).join(' · ') || 'Manual stop';
+  return `<div class="assessment-workspace assessment-workspace--chooser">
+    <p class="assessment-workspace-lead">Protocol and range of motion are different tests. Open one to edit the clinic defaults that new members start from.</p>
+    <div class="assessment-chooser-cards">
+      <button type="button" class="assessment-chooser-card assessment-chooser-card--protocol" data-action="assessment-open" data-tab="protocol">
+        <div class="assessment-chooser-card-top">
+          <div class="assessment-chooser-card-title">
+            <span class="assessment-chooser-kicker">Strength test</span>
+            <h2>Protocol</h2>
+            <p>Isometric, isokinetic, and eccentric defaults for team visits.</p>
+          </div>
+          <span class="assessment-chooser-icon" aria-hidden="true">${icon('isometric')}</span>
+        </div>
+        <div class="assessment-chooser-body">
+          <div class="assessment-chooser-pills">
+            <span class="assessment-pill">${escapeHTML(hold)}</span>
+            <span class="assessment-pill assessment-pill--muted tabular">${a.positions} dir × ${a.reps} reps</span>
+            <span class="assessment-pill assessment-pill--muted tabular">${a.weight} kg target</span>
+          </div>
+          <div class="assessment-chooser-radial">${assessmentChooserMiniRadial(a.positions)}</div>
+        </div>
+        <div class="assessment-chooser-foot"><span>Open protocol</span>${icon('chevron', 'icon-sm')}</div>
+      </button>
+      <button type="button" class="assessment-chooser-card assessment-chooser-card--rom" data-action="assessment-open" data-tab="rom">
+        <div class="assessment-chooser-card-top">
+          <div class="assessment-chooser-card-title">
+            <span class="assessment-chooser-kicker">Limit discovery</span>
+            <h2>Range of motion</h2>
+            <p>Comfortable start and max limits in each direction.</p>
+          </div>
+          <span class="assessment-chooser-icon" aria-hidden="true">${icon('rom')}</span>
+        </div>
+        <div class="assessment-chooser-body">
+          <div class="assessment-chooser-pills">
+            <span class="assessment-pill">${rom.positions} directions</span>
+            <span class="assessment-pill assessment-pill--muted tabular">${rom.challenge} kg trigger</span>
+            <span class="assessment-pill assessment-pill--muted">${escapeHTML(romStops)}</span>
+          </div>
+          <div class="assessment-chooser-radial">${assessmentChooserMiniRadial(rom.positions)}</div>
+        </div>
+        <div class="assessment-chooser-foot"><span>Open range of motion</span>${icon('chevron', 'icon-sm')}</div>
+      </button>
+    </div>
+  </div>`;
 }
 
-function teamRomWorkspaceMarkup() {
-  ensureTeamRomEditor();
-  return `<div class="assessment-workspace assessment-workspace--split">${isokineticSetupView()}</div>`;
+function teamAssessmentModeTiles() {
+  const c = state.setup;
+  return `<div class="assessment-mode-grid" role="group" aria-label="Assessment mode">${standardExerciseModeKeys('assessment').map(key => {
+    const mode = sessionModes[key];
+    const glyph = key === 'strength' ? 'isometric' : key;
+    return `<button type="button" id="assessment-mode-${key}" class="assessment-mode-tile${c.type === key ? ' is-active' : ''}" data-action="assessment-mode" data-value="${key}" aria-pressed="${c.type === key}">${icon(glyph, 'icon-sm')}<strong>${mode.name}</strong><span>${escapeHTML(mode.short)}</span></button>`;
+  }).join('')}</div>`;
+}
+
+function teamAssessmentRomRulesMarkup() {
+  const c = state.setup;
+  const still = c.romStillOn
+    ? setupStepper(c.romStill, {id: 'setup-romStill', action: 'setup-step', attrs: 'data-key="romStill" data-step="1" data-min="1" data-max="5"', label: 'No movement seconds', min: 1, max: 5, current: c.romStill, unit: 's'})
+    : '<span class="muted small">Off</span>';
+  const drop = c.romDropOn
+    ? setupStepper(c.romDrop, {id: 'setup-romDrop', action: 'setup-step', attrs: 'data-key="romDrop" data-step="5" data-min="5" data-max="50"', label: 'Force drop percent', min: 5, max: 50, current: c.romDrop, unit: '%'})
+    : '<span class="muted small">Off</span>';
+  return `<div class="assessment-rom-rules">
+    <span class="assessment-radial-kicker">Finish the rep when</span>
+    <div class="assessment-rom-rule">
+      <label class="check-label"><input type="checkbox" id="setup-romStillOn" data-setup-toggle="romStillOn" ${c.romStillOn ? 'checked' : ''}><span><strong>No movement</strong><small>Stops after holding at limit</small></span></label>
+      ${still}
+    </div>
+    <div class="assessment-rom-rule">
+      <label class="check-label"><input type="checkbox" id="setup-romDropOn" data-setup-toggle="romDropOn" ${c.romDropOn ? 'checked' : ''}><span><strong>Force drop</strong><small>Stops when push releases</small></span></label>
+      ${drop}
+    </div>
+  </div>`;
+}
+
+function teamAssessmentRadialStage() {
+  const c = state.setup;
+  const angles = currentAngles();
+  const active = c.isokTab === 'tilts' ? c.angle : null;
+  const kind = setupTiltKind();
+  const xy = (a, r) => [220 + Math.sin(a * Math.PI / 180) * r, 212 - Math.cos(a * Math.PI / 180) * r];
+  const repsCount = kind === 'limit' ? 1 : c.reps;
+  const spokes = angles.map(a => {
+    const p = xy(a, 140);
+    const q = xy(a, 54);
+    const tilt = setupTilt(a);
+    const bad = !validTilt(tilt);
+    const cls = bad ? 'is-bad' : a === active ? 'is-selected' : tilt.changed ? 'is-custom' : '';
+    return `<line x1="${q[0]}" y1="${q[1]}" x2="${p[0]}" y2="${p[1]}" class="assessment-radial-spoke ${cls}"/>`;
+  }).join('');
+  const nodes = angles.map(a => {
+    const p = xy(a, 150);
+    const tilt = setupTilt(a);
+    const bad = !validTilt(tilt);
+    const selected = a === active;
+    const cls = ['assessment-radial-node', selected ? 'is-selected' : '', bad ? 'is-bad' : '', tilt.changed && !bad ? 'is-custom' : ''].filter(Boolean).join(' ');
+    const marks = Array.from({length: repsCount}, () => '<i></i>').join('');
+    const editWhat = setupHasFixedTilt() ? 'pad position' : kind === 'limit' ? 'start and max tilt' : 'tilt';
+    return `<button type="button" class="${cls}" style="left:${p[0] / 440 * 100}%;top:${p[1] / 424 * 100}%" data-action="isok-direction" data-angle="${a}" aria-pressed="${selected}" aria-label="${setupDirectionNames[a]}, ${a} degrees, ${setupTiltText(a)}. Edit ${editWhat}."><strong>${a}°</strong><span>${setupTiltText(a)}</span><span class="assessment-radial-marks" aria-hidden="true">${marks}</span></button>`;
+  }).join('');
+  const settingsSelected = active === null;
+  const workload = kind === 'limit' ? `${c.positions} directions · 1 movement each` : `${c.positions} dir × ${c.reps} reps`;
+  return `<section class="assessment-radial-canvas" aria-label="Directional canvas">
+    <div class="assessment-radial-meta">
+      <span class="assessment-pill">${escapeHTML(c.type === 'rom' ? 'Range of motion' : sessionModes[c.type].name)}</span>
+      <span class="assessment-pill assessment-pill--muted tabular">${escapeHTML(workload)}</span>
+    </div>
+    <div class="assessment-radial-stage" role="group" aria-label="${angles.length} directions. Tap a direction to edit tilt, or the center for global settings.">
+      <svg viewBox="0 0 440 424" aria-hidden="true">
+        <circle class="assessment-radial-orbit" cx="220" cy="212" r="140"/>
+        <circle class="assessment-radial-orbit assessment-radial-orbit--inner" cx="220" cy="212" r="88"/>
+        ${spokes}
+        ${personOrientation(220, 212, 1.24)}
+      </svg>
+      <button type="button" id="assessment-radial-settings" class="assessment-radial-center${settingsSelected ? ' is-selected' : ''}" data-action="isok-tab" data-value="session" aria-pressed="${settingsSelected}" aria-label="Assessment settings"></button>
+      ${nodes}
+    </div>
+    <p class="assessment-radial-help">${settingsSelected ? 'Tap a direction to set tilt. Center keeps global settings open.' : `${setupDirectionNames[active]} selected. Tap the center to return to settings.`}</p>
+  </section>`;
+}
+
+function teamAssessmentRadialInspector() {
+  const c = state.setup;
+  const settings = c.isokTab !== 'tilts';
+  const forceHelp = c.type === 'rom' ? 'Light push needed before movement counts.' : 'Starting target when no member baseline exists.';
+  if (settings) {
+    const head = c.type === 'rom'
+      ? `<div class="assessment-radial-inspector-head"><h2>Limit discovery</h2><p class="muted small">Maps comfortable movement in each direction. One movement per direction.</p></div>`
+      : `<div class="assessment-radial-inspector-head"><h2>Protocol defaults</h2><p class="muted small">Starting configuration when clinicians open a new team assessment.</p></div>`;
+    return `<aside class="assessment-radial-inspector" aria-label="Assessment settings">
+      ${head}
+      ${c.type === 'rom' ? '' : teamAssessmentModeTiles()}
+      ${isokSessionPanel(forceHelp)}
+      ${c.type === 'rom' ? teamAssessmentRomRulesMarkup() : ''}
+    </aside>`;
+  }
+  return `<aside class="assessment-radial-inspector" aria-label="Direction settings">
+    <div class="assessment-radial-dir-nav">
+      ${button(icon('back', 'icon-sm') + ' All settings', 'isok-tab', 'small-button text-button', 'data-value="session" id="assessment-radial-settings-back"')}
+    </div>
+    ${isokTiltPanel()}
+  </aside>`;
+}
+
+function teamAssessmentRadialMarkup() {
+  if (assessmentWorkspaceTab() === 'rom') ensureTeamRomEditor();
+  else ensureTeamAssessmentEditor();
+  return `<div class="assessment-workspace assessment-workspace--radial">${teamAssessmentRadialStage()}${teamAssessmentRadialInspector()}</div>`;
 }
 
 function teamAssessmentWorkspaceMarkup() {
-  const tab = assessmentWorkspaceTab();
-  const body = tab === 'rom' ? teamRomWorkspaceMarkup() : teamAssessmentProtocolMarkup();
-  return `${assessmentWorkspaceSubnav()}${body}`;
+  return assessmentWorkspaceView() === 'editor' ? teamAssessmentRadialMarkup() : teamAssessmentChooserMarkup();
 }
 
 function teamSessionWorkspaceMarkup() {
@@ -393,7 +551,8 @@ function teamHubCardHint(cardId) {
 
 function visitTeamHub(card = null) {
   if (state.actor !== 'coach') return;
-  if (card !== 'assessments') leaveTeamAssessmentEditor();
+  leaveTeamAssessmentEditor();
+  directoryUI().programs.assessmentView = 'chooser';
   state.nav = 'team';
   state.settingsSection = null;
   state.personId = null;
@@ -478,7 +637,9 @@ function teamHubCardsMarkup() {
 
 function teamHubDetailHead(activeItem, cardId) {
   const library = isTeamHubLibraryId(cardId) ? cardId : null;
-  const saveAssessment = library === 'assessments' ? button('Save', 'save-assessment-workspace', 'primary') : '';
+  const assessmentEditor = cardId === 'assessments' && assessmentWorkspaceView() === 'editor';
+  const assessmentTab = assessmentEditor ? assessmentWorkspaceTab() : null;
+  const saveAssessment = library === 'assessments' && assessmentEditor ? button('Save', 'save-assessment-workspace', 'primary') : '';
   const saveSessionPlan = library === 'sessions' && sessionWorkspaceTab() === 'session-plan' ? button('Save', 'save-session-workspace', 'primary') : '';
   const createByLibrary = {
     sessions: {action: 'new-session-template', ariaLabel: 'New session template'},
@@ -489,12 +650,21 @@ function teamHubDetailHead(activeItem, cardId) {
   const action = cardId === 'station'
     ? button('Save settings', 'save-settings', 'primary')
     : saveAssessment || saveSessionPlan || (showCreate ? button(icon('plus', 'icon-sm') + ' New template', create.action, 'primary', `aria-label="${create.ariaLabel}"`) : '');
-  const desc = activeItem.description ? `<p class="settings-pane-desc">${escapeHTML(activeItem.description)}</p>` : '';
+  const title = assessmentEditor
+    ? (assessmentTab === 'rom' ? 'Range of motion' : 'Protocol')
+    : activeItem.label;
+  const descCopy = assessmentEditor
+    ? (assessmentTab === 'rom' ? 'Comfortable start and max limits in each direction.' : 'Default protocol for new assessments at this station.')
+    : activeItem.description;
+  const desc = descCopy ? `<p class="settings-pane-desc">${escapeHTML(descCopy)}</p>` : '';
+  const backAction = assessmentEditor ? 'assessment-back-chooser' : 'team-hub-back';
+  const backLabel = assessmentEditor ? 'Assessment' : 'Team';
+  const backAria = assessmentEditor ? 'Back to assessment types' : 'Back to team hub';
   return `<header class="settings-pane-head team-hub-detail-head">
-    ${button(icon('back', 'icon-sm') + ' Team', 'team-hub-back', 'small-button text-button team-hub-back', 'aria-label="Back to team hub"')}
+    ${button(icon('back', 'icon-sm') + ' ' + backLabel, backAction, 'small-button text-button team-hub-back', `aria-label="${backAria}"`)}
     <div class="settings-pane-head-row">
       <div class="settings-pane-head-text">
-        <h1>${escapeHTML(activeItem.label)}</h1>
+        <h1>${escapeHTML(title)}</h1>
         ${desc}
       </div>
       ${action ? `<div class="settings-pane-head-actions">${action}</div>` : ''}
@@ -692,6 +862,28 @@ const teamSettingsActions = {
     $(`[data-action="team-hub-card"][data-card="${el.dataset.card}"]`)?.focus();
   },
   'team-hub-back': () => visitTeamHub(null),
+  'assessment-open': el => {
+    if (!isTeamHubNav() || teamHubResolveCard() !== 'assessments') return;
+    const tab = el.dataset.tab;
+    if (!['protocol', 'rom'].includes(tab)) return;
+    const ui = directoryUI().programs;
+    ui.assessmentTab = tab;
+    ui.assessmentView = 'editor';
+    ui.teamTab = 'session';
+    render();
+    $('#assessment-radial-settings')?.focus();
+  },
+  'assessment-back-chooser': () => {
+    if (!isTeamHubNav() || teamHubResolveCard() !== 'assessments') return;
+    leaveTeamAssessmentEditor();
+    directoryUI().programs.assessmentView = 'chooser';
+    render();
+    $('[data-action="assessment-open"]')?.focus();
+  },
+  'assessment-mode': el => {
+    if (!isTeamHubNav() || teamHubResolveCard() !== 'assessments' || assessmentWorkspaceView() !== 'editor') return;
+    changeSetupMode(el.dataset.value);
+  },
   'settings-hub-section': el => {
     if (!SETTINGS_RAIL_SECTIONS.some(item => item.id === el.dataset.section)) return;
     visitTeamHub(el.dataset.section);
@@ -720,7 +912,7 @@ const teamSettingsActions = {
   },
   'save-assessment-workspace': () => {
     if (state.actor !== 'coach' || !isTeamHubNav() || teamHubResolveCard() !== 'assessments') return;
-    const team = teamSettings();
+    if (assessmentWorkspaceView() !== 'editor') return;
     const tab = assessmentWorkspaceTab();
     if (tab === 'protocol') {
       if (state.stage === 'team-assessment-edit' && !setupIsValid()) {

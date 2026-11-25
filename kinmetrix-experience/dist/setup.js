@@ -80,7 +80,8 @@ function changeSetupMode(type){
  if(type!=='strength')delete state.setup.holdStyle;
  else state.setup.holdStyle??='timed';
  if(isTeamAssessmentSetupContext())teamAssessmentConfig().activeMode=type;
- resetSetupAcceptance();renderSetupControl('#setup-mode');
+ resetSetupAcceptance();
+ renderSetupControl(isTeamAssessmentSetupContext()?`#assessment-mode-${type}`:'#setup-mode');
 }
 function setupStepperDisplay(text,{unit=''}){
  return unit?`<span class="stepper-value weight-input"><output class="field-value" aria-live="polite">${text}</output><span>${unit}</span></span>`:`<output class="stepper-value" aria-live="polite">${text}</output>`;

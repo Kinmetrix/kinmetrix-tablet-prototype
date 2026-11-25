@@ -8,7 +8,7 @@ const context=vm.createContext({assert,console,structuredClone,URL,Blob,crypto:r
  document:{addEventListener(){},querySelector(){return null;},querySelectorAll(){return [];},documentElement:{dataset:{}},baseURI:'http://127.0.0.1/'},
  window:{addEventListener(){},scrollTo(){}},location:{href:'http://127.0.0.1/'},localStorage:{getItem(){return null;}},matchMedia(){return {matches:false};},
  setTimeout(){},clearTimeout(){},setInterval(){},clearInterval(){}});
-for(const name of ['workspace','report','photos','profile','reps','setup','isokinetic-setup','live-rules','export','directory','comparison','mode-experience','session-tools','person-programs','team-settings','team-overview','session-plan','device','waiver','nav-icons','app']){
+for(const name of ['workspace','report','photos','profile','reps','setup','isokinetic-setup','live-rules','export','session-templates','directory','comparison','mode-experience','session-tools','person-programs','team-settings','team-overview','session-plan','device','waiver','nav-icons','app']){
  let source=fs.readFileSync(path.join(root,name+'.js'),'utf8');
  if(name==='app')source=source.replace(/\nrender\(\);\s*$/,'\n');
  vm.runInContext(source,context,{filename:name+'.js'});

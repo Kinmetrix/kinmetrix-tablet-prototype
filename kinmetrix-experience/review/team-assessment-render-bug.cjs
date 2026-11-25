@@ -28,7 +28,7 @@ const context = vm.createContext({
 
 for (const name of [
   'workspace', 'report', 'photos', 'profile', 'reps', 'setup', 'isokinetic-setup', 'live-rules',
-  'export', 'directory', 'comparison', 'mode-experience', 'session-tools', 'person-programs',
+  'export', 'session-templates', 'directory', 'comparison', 'mode-experience', 'session-tools', 'person-programs',
   'team-settings', 'team-overview', 'session-plan', 'device', 'waiver', 'nav-icons'
 ]) {
   vm.runInContext(fs.readFileSync(path.join(root, `${name}.js`), 'utf8'), context, { filename: `${name}.js` });
@@ -42,10 +42,14 @@ state.nav = 'team';
 state.teamHubCard = 'assessments';
 directoryUI().programs.library = 'assessments';
 directoryUI().programs.assessmentTab = 'protocol';
+directoryUI().programs.assessmentView = 'chooser';
+teamHubPage();
+assert.equal(state.stage, null, 'chooser does not open setup editor');
+directoryUI().programs.assessmentView = 'editor';
 teamHubPage();
 assert.equal(state.stage, 'team-assessment-edit', 'sync sets stage during markup');
 assert.doesNotThrow(() => appRootView(), 'team assessment edit stays on clinic shell');
-assert.match(appRootView(), /team-hub-back/, 'back control survives re-render');
+assert.match(appRootView(), /assessment-back-chooser/, 'editor back returns to assessment types');
 state.setup.reps = 4;
 teamHubPage();
 assert.equal(state.setup.reps, 4, 're-render does not reset draft setup from team defaults');

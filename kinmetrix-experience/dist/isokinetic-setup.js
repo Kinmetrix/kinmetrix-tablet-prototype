@@ -87,8 +87,18 @@ function refreshSplitSetupPreview(){
  const fields=$('.isok-rule-fields');if(fields&&state.setup.type==='isokinetic')fields.innerHTML=setupChallengeField(state.setup.challengeAuto?'Auto: 1 kg below target.':'Set for this session. <button class="text-button" data-action="challenge-auto" id="challenge-auto">Use automatic threshold</button>')+setupNumberField('challengeHold','Stop if below for','s',1,5,1);
 }
 Object.assign(setupActions,{
- 'isok-tab':el=>{state.setup.isokTab=el.dataset.value==='tilts'?'tilts':'session';if(isTeamAssessmentSetupContext())directoryUI().programs.teamTab=state.setup.isokTab;renderSetupControl('#isok-tab-'+state.setup.isokTab);},
- 'isok-direction':el=>{state.setup.angle=Number(el.dataset.angle);state.setup.isokTab='tilts';if(isTeamAssessmentSetupContext())directoryUI().programs.teamAngle=state.setup.angle;renderSetupControl('#isok-tab-tilts');},
+ 'isok-tab':el=>{
+  state.setup.isokTab=el.dataset.value==='tilts'?'tilts':'session';
+  if(isTeamAssessmentSetupContext())directoryUI().programs.teamTab=state.setup.isokTab;
+  const team=isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor';
+  renderSetupControl(team?(state.setup.isokTab==='tilts'?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#assessment-radial-settings'):'#isok-tab-'+state.setup.isokTab);
+ },
+ 'isok-direction':el=>{
+  state.setup.angle=Number(el.dataset.angle);state.setup.isokTab='tilts';
+  if(isTeamAssessmentSetupContext())directoryUI().programs.teamAngle=state.setup.angle;
+  const team=isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor';
+  renderSetupControl(team?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#isok-tab-tilts');
+ },
  'tilt-apply-selected':()=>{const a=state.setup.angle||0,source=tiltValues(setupTilt(a));currentAngles().forEach(angle=>setTiltOverride(angle,{...source}));resetSetupAcceptance();renderSetupControl('#tilt-all');toast(`${setupDirectionNames[a]} applied to every direction.`);}
 });
 document.addEventListener('keydown',event=>{
