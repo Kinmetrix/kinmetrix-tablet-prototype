@@ -57,7 +57,7 @@ function teamOverviewUI() {
   return ui;
 }
 
-const PULSE_KPI_SCREENS = {totalActivity: 'activity', membersActive: 'members', medianForceChange: 'medianForce'};
+const PULSE_KPI_SCREENS = {totalActivity: 'activity', membersTotal: 'members', medianForceChange: 'medianForce'};
 
 function pulseKpiScreenForId(id) {
   return PULSE_KPI_SCREENS[id] || null;
@@ -572,15 +572,11 @@ function pulseActiveMembersMeta(total, rosterSize) {
 }
 
 function pulseActiveMembersLineupCard(model) {
-  const kpi = model.kpis.find(item => item.id === 'membersActive');
-  const total = kpi?.value ?? 0;
   const rosterSize = model.roster.length;
   const smallRoster = rosterSize > 0 && rosterSize <= PULSE_SMALL_ROSTER_MAX;
   const summaries = pulseActiveMemberSummaries(model.activityAll, model.roster);
-  const reserveOverflow = !smallRoster && total > PULSE_MEMBER_LINEUP_MAX;
-  const faceCap = reserveOverflow ? PULSE_MEMBER_LINEUP_MAX - 1 : PULSE_MEMBER_LINEUP_MAX;
-  const shown = smallRoster ? summaries : summaries.slice(0, faceCap);
-  const overflow = smallRoster ? 0 : Math.max(0, total - shown.length);
+  const total = summaries.length;
+  const shown = smallRoster ? summaries : summaries.slice(0, PULSE_MEMBER_LINEUP_MAX);
   const activeIds = new Set(shown.map(item => item.memberId));
   const quiet = smallRoster
     ? model.roster.filter(person => !activeIds.has(person.id))
@@ -599,14 +595,10 @@ function pulseActiveMembersLineupCard(model) {
       <span class="pulse-member-chip__name">${name}</span>
     </button>`;
   }).join('');
-  const moreChip = overflow > 0
-    ? `<button type="button" class="pulse-member-chip pulse-member-chip--more tabular" role="listitem" data-action="pulse-kpi" data-value="membersActive" aria-label="View all ${total} active members, ${overflow} more not shown"><span class="pulse-member-chip__more-mark" aria-hidden="true">+${overflow}</span><span class="pulse-member-chip__name">View all</span></button>`
-    : '';
-  const lineupCount = shown.length + quiet.length + (overflow > 0 ? 1 : 0);
-  const hasLineup = lineupCount > 0;
+  const hasLineup = shown.length + quiet.length > 0;
   const meta = hasLineup ? pulseActiveMembersMeta(total, rosterSize) : '';
   const body = hasLineup
-    ? `<div class="pulse-member-lineup" role="list">${chips}${quietChips}${moreChip}</div>`
+    ? `<div class="pulse-member-lineup" role="list">${chips}${quietChips}</div>`
     : `<p class="pulse-perf-empty muted">No members with sessions in this range.</p>`;
   return `<section class="pulse-active-members-card" aria-label="Active members">
     <header class="pulse-perf-head pulse-active-members-head">
@@ -1260,6 +1252,23 @@ function pulseBrushSeries(roster) {
   return {domain, counts, max: Math.max(1, ...counts)};
 }
 
+function pulseTeamMembers(roster, end) {
+  const joinedAt = new Map(
+    pulseLifecycleEventCatalog(roster)
+      .filter(event => event.type === 'user_created' || event.type === 'user_joined')
+      .map(event => [event.memberId, event.at])
+  );
+  return roster
+    .map(person => ({person, joinedAt: joinedAt.get(person.id) ?? null}))
+    .filter(member => member.joinedAt == null || member.joinedAt <= end);
+}
+
+function pulseNewMembersDelta(total, added, comparePrior) {
+  if (!comparePrior || !total) return {deltaLabel: null};
+  if (!added) return {deltaLabel: 'No new members', deltaSpoken: 'No new members'};
+  return {deltaLabel: `+${added} new`, deltaSpoken: `${added} new this period`};
+}
+
 function pulseModel() {
   const ui = teamOverviewUI();
   const roster = visiblePeople();
@@ -1274,22 +1283,24 @@ function pulseModel() {
   const medianForce = pulseMedianValue(currentForceDeltas);
   const medianForcePrior = pulseMedianValue(priorForceDeltas);
   const comparePrior = ui.period !== 'all';
+  const members = pulseTeamMembers(roster, window.end);
+  const newMembers = members.filter(member => member.joinedAt != null && member.joinedAt >= window.start).length;
   const kpis = [
-    {id: 'totalActivity', label: 'Total activity', value: current.totalActivity, previous: previous.totalActivity},
-    {id: 'membersActive', label: 'Active members', value: current.membersActive, previous: previous.membersActive},
+    {
+      id: 'totalActivity',
+      label: 'Total activity',
+      value: current.totalActivity,
+      deltaLabel: teamKpiDelta(current.totalActivity, previous.totalActivity, {comparePrior})
+    },
+    {id: 'membersTotal', label: 'Total members', value: members.length, ...pulseNewMembersDelta(members.length, newMembers, comparePrior)},
     {
       id: 'medianForceChange',
       label: 'Median force change',
       value: medianForce,
       displayValue: pulseMedianForceDisplay(medianForce),
-      previous: medianForcePrior
+      deltaLabel: teamKpiDeltaForce(medianForce, medianForcePrior, {comparePrior})
     }
-  ].map(kpi => ({
-    ...kpi,
-    deltaLabel: kpi.id === 'medianForceChange'
-      ? teamKpiDeltaForce(kpi.value, kpi.previous, {comparePrior})
-      : teamKpiDelta(kpi.value, kpi.previous, {comparePrior})
-  }));
+  ];
   const activity = sortPulseActivity(
     currentRows.filter(row => pulseActivityMatchesFilter(row, ui.activityFilter) && pulseActivityMatchesSearch(row, ui.activitySearch.trim().toLowerCase())),
     ui.activitySort
@@ -1302,7 +1313,7 @@ function pulseModel() {
     trend: pulsePerformanceTrend(performanceCurrent, performancePrior, comparePrior)
   };
   return {
-    ui, roster, period, window, kpis, activityAll: currentRows, activity, performance,
+    ui, roster, members, period, window, kpis, activityAll: currentRows, activity, performance,
     brush: pulseBrushSeries(roster),
     team: teamSettings()
   };
@@ -1624,7 +1635,7 @@ function pulseKpiDeltaClass(label) {
 
 function pulseMetricLabel(id) {
   if (id === 'totalActivity') return 'Activity';
-  if (id === 'membersActive') return 'Active members';
+  if (id === 'membersTotal') return 'Total members';
   if (id === 'medianForceChange') return 'Median force change';
   return id;
 }
@@ -1637,7 +1648,7 @@ function pulseKpiShowsSelected(ui, id) {
 function pulseKpiDetailLabel(id) {
   const screen = pulseKpiScreenForId(id);
   if (screen === 'activity') return 'activity';
-  if (screen === 'members') return 'active members';
+  if (screen === 'members') return 'members';
   if (screen === 'medianForce') return 'median force change';
   return 'detail';
 }
@@ -1646,7 +1657,8 @@ function pulseKpiButtonAriaLabel(kpi) {
   const label = pulseMetricLabel(kpi.id);
   const display = kpi.displayValue ?? kpi.value;
   const detail = pulseKpiDetailLabel(kpi.id);
-  return `${label}, ${display}. ${kpi.deltaLabel}. View ${detail}.`;
+  const delta = kpi.deltaSpoken ?? kpi.deltaLabel;
+  return `${label}, ${display}.${delta ? ` ${delta}.` : ''} View ${detail}.`;
 }
 
 function pulseKpiStrip(kpis, ui) {
@@ -1656,38 +1668,26 @@ function pulseKpiStrip(kpis, ui) {
     return `<button type="button" class="team-overview-kpi pulse-kpi-strip-card pulse-kpi-strip-button${selected ? ' is-selected' : ''}" data-action="pulse-kpi" data-value="${kpi.id}" aria-pressed="${selected}" aria-label="${escapeHTML(pulseKpiButtonAriaLabel(kpi))}">
       <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}${icon('chevron', 'icon-sm pulse-kpi-strip-go')}</span>
       <span class="team-overview-kpi-value tabular">${escapeHTML(String(display))}</span>
-      <p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>
+      ${kpi.deltaLabel ? `<p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>` : ''}
     </button>`;
   }).join('')}</div>`;
 }
 
-function pulseMemberGroups(activity, sortKey) {
-  const buckets = new Map();
+function pulseMemberGroups(activity, sortKey, members = []) {
+  const groups = new Map(members.map(({person}) => [person.id, {memberId: person.id, memberName: person.name, events: []}]));
   for (const row of activity) {
-    if (!buckets.has(row.memberId)) buckets.set(row.memberId, []);
-    buckets.get(row.memberId).push(row);
+    if (!groups.has(row.memberId)) groups.set(row.memberId, {memberId: row.memberId, memberName: row.memberName, events: []});
+    groups.get(row.memberId).events.push(row);
   }
-  let memberIds = [...buckets.keys()];
-  if (sortKey === 'active') {
-    memberIds.sort(
-      (a, b) =>
-        buckets.get(b).filter(pulseIsVisitRow).length - buckets.get(a).filter(pulseIsVisitRow).length ||
-        buckets.get(a)[0].memberName.localeCompare(buckets.get(b)[0].memberName)
-    );
-  } else if (sortKey === 'member') {
-    memberIds.sort((a, b) => buckets.get(a)[0].memberName.localeCompare(buckets.get(b)[0].memberName));
-  } else {
-    const firstIndex = new Map();
-    activity.forEach((row, index) => {
-      if (!firstIndex.has(row.memberId)) firstIndex.set(row.memberId, index);
-    });
-    memberIds.sort((a, b) => firstIndex.get(a) - firstIndex.get(b));
-  }
-  return memberIds.map(id => ({
-    memberId: id,
-    memberName: buckets.get(id)[0].memberName,
-    visits: buckets.get(id)
-  }));
+  const byName = (a, b) => a.memberName.localeCompare(b.memberName);
+  const list = [...groups.values()];
+  if (sortKey === 'active') return list.sort((a, b) => b.events.length - a.events.length || byName(a, b));
+  if (sortKey === 'member') return list.sort(byName);
+  const firstIndex = new Map();
+  activity.forEach((row, index) => {
+    if (!firstIndex.has(row.memberId)) firstIndex.set(row.memberId, index);
+  });
+  return list.sort((a, b) => (firstIndex.get(a.memberId) ?? Infinity) - (firstIndex.get(b.memberId) ?? Infinity) || byName(a, b));
 }
 
 function pulseSortCatalog(ui) {
@@ -1819,25 +1819,35 @@ function pulseActivityRowMarkup(item, options = {}) {
 function pulseActivityListGrouped(model) {
   const {ui, activity, activityAll, roster} = model;
   const face = id => roster.find(person => person.id === id) || {initials: '•', name: ''};
-  const empty = `<li class="pulse-activity-empty muted">${activityAll.length ? 'No visits match this filter.' : 'No visits in this period.'}</li>`;
-  if (!activity.length) return empty;
-    const groups = pulseMemberGroups(activity, ui.activitySort);
-    return groups.map(group => {
-      const av = avatar(face(group.memberId), 'mini');
-      const countLabel = group.visits.length === 1 ? '1 visit' : `${group.visits.length} visits`;
-      const head = `<div class="pulse-member-head" data-action="open-pulse-person" data-id="${group.memberId}" data-member-name="${escapeHTML(group.memberName)}" tabindex="0" role="link">
-        ${av}
-        <span class="pulse-member-head-text">
-          <strong>${escapeHTML(group.memberName)}</strong>
-          <span class="muted">${countLabel}</span>
-        </span>
-      </div>`;
-      const visits = group.visits.map(item => pulseActivityRowMarkup(item, {nested: true})).join('');
-      return `<li class="pulse-member-group">
-        ${head}
-        <ul class="pulse-member-visits" aria-label="Visits for ${escapeHTML(group.memberName)}">${visits}</ul>
-      </li>`;
-    }).join('');
+  const membersScreen = ui.pulseScreen === 'members';
+  const term = ui.activitySearch.trim().toLowerCase();
+  const members = membersScreen && ui.activityFilter === 'all'
+    ? model.members.filter(({person}) => person.name.toLowerCase().includes(term))
+    : [];
+  const groups = pulseMemberGroups(activity, ui.activitySort, members);
+  if (!groups.length) {
+    const message = membersScreen && !model.members.length
+      ? 'No members on the team yet.'
+      : membersScreen || activityAll.length ? 'No visits match this filter.' : 'No visits in this period.';
+    return `<li class="pulse-activity-empty muted">${message}</li>`;
+  }
+  return groups.map(group => {
+    const count = group.events.length;
+    const countLabel = !count ? 'No events in this range' : count === 1 ? '1 event' : `${count} events`;
+    const head = `<div class="pulse-member-head" data-action="open-pulse-person" data-id="${group.memberId}" data-member-name="${escapeHTML(group.memberName)}" tabindex="0" role="link">
+      ${avatar(face(group.memberId), 'mini')}
+      <span class="pulse-member-head-text">
+        <strong>${escapeHTML(group.memberName)}</strong>
+        <span class="muted">${countLabel}</span>
+      </span>
+    </div>`;
+    if (!count) return `<li class="pulse-member-group pulse-member-group--empty">${head}</li>`;
+    const events = group.events.map(item => pulseActivityRowMarkup(item, {nested: true})).join('');
+    return `<li class="pulse-member-group">
+      ${head}
+      <ul class="pulse-member-visits" aria-label="Events for ${escapeHTML(group.memberName)}">${events}</ul>
+    </li>`;
+  }).join('');
 }
 
 function pulseActivityListMarkup(model, options = {}) {
@@ -1887,7 +1897,7 @@ function pulseOperationsTable(model, options = {}) {
   const list = pulseActivityListMarkup(model, {
     groupByMembers
   });
-  const sectionLabel = groupByMembers ? 'Active members and visits' : 'Station visits';
+  const sectionLabel = groupByMembers ? 'Members and events' : 'Station visits';
   const radarCol = groupByMembers ? '' : '<span class="pulse-col-radar">Shape</span>';
   const trailClass = groupByMembers ? '' : ' pulse-operations--with-radar';
   return `<section class="pulse-operations pulse-operations--trail${groupByMembers ? ' pulse-operations--by-member' : ''}${trailClass}" aria-label="${sectionLabel}">
@@ -1951,7 +1961,7 @@ function pulseActivityScreen(model) {
 }
 
 function pulseMembersScreen(model) {
-  return `${pulseSubScreenHead(model, 'Active members')}${pulseOperationsTable(model, {showTitle: false, groupByMembers: true})}`;
+  return `${pulseSubScreenHead(model, 'Members')}${pulseOperationsTable(model, {showTitle: false, groupByMembers: true})}`;
 }
 
 function pulseMedianForceScreen(model) {
@@ -1971,7 +1981,7 @@ function pulsePage() {
   const model = pulseModel();
   const screen = model.ui.pulseScreen || 'hub';
   if (screen === 'activity' || screen === 'members' || screen === 'medianForce') {
-    const paneLabel = screen === 'members' ? 'Active members' : screen === 'medianForce' ? 'Median force change' : 'Activity';
+    const paneLabel = screen === 'members' ? 'Members' : screen === 'medianForce' ? 'Median force change' : 'Activity';
     return `<main class="team-overview team-overview-home templates-hub staff-single-pane pulse-proto pulse-proto--activity-screen">
       <div class="settings-hub-pane pulse-layout pulse-layout-table-first" aria-label="${paneLabel}">
         ${pulseScreenBody(model)}

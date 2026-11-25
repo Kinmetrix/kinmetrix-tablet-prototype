@@ -253,6 +253,9 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .pulse-member-head-text{min-width:0;display:grid;gap:2px}
 .pulse-member-head-text strong{font-weight:600;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pulse-member-head-text .muted{font-size:12px}
+.pulse-member-group--empty .pulse-member-head{padding-bottom:12px}
+.pulse-member-group--empty .avatar{opacity:.55}
+.pulse-member-group--empty .pulse-member-head-text strong{font-weight:500;color:var(--muted)}
 .pulse-member-visits{list-style:none;margin:0;padding:0 0 4px}
 .pulse-activity-row--nested{padding-top:8px;padding-bottom:8px;border-bottom:0}
 .pulse-visit--nested .pulse-visit-sub{margin-top:0}
@@ -359,11 +362,6 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .pulse-active-members-card .pulse-member-chip:focus-visible{outline:2px solid var(--focus);outline-offset:4px;border-radius:8px}
 .pulse-active-members-card .pulse-member-chip .avatar{width:48px;height:48px;font-size:14px;align-self:center;justify-self:center}
 .pulse-active-members-card .pulse-member-chip__name{font-size:11px;font-weight:600;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pulse-active-members-card .pulse-member-chip--more{width:100%;max-width:5rem;color:var(--focus)}
-.pulse-active-members-card .pulse-member-chip__more-mark{display:flex;align-items:center;justify-content:center;width:48px;height:48px;margin:0 auto;border:1px solid var(--line);border-radius:50%;background:transparent;font-size:13px;font-weight:650;line-height:1;box-sizing:border-box}
-.pulse-active-members-card .pulse-member-chip--more:hover .pulse-member-chip__name{color:var(--focus)}
-.pulse-active-members-card .pulse-member-chip--more:hover .pulse-member-chip__more-mark{border-color:color-mix(in srgb,var(--focus) 35%,var(--line));background:transparent}
-.pulse-active-members-card .pulse-member-chip--more:hover{text-decoration:underline}
 @media(max-width:900px){
  .pulse-bottom-row{grid-template-columns:minmax(0,1fr)}
  .pulse-bottom-row .pulse-perf-card,.pulse-active-members-card{grid-column:span 1}
