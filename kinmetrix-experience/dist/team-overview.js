@@ -529,8 +529,7 @@ function pulseMemberPerformanceCard(model) {
   </section>`;
 }
 
-const PULSE_MEMBER_LINEUP_MAX = 6;
-const PULSE_SMALL_ROSTER_MAX = 4;
+const PULSE_MOST_ACTIVE_MAX = 3;
 
 function pulseMemberFirstName(name) {
   const parts = String(name || '').trim().split(/\s+/);
@@ -538,15 +537,18 @@ function pulseMemberFirstName(name) {
 }
 
 function pulseActiveMemberSummaries(rows, roster) {
-  const counts = new Map();
+  const byMember = new Map();
   for (const row of rows) {
     if (!pulseIsVisitRow(row)) continue;
-    counts.set(row.memberId, (counts.get(row.memberId) || 0) + 1);
+    const entry = byMember.get(row.memberId) || {sessions: 0, lastAt: -Infinity};
+    entry.sessions += 1;
+    entry.lastAt = Math.max(entry.lastAt, row.at);
+    byMember.set(row.memberId, entry);
   }
   const face = id => roster.find(person => person.id === id) || {id, name: '—', initials: '•'};
-  return [...counts.entries()]
-    .map(([memberId, sessions]) => ({memberId, sessions, person: face(memberId)}))
-    .sort((a, b) => b.sessions - a.sessions || a.person.name.localeCompare(b.person.name));
+  return [...byMember.entries()]
+    .map(([memberId, {sessions, lastAt}]) => ({memberId, sessions, lastAt, person: face(memberId)}))
+    .sort((a, b) => b.sessions - a.sessions || b.lastAt - a.lastAt || a.person.name.localeCompare(b.person.name));
 }
 
 function pulseOpenAnalysisRecord(personId, recordId) {
@@ -563,46 +565,29 @@ function pulseOpenAnalysisRecord(personId, recordId) {
   window.scrollTo(0, 0);
 }
 
-function pulseActiveMembersMeta(total, rosterSize) {
-  if (!total) return '<p class="pulse-perf-meta muted">No sessions in this range</p>';
-  if (rosterSize <= PULSE_SMALL_ROSTER_MAX && total < rosterSize) {
-    return `<p class="pulse-perf-meta muted tabular">${total} of ${rosterSize} in range</p>`;
-  }
-  return `<p class="pulse-perf-meta muted tabular">${total} in range</p>`;
+function pulseSessionCountLabel(sessions) {
+  return `${sessions} ${sessions === 1 ? 'session' : 'sessions'}`;
 }
 
 function pulseActiveMembersLineupCard(model) {
-  const rosterSize = model.roster.length;
-  const smallRoster = rosterSize > 0 && rosterSize <= PULSE_SMALL_ROSTER_MAX;
   const summaries = pulseActiveMemberSummaries(model.activityAll, model.roster);
   const total = summaries.length;
-  const shown = smallRoster ? summaries : summaries.slice(0, PULSE_MEMBER_LINEUP_MAX);
-  const activeIds = new Set(shown.map(item => item.memberId));
-  const quiet = smallRoster
-    ? model.roster.filter(person => !activeIds.has(person.id))
-    : [];
-  const chips = shown.map(({memberId, sessions, person}) => {
+  const chips = summaries.slice(0, PULSE_MOST_ACTIVE_MAX).map(({memberId, sessions, person}) => {
     const name = escapeHTML(pulseMemberFirstName(person.name));
-    return `<button type="button" class="pulse-member-chip" role="listitem" data-action="open-pulse-person" data-id="${escapeHTML(memberId)}" data-member-name="${escapeHTML(person.name)}" aria-label="${escapeHTML(person.name)}, ${sessions} sessions in range">
+    const count = pulseSessionCountLabel(sessions);
+    return `<button type="button" class="pulse-member-chip" role="listitem" data-action="open-pulse-person" data-id="${escapeHTML(memberId)}" data-member-name="${escapeHTML(person.name)}" aria-label="${escapeHTML(person.name)}, ${count} in range">
       ${avatar(person)}
       <span class="pulse-member-chip__name">${name}</span>
+      <span class="pulse-member-chip__count muted tabular">${count}</span>
     </button>`;
   }).join('');
-  const quietChips = quiet.map(person => {
-    const name = escapeHTML(pulseMemberFirstName(person.name));
-    return `<button type="button" class="pulse-member-chip pulse-member-chip--quiet" role="listitem" data-action="open-pulse-person" data-id="${escapeHTML(person.id)}" data-member-name="${escapeHTML(person.name)}" aria-label="${escapeHTML(person.name)}, no sessions in range">
-      ${avatar(person)}
-      <span class="pulse-member-chip__name">${name}</span>
-    </button>`;
-  }).join('');
-  const hasLineup = shown.length + quiet.length > 0;
-  const meta = hasLineup ? pulseActiveMembersMeta(total, rosterSize) : '';
-  const body = hasLineup
-    ? `<div class="pulse-member-lineup" role="list">${chips}${quietChips}</div>`
+  const meta = total ? `<p class="pulse-perf-meta muted tabular">${total} in range</p>` : '';
+  const body = total
+    ? `<div class="pulse-member-lineup" role="list">${chips}</div>`
     : `<p class="pulse-perf-empty muted">No members with sessions in this range.</p>`;
-  return `<section class="pulse-active-members-card" aria-label="Active members">
+  return `<section class="pulse-active-members-card" aria-label="Most active">
     <header class="pulse-perf-head pulse-active-members-head">
-      <h2 class="pulse-perf-title">Active members</h2>
+      <h2 class="pulse-perf-title">Most active</h2>
       ${meta}
     </header>
     ${body}

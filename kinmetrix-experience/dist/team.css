@@ -342,26 +342,23 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .pulse-bottom-row .pulse-perf-card>.pulse-perf-empty,
 .pulse-bottom-row .pulse-active-members-card>.pulse-perf-empty{flex:0 0 auto;min-height:0;align-self:flex-start}
 .pulse-bottom-row{--pulse-bottom-head-min-h:2.3125rem;--pulse-bottom-body-min-h:5.25rem;--pulse-bottom-card-min-h:10.125rem;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;flex-shrink:0;margin-top:0;min-width:0;align-items:stretch;min-height:var(--pulse-bottom-card-min-h)}
-.pulse-bottom-row .pulse-perf-card{grid-column:span 1;width:100%;max-width:none;align-self:stretch;min-width:0;display:flex;flex-direction:column;min-height:0;box-sizing:border-box;justify-self:stretch}
+.pulse-bottom-row .pulse-perf-card{grid-column:span 2;width:100%;max-width:none;align-self:stretch;min-width:0;display:flex;flex-direction:column;min-height:0;box-sizing:border-box;justify-self:stretch}
 .pulse-bottom-row .pulse-perf-card .pulse-perf-body{width:100%;max-width:none}
 .pulse-bottom-row .pulse-perf-head{flex-shrink:0;min-height:var(--pulse-bottom-head-min-h)}
 .pulse-bottom-row .pulse-perf-card>:not(.pulse-perf-head){flex:1 1 auto;min-height:var(--pulse-bottom-body-min-h);min-width:0}
-.pulse-active-members-card{grid-column:span 2;min-width:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;min-height:0;box-sizing:border-box;justify-self:stretch}
+.pulse-active-members-card{grid-column:span 1;min-width:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;min-height:0;box-sizing:border-box;justify-self:stretch}
 .pulse-active-members-card .pulse-active-members-head{margin-bottom:8px;width:100%;min-width:0}
 .pulse-bottom-row .pulse-active-members-card>:not(.pulse-perf-head){flex:0 0 auto;min-height:0;min-width:0}
 .pulse-lineup-viewall{margin:0;padding:0;border:0;background:none;font:inherit;color:var(--focus);font-weight:600;cursor:pointer;text-decoration:none}
 .pulse-lineup-viewall:hover{text-decoration:underline}
 .pulse-lineup-viewall:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:4px}
-.pulse-active-members-card .pulse-member-lineup{display:grid;grid-auto-flow:column;grid-auto-columns:5rem;justify-content:start;column-gap:6px;align-items:start;justify-items:center;min-width:0;width:100%;overflow-x:auto;padding:6px 0 0;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
-.pulse-active-members-card .pulse-member-chip--quiet{color:var(--muted);cursor:pointer}
-.pulse-active-members-card .pulse-member-chip--quiet .avatar{opacity:.55}
-.pulse-active-members-card .pulse-member-chip--quiet .pulse-member-chip__name{font-weight:500;color:var(--muted)}
-.pulse-active-members-card .pulse-member-chip--quiet:hover .pulse-member-chip__name,.pulse-active-members-card .pulse-member-chip--quiet:focus-visible .pulse-member-chip__name{color:var(--ink)}
-.pulse-active-members-card .pulse-member-chip{width:5rem;max-width:5rem;margin:0;padding:0;border:0;background:transparent;display:grid;grid-template-rows:48px auto;justify-items:center;align-content:start;row-gap:5px;font:inherit;color:inherit;cursor:pointer;text-align:center}
+.pulse-active-members-card .pulse-member-lineup{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:6px;align-items:start;justify-items:center;min-width:0;width:100%;padding:6px 0 0}
+.pulse-active-members-card .pulse-member-chip{width:100%;min-width:0;margin:0;padding:0;border:0;background:transparent;display:grid;grid-template-rows:48px auto auto;justify-items:center;align-content:start;row-gap:3px;font:inherit;color:inherit;cursor:pointer;text-align:center}
 .pulse-active-members-card .pulse-member-chip:hover .pulse-member-chip__name{color:var(--focus)}
 .pulse-active-members-card .pulse-member-chip:focus-visible{outline:2px solid var(--focus);outline-offset:4px;border-radius:8px}
 .pulse-active-members-card .pulse-member-chip .avatar{width:48px;height:48px;font-size:14px;align-self:center;justify-self:center}
 .pulse-active-members-card .pulse-member-chip__name{font-size:11px;font-weight:600;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pulse-active-members-card .pulse-member-chip__count{font-size:11px;font-weight:500;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:900px){
  .pulse-bottom-row{grid-template-columns:minmax(0,1fr)}
  .pulse-bottom-row .pulse-perf-card,.pulse-active-members-card{grid-column:span 1}
