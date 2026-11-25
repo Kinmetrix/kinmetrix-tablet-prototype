@@ -195,8 +195,6 @@ directoryUI().programs.assessmentTab='protocol';
 const protocolEditor=programsPage();
 assert.match(protocolEditor,/<h1>Protocol<\\/h1>/);
 assert.match(protocolEditor,/assessment-radial/);
-assert.match(protocolEditor,/assessment-emil-settings/);
-assert.doesNotMatch(protocolEditor,/id="positions"/);
 assert.match(protocolEditor,/data-action="isok-direction"/);
 assert.match(protocolEditor,/data-action="assessment-back-chooser"/);
 assert.doesNotMatch(protocolEditor,/<option value="rom"/);

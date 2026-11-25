@@ -152,11 +152,8 @@ const setupActions={
   setTiltOverride(angle,{...tiltValues(current),[field]:next});resetSetupAcceptance();renderSetupControl('#'+el.id);if($('#'+el.id)?.disabled)$(`#tilt-${angle}-${field}-${Number(el.dataset.delta)>0?'minus':'plus'}`)?.focus({preventScroll:true});
  },
  'setup-step':el=>{
-  const key=el.dataset.key,cfg=state.setup;if(!['holdSeconds','endDrop','endCap','romStart','romMax','romStill','romDrop','eccCap','challenge','challengeHold','weight'].includes(key))return;
-  if(key==='challenge')cfg.challengeAuto=false;
-  if(key==='weight')cfg.forceEdited=true;
-  cfg[key]=Math.max(Number(el.dataset.min),Math.min(Number(el.dataset.max),cfg[key]+Number(el.dataset.delta)*Number(el.dataset.step)));
-  if(key==='weight'||key==='challenge')cfg[key]=Math.round(cfg[key]*2)/2;
+  const key=el.dataset.key,cfg=state.setup;if(!['holdSeconds','endDrop','endCap','romStart','romMax','romStill','romDrop','eccCap','challenge','challengeHold'].includes(key))return;
+  if(key==='challenge')cfg.challengeAuto=false;cfg[key]=Math.max(Number(el.dataset.min),Math.min(Number(el.dataset.max),cfg[key]+Number(el.dataset.delta)*Number(el.dataset.step)));
   resetSetupAcceptance();renderSetupControl('#'+el.id);if($('#'+el.id)?.disabled)$(`#setup-${key}-${Number(el.dataset.delta)>0?'minus':'plus'}`)?.focus({preventScroll:true});
  },
  'challenge-auto':()=>{state.setup.challengeAuto=true;resetSetupAcceptance();renderSetupControl('#setup-challenge-plus');},
