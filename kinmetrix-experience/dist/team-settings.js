@@ -333,13 +333,6 @@ function protocolSegThumb() {
   return '<span class="seg-thumb" aria-hidden="true"></span>';
 }
 
-function teamAssessmentProtocolPanelSeg() {
-  const tab = state.setup.isokTab === 'tilts' ? 'tilts' : 'session';
-  const positionsLabel = setupTiltKind() === 'fixed' ? 'Positions' : setupTiltKind() === 'limit' ? 'Limits' : 'Tilts';
-  const bad = currentAngles().some(a => !validTilt(setupTilt(a)));
-  return `<div class="seg seg-panel segmented protocol-panel-seg" role="tablist" aria-label="Setup sections">${protocolSegThumb()}${[['session', 'Session'], ['tilts', positionsLabel]].map(([key, label]) => `<button type="button" role="tab" id="isok-tab-${key}" class="${tab === key ? 'active' : ''}" data-action="isok-tab" data-value="${key}" aria-selected="${tab === key}" aria-controls="isok-panel-${key}" tabindex="${tab === key ? 0 : -1}">${label}${key === 'tilts' && bad ? '<span class="isok-tab-error">Check</span>' : ''}</button>`).join('')}</div>`;
-}
-
 function assessmentProtocolModeKey(type = state.setup?.type) {
   return standardExerciseModeKeys('assessment').includes(type) ? type : 'strength';
 }
@@ -363,7 +356,8 @@ function teamAssessmentProtocolCoreRows() {
   const modeName = sessionModes[modeKey].name;
   const modeRow = `<div class="row"><span class="row-label" id="protocol-mode-label">Exercise</span><button type="button" id="assessment-mode-button" class="protocol-mode-button" data-action="open-assessment-mode-picker" aria-haspopup="dialog" aria-label="Change exercise mode, currently ${modeName}"><span class="protocol-mode-button-value">${modeName}</span>${icon('down', 'icon-sm')}</button></div>`;
   const dirRow = `<div class="row"><span class="row-label" id="protocol-dir-label">Directions</span><div class="seg seg-row seg-2 segmented" role="group" aria-labelledby="protocol-dir-label">${protocolSegThumb()}${[4, 8].map(n => `<button type="button" id="setup-count-${n}" class="${c.positions === n ? 'active' : ''}" data-action="setup-positions" data-value="${n}" aria-pressed="${c.positions === n}">${n}</button>`).join('')}</div></div>`;
-  const repsRow = `<div class="row"><span class="row-label" id="protocol-reps-label">Reps per direction</span>${setupRepsControl()}</div>`;
+  const repsTotal = c.positions * c.reps;
+  const repsRow = `<div class="row protocol-reps-row"><div class="protocol-reps-label-wrap"><span class="row-label" id="protocol-reps-label">Reps per direction</span><span class="protocol-reps-total tabular" id="protocol-reps-total">${repsTotal} total across ${c.positions} directions</span></div>${setupRepsControl()}</div>`;
   return `${modeRow}${dirRow}${repsRow}`;
 }
 
@@ -383,15 +377,24 @@ function teamAssessmentProtocolHoldBlock() {
 
 function teamAssessmentProtocolForceBlock() {
   const fields = setupNumberField('weight', 'Target force', 'kg', 1, 50, 0.5);
-  return `<h2 class="group-title protocol-group-heading">Force</h2><div class="protocol-group protocol-force-group">${fields}</div><p class="protocol-note" id="force-note">Default target when no member baseline exists.</p>`;
+  return `<h2 class="group-title protocol-group-heading">Force</h2><div class="protocol-group protocol-force-group">${fields}</div><p class="protocol-note" id="force-note">Team starting target. Assessed members use their own.</p>`;
 }
 
 function teamAssessmentProtocolSessionPage() {
-  return `<div class="protocol-session-stack"><div class="protocol-group">${teamAssessmentProtocolCoreRows()}</div>${teamAssessmentProtocolHoldBlock()}${teamAssessmentProtocolForceBlock()}</div>`;
+  return `<div class="protocol-session-stack"><h2 class="sr-only" id="protocol-session-label">Session</h2><div class="protocol-group">${teamAssessmentProtocolCoreRows()}</div>${teamAssessmentProtocolHoldBlock()}${teamAssessmentProtocolForceBlock()}</div>`;
 }
 
 function teamAssessmentProtocolPositionsPage() {
-  return `<div class="protocol-group protocol-positions-panel">${isokTiltPanel({compact: true})}</div>`;
+  const positionsLabel = setupTiltKind() === 'fixed' ? 'Positions' : setupTiltKind() === 'limit' ? 'Limits' : 'Tilts';
+  const bad = currentAngles().some(a => !validTilt(setupTilt(a)));
+  const check = bad ? '<span class="isok-tab-error">Check</span>' : '';
+  return `<div class="protocol-positions-shell">
+    <div class="protocol-positions-nav assessment-radial-dir-nav">
+      ${backNavButton('Session', 'isok-tab', 'data-value="session" id="protocol-positions-back" aria-label="Back to session settings"')}
+      <h2 id="protocol-positions-title" class="protocol-positions-title">${positionsLabel}${check}</h2>
+    </div>
+    <div class="protocol-group protocol-positions-panel">${isokTiltPanel({compact: true})}</div>
+  </div>`;
 }
 
 let lastProtocolPanelTab = null;
@@ -404,14 +407,13 @@ function teamAssessmentProtocolFormMarkup() {
   lastProtocolPanelTab = tab;
   const enter = entering ? ' is-entering' : '';
   return `<section class="assessment-workspace assessment-workspace--protocol pager-page view-protocol assessment-protocol-form" aria-label="Protocol">
-    <section class="preview protocol-preview" id="team-assessment-preview" aria-labelledby="team-assessment-preview-title">${isokineticPreview({title: 'Your session', headingId: 'team-assessment-preview-title', showRangeSummary: false, card: true})}</section>
     <div class="settings">
-      ${teamAssessmentProtocolPanelSeg()}
       <div class="protocol-panel-pager">
-        <div class="protocol-panel-page${tab === 'session' ? ' is-active' : ''}${tab === 'session' ? enter : ''}" id="isok-panel-session" role="tabpanel" aria-labelledby="isok-tab-session">${teamAssessmentProtocolSessionPage()}</div>
-        <div class="protocol-panel-page${tab === 'tilts' ? ' is-active' : ''}${tab === 'tilts' ? enter : ''}" id="isok-panel-tilts" role="tabpanel" aria-labelledby="isok-tab-tilts">${teamAssessmentProtocolPositionsPage()}</div>
+        <div class="protocol-panel-page${tab === 'session' ? ' is-active' : ''}${tab === 'session' ? enter : ''}" id="isok-panel-session" role="region" aria-labelledby="protocol-session-label">${teamAssessmentProtocolSessionPage()}</div>
+        <div class="protocol-panel-page${tab === 'tilts' ? ' is-active' : ''}${tab === 'tilts' ? enter : ''}" id="isok-panel-tilts" role="region" aria-labelledby="protocol-positions-title">${teamAssessmentProtocolPositionsPage()}</div>
       </div>
     </div>
+    <section class="preview protocol-preview" id="team-assessment-preview" aria-labelledby="team-assessment-preview-title">${isokineticPreview({title: 'Your session', headingId: 'team-assessment-preview-title', showRangeSummary: false, card: true})}</section>
   </section>`;
 }
 
@@ -546,7 +548,7 @@ function teamAssessmentRadialStage() {
 function teamAssessmentRadialInspector() {
   const c = state.setup;
   const settings = c.isokTab !== 'tilts';
-  const forceHelp = c.type === 'rom' ? 'Light push needed before movement counts.' : 'Starting target when no member baseline exists.';
+  const forceHelp = c.type === 'rom' ? 'Light push needed before movement counts.' : 'Team starting target. Assessed members use their own.';
   if (settings) {
     const head = c.type === 'rom'
       ? `<div class="assessment-radial-inspector-head"><h2>Limit discovery</h2><p class="muted small">Maps comfortable movement in each direction. One movement per direction.</p></div>`

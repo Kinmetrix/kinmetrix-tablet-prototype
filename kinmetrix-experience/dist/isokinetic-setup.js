@@ -13,20 +13,33 @@ function isokTiltSummary(){
 }
 function splitRangeSummaryLabel(){const kind=setupTiltKind();return kind==='fixed'?'Pad position':kind==='limit'?'Range limits':'Tilt range';}
 function splitNodeDetail(){const kind=setupTiltKind();return setupHasFixedTilt()||kind==='limit'?angle=>setupTiltText(angle):angle=>isokForceText(isokForce(angle));}
+const ISOK_REP_MARKS_CAP=6;
+function isokRepMarksMarkup(reps){
+ const n=Math.max(0,Math.round(Number(reps))||0);
+ if(n<=0)return '';
+ if(n<=ISOK_REP_MARKS_CAP)return `<span class="isok-rep-marks" aria-hidden="true">${Array.from({length:n},()=>'<i></i>').join('')}</span>`;
+ return `<span class="isok-rep-count" aria-hidden="true">×${n}</span>`;
+}
+function isokRepDiagramHelp(reps){
+ const n=Math.max(0,Math.round(Number(reps))||0);
+ return n>ISOK_REP_MARKS_CAP?`×${n} is reps per direction.`:'Each mark is one rep.';
+}
 function isokineticDiagram(){
  const c=state.setup,angles=currentAngles(),active=c.isokTab==='tilts'?c.angle:null,kind=setupTiltKind(),nodeDetail=splitNodeDetail();
+ const repCount=kind==='limit'?1:c.reps,repMarks=isokRepMarksMarkup(repCount);
  const xy=(a,r)=>[220+Math.sin(a*Math.PI/180)*r,212-Math.cos(a*Math.PI/180)*r];
  const lines=angles.map(a=>{const p=xy(a,142),q=xy(a,57);return `<line x1="${q[0]}" y1="${q[1]}" x2="${p[0]}" y2="${p[1]}" class="isok-spoke ${a===active?'selected':''}"/><line x1="${q[0]}" y1="${q[1]}" x2="${p[0]}" y2="${p[1]}" class="isok-spoke-hit" data-action="isok-direction" data-angle="${a}"/>`;}).join('');
  const workload=kind==='limit'?'one movement per direction':`${c.reps} reps per direction`;
  const editWhat=setupHasFixedTilt()?'pad position':kind==='limit'?'start and max tilt':'tilt';
- return `<div class="isok-radial" role="group" aria-label="${angles.length} directions, ${workload}. Tap a direction for ${editWhat} settings."><svg viewBox="0 0 440 424" aria-hidden="true"><circle class="isok-orbit" cx="220" cy="212" r="142"/>${lines}${personOrientation(220,212,1.3)}</svg>${angles.map(a=>{const p=xy(a,151);const nodeLabel=setupHasFixedTilt()?'position '+setupTiltText(a):kind==='limit'?'limit '+setupTiltText(a):'target '+isokForceText(isokForce(a));return `<button type="button" class="isok-node ${a===active?'selected':''}" style="left:${p[0]/440*100}%;top:${p[1]/424*100}%" data-action="isok-direction" data-angle="${a}" aria-label="${setupDirectionNames[a]}, ${a} degrees, ${kind==='limit'?'1 movement':c.reps+' reps'}, ${nodeLabel}. Edit ${editWhat}." aria-pressed="${a===active}"><strong>${a}°</strong><span>${nodeDetail(a)}</span><span class="isok-rep-marks" aria-hidden="true">${Array.from({length:c.reps},()=>'<i></i>').join('')}</span></button>`;}).join('')}</div>`;
+ const radialCls=['isok-radial',c.reps>ISOK_REP_MARKS_CAP&&kind!=='limit'?'isok-radial--compact-reps':''].filter(Boolean).join(' ');
+ return `<div class="${radialCls}" role="group" aria-label="${angles.length} directions, ${workload}. Tap a direction for ${editWhat} settings."><svg viewBox="0 0 440 424" aria-hidden="true"><circle class="isok-orbit" cx="220" cy="212" r="142"/>${lines}${personOrientation(220,212,1.3)}</svg>${angles.map(a=>{const p=xy(a,151);const nodeLabel=setupHasFixedTilt()?'position '+setupTiltText(a):kind==='limit'?'limit '+setupTiltText(a):'target '+isokForceText(isokForce(a));return `<button type="button" class="isok-node ${a===active?'selected':''}" style="left:${p[0]/440*100}%;top:${p[1]/424*100}%" data-action="isok-direction" data-angle="${a}" aria-label="${setupDirectionNames[a]}, ${a} degrees, ${kind==='limit'?'1 movement':c.reps+' reps'}, ${nodeLabel}. Edit ${editWhat}." aria-pressed="${a===active}"><strong>${a}°</strong><span>${nodeDetail(a)}</span>${repMarks}</button>`;}).join('')}</div>`;
 }
 function splitDiagramHelp(){
- const kind=setupTiltKind();
- if(kind==='fixed')return 'Each mark is one rep. Tap a direction to set pad position.';
+ const kind=setupTiltKind(),repHelp=kind==='limit'?'':isokRepDiagramHelp(state.setup.reps)+' ';
+ if(kind==='fixed')return `${repHelp}Tap a direction to set pad position.`;
  if(kind==='limit')return 'Tap a direction to set start and max tilt.';
- if(kind==='return')return 'Each mark is one rep. Tap a direction to review the return path.';
- return 'Each mark is one rep. Tap a direction to review its tilt.';
+ if(kind==='return')return `${repHelp}Tap a direction to review the return path.`;
+ return `${repHelp}Tap a direction to review its tilt.`;
 }
 function teamProtocolRepExplainerMarkup(){
  const c=state.setup;
@@ -51,8 +64,11 @@ function isokineticPreview(options={}){
   const sum=kind==='limit'
    ?`<p class="preview-sum"><span>${c.positions} directions</span> · 1 movement each</p>`
    :`<p class="preview-sum"><span>${c.positions} directions</span> × <span>${c.reps} ${c.reps===1?'rep':'reps'}</span> <strong>${total} reps total</strong></p>`;
-  const padRow=`<button type="button" class="protocol-pad-row press" data-action="isok-tab" data-value="tilts"><span>${splitRangeSummaryLabel()}</span><strong>${isokTiltSummary()}</strong>${icon('chevron','icon-sm')}</button>`;
-  return `<header class="preview-head"><h2${headingId?` id="${headingId}"`:''}>${escapeHTML(title)}</h2>${sum}</header><div class="session-preview-radial">${isokineticDiagram()}</div>${padRow}${teamProtocolRepExplainerMarkup()}`;
+  const bad=currentAngles().some(a=>!validTilt(setupTilt(a)));
+ const check=bad?`<span class="isok-tab-error">Check</span>`:'';
+ const padRow=`<button type="button" class="protocol-pad-row press${bad?' is-bad':''}" data-action="isok-tab" data-value="tilts" aria-label="Edit ${splitRangeSummaryLabel()}, ${isokTiltSummary()}${bad?'. Check directions.':''}"><span>${splitRangeSummaryLabel()}</span><strong>${isokTiltSummary()}</strong>${check}${icon('chevron','icon-sm')}</button>`;
+ const repHint=kind!=='limit'&&c.reps>ISOK_REP_MARKS_CAP?`<p class="protocol-radial-rep-hint">${isokRepDiagramHelp(c.reps)} Tap a direction for pad position.</p>`:'';
+  return `<header class="preview-head"><h2${headingId?` id="${headingId}"`:''}>${escapeHTML(title)}</h2>${sum}</header><div class="session-preview-radial">${isokineticDiagram()}</div>${repHint}${padRow}${teamProtocolRepExplainerMarkup()}`;
  }
  const workload=kind==='limit'?`${c.positions} directions · 1 movement each`:`${c.positions} directions × ${c.reps} reps`;
  const rangeSummary=showRangeSummary?`<button type="button" class="isok-range-summary" data-action="isok-tab" data-value="tilts"><span>${splitRangeSummaryLabel()}</span><strong>${isokTiltSummary()}</strong>${icon('chevron','icon-sm')}</button>`:'';
@@ -120,11 +136,11 @@ function isokineticSetupView(){
  const tiltKind=setupTiltKind();
  const tiltTab=tiltKind==='fixed'?'Positions':tiltKind==='limit'?'Limits':'Tilts';
  const invalidCopy=tiltKind==='fixed'?'Review the invalid position in Positions before starting.':tiltKind==='limit'?'Review the invalid limit in Limits before starting.':'Review the invalid range in Tilts before starting.';
- const readyCopy=team?`Starting value when no member baseline exists. ${bad?invalidCopy:'Save when you are done.'}`:!state.deviceReady?'Device unavailable. Mark it ready in Device before starting.':bad?invalidCopy:`${mode.name} ${purpose}`;
+ const readyCopy=team?`Team starting target. Assessed members use their own. ${bad?invalidCopy:'Save when you are done.'}`:!state.deviceReady?'Device unavailable. Mark it ready in Device before starting.':bad?invalidCopy:`${mode.name} ${purpose}`;
  const modeSelect=c.programLoad||c.type==='rom'?'':`<label class="setup-change"><span>Change mode</span><select id="setup-mode" aria-label="Change exercise mode">${standardExerciseModeKeys(c.purpose).map(key=>`<option value="${key}" ${c.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label>`;
  const commit=c.type==='rom'?`<strong>${c.positions} directions · 1 movement each</strong>`:`<strong>${c.positions*c.reps} reps · ${c.positions} directions</strong>`;
  const footer=team?'':`<footer class="isok-start"><div class="isok-commit">${commit}<span>${readyCopy}</span></div>${button('Begin session','start-session','primary',`${!state.deviceReady||!setupIsValid()?'disabled':''} id="begin-session-button"`)}</footer>`;
- const forceHelp=team?'Starting target when no member baseline exists.':undefined;
+ const forceHelp=team?'Team starting target. Assessed members use their own.':undefined;
  return `<div class="setup-page isok-setup ${team?'isok-setup--team':''}"><header class="session-title setup-heading"><div><div class="setup-title-row"><h1>${title}</h1>${team?'':c.type==='eccentric'?'<span class="badge setup-new">New</span>':''}${modeSelect}</div><p>${c.type==='strength'&&isIsometricEndurance(c)?'Endurance · ':''}${sub}</p></div></header><div class="isok-split"><section class="isok-controls" aria-label="Session setup"><div class="isok-tabs" role="tablist" aria-label="Setup sections">${[['session','Session'],['tilts',tiltTab]].map(([key,label])=>`<button role="tab" id="isok-tab-${key}" data-action="isok-tab" data-value="${key}" aria-selected="${tab===key}" aria-controls="isok-panel-${key}" tabindex="${tab===key?0:-1}">${label}${key==='tilts'&&bad?'<span class="isok-tab-error">Check</span>':''}</button>`).join('')}</div><div id="isok-panel-${tab}" role="tabpanel" aria-labelledby="isok-tab-${tab}">${tab==='session'?isokSessionPanel(forceHelp):isokTiltPanel()}</div></section><section class="isok-preview" id="isok-preview" aria-label="Session preview">${isokineticPreview()}</section></div>${footer}</div>`;
 }
 function refreshSplitSetupPreview(){
@@ -145,14 +161,14 @@ Object.assign(setupActions,{
   if(isTeamAssessmentSetupContext())directoryUI().programs.teamTab=state.setup.isokTab;
   const team=isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor';
   const protocol=teamAssessmentProtocolEditorActive();
-  renderSetupControl(protocol?'#isok-tab-'+state.setup.isokTab:team?(state.setup.isokTab==='tilts'?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#assessment-radial-settings'):'#isok-tab-'+state.setup.isokTab);
+  renderSetupControl(protocol?(state.setup.isokTab==='tilts'?'#protocol-positions-back':'.protocol-pad-row'):team?(state.setup.isokTab==='tilts'?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#assessment-radial-settings'):'#isok-tab-'+state.setup.isokTab);
  },
  'isok-direction':el=>{
   state.setup.angle=Number(el.dataset.angle);state.setup.isokTab='tilts';
   if(isTeamAssessmentSetupContext())directoryUI().programs.teamAngle=state.setup.angle;
   const team=isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor';
   const protocol=teamAssessmentProtocolEditorActive();
-  renderSetupControl(protocol?'#isok-tab-tilts':team?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#isok-tab-tilts');
+  renderSetupControl(protocol?`#isok-panel-tilts [data-angle="${state.setup.angle}"]`:team?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#isok-tab-tilts');
  },
  'tilt-apply-selected':()=>{const a=state.setup.angle||0,source=tiltValues(setupTilt(a));currentAngles().forEach(angle=>setTiltOverride(angle,{...source}));resetSetupAcceptance();renderSetupControl('#tilt-all');toast(`${setupDirectionNames[a]} applied to every direction.`);}
 });
