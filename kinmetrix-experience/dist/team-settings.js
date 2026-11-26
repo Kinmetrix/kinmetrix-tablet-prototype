@@ -384,35 +384,39 @@ function teamAssessmentProtocolSessionPage() {
   return `<div class="protocol-session-stack"><h2 class="sr-only" id="protocol-session-label">Session</h2><div class="protocol-group">${teamAssessmentProtocolCoreRows()}</div>${teamAssessmentProtocolHoldBlock()}${teamAssessmentProtocolForceBlock()}</div>`;
 }
 
-function teamAssessmentProtocolPositionsPage() {
-  const positionsLabel = setupTiltKind() === 'fixed' ? 'Positions' : setupTiltKind() === 'limit' ? 'Limits' : 'Tilts';
-  const bad = currentAngles().some(a => !validTilt(setupTilt(a)));
-  const check = bad ? '<span class="isok-tab-error">Check</span>' : '';
-  return `<div class="protocol-positions-shell">
-    <div class="protocol-positions-nav assessment-radial-dir-nav">
-      ${backNavButton('Session', 'isok-tab', 'data-value="session" id="protocol-positions-back" aria-label="Back to session settings"')}
-      <h2 id="protocol-positions-title" class="protocol-positions-title">${positionsLabel}${check}</h2>
+function protocolPositionsSheet() {
+  const kind = setupTiltKind();
+  const title = kind === 'fixed' ? 'Pad positions' : kind === 'limit' ? 'Range limits' : 'Tilt range';
+  const directions = currentAngles().map(a => {
+    const selected = a === state.setup.angle;
+    const bad = !validTilt(setupTilt(a));
+    return `<button type="button" class="protocol-positions-dir${selected ? ' is-selected' : ''}${bad ? ' is-bad' : ''}" data-action="isok-direction" data-angle="${a}" aria-pressed="${selected}" aria-label="${setupDirectionNames[a]}, ${a} degrees, ${setupTiltText(a)}${bad ? '. Check this direction.' : ''}"><strong>${a}°</strong><span>${setupTiltText(a)}</span></button>`;
+  }).join('');
+  return `<div class="modal-backdrop protocol-positions-backdrop"><section class="dialog protocol-positions-sheet" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <header class="protocol-positions-toolbar">
+      <button type="button" class="protocol-positions-action" data-action="close-modal">Cancel</button>
+      <h2 id="dialog-title">${title}</h2>
+      <button type="button" class="protocol-positions-action protocol-positions-action--done" data-action="done-protocol-positions"${currentAngles().every(a => validTilt(setupTilt(a))) ? '' : ' disabled'}>Done</button>
+    </header>
+    <div class="protocol-positions-body">
+      <div class="protocol-positions-dirs" role="group" aria-label="Directions">${directions}</div>
+      ${isokTiltPanel({compact: true})}
     </div>
-    <div class="protocol-group protocol-positions-panel">${isokTiltPanel({compact: true})}</div>
-  </div>`;
+  </section></div>`;
 }
 
-let lastProtocolPanelTab = null;
+function openProtocolPositions(angle) {
+  if (currentAngles().includes(angle)) state.setup.angle = angle;
+  state.setup.valuePicker = null;
+  openModal('protocol-positions', {tiltOverrides: structuredClone(state.setup.tiltOverrides ?? {}), angle: state.setup.angle});
+  $(`.protocol-positions-dir[data-angle="${state.setup.angle}"]`)?.focus();
+}
 
 function teamAssessmentProtocolFormMarkup() {
   ensureTeamAssessmentEditor();
   setupModeDefaults();
-  const tab = state.setup.isokTab === 'tilts' ? 'tilts' : 'session';
-  const entering = lastProtocolPanelTab !== null && lastProtocolPanelTab !== tab;
-  lastProtocolPanelTab = tab;
-  const enter = entering ? ' is-entering' : '';
   return `<section class="assessment-workspace assessment-workspace--protocol pager-page view-protocol assessment-protocol-form" aria-label="Protocol">
-    <div class="settings">
-      <div class="protocol-panel-pager">
-        <div class="protocol-panel-page${tab === 'session' ? ' is-active' : ''}${tab === 'session' ? enter : ''}" id="isok-panel-session" role="region" aria-labelledby="protocol-session-label">${teamAssessmentProtocolSessionPage()}</div>
-        <div class="protocol-panel-page${tab === 'tilts' ? ' is-active' : ''}${tab === 'tilts' ? enter : ''}" id="isok-panel-tilts" role="region" aria-labelledby="protocol-positions-title">${teamAssessmentProtocolPositionsPage()}</div>
-      </div>
-    </div>
+    <div class="settings">${teamAssessmentProtocolSessionPage()}</div>
     <section class="preview protocol-preview" id="team-assessment-preview" aria-labelledby="team-assessment-preview-title">${isokineticPreview({title: 'Your session', headingId: 'team-assessment-preview-title', showRangeSummary: false, card: true})}</section>
   </section>`;
 }
@@ -1030,6 +1034,12 @@ const teamSettingsActions = {
     o.paused = matchMedia('(prefers-reduced-motion: reduce)').matches;
     renderOverlay();
     $(`[data-action="preview-assessment-mode"][data-mode="${o.mode}"]`)?.focus();
+  },
+  'done-protocol-positions': () => {
+    const o = state.overlay;
+    if (o?.type !== 'protocol-positions' || !currentAngles().every(a => validTilt(setupTilt(a)))) return;
+    o.tiltOverrides = null;
+    closeModal();
   },
   'confirm-assessment-mode': () => {
     const o = state.overlay;

@@ -97,7 +97,7 @@ function isokTiltPanel(options={}){
  const c=state.setup,a=currentAngles().includes(c.angle)?c.angle:0,t=setupTilt(a),kind=setupTiltKind(),valid=validTilt(t),summary=setupTiltText(a);c.angle=a;
  const step=(field,label)=>`<div><span class="setup-label">${label}</span>${setupNumericControl({id:`tilt-${a}-${field}`,key:`tilt:${a}:${field}`,label:`${setupDirectionNames[a]} ${label.toLowerCase()}`,current:t[field],unit:'°',min:0,max:SETUP_MAX_TILT,step:1})}</div>`;
  const intro=compact
-  ?(kind==='fixed'?'Pad angle held for the rep. Tap a direction on the preview to switch.':kind==='return'?'Start and end pad angles for the resisted return. Tap a direction on the preview.':'Start and end pad angles for each rep. Tap a direction on the preview.')
+  ?(kind==='fixed'?'Pad angle held for the whole rep.':kind==='limit'?'Start and maximum tilt for comfortable movement.':kind==='return'?'Start and end pad angles for the resisted return.':'Start and end pad angles for each rep.')
   :(kind==='fixed'?'Pad position for each direction. The pad stays at this angle for the whole rep.':kind==='limit'?'Start and maximum tilt for comfortable movement. Separate from the directions around the head.':kind==='return'?'Start and end positions for the return path. The device moves the pad from start toward end; the person resists.':'Start and end positions of the pad. These are tilt angles, separate from the directions around the head.');
  const fields=kind==='fixed'?step('start','Pad tilt'):`${step('start',kind==='limit'?'Start tilt':'Start tilt')}${step('end',kind==='limit'?'Max tilt':'End tilt')}`;
  const help=kind==='fixed'?`${t.start}° for each rep.`:kind==='limit'?valid?`${t.end-t.start}° of allowed travel on each movement.`:'Max tilt must be higher than start tilt.':kind==='return'?valid?`${t.start-t.end}° of return travel on each rep.`:'End tilt must be lower than start tilt.':valid?`${t.end-t.start}° of travel on each rep.`:'End tilt must be higher than start tilt.';
@@ -156,19 +156,22 @@ function teamAssessmentProtocolEditorActive(){
 }
 Object.assign(setupActions,{
  'isok-tab':el=>{
+  if(teamAssessmentProtocolEditorActive()){if(el.dataset.value==='tilts')openProtocolPositions(state.setup.angle);return;}
   state.setup.isokTab=el.dataset.value==='tilts'?'tilts':'session';
   state.setup.valuePicker=null;
   if(isTeamAssessmentSetupContext())directoryUI().programs.teamTab=state.setup.isokTab;
   const team=isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor';
-  const protocol=teamAssessmentProtocolEditorActive();
-  renderSetupControl(protocol?(state.setup.isokTab==='tilts'?'#protocol-positions-back':'.protocol-pad-row'):team?(state.setup.isokTab==='tilts'?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#assessment-radial-settings'):'#isok-tab-'+state.setup.isokTab);
+  renderSetupControl(team?(state.setup.isokTab==='tilts'?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#assessment-radial-settings'):'#isok-tab-'+state.setup.isokTab);
  },
  'isok-direction':el=>{
-  state.setup.angle=Number(el.dataset.angle);state.setup.isokTab='tilts';
-  if(isTeamAssessmentSetupContext())directoryUI().programs.teamAngle=state.setup.angle;
+  const angle=Number(el.dataset.angle);
+  if(teamAssessmentProtocolEditorActive()&&state.overlay?.type!=='protocol-positions'){openProtocolPositions(angle);return;}
+  state.setup.angle=angle;
+  if(isTeamAssessmentSetupContext())directoryUI().programs.teamAngle=angle;
+  if(state.overlay?.type==='protocol-positions'){state.setup.valuePicker=null;renderSetupControl(`.protocol-positions-dir[data-angle="${angle}"]`);return;}
+  state.setup.isokTab='tilts';
   const team=isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor';
-  const protocol=teamAssessmentProtocolEditorActive();
-  renderSetupControl(protocol?`#isok-panel-tilts [data-angle="${state.setup.angle}"]`:team?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#isok-tab-tilts');
+  renderSetupControl(team?`[data-action="isok-direction"][data-angle="${angle}"]`:'#isok-tab-tilts');
  },
  'tilt-apply-selected':()=>{const a=state.setup.angle||0,source=tiltValues(setupTilt(a));currentAngles().forEach(angle=>setTiltOverride(angle,{...source}));resetSetupAcceptance();renderSetupControl('#tilt-all');toast(`${setupDirectionNames[a]} applied to every direction.`);}
 });
