@@ -590,15 +590,24 @@ function pulseKpiActivityLineValues(activityAll, window, mode) {
   return pulseActivityChartSeries(activityAll, window, mode).buckets.map(bucket => bucket.total);
 }
 
-function pulseKpiMiniChartCoords(values, max) {
+function pulseKpiMiniChartScale(values, {step = false} = {}) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  if (!step) return {floor: 0, ceil: Math.max(1, max)};
+  const span = max - min;
+  const pad = span === 0 ? Math.max(1, Math.ceil(max * 0.08)) : Math.max(1, Math.ceil(span * 0.15));
+  return {floor: Math.max(0, min - pad), ceil: max + pad};
+}
+
+function pulseKpiMiniChartCoords(values, scale) {
   const {padX, padY, plotW, plotH} = PULSE_KPI_MINI_CHART;
-  const safeMax = Math.max(1, max);
+  const range = Math.max(1, scale.ceil - scale.floor);
   const count = values.length;
   if (!count) return [];
   const spanX = count > 1 ? plotW / (count - 1) : 0;
   return values.map((value, index) => ({
     x: padX + (count > 1 ? spanX * index : plotW / 2),
-    y: padY + plotH - (value / safeMax) * plotH
+    y: padY + plotH - ((value - scale.floor) / range) * plotH
   }));
 }
 
@@ -623,8 +632,8 @@ function pulseKpiMiniStepPath(coords) {
 
 function pulseKpiMiniChartMarkup(values, {step = false} = {}) {
   if (!values?.length) return '';
-  const max = Math.max(...values);
-  const coords = pulseKpiMiniChartCoords(values, max);
+  const scale = pulseKpiMiniChartScale(values, {step});
+  const coords = pulseKpiMiniChartCoords(values, scale);
   const baseline = PULSE_KPI_MINI_CHART.padY + PULSE_KPI_MINI_CHART.plotH;
   const path = step ? pulseKpiMiniStepPath(coords) : pulseKpiMiniLinePath(coords);
   const kind = step ? 'step' : 'line';
