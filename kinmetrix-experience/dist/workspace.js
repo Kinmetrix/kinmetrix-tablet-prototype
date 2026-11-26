@@ -25,9 +25,10 @@ function memberHasSessionData(personId=state.personId){
 }
 function memberWorkspaceView(){
  const p=person(),continuing=activeProgram(),backLabel=state.memberOrigin==='roster'?'Back to roster':state.memberOrigin==='pulse'?'Back to Pulse':state.memberOrigin==='programs'||state.memberOrigin==='team'?'Back to team':'Find another person';
+ const backParent=state.memberOrigin==='roster'?'Roster':state.memberOrigin==='pulse'?'Pulse':state.memberOrigin==='programs'||state.memberOrigin==='team'?'Team':'Find';
  if((state.tab==='history'||state.tab==='programs')&&!memberHasSessionData())state.tab='overview';
  const waiverNext=waiverBlocksCurrent();
- return `<div class="member-heading">${state.actor==='coach'?`<button class="icon-button member-find-another" data-action="show-roster" aria-label="${backLabel}" title="${backLabel}">${icon('back','icon-sm')}</button>`:''}${photoAvatar(p,'large')}<div class="member-identity"><h1>${escapeHTML(p.name)}</h1><p>${p.detail}${state.history.some(h=>h.personId===p.id)?' · Last visit Today':p.last?' · Last visit '+p.last:' · First visit'}</p></div>
+ return `<div class="member-heading">${state.actor==='coach'?backNavButton(backParent,'show-roster',`aria-label="${backLabel}" title="${backLabel}"`,'member-find-another'):''}${photoAvatar(p,'large')}<div class="member-identity"><h1>${escapeHTML(p.name)}</h1><p>${p.detail}${state.history.some(h=>h.personId===p.id)?' · Last visit Today':p.last?' · Last visit '+p.last:' · First visit'}</p></div>
  <div class="member-session-actions">${continuing&&state.tab!=='programs'?button(icon('play','icon-sm')+'<span>Continue program</span><span class="continue-session">'+(continuing.completed+1)+' / '+continuing.total+'</span>','continue-program','primary continue-program-button',`data-program-id="${continuing.id}" aria-label="Continue program, session ${continuing.completed+1} of ${continuing.total}"`):''}${button(icon('plus','icon-sm')+' New','new-session',continuing||waiverNext?'':'primary','aria-haspopup="dialog"')}</div></div>
  <nav class="member-tabs" aria-label="Member workspace">${['overview','history','programs','profile'].map(tab=>{const locked=(tab==='history'||tab==='programs')&&!memberHasSessionData(),current=state.tab===tab;return `<button class="member-tab ${current?'active':''}" data-action="member-tab" data-tab="${tab}" ${locked?'disabled':''} ${current?'aria-current="page"':''}>${tab[0].toUpperCase()+tab.slice(1)}</button>`;}).join('')}</nav>
  ${state.tab==='profile'?profileView():state.tab==='history'?memberHistoryView():state.tab==='programs'?personProgramsView():overviewView()}`;
@@ -44,7 +45,7 @@ function overviewDirectionDetails(r){
  const index=overviewState(r).direction,d=index===null?null:reportData(r).directions[index];
  if(!d)return overviewWorthALook(r);
  const viewer={selected:null,visible:d.reps.map(rep=>rep.number),average:true,target:false,cursor:null,canvasWidth:360,canvasHeight:300,preview:true};
- return `<button type="button" class="overview-rep-chart" data-action="overview-open-reps" aria-label="Open detailed rep charts for ${d.angle} degrees, ${escapeHTML(d.name)}">${repForceChart(r,d,viewer)}</button><div class="overview-rep-heading" aria-live="polite"><div class="overview-rep-title"><h3>${d.angle}° · ${escapeHTML(d.name)}</h3><span class="overview-rep-unit">${r.type==='rom'?'Tilt · °':'Force · kg'}</span></div><p>${d.reps.length} repetitions · Tap chart for details</p>${button(icon('back','icon-sm')+' Back to summary','overview-clear-direction','small-button','id="overview-clear-direction"')}</div>`;
+ return `<button type="button" class="overview-rep-chart" data-action="overview-open-reps" aria-label="Open detailed rep charts for ${d.angle} degrees, ${escapeHTML(d.name)}">${repForceChart(r,d,viewer)}</button><div class="overview-rep-heading" aria-live="polite"><div class="overview-rep-title"><h3>${d.angle}° · ${escapeHTML(d.name)}</h3><span class="overview-rep-unit">${r.type==='rom'?'Tilt · °':'Force · kg'}</span></div><p>${d.reps.length} repetitions · Tap chart for details</p>${backNavButton('Summary','overview-clear-direction','id="overview-clear-direction" aria-label="Back to summary"')}</div>`;
 }
 function overviewRadialView(r){const index=overviewState(r).direction,lowest=overviewLowestDirection(r);return `${reportRadial(r,{overlay:r.type==='rom'?'working':'stability',scaleLabels:true,direction:index??lowest?.index??null,directionAction:'overview-direction',pointCallout:index!==null})}<p class="overview-chart-hint">Tap a direction to see its reps.</p>`;}
 // The Overview points at one thing to look at: the direction with the lowest value on the session's main measure.
@@ -120,7 +121,7 @@ function modeThumbnail(type){return `<svg class="mode-thumbnail" viewBox="0 0 12
 function movementPreview(type){return type==='strength'?RenderedIsometric.markup({mode:'strength',compact:true}):RenderedIsokinetic.markup({mode:type,compact:true});}
 
 function pickerFrame(o,title,intro,body,footer='',compact=false){
- const back=o.step==='start'?'':`<button class="text-button picker-back" data-action="picker-back">${icon('back','icon-sm')} ${o.step==='create-program'?'Programs':'New'}</button>`;
+ const back=o.step==='start'?'':backNavButton(o.step==='create-program'?'Programs':'New','picker-back',`aria-label="Back to ${o.step==='create-program'?'programs':'new session'}"`,'picker-back');
  return `<div class="modal-backdrop session-picker-backdrop"><section class="dialog session-picker ${compact?'picker-compact':''} ${o.step==='create-program'?'program-editor-dialog':''}" role="dialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="picker-intro"><header class="dialog-header"><div>${back}<h2 id="dialog-title" tabindex="-1">${title}</h2><p id="picker-intro">${intro}</p></div><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header>${body}${footer?`<footer class="session-picker-footer">${footer}</footer>`:''}</section></div>`;
 }
 function sessionPickerView(o){
@@ -141,18 +142,21 @@ function sessionPickerView(o){
  </div>`:`<div class="mode-choices" role="group" aria-label="${label} mode">${sessionModeKeys(o.purpose).map(key=>{const m=sessionModes[key];return `<button class="mode-choice ${key===o.mode?'selected':''}" data-action="choose-session-mode" data-mode="${key}" aria-pressed="${key===o.mode}" aria-controls="mode-detail"><span><strong>${m.name}</strong><small>${m.short}</small></span><span class="mode-choice-indicator" aria-hidden="true">${key===o.mode?icon('check','icon-sm'):icon('chevron','icon-sm')}</span></button>`;}).join('')}</div>`;
  return pickerFrame(o,label,isMeasure?`Choose an assessment kind for ${name}.`:`Choose a mode for ${name}.`,
  `<div class="session-picker-body">${modeChoices}
- <section class="mode-detail" id="mode-detail" aria-labelledby="mode-detail-title"><div class="mode-expanded-bar"><button type="button" class="text-button" data-action="collapse-mode-preview">${icon('back','icon-sm')} Back to modes</button><h3 id="expanded-preview-title">${mode.name}</h3></div><div class="mode-detail-heading"><h3 id="mode-detail-title">${mode.name}</h3></div>
+ <section class="mode-detail" id="mode-detail" aria-labelledby="mode-detail-title"><div class="mode-expanded-bar">${backNavButton('Modes','collapse-mode-preview','aria-label="Back to modes"')}<h3 id="expanded-preview-title">${mode.name}</h3></div><div class="mode-detail-heading"><h3 id="mode-detail-title">${mode.name}</h3></div>
  <p class="mode-description">${modePurposeCopy[o.purpose][o.mode]}</p>
  <div class="mode-animation ${o.paused?'is-paused':''}">${movementPreview(o.mode)}<div class="mode-render-controls"><button type="button" data-action="expand-mode-preview" aria-label="Open larger ${mode.name} example" title="Larger example">${icon('expand','icon-sm')}</button><button type="button" data-action="toggle-mode-preview" aria-label="${o.paused?'Play':'Pause'} animation" title="${o.paused?'Play':'Pause'} animation">${icon(o.paused?'play':'pause','icon-sm')}</button></div></div></section></div>`,
  `<div>${button('Cancel','close-modal')}${button((isMeasure?'Set up assessment':'Set up session')+' '+icon('arrow','icon-sm'),'confirm-session-mode','primary')}</div>`);
 
 }
 let modePreviewController=null;
+function isModePreviewHost(o=state.overlay){
+ return o?.type==='session-picker'||o?.type==='assessment-mode-picker'||(o?.type==='program-editor'&&(o.wizardStep??0)===1);
+}
 function mountModePreview(){
  const root=$('.rendered-isometric,.rendered-isokinetic');if(!root)return;
  const renderer=root.matches('.rendered-isokinetic')?RenderedIsokinetic:RenderedIsometric;
  modePreviewController=renderer.mount(root,{paused:state.overlay?.paused,onPause(){
-  const o=state.overlay;const previewHost=o?.type==='session-picker'||(o?.type==='program-editor'&&(o.wizardStep??0)===1);if(!previewHost)return;o.paused=true;
+  const o=state.overlay;if(!isModePreviewHost(o))return;o.paused=true;
   const control=$('[data-action="toggle-mode-preview"]');if(control){control.innerHTML=icon('play','icon-sm');control.title='Play animation';control.setAttribute('aria-label','Play animation');}
  }});
  if(matchMedia('(max-width:620px)').matches)$('.mode-choice.selected')?.scrollIntoView({block:'nearest',inline:'nearest'});
@@ -270,7 +274,7 @@ const workspaceActions={
  'choose-session-mode':el=>{const o=state.overlay;if(o?.type!=='session-picker'||!sessionModeKeys(o.purpose).includes(el.dataset.mode))return;o.mode=el.dataset.mode;o.selections[o.purpose]=o.mode;o.paused=matchMedia('(prefers-reduced-motion: reduce)').matches;renderOverlay();$(`[data-action="choose-session-mode"][data-mode="${o.mode}"]`).focus();},
  'expand-mode-preview':expandModePreview,
  'collapse-mode-preview':collapseModePreview,
- 'toggle-mode-preview':el=>{const o=state.overlay;const wizard=o?.type==='program-editor'&&(o.wizardStep??0)===1;if(o?.type!=='session-picker'&&!wizard)return;o.paused=!o.paused;$('.mode-animation').classList.toggle('is-paused',o.paused);el.innerHTML=icon(o.paused?'play':'pause','icon-sm');el.title=(o.paused?'Play':'Pause')+' animation';el.setAttribute('aria-label',(o.paused?'Play':'Pause')+' animation');modePreviewController?.setPlaying(!o.paused);},
+ 'toggle-mode-preview':el=>{const o=state.overlay;if(!isModePreviewHost(o))return;o.paused=!o.paused;$('.mode-animation').classList.toggle('is-paused',o.paused);el.innerHTML=icon(o.paused?'play':'pause','icon-sm');el.title=(o.paused?'Play':'Pause')+' animation';el.setAttribute('aria-label',(o.paused?'Play':'Pause')+' animation');modePreviewController?.setPlaying(!o.paused);},
  'confirm-session-mode':()=>{const o=state.overlay;if(o?.type!=='session-picker'||!sessionModeKeys(o.purpose).includes(o.mode))return;beginSetup(o.purpose,o.mode);const heading=$('.session-title h1');heading?.setAttribute('tabindex','-1');heading?.focus();}
 };
 document.addEventListener('input',event=>{const field=event.target.dataset.programField,o=state.overlay;if(field&&o?.step==='create-program'){o.programDraft[field]=event.target.value;event.target.setCustomValidity('');}});

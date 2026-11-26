@@ -9,7 +9,7 @@ function isokTiltSummary(){
  if(groups.size===1)return [...groups.keys()][0]+' in every direction';
  const changed=angles.filter(a=>setupTilt(a).changed).length;
  if(changed)return `${changed} direction${changed===1?'':'s'} adjusted`;
- return angles.some(a=>setupTilt(a).source==='Coach applied')?'Coach-applied ranges':setupTiltKind()==='fixed'?'Default pad positions':'5–33° · Rear directions 10–33°';
+ return angles.some(a=>setupTilt(a).source==='Coach applied')?'Coach-applied ranges':setupTiltKind()==='fixed'?'Default':'5–33° · Rear directions 10–33°';
 }
 function splitRangeSummaryLabel(){const kind=setupTiltKind();return kind==='fixed'?'Pad position':kind==='limit'?'Range limits':'Tilt range';}
 function splitNodeDetail(){const kind=setupTiltKind();return setupHasFixedTilt()||kind==='limit'?angle=>setupTiltText(angle):angle=>isokForceText(isokForce(angle));}
@@ -28,9 +28,32 @@ function splitDiagramHelp(){
  if(kind==='return')return 'Each mark is one rep. Tap a direction to review the return path.';
  return 'Each mark is one rep. Tap a direction to review its tilt.';
 }
+function teamProtocolRepExplainerMarkup(){
+ const c=state.setup;
+ if(!isTeamAssessmentSetupContext())return '';
+ let how='';
+ if(c.type==='rom'){
+  how=setupModeLine.rom;
+ }else if(c.type==='strength'){
+  const endurance=isIsometricEndurance(c);
+  how=endurance?setupModeLine.endurance:`Hold at target · <strong>${c.holdSeconds} s</strong> per rep.`;
+ }else if(c.type==='isokinetic'){
+  how='Push through the tilt range; rep ends at end tilt.';
+ }else if(c.type==='eccentric'){
+  how='Resist the return to end tilt.';
+ }
+ return `<div class="protocol-rep-explainer"><p>${how}</p></div>`;
+}
 function isokineticPreview(options={}){
- const {title='Your session',headingId='',showRangeSummary=true}=options;
+ const {title='Your session',headingId='',showRangeSummary=true,card=false}=options;
  const c=state.setup,total=c.positions*c.reps,kind=setupTiltKind();
+ if(card){
+  const sum=kind==='limit'
+   ?`<p class="preview-sum"><span>${c.positions} directions</span> · 1 movement each</p>`
+   :`<p class="preview-sum"><span>${c.positions} directions</span> × <span>${c.reps} ${c.reps===1?'rep':'reps'}</span> <strong>${total} reps total</strong></p>`;
+  const padRow=`<button type="button" class="protocol-pad-row press" data-action="isok-tab" data-value="tilts"><span>${splitRangeSummaryLabel()}</span><strong>${isokTiltSummary()}</strong>${icon('chevron','icon-sm')}</button>`;
+  return `<header class="preview-head"><h2${headingId?` id="${headingId}"`:''}>${escapeHTML(title)}</h2>${sum}</header><div class="session-preview-radial">${isokineticDiagram()}</div>${padRow}${teamProtocolRepExplainerMarkup()}`;
+ }
  const workload=kind==='limit'?`${c.positions} directions · 1 movement each`:`${c.positions} directions × ${c.reps} reps`;
  const rangeSummary=showRangeSummary?`<button type="button" class="isok-range-summary" data-action="isok-tab" data-value="tilts"><span>${splitRangeSummaryLabel()}</span><strong>${isokTiltSummary()}</strong>${icon('chevron','icon-sm')}</button>`:'';
  return `<header class="isok-preview-heading"><h2${headingId?` id="${headingId}"`:''}>${escapeHTML(title)}</h2><p>${workload}${kind==='limit'?'':` <strong>${total} reps total</strong>`}</p></header>${isokineticDiagram()}<p class="isok-diagram-help">${splitDiagramHelp()}</p>${rangeSummary}`;
@@ -107,7 +130,7 @@ function isokineticSetupView(){
 function refreshSplitSetupPreview(){
  if(!isSetupStageContext()||!splitSetupUsesSplitLayout())return;
  setupModeDefaults();
- const preview=$('#team-assessment-preview');if(preview)preview.innerHTML=isokineticPreview({title:'Your session',headingId:'team-assessment-preview-title',showRangeSummary:false});
+ const preview=$('#team-assessment-preview');if(preview)preview.innerHTML=isokineticPreview({title:'Your session',headingId:'team-assessment-preview-title',showRangeSummary:false,card:true});
  const splitPreview=$('#isok-preview');if(splitPreview)splitPreview.innerHTML=isokineticPreview();
  const stop=$('#isok-stop-summary');if(stop)stop.innerHTML=isokStopSummary();
  const fields=$('.isok-rule-fields');if(fields&&state.setup.type==='isokinetic')fields.innerHTML=setupChallengeField(state.setup.challengeAuto?'Auto: 1 kg below target.':'Set for this session. <button class="text-button" data-action="challenge-auto" id="challenge-auto">Use automatic threshold</button>')+setupNumberField('challengeHold','Stop if below for','s',1,5,1);

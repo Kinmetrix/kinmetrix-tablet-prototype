@@ -28,7 +28,7 @@
 .overview-side.has-direction .overview-stats{display:none}
 .overview-side.has-direction .overview-direction{display:flex;flex-direction:column;margin-top:8px}
 .overview-side.has-direction .overview-rep-heading{order:-1;margin:0 0 6px!important;display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center}
-.overview-side.has-direction .overview-rep-heading .button{grid-column:2;grid-row:1/span 2;min-height:44px}
+.overview-side.has-direction .overview-rep-heading .back{grid-column:2;grid-row:1/span 2;justify-self:end}
 .overview-side.has-direction .overview-rep-title h3{font-size:19px}
 .overview-look{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:14px 16px;border-radius:12px;background:var(--soft)}
 .overview-look-title{font-size:13px;font-weight:600;color:var(--signal);margin:0 0 2px}

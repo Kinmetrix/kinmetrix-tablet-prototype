@@ -480,6 +480,58 @@ function pulseActivityChartBindTooltip() {
 
 pulseActivityChartBindTooltip();
 
+let pulseMembersChartTooltipHooked = false;
+
+function pulseMembersChartHideTooltip() {
+  const tip = document.getElementById('pulse-members-tooltip');
+  if (!tip) return;
+  tip.hidden = true;
+  tip.innerHTML = '';
+}
+
+function pulseMembersChartShowTooltip(hit, clientX, clientY) {
+  const tip = document.getElementById('pulse-members-tooltip');
+  const plot = hit.closest('.pulse-members-plot');
+  if (!tip || !plot) return;
+  const key = Number(hit.dataset.key);
+  const model = pulseModel();
+  const series = pulseMembersChartSeries(model.roster, model.window, model.ui.activityChartBucket);
+  const bucket = series.buckets.find(item => item.key === key);
+  if (!bucket) return;
+  const added = bucket.added ? ` · +${bucket.added} ${bucket.names.join(', ')}` : '';
+  tip.innerHTML = `<strong>${escapeHTML(pulseChartBucketTitle(bucket.key, series.mode))}</strong>${bucket.count} members${escapeHTML(added)}`;
+  tip.hidden = false;
+  const plotRect = plot.getBoundingClientRect();
+  tip.style.left = `${Math.max(8, Math.min(plotRect.width - 8, clientX - plotRect.left))}px`;
+  tip.style.top = `${Math.max(8, clientY - plotRect.top - 8)}px`;
+}
+
+function pulseMembersChartBindTooltip() {
+  if (pulseMembersChartTooltipHooked) return;
+  pulseMembersChartTooltipHooked = true;
+  document.addEventListener('pointerover', event => {
+    if (state.nav !== 'pulse' || teamOverviewUI().pulseScreen !== 'members') return;
+    const hit = event.target.closest?.('.pulse-members-hit');
+    if (!hit) {
+      if (!event.target.closest?.('.pulse-members-plot')) pulseMembersChartHideTooltip();
+      return;
+    }
+    pulseMembersChartShowTooltip(hit, event.clientX, event.clientY);
+  });
+  document.addEventListener('pointermove', event => {
+    if (state.nav !== 'pulse') return;
+    const hit = event.target.closest?.('.pulse-members-hit');
+    if (!hit) return;
+    pulseMembersChartShowTooltip(hit, event.clientX, event.clientY);
+  });
+  document.addEventListener('pointerleave', event => {
+    const plot = event.target.closest?.('.pulse-members-plot');
+    if (plot && !plot.contains(event.relatedTarget)) pulseMembersChartHideTooltip();
+  });
+}
+
+pulseMembersChartBindTooltip();
+
 let pulsePerformancePieSeq = 0;
 
 function pulsePerformanceBarTileGradient(prefix, id) {
@@ -2013,7 +2065,7 @@ function pulseActivityListGrouped(model) {
 
 function pulseActivityListMarkup(model, options = {}) {
   const {ui, activity, activityAll, roster} = model;
-  const groupByMembers = options.groupByMembers ?? (ui.pulseScreen === 'members' || ui.pulseGrouping === 'members');
+  const groupByMembers = options.groupByMembers ?? (ui.pulseGrouping === 'members');
   if (groupByMembers) return pulseActivityListGrouped(model);
   const face = id => roster.find(person => person.id === id) || {initials: '•', name: ''};
   const empty = `<li class="pulse-activity-empty muted">${activityAll.length ? 'No visits match this filter.' : 'No visits in this period.'}</li>`;
@@ -2121,8 +2173,165 @@ function pulseActivityScreen(model) {
   return `${pulseSubScreenHead(model, 'Activity')}${pulseOperationsTable(model, {showTitle: false})}`;
 }
 
+function pulseMembersChartSeries(roster, window, mode) {
+  const keys = pulseChartBucketKeys(window, mode);
+  const joinedAt = pulseMemberJoinedAtMap(roster);
+  const buckets = keys.map(key => {
+    const end = pulseChartBucketEndMs(key, mode, window.end);
+    const start = Math.max(key, window.start);
+    const addedPeople = roster.filter(person => {
+      const join = joinedAt.get(person.id);
+      return join != null && join >= start && join <= end;
+    });
+    return {
+      key,
+      end,
+      count: pulseRosterCountAt(roster, end),
+      added: addedPeople.length,
+      names: addedPeople.map(person => person.name),
+      ids: addedPeople.map(person => person.id)
+    };
+  });
+  return {buckets, mode};
+}
+
+function pulseMembersSelectedBucket(series, ui) {
+  const match = series.buckets.find(bucket => bucket.key === ui.pulseMembersBucketKey);
+  return match || series.buckets.at(-1) || null;
+}
+
+function pulseMembersRosterRows(model, asOf, highlightIds) {
+  const sessions = new Map();
+  for (const row of model.activityAll) {
+    if (!pulseIsVisitRow(row)) continue;
+    sessions.set(row.memberId, (sessions.get(row.memberId) || 0) + 1);
+  }
+  const highlight = new Set(highlightIds);
+  const dimOthers = highlight.size > 0;
+  return pulseTeamMembers(model.roster, asOf)
+    .map(({person, joinedAt}) => ({
+      person,
+      joinedAt,
+      sessions: sessions.get(person.id) || 0,
+      isNew: highlight.has(person.id),
+      isDim: dimOthers && !highlight.has(person.id)
+    }))
+    .sort((a, b) => (b.joinedAt ?? 0) - (a.joinedAt ?? 0) || a.person.name.localeCompare(b.person.name));
+}
+
+function pulseMembersChartMarkup(series, selected) {
+  const w = 640;
+  const h = 220;
+  const padL = 44;
+  const padR = 18;
+  const padT = 12;
+  const padB = 32;
+  const counts = series.buckets.map(bucket => bucket.count);
+  if (!counts.length) {
+    return '<p class="pulse-members-empty muted">No members in this range.</p>';
+  }
+  const min = Math.max(0, Math.min(...counts) - 1);
+  const max = Math.max(...counts) + 1;
+  const span = Math.max(1, max - min);
+  const x = i => padL + (i / Math.max(1, series.buckets.length - 1)) * (w - padL - padR);
+  const y = v => padT + (1 - (v - min) / span) * (h - padT - padB);
+  let line = `M ${x(0).toFixed(1)} ${y(series.buckets[0].count).toFixed(1)}`;
+  for (let i = 1; i < series.buckets.length; i++) {
+    line += ` H ${x(i).toFixed(1)} V ${y(series.buckets[i].count).toFixed(1)}`;
+  }
+  const area = `${line} V ${y(min).toFixed(1)} H ${x(0).toFixed(1)} Z`;
+  const ticks = [...new Set([Math.round(min), Math.round(max)])];
+  const grid = ticks.map(tick =>
+    `<line class="pulse-members-grid" x1="${padL}" x2="${w - padR}" y1="${y(tick).toFixed(1)}" y2="${y(tick).toFixed(1)}"/>
+     <text class="pulse-members-label" x="${padL - 8}" y="${(y(tick) + 3).toFixed(1)}" text-anchor="end">${tick}</text>`
+  ).join('');
+  const hits = series.buckets.map((bucket, i) => {
+    const left = i === 0 ? padL : (x(i - 1) + x(i)) / 2;
+    const right = i === series.buckets.length - 1 ? w - padR : (x(i) + x(i + 1)) / 2;
+    const selectedHit = selected && selected.key === bucket.key;
+    const added = bucket.added ? `, ${bucket.added} joined` : '';
+    return `<rect class="pulse-members-hit${selectedHit ? ' is-selected' : ''}" data-action="pulse-members-bucket" data-key="${bucket.key}" tabindex="0" role="button" aria-pressed="${selectedHit ? 'true' : 'false'}" aria-label="${escapeHTML(pulseChartBucketTitle(bucket.key, series.mode))}, ${bucket.count} members${added}" x="${left.toFixed(1)}" y="${padT}" width="${Math.max(right - left, 1).toFixed(1)}" height="${(h - padT - padB).toFixed(1)}"/>`;
+  }).join('');
+  const dots = series.buckets.map((bucket, i) => {
+    if (i > 0 && bucket.added === 0 && i < series.buckets.length - 1) return '';
+    return `<circle class="pulse-members-dot${bucket.added ? ' is-new' : ''}" cx="${x(i).toFixed(1)}" cy="${y(bucket.count).toFixed(1)}" r="3.5"/>`;
+  }).join('');
+  const labels = series.buckets.map((bucket, i) => {
+    const text = pulseChartAxisLabel(bucket.key, series.mode, i, series.buckets.length);
+    return text ? `<text class="pulse-members-label" x="${x(i).toFixed(1)}" y="${h - 8}" text-anchor="middle">${escapeHTML(text)}</text>` : '';
+  }).join('');
+  return `<div class="pulse-members-plot">
+    <svg class="pulse-members-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Total members over time">
+      ${grid}
+      <path class="pulse-members-area" d="${area}"/>
+      <path class="pulse-members-line" d="${line}"/>
+      ${dots}
+      ${labels}
+      ${hits}
+    </svg>
+    <div class="pulse-members-tooltip" id="pulse-members-tooltip" role="tooltip" hidden></div>
+  </div>`;
+}
+
+function pulseMembersTableMarkup(rows) {
+  if (!rows.length) {
+    return '<p class="pulse-members-empty muted">No members on the roster for this stretch.</p>';
+  }
+  const body = rows.map(row => {
+    const joined = row.joinedAt == null ? '—' : pulseStampLabel(row.joinedAt);
+    return `<button type="button" class="pulse-members-row${row.isNew ? ' is-new' : ''}${row.isDim ? ' is-dim' : ''}" data-action="open-pulse-person" data-id="${escapeHTML(row.person.id)}" data-member-name="${escapeHTML(row.person.name)}">
+      <span class="pulse-members-person">${avatar(row.person, 'mini')}<span><strong>${escapeHTML(row.person.name)}${row.isNew ? '<span class="pulse-members-badge">New</span>' : ''}</strong><small class="muted">${escapeHTML(joined)}</small></span></span>
+      <span class="pulse-members-sessions tabular">${row.sessions}</span>
+    </button>`;
+  }).join('');
+  return `<div class="pulse-members-scroll" role="table" aria-label="Members on the roster">
+    <div class="pulse-members-cols" aria-hidden="true"><span>Member</span><span>Sessions</span></div>
+    ${body}
+  </div>`;
+}
+
 function pulseMembersScreen(model) {
-  return `${pulseSubScreenHead(model, 'Members')}${pulseOperationsTable(model, {showTitle: false, groupByMembers: true})}`;
+  const {ui, roster, window} = model;
+  const mode = ui.activityChartBucket;
+  const series = pulseMembersChartSeries(roster, window, mode);
+  const selected = pulseMembersSelectedBucket(series, ui);
+  const rows = selected
+    ? pulseMembersRosterRows(model, selected.end, selected.ids)
+    : [];
+  const unit = mode === 'day' ? 'day' : mode === 'month' ? 'month' : 'week';
+  const meta = selected
+    ? `${selected.count} on ${pulseChartBucketTitle(selected.key, mode)}`
+    : '';
+  const joinedMeta = selected
+    ? (selected.added ? `${selected.added} joined` : 'none joined')
+    : '';
+  const bucketControl = `<div class="pulse-activity-filter-anchor">
+    <button type="button" class="pulse-activity-bar-button pulse-activity-chart-bucket-button" data-action="pulse-chart-bucket-toggle" aria-haspopup="menu" aria-expanded="${ui.activityChartBucketOpen}" aria-label="Group dates by, ${escapeHTML(PULSE_CHART_BUCKETS[mode])}"${ui.activityChartBucketOpen ? ' aria-controls="pulse-chart-bucket-popover"' : ''}>
+      <span class="muted">Group by</span> ${escapeHTML(PULSE_CHART_BUCKETS[mode])}
+    </button>
+    ${pulseActivityChartBucketPopover(ui, window)}
+  </div>`;
+  return `${pulseSubScreenHead(model, 'Total members')}
+    <div class="pulse-members-board">
+      <section class="pulse-members-chart" aria-label="Members over time">
+        <header class="pulse-members-chart-head">
+          <div>
+            <h2>Members over time</h2>
+            <p class="pulse-members-meta tabular">${escapeHTML(meta)}</p>
+          </div>
+          ${bucketControl}
+        </header>
+        ${pulseMembersChartMarkup(series, selected)}
+        <p class="pulse-members-hint muted">Tap a ${unit} to see who was on the roster then.</p>
+      </section>
+      <section class="pulse-members-roster" aria-label="On the roster">
+        <header class="pulse-members-roster-head">
+          <h2>On the roster</h2>
+          <p class="pulse-members-meta">${rows.length} ${rows.length === 1 ? 'person' : 'people'} · ${escapeHTML(joinedMeta)}</p>
+        </header>
+        ${pulseMembersTableMarkup(rows)}
+      </section>
+    </div>`;
 }
 
 function pulseMedianForceScreen(model) {
@@ -2141,8 +2350,15 @@ function pulsePage() {
   if (state.actor !== 'coach') return peopleView();
   const model = pulseModel();
   const screen = model.ui.pulseScreen || 'hub';
-  if (screen === 'activity' || screen === 'members' || screen === 'medianForce') {
-    const paneLabel = screen === 'members' ? 'Members' : screen === 'medianForce' ? 'Strength trend' : 'Activity';
+  if (screen === 'members') {
+    return `<main class="team-overview team-overview-home templates-hub staff-single-pane pulse-proto pulse-proto--members-screen">
+      <div class="settings-hub-pane pulse-layout" aria-label="Total members">
+        ${pulseScreenBody(model)}
+      </div>
+    </main>`;
+  }
+  if (screen === 'activity' || screen === 'medianForce') {
+    const paneLabel = screen === 'medianForce' ? 'Strength trend' : 'Activity';
     return `<main class="team-overview team-overview-home templates-hub staff-single-pane pulse-proto pulse-proto--activity-screen">
       <div class="settings-hub-pane pulse-layout pulse-layout-table-first" aria-label="${paneLabel}">
         ${pulseScreenBody(model)}
@@ -2170,7 +2386,10 @@ const teamOverviewActions = {
     if (!screen) return;
     const ui = teamOverviewUI();
     ui.pulseScreen = screen;
-    if (screen === 'members') ui.activitySort = 'active';
+    if (screen === 'members') {
+      ui.activitySort = 'active';
+      ui.pulseMembersBucketKey = null;
+    }
     ui.activityTypeOpen = false;
     ui.activitySortOpen = false;
     ui.activityChartBucketOpen = false;
@@ -2253,10 +2472,20 @@ const teamOverviewActions = {
     if (!PULSE_CHART_BUCKETS[value]) return;
     const ui = teamOverviewUI();
     ui.activityChartBucket = value;
+    ui.pulseMembersBucketKey = null;
     pulseClampRangeForChartBucket(ui, value);
     ui.activityChartBucketOpen = false;
     render();
     document.querySelector('[data-action="pulse-chart-bucket-toggle"]')?.focus({preventScroll: true});
+  },
+  'pulse-members-bucket': el => {
+    const key = Number(el.dataset.key);
+    if (!Number.isFinite(key)) return;
+    const ui = teamOverviewUI();
+    ui.pulseMembersBucketKey = key;
+    ui.activityChartBucketOpen = false;
+    render();
+    document.querySelector(`.pulse-members-hit.is-selected`)?.focus({preventScroll: true});
   },
   'open-pulse-person': el => openDirectoryPerson(el.dataset.id, 'pulse'),
   'pulse-open-analysis': el => pulseOpenAnalysisRecord(el.dataset.personId, el.dataset.recordId),
@@ -2273,6 +2502,7 @@ const teamOverviewActions = {
       ui.activityChartBucket = pulseDefaultChartBucket(window);
     }
     ui.rangePickerOpen = false;
+    ui.pulseMembersBucketKey = null;
     render();
     document.querySelector(`[data-action="pulse-period"][data-value="${value}"]`)?.focus({preventScroll: true});
   },
@@ -2307,6 +2537,7 @@ const teamOverviewActions = {
     }
     ui.rangePickerOpen = false;
     ui.period = 'custom';
+    ui.pulseMembersBucketKey = null;
     pulseRangePickerTeardown();
     render();
     document.querySelector('[data-action="pulse-range-picker-toggle"]')?.focus({preventScroll: true});
@@ -2349,6 +2580,7 @@ function pulseBrushCommit(startI, endI) {
   ui.rangeEnd = layout.end;
   ui.period = pulsePresetMatching(layout.start, layout.end, visiblePeople());
   ui.rangePickerOpen = false;
+  ui.pulseMembersBucketKey = null;
   pulseBrushDrag = null;
   render();
 }
@@ -2480,6 +2712,7 @@ document.addEventListener('change', event => {
     if (!pulseChartBucketEnabled(window, ui.activityChartBucket)) {
       ui.activityChartBucket = pulseDefaultChartBucket(window);
     }
+    ui.pulseMembersBucketKey = null;
     render();
     return;
   }

@@ -340,12 +340,28 @@ function teamAssessmentProtocolPanelSeg() {
   return `<div class="seg seg-panel segmented protocol-panel-seg" role="tablist" aria-label="Setup sections">${protocolSegThumb()}${[['session', 'Session'], ['tilts', positionsLabel]].map(([key, label]) => `<button type="button" role="tab" id="isok-tab-${key}" class="${tab === key ? 'active' : ''}" data-action="isok-tab" data-value="${key}" aria-selected="${tab === key}" aria-controls="isok-panel-${key}" tabindex="${tab === key ? 0 : -1}">${label}${key === 'tilts' && bad ? '<span class="isok-tab-error">Check</span>' : ''}</button>`).join('')}</div>`;
 }
 
+function assessmentProtocolModeKey(type = state.setup?.type) {
+  return standardExerciseModeKeys('assessment').includes(type) ? type : 'strength';
+}
+
+function assessmentModePickerDialog(o) {
+  const modeKey = assessmentProtocolModeKey(o.mode);
+  const mode = sessionModes[modeKey];
+  const paused = !!o.paused;
+  const choices = `<div class="mode-choices" role="group" aria-label="Exercise mode">${standardExerciseModeKeys('assessment').map(key => {
+    const m = sessionModes[key];
+    const sel = key === modeKey;
+    return `<button type="button" class="mode-choice ${sel ? 'selected' : ''}" data-action="preview-assessment-mode" data-mode="${key}" aria-pressed="${sel}" aria-controls="assessment-mode-detail">${modeThumbnail(key)}<span><strong>${m.name}</strong><small>${m.short}</small></span><span class="mode-choice-indicator" aria-hidden="true">${sel ? icon('check', 'icon-sm') : icon('chevron', 'icon-sm')}</span></button>`;
+  }).join('')}</div>`;
+  const detail = `<section class="mode-detail" id="assessment-mode-detail" aria-labelledby="assessment-mode-detail-title"><div class="mode-detail-heading"><h3 id="assessment-mode-detail-title">${mode.name}</h3></div><p class="mode-description">${modePurposeCopy.assessment[modeKey]}</p><div class="mode-animation ${paused ? 'is-paused' : ''}">${movementPreview(modeKey)}<div class="mode-render-controls"><button type="button" data-action="toggle-mode-preview" aria-label="${paused ? 'Play' : 'Pause'} animation" title="${paused ? 'Play' : 'Pause'} animation">${icon(paused ? 'play' : 'pause', 'icon-sm')}</button></div></div></section>`;
+  return `<div class="modal-backdrop"><section class="dialog directory-dialog program-editor-dialog program-editor-wizard program-editor-wizard--mode assessment-mode-picker" role="dialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="assessment-mode-intro"><header class="dialog-header"><h2 id="dialog-title">Exercise mode</h2><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></header><p id="assessment-mode-intro" class="directory-dialog-intro">Watch how the pad moves, then use that mode for new team assessments.</p><div class="program-form program-wizard-form"><div class="program-wizard-step program-wizard-step--mode session-picker-body">${choices}${detail}</div></div><footer class="directory-dialog-footer program-wizard-footer"><div class="program-wizard-actions">${button('Cancel', 'close-modal')}${button('Use this mode', 'confirm-assessment-mode', 'primary')}</div></footer></section></div>`;
+}
+
 function teamAssessmentProtocolCoreRows() {
   const c = state.setup;
-  const modeRow = `<div class="row"><span class="row-label" id="protocol-mode-label">Exercise</span><div class="seg seg-row seg-3 segmented protocol-mode-seg" role="group" aria-labelledby="protocol-mode-label">${protocolSegThumb()}${standardExerciseModeKeys('assessment').map(key => {
-    const label = key === 'strength' ? 'Isometric' : sessionModes[key].name;
-    return `<button type="button" id="assessment-mode-${key}" class="${c.type === key ? 'active' : ''}" data-action="assessment-mode" data-value="${key}" aria-pressed="${c.type === key}">${label}</button>`;
-  }).join('')}</div></div>`;
+  const modeKey = assessmentProtocolModeKey(c.type);
+  const modeName = sessionModes[modeKey].name;
+  const modeRow = `<div class="row"><span class="row-label" id="protocol-mode-label">Exercise</span><button type="button" id="assessment-mode-button" class="protocol-mode-button" data-action="open-assessment-mode-picker" aria-haspopup="dialog" aria-label="Change exercise mode, currently ${modeName}"><span class="protocol-mode-button-value">${modeName}</span>${icon('down', 'icon-sm')}</button></div>`;
   const dirRow = `<div class="row"><span class="row-label" id="protocol-dir-label">Directions</span><div class="seg seg-row seg-2 segmented" role="group" aria-labelledby="protocol-dir-label">${protocolSegThumb()}${[4, 8].map(n => `<button type="button" id="setup-count-${n}" class="${c.positions === n ? 'active' : ''}" data-action="setup-positions" data-value="${n}" aria-pressed="${c.positions === n}">${n}</button>`).join('')}</div></div>`;
   const repsRow = `<div class="row"><span class="row-label" id="protocol-reps-label">Reps per direction</span><div class="stepper protocol-stepper" role="group" aria-labelledby="protocol-reps-label"><button type="button" class="protocol-step" id="reps-minus" data-action="reps-minus" aria-label="Fewer reps" ${c.reps <= 1 ? 'disabled' : ''}>${icon('minus', 'icon-sm')}</button><output class="stepper-value" id="protocol-reps-value" aria-live="polite">${c.reps}</output><button type="button" class="protocol-step" id="reps-plus" data-action="reps-plus" aria-label="More reps" ${c.reps >= 5 ? 'disabled' : ''}>${icon('plus', 'icon-sm')}</button></div></div>`;
   return `${modeRow}${dirRow}${repsRow}`;
@@ -360,32 +376,14 @@ function teamAssessmentProtocolHoldBlock() {
     ? `<div class="row" id="hold-row"><span class="row-label" id="hold-time-label">Hold time</span>${setupIsometricHoldSecondsControl()}</div>`
     : '';
   const note = style === 'timed'
-    ? '2–15 seconds. The rep ends when the timer runs out.'
-    : 'No countdown. Release or drop rules end the rep.';
+    ? '2–15 s. Timer ends the rep.'
+    : 'No timer; release rules end the rep.';
   return `<h2 class="group-title protocol-group-heading">Hold</h2><div class="protocol-group">${holdStyleRow}${holdTimeRow}</div><p class="protocol-note" id="hold-note">${note}</p>`;
 }
 
 function teamAssessmentProtocolForceBlock() {
-  const c = state.setup;
-  let fields = '';
-  let note = '';
-  if (c.type === 'strength') {
-    fields = setupNumberField('weight', 'Target force', 'kg', 1, 50, 0.5)
-      + setupChallengeField('Counting starts above this, so noise can’t start a rep.');
-    note = 'Starting target when a member has no baseline.';
-  } else if (c.type === 'eccentric') {
-    fields = setupNumberField('weight', 'Target force', 'kg', 1, 50, 0.5, 'Line to stay near while resisting.')
-      + setupChallengeField('Safety stop: the device stops if force drops below this.')
-      + `<div class="setup-field"><span class="setup-label" id="speed-label">Speed</span><div class="seg seg-row segmented" role="group" aria-labelledby="speed-label">${protocolSegThumb()}${Object.entries(eccentricSpeeds).map(([key, speed]) => `<button type="button" id="setup-speed-${key}" class="${c.eccSpeed === key ? 'active' : ''}" data-action="setup-speed" data-value="${key}" aria-pressed="${c.eccSpeed === key}">${speed.label}</button>`).join('')}</div></div>`
-      + setupNumberField('eccCap', 'Force cap', 'kg', Math.ceil(c.weight) || 1, 75, 1, 'The rep stops if force goes above this.');
-    note = `${eccentricSpeeds[c.eccSpeed].label} return speed · Starting target when no member baseline exists.`;
-  } else {
-    fields = setupNumberField('weight', 'Target force', 'kg', 1, 50, 0.5)
-      + setupChallengeField(c.challengeAuto ? 'Auto: 1 kg below target.' : 'Set for this protocol. <button type="button" class="text-button" data-action="challenge-auto" id="challenge-auto">Use automatic threshold</button>')
-      + setupNumberField('challengeHold', 'Stop if below for', 's', 1, 5, 1);
-    note = `Movement starts above <strong>${isokForceText(c.challenge)}</strong>. Pad stops if effort stays below for <strong>${c.challengeHold} s</strong>.`;
-  }
-  return `<h2 class="group-title protocol-group-heading">Force</h2><div class="protocol-group protocol-force-group">${fields}</div><p class="protocol-note" id="force-note">${note}</p>`;
+  const fields = setupNumberField('weight', 'Target force', 'kg', 1, 50, 0.5);
+  return `<h2 class="group-title protocol-group-heading">Force</h2><div class="protocol-group protocol-force-group">${fields}</div><p class="protocol-note" id="force-note">Default target when no member baseline exists.</p>`;
 }
 
 function teamAssessmentProtocolSessionPage() {
@@ -396,17 +394,22 @@ function teamAssessmentProtocolPositionsPage() {
   return `<div class="protocol-group protocol-positions-panel">${isokTiltPanel({compact: true})}</div>`;
 }
 
+let lastProtocolPanelTab = null;
+
 function teamAssessmentProtocolFormMarkup() {
   ensureTeamAssessmentEditor();
   setupModeDefaults();
   const tab = state.setup.isokTab === 'tilts' ? 'tilts' : 'session';
+  const entering = lastProtocolPanelTab !== null && lastProtocolPanelTab !== tab;
+  lastProtocolPanelTab = tab;
+  const enter = entering ? ' is-entering' : '';
   return `<section class="assessment-workspace assessment-workspace--protocol pager-page view-protocol assessment-protocol-form" aria-label="Protocol">
-    <section class="preview protocol-preview" id="team-assessment-preview" aria-labelledby="team-assessment-preview-title">${isokineticPreview({title: 'Your session', headingId: 'team-assessment-preview-title', showRangeSummary: false})}</section>
+    <section class="preview protocol-preview" id="team-assessment-preview" aria-labelledby="team-assessment-preview-title">${isokineticPreview({title: 'Your session', headingId: 'team-assessment-preview-title', showRangeSummary: false, card: true})}</section>
     <div class="settings">
       ${teamAssessmentProtocolPanelSeg()}
       <div class="protocol-panel-pager">
-        <div class="protocol-panel-page${tab === 'session' ? ' is-active' : ''}" id="isok-panel-session" role="tabpanel" aria-labelledby="isok-tab-session">${teamAssessmentProtocolSessionPage()}</div>
-        <div class="protocol-panel-page${tab === 'tilts' ? ' is-active' : ''}" id="isok-panel-tilts" role="tabpanel" aria-labelledby="isok-tab-tilts">${teamAssessmentProtocolPositionsPage()}</div>
+        <div class="protocol-panel-page${tab === 'session' ? ' is-active' : ''}${tab === 'session' ? enter : ''}" id="isok-panel-session" role="tabpanel" aria-labelledby="isok-tab-session">${teamAssessmentProtocolSessionPage()}</div>
+        <div class="protocol-panel-page${tab === 'tilts' ? ' is-active' : ''}${tab === 'tilts' ? enter : ''}" id="isok-panel-tilts" role="tabpanel" aria-labelledby="isok-tab-tilts">${teamAssessmentProtocolPositionsPage()}</div>
       </div>
     </div>
   </section>`;
@@ -737,11 +740,14 @@ function teamHubCardsMarkup() {
   </div>`;
 }
 
-function teamHubPathKicker(cardId, activeItem) {
+function teamHubPathKicker(cardId, activeItem, assessmentEditor = false) {
   if (!cardId || !activeItem) return '';
   const dot = '<span aria-hidden="true">·</span>';
   if (isTeamHubLibraryId(cardId)) {
-    return `<p class="team-hub-path">Team ${dot} Libraries ${dot} ${escapeHTML(activeItem.label)}</p>`;
+    if (cardId === 'assessments' && assessmentEditor) {
+      return `<p class="team-hub-path">Team ${dot} Libraries ${dot} ${escapeHTML(activeItem.label)}</p>`;
+    }
+    return `<p class="team-hub-path">Team ${dot} Libraries</p>`;
   }
   if (TEAM_HUB_POLICY_IDS.has(cardId)) {
     return `<p class="team-hub-path">Team ${dot} ${escapeHTML(activeItem.label)}</p>`;
@@ -773,28 +779,24 @@ function teamHubDetailHead(activeItem, cardId) {
     : saveAssessment || saveSessionPlan || (showCreate ? button(icon('plus', 'icon-sm') + ' New template', create.action, 'primary', `aria-label="${create.ariaLabel}"`) : '');
   const title = assessmentEditor
     ? (assessmentTab === 'rom' ? 'Range of motion' : 'Protocol')
-    : cardId === 'assessments'
-      ? 'Protocol or range of motion'
-      : activeItem.label;
-  const descCopy = cardId === 'assessments' && !assessmentEditor
-    ? ''
-    : assessmentEditor
-      ? (assessmentTab === 'rom' ? 'Comfortable start and max limits in each direction.' : 'Team defaults for new assessments. Members still review pad positions before Begin.')
-      : activeItem.description;
+    : activeItem.label;
+  const descCopy = assessmentEditor
+    ? (assessmentTab === 'rom' ? 'Comfortable start and max limits in each direction.' : 'Station defaults. Members confirm pad positions before Begin.')
+    : activeItem.description;
   const desc = descCopy ? `<p class="settings-pane-desc">${escapeHTML(descCopy)}</p>` : '';
   const backAction = assessmentEditor ? 'assessment-back-chooser' : 'team-hub-back';
-  const backLabel = assessmentEditor && cardId === 'assessments' ? 'Assessment templates' : assessmentEditor ? activeItem.label : 'Team';
-  const backAria = assessmentEditor && cardId === 'assessments' ? 'Back to assessment templates' : assessmentEditor ? `Back to ${activeItem.label}` : 'Back to team hub';
-  const pathKicker = teamHubPathKicker(cardId, activeItem);
+  const backLabel = assessmentEditor && cardId === 'assessments' ? 'Assessments' : assessmentEditor ? activeItem.label : 'Team';
+  const backAria = assessmentEditor && cardId === 'assessments' ? 'Back to assessments' : assessmentEditor ? `Back to ${activeItem.label}` : 'Back to team hub';
+  const pathKicker = teamHubPathKicker(cardId, activeItem, assessmentEditor);
   return `<header class="settings-pane-head team-hub-detail-head">
-    ${backNavButton(backLabel, backAction, `aria-label="${backAria}"`)}
-    <div class="settings-pane-head-row">
-      <div class="settings-pane-head-text">
-        ${pathKicker}
-        <h1>${escapeHTML(title)}</h1>
-        ${desc}
-      </div>
+    <div class="team-hub-detail-head-bar">
+      ${backNavButton(backLabel, backAction, `aria-label="${backAria}"`)}
       ${action ? `<div class="settings-pane-head-actions">${action}</div>` : ''}
+    </div>
+    <div class="settings-pane-head-text">
+      ${pathKicker}
+      <h1>${escapeHTML(title)}</h1>
+      ${desc}
     </div>
   </header>`;
 }
@@ -1010,6 +1012,29 @@ const teamSettingsActions = {
   'assessment-mode': el => {
     if (!isTeamHubNav() || teamHubResolveCard() !== 'assessments' || assessmentWorkspaceView() !== 'editor') return;
     changeSetupMode(el.dataset.value);
+  },
+  'open-assessment-mode-picker': () => {
+    if (!isTeamHubNav() || teamHubResolveCard() !== 'assessments' || assessmentWorkspaceView() !== 'editor') return;
+    if (assessmentWorkspaceTab() !== 'protocol') return;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mode = assessmentProtocolModeKey(state.setup.type);
+    openModal('assessment-mode-picker', {mode, paused: reduced});
+    $(`[data-action="preview-assessment-mode"][data-mode="${mode}"]`)?.focus();
+  },
+  'preview-assessment-mode': el => {
+    const o = state.overlay;
+    if (o?.type !== 'assessment-mode-picker' || !standardExerciseModeKeys('assessment').includes(el.dataset.mode)) return;
+    o.mode = el.dataset.mode;
+    o.paused = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    renderOverlay();
+    $(`[data-action="preview-assessment-mode"][data-mode="${o.mode}"]`)?.focus();
+  },
+  'confirm-assessment-mode': () => {
+    const o = state.overlay;
+    if (o?.type !== 'assessment-mode-picker' || !standardExerciseModeKeys('assessment').includes(o.mode)) return;
+    const mode = o.mode;
+    closeModal();
+    changeSetupMode(mode);
   },
   'settings-hub-section': el => {
     if (!SETTINGS_RAIL_SECTIONS.some(item => item.id === el.dataset.section)) return;

@@ -266,7 +266,7 @@ function clinicProgramTemplates(){
 }
 function assignedPrograms(){if(state.actor!=='coach')return [];return visiblePeople().flatMap(p=>memberPrograms(p.id).map(program=>({p,program})));}
 const TEMPLATE_LIBRARIES=[
- {id:'assessments',label:'Assessment',description:'Protocol and range of motion defaults for assessments at the station.'},
+ {id:'assessments',label:'Assessments',description:'Protocol and range of motion defaults for assessments at the station.'},
  {id:'sessions',label:'Sessions',description:'Reusable load presets for sessions and for session plans.'},
  {id:'programs',label:'Programs',description:'Multi-day plans assigned from this workspace.'}
 ];

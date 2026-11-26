@@ -127,6 +127,8 @@
 .program-editor-wizard--name .program-wizard-progress{margin-bottom:22px}
 .program-editor-wizard--name .program-form.program-wizard-form{flex:0 1 auto;padding:22px 32px 28px}
 .program-editor-wizard--mode{max-width:1000px}
+.assessment-mode-picker.program-editor-wizard--mode .program-form.program-wizard-form{padding-top:0}
+.assessment-mode-picker .directory-dialog-intro{margin-bottom:8px}
 .program-wizard-step-label{margin:0 26px 8px;font-size:13px;font-weight:600;color:var(--muted)}
 .program-wizard-progress{flex-shrink:0;height:4px;margin:0 26px 16px;background:var(--line);border-radius:2px}
 .program-wizard-progress>span{display:block;height:100%;background:var(--ink);border-radius:2px;transition:width .2s ease-out}

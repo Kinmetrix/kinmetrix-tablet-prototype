@@ -86,6 +86,13 @@
 .isok-tilt-editor{padding-top:20px;margin-top:18px;border-top:1px solid var(--line)}
 .isok-editor-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
 .isok-editor-heading span{font-size:12px;color:var(--muted)}
+.isok-arc-card{display:flex;align-items:center;gap:16px;padding:12px 16px;margin-bottom:16px;border-radius:14px;border:1px solid var(--line);background:var(--soft)}
+.isok-arc-card.is-invalid{border-color:var(--red-line);background:var(--red-bg)}
+.isok-arc-gauge{width:170px;height:118px;flex-shrink:0;display:block}
+.isok-arc-gauge line,.isok-arc-gauge circle,.isok-arc-gauge path{transition:all 180ms cubic-bezier(.23,1,.32,1)}
+.isok-arc-meta{min-width:0}
+.isok-arc-meta strong{display:block;font-size:24px;font-weight:650;letter-spacing:-.02em;line-height:1.15;margin-bottom:4px}
+.isok-arc-meta p{margin:0;font-size:13px;line-height:1.4}
 .isok-tilt-fields{display:flex;gap:24px;flex-wrap:wrap}
 .isok-tilt-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
 .isok-setup .stepper .stepper-value output,.isok-setup .stepper>output.stepper-value{min-width:48px}

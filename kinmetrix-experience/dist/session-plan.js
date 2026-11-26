@@ -72,7 +72,7 @@ function sessionPlanView() {
   return `<div class="session-page stage-session-plan">
     <header class="session-header">
       <div class="session-person">
-        <button class="icon-button" data-action="leave-session-plan" aria-label="Back to report">${icon('back')}</button>
+        ${backNavButton('Report', 'leave-session-plan', 'aria-label="Back to report"')}
         ${photoAvatar(member)}
         <div><strong>${escapeHTML(member.name)}</strong><small>Session plan</small></div>
       </div>

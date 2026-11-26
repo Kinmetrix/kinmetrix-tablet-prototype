@@ -63,7 +63,7 @@ function clampHoldSeconds(value){return Math.max(2,Math.min(15,Math.round(Number
 function setupIsometricHoldSecondsControl(){
  const cfg=state.setup,seconds=clampHoldSeconds(cfg.holdSeconds);
  cfg.holdSeconds=seconds;
- return `<div class="setup-hold-seconds-row"><div class="weight-input"><input id="setup-hold-seconds" type="number" min="2" max="15" step="1" value="${seconds}" inputmode="numeric" aria-label="Hold seconds" aria-describedby="hold-seconds-help"><span>s</span></div>${setupStepper(seconds,{id:'setup-holdSeconds',action:'setup-step',attrs:'data-key="holdSeconds" data-step="1" data-min="2" data-max="15"',label:'hold seconds',min:2,max:15,current:seconds,unit:'s'})}</div>`;
+ return setupStepper(seconds,{id:'setup-holdSeconds',action:'setup-step',attrs:'data-key="holdSeconds" data-step="1" data-min="2" data-max="15"',label:'hold seconds',min:2,max:15,current:seconds,unit:'s'});
 }
 function setupHoldStyleField(){
  const cfg=state.setup,style=isometricHoldStyle(cfg);
@@ -81,7 +81,7 @@ function changeSetupMode(type){
  else state.setup.holdStyle??='timed';
  if(isTeamAssessmentSetupContext())teamAssessmentConfig().activeMode=type;
  resetSetupAcceptance();
- renderSetupControl(isTeamAssessmentSetupContext()?`#assessment-mode-${type}`:'#setup-mode');
+ renderSetupControl(isTeamAssessmentSetupContext()?`#assessment-mode-button, #assessment-mode-${type}`:'#setup-mode');
 }
 function setupStepperDisplay(text,{unit=''}){
  return unit?`<span class="stepper-value weight-input"><output class="field-value" aria-live="polite">${text}</output><span>${unit}</span></span>`:`<output class="stepper-value" aria-live="polite">${text}</output>`;
@@ -152,8 +152,15 @@ const setupActions={
   setTiltOverride(angle,{...tiltValues(current),[field]:next});resetSetupAcceptance();renderSetupControl('#'+el.id);if($('#'+el.id)?.disabled)$(`#tilt-${angle}-${field}-${Number(el.dataset.delta)>0?'minus':'plus'}`)?.focus({preventScroll:true});
  },
  'setup-step':el=>{
-  const key=el.dataset.key,cfg=state.setup;if(!['holdSeconds','endDrop','endCap','romStart','romMax','romStill','romDrop','eccCap','challenge','challengeHold'].includes(key))return;
-  if(key==='challenge')cfg.challengeAuto=false;cfg[key]=Math.max(Number(el.dataset.min),Math.min(Number(el.dataset.max),cfg[key]+Number(el.dataset.delta)*Number(el.dataset.step)));
+  const key=el.dataset.key,cfg=state.setup;if(!['weight','holdSeconds','endDrop','endCap','romStart','romMax','romStill','romDrop','eccCap','challenge','challengeHold'].includes(key))return;
+  if(key==='challenge')cfg.challengeAuto=false;
+  const step=Number(el.dataset.step);
+  const next=Math.max(Number(el.dataset.min),Math.min(Number(el.dataset.max),cfg[key]+Number(el.dataset.delta)*step));
+  cfg[key]=step<1?Math.round(next*10)/10:next;
+  if(key==='weight'){
+   cfg.forceEdited=true;
+   if(cfg.challengeAuto&&Number.isFinite(cfg.weight)&&cfg.weight>=1)cfg.challenge=setupAutoChallenge(cfg.weight);
+  }
   resetSetupAcceptance();renderSetupControl('#'+el.id);if($('#'+el.id)?.disabled)$(`#setup-${key}-${Number(el.dataset.delta)>0?'minus':'plus'}`)?.focus({preventScroll:true});
  },
  'challenge-auto':()=>{state.setup.challengeAuto=true;resetSetupAcceptance();renderSetupControl('#setup-challenge-plus');},
@@ -161,7 +168,7 @@ const setupActions={
  'tilt-apply-all':()=>{const angles=currentAngles(),source=tiltValues(setupTilt(angles[0]));angles.forEach(angle=>setTiltOverride(angle,{...source}));resetSetupAcceptance();renderSetupControl('#tilt-all');toast(`${setupDirectionNames[angles[0]]} tilt applied to every direction.`);},
  'tilt-reset-all':()=>{const cfg=state.setup;if(cfg.tiltOverrides)delete cfg.tiltOverrides[cfg.type];resetSetupAcceptance();renderSetupControl('#tilt-all');},
  'reset-direction-tilt':el=>{const angle=Number(el.dataset.angle),overrides=state.setup.tiltOverrides?.[state.setup.type];if(overrides)delete overrides[angle];resetSetupAcceptance();renderSetupControl(`#tilt-${angle}-start-plus`);},
- 'setup-hold-style':el=>{if(state.setup.type!=='strength'||!['timed','endurance'].includes(el.dataset.value))return;state.setup.holdStyle=el.dataset.value;if(el.dataset.value==='timed')state.setup.holdSeconds=clampHoldSeconds(state.setup.holdSeconds);resetSetupAcceptance();renderSetupControl(el.dataset.value==='timed'?'#setup-hold-seconds':'#'+el.id);}
+ 'setup-hold-style':el=>{if(state.setup.type!=='strength'||!['timed','endurance'].includes(el.dataset.value))return;state.setup.holdStyle=el.dataset.value;if(el.dataset.value==='timed')state.setup.holdSeconds=clampHoldSeconds(state.setup.holdSeconds);resetSetupAcceptance();renderSetupControl(el.dataset.value==='timed'?'#setup-holdSeconds-plus':'#'+el.id);}
 };
 document.addEventListener('change',event=>{
  const el=event.target;

@@ -92,7 +92,7 @@
 
 /* Choose the task, then a mode within that task. */
 .session-picker.picker-compact{max-width:680px}
-.picker-back{display:inline-flex;align-items:center;gap:7px;min-height:36px;font-size:12px;color:var(--muted);margin:-8px 0 7px;padding:0}
+.picker-back{margin:-8px 0 7px}
 #dialog-title:focus{outline:none}
 .new-task-list{padding:0 26px 16px}
 .new-task-row{display:flex;align-items:center;text-align:left;gap:20px;min-height:110px;width:100%;padding:24px 2px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
@@ -138,7 +138,7 @@
 @media(min-width:861px){.member-workspace{padding-top:16px}.member-find-another{margin-bottom:8px}.member-workspace .member-tabs{margin-bottom:12px}}
 @media(min-width:701px) and (max-width:1000px){.overview-summary{grid-template-columns:minmax(0,1fr) 300px;gap:24px}.overview-radial .report-radial{height:290px}.overview-measures{gap:16px 24px}.overview-measures dd{font-size:23px}}
 @media(max-width:700px){.overview-summary{grid-template-columns:1fr;gap:16px}.overview-result-heading{display:flex;align-items:center;gap:12px}.overview-result-heading .button{margin-top:0;flex-shrink:0}.overview-result-heading h2{font-size:20px}.overview-measures{gap:28px;margin:22px 0 12px}.overview-measures dd{font-size:23px}.overview-measures dt{font-size:11px}.overview-data-note{font-size:11px}.overview-radial{max-width:340px}.overview-radial .report-radial{height:290px}.overview-radial .radial-angle{font-size:17px}}
-@media(max-width:620px){.new-task-list,.program-picker-content{padding:0 20px 14px}.new-task-row{gap:15px;min-height:112px;padding:22px 0}.new-task-row strong{font-size:18px}.new-task-row small{font-size:12px}.new-task-row>.icon:first-child{width:25px;height:25px}.picker-back{min-height:36px;margin-top:-4px}.program-list-row{align-items:flex-start;flex-direction:column;gap:18px}.program-list-row .button{width:100%}.program-form{padding:20px}.program-form-grid{gap:18px 14px;margin-top:20px}.program-form label{font-size:12px}.program-form input,.program-form select{font-size:14px}.overview-result-heading h2{font-size:18px}.overview-result-heading .button{font-size:12px;padding:8px 10px}}
+@media(max-width:620px){.new-task-list,.program-picker-content{padding:0 20px 14px}.new-task-row{gap:15px;min-height:112px;padding:22px 0}.new-task-row strong{font-size:18px}.new-task-row small{font-size:12px}.new-task-row>.icon:first-child{width:25px;height:25px}.picker-back{margin-top:-4px}.program-list-row{align-items:flex-start;flex-direction:column;gap:18px}.program-list-row .button{width:100%}.program-form{padding:20px}.program-form-grid{gap:18px 14px;margin-top:20px}.program-form label{font-size:12px}.program-form input,.program-form select{font-size:14px}.overview-result-heading h2{font-size:18px}.overview-result-heading .button{font-size:12px;padding:8px 10px}}
 
 /* The radial carries its scales; the side panel previews a selected angle. */
 .overview-summary{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"result result" "radial direction";grid-template-rows:auto 1fr;align-items:center;gap:18px 0}
@@ -189,7 +189,7 @@
 /* Compact record chrome keeps chart space available on landscape iPad. */
 .member-workspace{padding-top:16px}
 .member-heading:has(.member-session-actions){align-items:center;margin-bottom:8px;gap:10px}
-.member-heading>.member-find-another{margin:0 0 0 -8px;padding:0;width:44px;height:44px;min-height:44px;flex:none;justify-content:center}
+.member-heading>.member-find-another{margin:0 8px 0 0;flex:none;align-self:flex-start}
 .member-heading .avatar.large{width:40px;height:40px;font-size:15px}
 .member-heading .member-identity{padding-top:0;min-width:0}
 .member-heading h1{font-size:24px;line-height:1.2;margin-bottom:2px}

@@ -297,7 +297,7 @@ function sessionTemplateStepsMarkup(templateId) {
   const template = clinicSessionTemplate(templateId);
   const steps = [...(template.steps || [])].sort((a, b) => a.ordinal - b.ordinal);
   return `<header class="session-template-steps-head">
-    ${button(icon('back', 'icon-sm') + ' Templates', 'session-template-list-back', 'small-button text-button')}
+    ${backNavButton('Templates', 'session-template-list-back', 'aria-label="Back to session templates"')}
     <div class="settings-pane-head-row">
       <div class="settings-pane-head-text"><h2>${escapeHTML(template.name)}</h2><p class="settings-pane-desc">${escapeHTML(template.detail)} · ${steps.length} step${steps.length === 1 ? '' : 's'}</p></div>
       <div class="settings-pane-head-actions">${button('Edit details', 'edit-session-template-meta', 'small-button', `data-id="${template.id}"`)}${button('Add step', 'add-session-template-step', 'small-button', `data-id="${template.id}"`)}</div>

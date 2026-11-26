@@ -1,6 +1,6 @@
-/* Templates workspace: black app rail (top), grey library rail + shell (base), white pane card */
+/* Templates workspace: black app rail (top), canvas shell (base), white pane card */
 .templates-layered-shell{
- --templates-shell-bg:#f6f6f8;
+ --templates-shell-bg:var(--canvas-bottom);
  --templates-shell-inset:4px;
  --templates-display-corner:25px;
  --templates-card-corner:calc(var(--templates-display-corner) - var(--templates-shell-inset));
@@ -24,12 +24,26 @@
  gap:var(--templates-shell-gap,10px);
  align-items:stretch;
  box-sizing:border-box;
- background:var(--templates-shell-bg);
+ position:relative;
+ isolation:isolate;
+ background:
+  radial-gradient(ellipse 165% 145% at -8% -12%,rgba(36,104,206,.035),transparent 82%),
+  radial-gradient(ellipse 155% 135% at 108% 108%,rgba(214,160,70,.028),transparent 80%),
+  radial-gradient(ellipse 190% 160% at 52% -28%,rgba(255,255,255,.42),transparent 78%),
+  radial-gradient(ellipse 140% 120% at 78% 18%,rgba(36,104,206,.025),transparent 85%),
+  linear-gradient(152deg,var(--canvas-top) 0%,var(--canvas-mid) 48%,var(--canvas-bottom) 100%);
  min-height:calc(100dvh - var(--prototype-footer-height));
 }
+.templates-layered-shell>.sidebar,
+.templates-layered-shell>.shell-main{position:relative;z-index:1}
 :root[data-theme="dark"] .templates-layered-shell{
+ background:
+  radial-gradient(ellipse 165% 145% at -8% -12%,rgba(131,179,255,.05),transparent 82%),
+  radial-gradient(ellipse 155% 135% at 108% 108%,rgba(214,160,70,.035),transparent 80%),
+  radial-gradient(ellipse 190% 160% at 52% -28%,rgba(255,255,255,.08),transparent 78%),
+  radial-gradient(ellipse 140% 120% at 78% 18%,rgba(131,179,255,.04),transparent 85%),
+  linear-gradient(152deg,var(--canvas-top) 0%,var(--canvas-mid) 48%,var(--canvas-bottom) 100%);
  --templates-status-ready:#6fcf97;
- --templates-shell-bg:#2a2a2e;
  --templates-nav-bg:#0a0a0a;
  --templates-nav-active-bg:#1f1f22;
  --templates-rail-hover:rgba(0,0,0,.14);
@@ -98,7 +112,12 @@
 }
 .templates-layered-shell .shell-main{
  display:flex;flex-direction:column;
- background:var(--templates-shell-bg);
+ background:
+  radial-gradient(ellipse 165% 145% at -8% -12%,rgba(36,104,206,.035),transparent 82%),
+  radial-gradient(ellipse 155% 135% at 108% 108%,rgba(214,160,70,.028),transparent 80%),
+  radial-gradient(ellipse 190% 160% at 52% -28%,rgba(255,255,255,.42),transparent 78%),
+  radial-gradient(ellipse 140% 120% at 78% 18%,rgba(36,104,206,.025),transparent 85%),
+  linear-gradient(152deg,var(--canvas-top) 0%,var(--canvas-mid) 48%,var(--canvas-bottom) 100%);
  height:var(--templates-card-height);
  min-height:var(--templates-card-height);
  max-height:var(--templates-card-height);
@@ -274,8 +293,7 @@
 .templates-layered-shell main.people-finder .finder-help-open .finder-person-name{flex:1;min-width:0}
 .templates-layered-shell main.people-finder .finder-help-open .icon{width:18px;height:18px;color:var(--muted);flex-shrink:0}
 .templates-layered-shell main.help-article .help-article-sheet{width:min(68ch,100%);margin:0}
-.templates-layered-shell main.help-article .help-article-back{display:inline-flex;align-items:center;gap:6px;margin:0}
-.templates-layered-shell main.help-article .help-article-back .icon{width:18px;height:18px}
+.templates-layered-shell main.help-article .help-article-back{margin:0 0 4px}
 .templates-layered-shell main.help-article h1{
  font-size:34px;font-weight:620;letter-spacing:-.025em;line-height:1.2;
  margin:28px 0 12px;text-wrap:balance;
@@ -313,6 +331,7 @@
 .templates-layered-shell main.team-overview.pulse-proto .settings-pane-head{margin-bottom:0}
 .templates-layered-shell main.team-overview.pulse-proto .settings-hub-pane.pulse-layout{flex:1;min-height:0}
 .templates-layered-shell main.team-overview.pulse-proto .pulse-operations{flex:1;min-height:0}
+.templates-layered-shell main.team-overview.pulse-proto .pulse-members-board{flex:1;min-height:0}
 .templates-layered-shell main.templates-hub.team-hub-layout{
  flex:1;min-height:0;width:100%;padding:0;max-width:none;margin:0;
  display:flex;flex-direction:column;background:transparent;
