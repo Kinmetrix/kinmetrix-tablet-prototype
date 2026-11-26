@@ -28,18 +28,43 @@ function splitDiagramHelp(){
  if(kind==='return')return 'Each mark is one rep. Tap a direction to review the return path.';
  return 'Each mark is one rep. Tap a direction to review its tilt.';
 }
-function isokineticPreview(){
+function isokineticPreview(options={}){
+ const {title='Your session',headingId='',showRangeSummary=true}=options;
  const c=state.setup,total=c.positions*c.reps,kind=setupTiltKind();
  const workload=kind==='limit'?`${c.positions} directions · 1 movement each`:`${c.positions} directions × ${c.reps} reps`;
- return `<header class="isok-preview-heading"><h2>Your session</h2><p>${workload}${kind==='limit'?'':` <strong>${total} reps total</strong>`}</p></header>${isokineticDiagram()}<p class="isok-diagram-help">${splitDiagramHelp()}</p><button type="button" class="isok-range-summary" data-action="isok-tab" data-value="tilts"><span>${splitRangeSummaryLabel()}</span><strong>${isokTiltSummary()}</strong>${icon('chevron','icon-sm')}</button>`;
+ const rangeSummary=showRangeSummary?`<button type="button" class="isok-range-summary" data-action="isok-tab" data-value="tilts"><span>${splitRangeSummaryLabel()}</span><strong>${isokTiltSummary()}</strong>${icon('chevron','icon-sm')}</button>`:'';
+ return `<header class="isok-preview-heading"><h2${headingId?` id="${headingId}"`:''}>${escapeHTML(title)}</h2><p>${workload}${kind==='limit'?'':` <strong>${total} reps total</strong>`}</p></header>${isokineticDiagram()}<p class="isok-diagram-help">${splitDiagramHelp()}</p>${rangeSummary}`;
 }
-function isokTiltPanel(){
- const c=state.setup,a=currentAngles().includes(c.angle)?c.angle:0,t=setupTilt(a),kind=setupTiltKind();c.angle=a;
+function padArcGaugeSVG(tilt,kind,valid,label){
+ const cx=44,cy=114,r=84;
+ const toXY=deg=>{const clamped=Math.max(0,Math.min(SETUP_MAX_TILT,Number(deg)||0)),rad=((-90+(clamped/SETUP_MAX_TILT)*76)*Math.PI)/180;return [cx+r*Math.cos(rad),cy+r*Math.sin(rad)];};
+ const [x0,y0]=toXY(0),[xMax,yMax]=toXY(SETUP_MAX_TILT);
+ const ticks=[0,15,30,45].map(d=>{const [tx,ty]=toXY(d),rad=((-90+(d/SETUP_MAX_TILT)*76)*Math.PI)/180,lx=cx+(r+16)*Math.cos(rad),ly=cy+(r+16)*Math.sin(rad);return `<line x1="${(cx+(r-5)*Math.cos(rad)).toFixed(1)}" y1="${(cy+(r-5)*Math.sin(rad)).toFixed(1)}" x2="${tx.toFixed(1)}" y2="${ty.toFixed(1)}" stroke="var(--line)" stroke-width="1.2"/><text x="${lx.toFixed(1)}" y="${(ly+3.5).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--muted)">${d}°</text>`;}).join('');
+ const stroke=!valid?'var(--red)':kind==='return'?'var(--amber)':'var(--signal)';
+ let active='';
+ if(kind==='fixed'){
+  const [px,py]=toXY(tilt.start);
+  active=`<line x1="${cx}" y1="${cy}" x2="${px.toFixed(1)}" y2="${py.toFixed(1)}" stroke="${stroke}" stroke-width="2.5" stroke-linecap="round"/><circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="6" fill="${stroke}"/><circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="10" fill="${stroke}" opacity="0.16"/>`;
+ }else{
+  const lo=Math.min(tilt.start,tilt.end),hi=Math.max(tilt.start,tilt.end);
+  const [xA,yA]=toXY(lo),[xB,yB]=toXY(hi),[xS,yS]=toXY(tilt.start),[xE,yE]=toXY(tilt.end);
+  const sweep=valid?`<path d="M ${cx} ${cy} L ${xA.toFixed(1)} ${yA.toFixed(1)} A ${r} ${r} 0 0 1 ${xB.toFixed(1)} ${yB.toFixed(1)} Z" fill="${stroke}" opacity="0.11"/><path d="M ${xA.toFixed(1)} ${yA.toFixed(1)} A ${r} ${r} 0 0 1 ${xB.toFixed(1)} ${yB.toFixed(1)}" fill="none" stroke="${stroke}" stroke-width="3.5" stroke-linecap="round"/>`:'';
+  active=`${sweep}<line x1="${cx}" y1="${cy}" x2="${xS.toFixed(1)}" y2="${yS.toFixed(1)}" stroke="${stroke}" stroke-width="1.8" stroke-dasharray="3 3"/><line x1="${cx}" y1="${cy}" x2="${xE.toFixed(1)}" y2="${yE.toFixed(1)}" stroke="${stroke}" stroke-width="2.2"/><circle cx="${xS.toFixed(1)}" cy="${yS.toFixed(1)}" r="4.5" fill="var(--surface)" stroke="${stroke}" stroke-width="2.2"/><circle cx="${xE.toFixed(1)}" cy="${yE.toFixed(1)}" r="5.5" fill="${stroke}"/>`;
+ }
+ return `<svg class="isok-arc-gauge" viewBox="0 0 185 130" role="img" aria-label="Pad tilt diagram ${escapeHTML(label)}"><path d="M ${x0.toFixed(1)} ${y0.toFixed(1)} A ${r} ${r} 0 0 1 ${xMax.toFixed(1)} ${yMax.toFixed(1)}" fill="none" stroke="var(--line)" stroke-width="2" stroke-linecap="round"/><line x1="${cx}" y1="${cy}" x2="${x0.toFixed(1)}" y2="${y0.toFixed(1)}" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 3"/><line x1="${cx}" y1="${cy}" x2="${xMax.toFixed(1)}" y2="${yMax.toFixed(1)}" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 3"/>${ticks}${active}<circle cx="${cx}" cy="${cy}" r="4" fill="var(--ink)"/><text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="9.5" fill="var(--muted)">Pivot</text></svg>`;
+}
+function isokTiltPanel(options={}){
+ const {compact=false}=options;
+ const c=state.setup,a=currentAngles().includes(c.angle)?c.angle:0,t=setupTilt(a),kind=setupTiltKind(),valid=validTilt(t),summary=setupTiltText(a);c.angle=a;
  const step=(field,label)=>`<div><span class="setup-label">${label}</span>${setupStepper(t[field],{id:`tilt-${a}-${field}`,action:'tilt-step',attrs:`data-angle="${a}" data-field="${field}"`,label:`${setupDirectionNames[a]} ${label.toLowerCase()}`,min:0,max:SETUP_MAX_TILT,current:t[field],unit:'°'})}</div>`;
- const intro=kind==='fixed'?'Pad position for each direction. The pad stays at this angle for the whole rep.':kind==='limit'?'Start and maximum tilt for comfortable movement. Separate from the directions around the head.':kind==='return'?'Start and end positions for the return path. The device moves the pad from start toward end; the person resists.':'Start and end positions of the pad. These are tilt angles, separate from the directions around the head.';
+ const intro=compact
+  ?(kind==='fixed'?'Pad angle held for the rep. Tap a direction on the preview to switch.':kind==='return'?'Start and end pad angles for the resisted return. Tap a direction on the preview.':'Start and end pad angles for each rep. Tap a direction on the preview.')
+  :(kind==='fixed'?'Pad position for each direction. The pad stays at this angle for the whole rep.':kind==='limit'?'Start and maximum tilt for comfortable movement. Separate from the directions around the head.':kind==='return'?'Start and end positions for the return path. The device moves the pad from start toward end; the person resists.':'Start and end positions of the pad. These are tilt angles, separate from the directions around the head.');
  const fields=kind==='fixed'?step('start','Pad tilt'):`${step('start',kind==='limit'?'Start tilt':'Start tilt')}${step('end',kind==='limit'?'Max tilt':'End tilt')}`;
- const help=kind==='fixed'?`${t.start}° for each rep.`:kind==='limit'?validTilt(t)?`${t.end-t.start}° of allowed travel on each movement.`:'Max tilt must be higher than start tilt.':kind==='return'?validTilt(t)?`${t.start-t.end}° of return travel on each rep.`:'End tilt must be lower than start tilt.':validTilt(t)?`${t.end-t.start}° of travel on each rep.`:'End tilt must be higher than start tilt.';
- return `<p class="isok-panel-intro">${intro}</p><label class="isok-direction-select"><span class="setup-label">Direction</span><select id="isok-tilt-direction">${currentAngles().map(angle=>`<option value="${angle}" ${a===angle?'selected':''}>${angle}° · ${setupDirectionNames[angle]} — ${setupTiltText(angle)}</option>`).join('')}</select></label><div class="isok-tilt-editor"><div class="isok-editor-heading"><h2>${a}° · ${setupDirectionNames[a]}</h2><span>${t.source}</span></div><div class="isok-tilt-fields">${fields}</div><p class="${validTilt(t)?'setup-help':'tilt-error'}" role="status">${help}</p><div class="isok-tilt-actions">${button('Apply to all directions','tilt-apply-selected','small-button','id="tilt-all"')}${t.changed?button('Reset this direction','reset-direction-tilt','text-button',`data-angle="${a}" id="tilt-${a}-reset"`):''}</div></div>`;
+ const help=kind==='fixed'?`${t.start}° for each rep.`:kind==='limit'?valid?`${t.end-t.start}° of allowed travel on each movement.`:'Max tilt must be higher than start tilt.':kind==='return'?valid?`${t.start-t.end}° of return travel on each rep.`:'End tilt must be lower than start tilt.':valid?`${t.end-t.start}° of travel on each rep.`:'End tilt must be higher than start tilt.';
+ const arcCard=`<div class="isok-arc-card${valid?'':' is-invalid'}">${padArcGaugeSVG(t,kind,valid,summary)}<div class="isok-arc-meta"><strong class="tabular">${summary}</strong><p class="${valid?'setup-help':'tilt-error'}" role="status">${help}</p></div></div>`;
+ const dirSelect=compact?'':`<label class="isok-direction-select"><span class="setup-label">Direction</span><select id="isok-tilt-direction">${currentAngles().map(angle=>`<option value="${angle}" ${a===angle?'selected':''}>${angle}° · ${setupDirectionNames[angle]} — ${setupTiltText(angle)}</option>`).join('')}</select></label>`;
+ return `<p class="isok-panel-intro">${intro}</p>${dirSelect}<div class="isok-tilt-editor"><div class="isok-editor-heading"><h2>${a}° · ${setupDirectionNames[a]}</h2><span>${t.source}</span></div>${arcCard}<div class="isok-tilt-fields">${fields}</div><div class="isok-tilt-actions">${button('Apply to all directions','tilt-apply-selected','small-button','id="tilt-all"')}${t.changed?button('Reset this direction','reset-direction-tilt','text-button',`data-angle="${a}" id="tilt-${a}-reset"`):''}</div></div>`;
 }
 function splitModeFieldsBlock(forceHelp){
  const c=state.setup;
@@ -82,22 +107,28 @@ function isokineticSetupView(){
 function refreshSplitSetupPreview(){
  if(!isSetupStageContext()||!splitSetupUsesSplitLayout())return;
  setupModeDefaults();
- const preview=$('#isok-preview');if(preview)preview.innerHTML=isokineticPreview();
+ const preview=$('#team-assessment-preview');if(preview)preview.innerHTML=isokineticPreview({title:'Your session',headingId:'team-assessment-preview-title',showRangeSummary:false});
+ const splitPreview=$('#isok-preview');if(splitPreview)splitPreview.innerHTML=isokineticPreview();
  const stop=$('#isok-stop-summary');if(stop)stop.innerHTML=isokStopSummary();
  const fields=$('.isok-rule-fields');if(fields&&state.setup.type==='isokinetic')fields.innerHTML=setupChallengeField(state.setup.challengeAuto?'Auto: 1 kg below target.':'Set for this session. <button class="text-button" data-action="challenge-auto" id="challenge-auto">Use automatic threshold</button>')+setupNumberField('challengeHold','Stop if below for','s',1,5,1);
+}
+function teamAssessmentProtocolEditorActive(){
+ return isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor'&&typeof assessmentWorkspaceTab==='function'&&assessmentWorkspaceTab()!=='rom';
 }
 Object.assign(setupActions,{
  'isok-tab':el=>{
   state.setup.isokTab=el.dataset.value==='tilts'?'tilts':'session';
   if(isTeamAssessmentSetupContext())directoryUI().programs.teamTab=state.setup.isokTab;
   const team=isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor';
-  renderSetupControl(team?(state.setup.isokTab==='tilts'?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#assessment-radial-settings'):'#isok-tab-'+state.setup.isokTab);
+  const protocol=teamAssessmentProtocolEditorActive();
+  renderSetupControl(protocol?'#isok-tab-'+state.setup.isokTab:team?(state.setup.isokTab==='tilts'?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#assessment-radial-settings'):'#isok-tab-'+state.setup.isokTab);
  },
  'isok-direction':el=>{
   state.setup.angle=Number(el.dataset.angle);state.setup.isokTab='tilts';
   if(isTeamAssessmentSetupContext())directoryUI().programs.teamAngle=state.setup.angle;
   const team=isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor';
-  renderSetupControl(team?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#isok-tab-tilts');
+  const protocol=teamAssessmentProtocolEditorActive();
+  renderSetupControl(protocol?'#isok-tab-tilts':team?`[data-action="isok-direction"][data-angle="${state.setup.angle}"]`:'#isok-tab-tilts');
  },
  'tilt-apply-selected':()=>{const a=state.setup.angle||0,source=tiltValues(setupTilt(a));currentAngles().forEach(angle=>setTiltOverride(angle,{...source}));resetSetupAcceptance();renderSetupControl('#tilt-all');toast(`${setupDirectionNames[a]} applied to every direction.`);}
 });
