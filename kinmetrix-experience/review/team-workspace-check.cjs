@@ -43,7 +43,7 @@ assert.match(pulse,/pulse-bottom-row/);
 assert.match(pulse,/pulse-active-members-card/);
 assert.match(pulse,/<h2 class="pulse-perf-title">Most active<\\/h2>/);
 assert.match(pulse,/pulse-active-members-head/);
-assert.equal((pulse.match(/class="pulse-member-chip"/g)||[]).length,3,'most active shows the top 3 members');
+assert.equal((pulse.match(/class="pulse-member-chip"/g)||[]).length,Math.min(6,pulseActiveMemberSummaries(pulseModel().activityAll,pulseModel().roster).length),'most active shows up to the top 6 members');
 assert.match(pulse,/<span class="pulse-member-chip__count muted tabular">\\d+ sessions?<\\/span>/);
 assert.doesNotMatch(pulse,/pulse-member-chip--quiet/);
 const tiedSummaries=pulseActiveMemberSummaries([{memberId:'a',at:1},{memberId:'b',at:5},{memberId:'a',at:2},{memberId:'b',at:3}],[{id:'a',name:'Ann'},{id:'b',name:'Bo'}]);

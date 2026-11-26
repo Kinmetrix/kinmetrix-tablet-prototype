@@ -550,10 +550,10 @@ function pulsePerformancePieMarkup(counts) {
     }).join('');
     body = `${paths}${dividers.join('')}`;
   }
-  return `<svg class="pulse-kpi-pie" viewBox="0 0 56 56" width="52" height="52" aria-hidden="true">${pulsePerformancePiePatternDefs(prefix)}${body}</svg>`;
+  return `<svg class="pulse-kpi-pie" viewBox="0 0 56 56" width="58" height="58" aria-hidden="true">${pulsePerformancePiePatternDefs(prefix)}${body}</svg>`;
 }
 
-const PULSE_KPI_MINI_CHART = {width: 56, height: 56, pad: 6, plotW: 44, plotH: 36};
+const PULSE_KPI_MINI_CHART = {width: 116, height: 64, padX: 4, padY: 6, plotW: 108, plotH: 52};
 
 function pulseMemberJoinedAtMap(roster) {
   return new Map(
@@ -591,14 +591,14 @@ function pulseKpiActivityLineValues(activityAll, window, mode) {
 }
 
 function pulseKpiMiniChartCoords(values, max) {
-  const {pad, plotW, plotH} = PULSE_KPI_MINI_CHART;
+  const {padX, padY, plotW, plotH} = PULSE_KPI_MINI_CHART;
   const safeMax = Math.max(1, max);
   const count = values.length;
   if (!count) return [];
   const spanX = count > 1 ? plotW / (count - 1) : 0;
   return values.map((value, index) => ({
-    x: pad + (count > 1 ? spanX * index : plotW / 2),
-    y: pad + plotH - (value / safeMax) * plotH
+    x: padX + (count > 1 ? spanX * index : plotW / 2),
+    y: padY + plotH - (value / safeMax) * plotH
   }));
 }
 
@@ -625,12 +625,13 @@ function pulseKpiMiniChartMarkup(values, {step = false} = {}) {
   if (!values?.length) return '';
   const max = Math.max(...values);
   const coords = pulseKpiMiniChartCoords(values, max);
-  const baseline = PULSE_KPI_MINI_CHART.pad + PULSE_KPI_MINI_CHART.plotH;
+  const baseline = PULSE_KPI_MINI_CHART.padY + PULSE_KPI_MINI_CHART.plotH;
   const path = step ? pulseKpiMiniStepPath(coords) : pulseKpiMiniLinePath(coords);
   const kind = step ? 'step' : 'line';
-  const x1 = PULSE_KPI_MINI_CHART.pad;
+  const x1 = PULSE_KPI_MINI_CHART.padX;
   const x2 = x1 + PULSE_KPI_MINI_CHART.plotW;
-  return `<svg class="pulse-kpi-mini-chart pulse-kpi-mini-chart--${kind}" viewBox="0 0 56 56" width="52" height="52" aria-hidden="true">
+  const {width, height} = PULSE_KPI_MINI_CHART;
+  return `<svg class="pulse-kpi-mini-chart pulse-kpi-mini-chart--${kind}" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" aria-hidden="true">
     <line class="pulse-kpi-mini-chart-base" x1="${x1}" y1="${baseline}" x2="${x2}" y2="${baseline}"/>
     <path class="pulse-kpi-mini-chart-path" d="${path}" fill="none"/>
   </svg>`;
@@ -669,7 +670,7 @@ function pulseKpiMedianForceCompactBody(kpi) {
   </span>`;
 }
 
-const PULSE_MOST_ACTIVE_MAX = 3;
+const PULSE_MOST_ACTIVE_MAX = 6;
 
 function pulseMemberFirstName(name) {
   const parts = String(name || '').trim().split(/\s+/);

@@ -387,10 +387,11 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .pulse-kpi-strip-compact{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-width:0}
 .pulse-kpi-strip-compact-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .pulse-kpi-strip-visual{display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.pulse-kpi-pie{display:block;width:52px;height:52px}
-.pulse-kpi-mini-chart{display:block;width:52px;height:52px}
+.pulse-kpi-pie{display:block;width:58px;height:58px}
+.pulse-kpi-mini-chart{display:block;width:116px;height:64px}
 .pulse-kpi-mini-chart-base{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
-.pulse-kpi-mini-chart-path{stroke:var(--signal);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.pulse-kpi-mini-chart-path{stroke:var(--signal);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+@media(max-width:1100px){.pulse-kpi-mini-chart{width:92px;height:54px}}
 .pulse-kpi-mini-chart--step .pulse-kpi-mini-chart-path{stroke-linejoin:miter}
 .pulse-kpi-pie-slice{paint-order:stroke fill;stroke-width:1.15;vector-effect:non-scaling-stroke}
 .pulse-kpi-pie-divider{stroke:var(--surface);stroke-width:2;stroke-linecap:butt}
@@ -478,7 +479,7 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .pulse-lineup-viewall{margin:0;padding:0;border:0;background:none;font:inherit;color:var(--focus);font-weight:600;cursor:pointer;text-decoration:none}
 .pulse-lineup-viewall:hover{text-decoration:underline}
 .pulse-lineup-viewall:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:4px}
-.pulse-active-members-card .pulse-member-lineup{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:6px;align-items:start;justify-items:center;min-width:0;width:100%;padding:6px 0 0}
+.pulse-active-members-card .pulse-member-lineup{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));column-gap:6px;align-items:start;justify-items:center;min-width:0;width:100%;padding:6px 0 0}
 .pulse-active-members-card .pulse-member-chip{width:100%;min-width:0;margin:0;padding:0;border:0;background:transparent;display:grid;grid-template-rows:48px auto auto;justify-items:center;align-content:start;row-gap:3px;font:inherit;color:inherit;cursor:pointer;text-align:center}
 .pulse-active-members-card .pulse-member-chip:hover .pulse-member-chip__name{color:var(--focus)}
 .pulse-active-members-card .pulse-member-chip:focus-visible{outline:2px solid var(--focus);outline-offset:4px;border-radius:8px}
