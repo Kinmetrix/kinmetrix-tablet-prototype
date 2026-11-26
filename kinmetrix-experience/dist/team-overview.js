@@ -783,16 +783,19 @@ function pulseActiveMembersLineupCard(model) {
       <span class="pulse-member-chip__count muted tabular">${count}</span>
     </button>`;
   }).join('');
-  const meta = total
-    ? `<p class="pulse-perf-meta muted tabular">${total} in range · <button type="button" class="pulse-lineup-viewall" data-action="pulse-kpi" data-value="membersTotal">View all</button></p>`
-    : '';
+  const headMeta = total
+    ? `<div class="pulse-active-members-head__lead">
+      <h2 class="pulse-perf-title">Most active</h2>
+      <p class="pulse-perf-meta muted tabular">${total} in range</p>
+    </div>
+    <button type="button" class="pulse-lineup-viewall" data-action="pulse-kpi" data-value="membersTotal">View all</button>`
+    : '<h2 class="pulse-perf-title">Most active</h2>';
   const body = total
     ? `<div class="pulse-member-lineup" role="list">${chips}</div>`
     : `<p class="pulse-perf-empty muted">No members with sessions in this range.</p>`;
   return `<section class="pulse-active-members-card" aria-label="Most active">
     <header class="pulse-perf-head pulse-active-members-head">
-      <h2 class="pulse-perf-title">Most active</h2>
-      ${meta}
+      ${headMeta}
     </header>
     ${body}
   </section>`;
@@ -2185,6 +2188,7 @@ function pulseMembersChartSeries(roster, window, mode) {
     });
     return {
       key,
+      start,
       end,
       count: pulseRosterCountAt(roster, end),
       added: addedPeople.length,
@@ -2200,38 +2204,52 @@ function pulseMembersSelectedBucket(series, ui) {
   return match || series.buckets.at(-1) || null;
 }
 
-function pulseMembersRosterRows(model, asOf, highlightIds) {
+function pulseMembersRosterRows(model, bucket) {
   const sessions = new Map();
   for (const row of model.activityAll) {
     if (!pulseIsVisitRow(row)) continue;
+    if (row.at < bucket.start || row.at > bucket.end) continue;
     sessions.set(row.memberId, (sessions.get(row.memberId) || 0) + 1);
   }
-  const highlight = new Set(highlightIds);
-  const dimOthers = highlight.size > 0;
-  return pulseTeamMembers(model.roster, asOf)
+  const joinedIds = new Set(bucket.ids);
+  return pulseTeamMembers(model.roster, bucket.end)
     .map(({person, joinedAt}) => ({
       person,
       joinedAt,
       sessions: sessions.get(person.id) || 0,
-      isNew: highlight.has(person.id),
-      isDim: dimOthers && !highlight.has(person.id)
+      isNew: joinedIds.has(person.id)
     }))
-    .sort((a, b) => (b.joinedAt ?? 0) - (a.joinedAt ?? 0) || a.person.name.localeCompare(b.person.name));
+    .sort((a, b) => Number(b.isNew) - Number(a.isNew) || b.sessions - a.sessions || a.person.name.localeCompare(b.person.name));
+}
+
+function pulseMembersYTicks(min, max) {
+  const lo = Math.floor(min);
+  const hi = Math.ceil(max);
+  const span = hi - lo;
+  if (span <= 0) return [hi, Math.max(0, hi - 1)];
+  if (span <= 5) {
+    const ticks = [];
+    for (let value = hi; value >= lo; value--) ticks.push(value);
+    return ticks;
+  }
+  return [hi, Math.round((hi + lo) / 2), lo];
 }
 
 function pulseMembersChartMarkup(series, selected) {
   const w = 640;
-  const h = 220;
+  const h = 520;
   const padL = 44;
   const padR = 18;
-  const padT = 12;
-  const padB = 32;
+  const padT = 16;
+  const padB = 36;
   const counts = series.buckets.map(bucket => bucket.count);
   if (!counts.length) {
     return '<p class="pulse-members-empty muted">No members in this range.</p>';
   }
-  const min = Math.max(0, Math.min(...counts) - 1);
-  const max = Math.max(...counts) + 1;
+  const lo = Math.min(...counts);
+  const hi = Math.max(...counts);
+  const min = Math.max(0, lo === hi ? lo - 1 : lo);
+  const max = lo === hi ? hi + 1 : hi;
   const span = Math.max(1, max - min);
   const x = i => padL + (i / Math.max(1, series.buckets.length - 1)) * (w - padL - padR);
   const y = v => padT + (1 - (v - min) / span) * (h - padT - padB);
@@ -2239,8 +2257,7 @@ function pulseMembersChartMarkup(series, selected) {
   for (let i = 1; i < series.buckets.length; i++) {
     line += ` H ${x(i).toFixed(1)} V ${y(series.buckets[i].count).toFixed(1)}`;
   }
-  const area = `${line} V ${y(min).toFixed(1)} H ${x(0).toFixed(1)} Z`;
-  const ticks = [...new Set([Math.round(min), Math.round(max)])];
+  const ticks = pulseMembersYTicks(min, max);
   const grid = ticks.map(tick =>
     `<line class="pulse-members-grid" x1="${padL}" x2="${w - padR}" y1="${y(tick).toFixed(1)}" y2="${y(tick).toFixed(1)}"/>
      <text class="pulse-members-label" x="${padL - 8}" y="${(y(tick) + 3).toFixed(1)}" text-anchor="end">${tick}</text>`
@@ -2253,17 +2270,17 @@ function pulseMembersChartMarkup(series, selected) {
     return `<rect class="pulse-members-hit${selectedHit ? ' is-selected' : ''}" data-action="pulse-members-bucket" data-key="${bucket.key}" tabindex="0" role="button" aria-pressed="${selectedHit ? 'true' : 'false'}" aria-label="${escapeHTML(pulseChartBucketTitle(bucket.key, series.mode))}, ${bucket.count} members${added}" x="${left.toFixed(1)}" y="${padT}" width="${Math.max(right - left, 1).toFixed(1)}" height="${(h - padT - padB).toFixed(1)}"/>`;
   }).join('');
   const dots = series.buckets.map((bucket, i) => {
-    if (i > 0 && bucket.added === 0 && i < series.buckets.length - 1) return '';
-    return `<circle class="pulse-members-dot${bucket.added ? ' is-new' : ''}" cx="${x(i).toFixed(1)}" cy="${y(bucket.count).toFixed(1)}" r="3.5"/>`;
+    const selectedDot = selected && selected.key === bucket.key;
+    if (i > 0 && bucket.added === 0 && !selectedDot && i < series.buckets.length - 1) return '';
+    return `<circle class="pulse-members-dot${bucket.added || selectedDot ? ' is-new' : ''}" cx="${x(i).toFixed(1)}" cy="${y(bucket.count).toFixed(1)}" r="4"/>`;
   }).join('');
   const labels = series.buckets.map((bucket, i) => {
     const text = pulseChartAxisLabel(bucket.key, series.mode, i, series.buckets.length);
     return text ? `<text class="pulse-members-label" x="${x(i).toFixed(1)}" y="${h - 8}" text-anchor="middle">${escapeHTML(text)}</text>` : '';
   }).join('');
   return `<div class="pulse-members-plot">
-    <svg class="pulse-members-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Total members over time">
+    <svg class="pulse-members-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Members on the roster over time">
       ${grid}
-      <path class="pulse-members-area" d="${area}"/>
       <path class="pulse-members-line" d="${line}"/>
       ${dots}
       ${labels}
@@ -2278,14 +2295,17 @@ function pulseMembersTableMarkup(rows) {
     return '<p class="pulse-members-empty muted">No members on the roster for this stretch.</p>';
   }
   const body = rows.map(row => {
-    const joined = row.joinedAt == null ? '—' : pulseStampLabel(row.joinedAt);
-    return `<button type="button" class="pulse-members-row${row.isNew ? ' is-new' : ''}${row.isDim ? ' is-dim' : ''}" data-action="open-pulse-person" data-id="${escapeHTML(row.person.id)}" data-member-name="${escapeHTML(row.person.name)}">
-      <span class="pulse-members-person">${avatar(row.person, 'mini')}<span><strong>${escapeHTML(row.person.name)}${row.isNew ? '<span class="pulse-members-badge">New</span>' : ''}</strong><small class="muted">${escapeHTML(joined)}</small></span></span>
+    const joined = row.joinedAt == null ? '' : pulseStampLabel(row.joinedAt);
+    const sessionLabel = row.sessions === 1 ? '1 session' : `${row.sessions} sessions`;
+    const spoken = `${row.person.name}${row.isNew ? ', new' : ''}${joined ? `, joined ${joined}` : ''}, ${sessionLabel}`;
+    const joinedLine = joined ? `<small>${escapeHTML(joined)}</small>` : '';
+    return `<button type="button" class="pulse-members-row${row.isNew ? ' is-new' : ''}" data-action="open-pulse-person" data-id="${escapeHTML(row.person.id)}" data-member-name="${escapeHTML(row.person.name)}" aria-label="${escapeHTML(spoken)}">
+      <span class="pulse-members-person">${avatar(row.person, 'mini')}<span><strong>${escapeHTML(row.person.name)}${row.isNew ? '<span class="pulse-members-badge">New</span>' : ''}</strong>${joinedLine}</span></span>
       <span class="pulse-members-sessions tabular">${row.sessions}</span>
     </button>`;
   }).join('');
-  return `<div class="pulse-members-scroll" role="table" aria-label="Members on the roster">
-    <div class="pulse-members-cols" aria-hidden="true"><span>Member</span><span>Sessions</span></div>
+  return `<div class="pulse-members-scroll">
+    <div class="pulse-members-cols"><span>Member</span><span>Sessions</span></div>
     ${body}
   </div>`;
 }
@@ -2295,15 +2315,10 @@ function pulseMembersScreen(model) {
   const mode = ui.activityChartBucket;
   const series = pulseMembersChartSeries(roster, window, mode);
   const selected = pulseMembersSelectedBucket(series, ui);
-  const rows = selected
-    ? pulseMembersRosterRows(model, selected.end, selected.ids)
-    : [];
-  const unit = mode === 'day' ? 'day' : mode === 'month' ? 'month' : 'week';
-  const meta = selected
-    ? `${selected.count} on ${pulseChartBucketTitle(selected.key, mode)}`
-    : '';
+  const rows = selected ? pulseMembersRosterRows(model, selected) : [];
+  const weekTitle = selected ? pulseChartBucketTitle(selected.key, mode) : '';
   const joinedMeta = selected
-    ? (selected.added ? `${selected.added} joined` : 'none joined')
+    ? (selected.added === 1 ? '1 joined' : selected.added ? `${selected.added} joined` : 'No one joined')
     : '';
   const bucketControl = `<div class="pulse-activity-filter-anchor">
     <button type="button" class="pulse-activity-bar-button pulse-activity-chart-bucket-button" data-action="pulse-chart-bucket-toggle" aria-haspopup="menu" aria-expanded="${ui.activityChartBucketOpen}" aria-label="Group dates by, ${escapeHTML(PULSE_CHART_BUCKETS[mode])}"${ui.activityChartBucketOpen ? ' aria-controls="pulse-chart-bucket-popover"' : ''}>
@@ -2313,21 +2328,19 @@ function pulseMembersScreen(model) {
   </div>`;
   return `${pulseSubScreenHead(model, 'Total members')}
     <div class="pulse-members-board">
-      <section class="pulse-members-chart" aria-label="Members over time">
+      <section class="pulse-members-chart" aria-label="Roster over this stretch">
         <header class="pulse-members-chart-head">
           <div>
-            <h2>Members over time</h2>
-            <p class="pulse-members-meta tabular">${escapeHTML(meta)}</p>
+            <h2>${escapeHTML(weekTitle)}</h2>
+            <p class="pulse-members-meta">${escapeHTML(joinedMeta)}</p>
           </div>
           ${bucketControl}
         </header>
         ${pulseMembersChartMarkup(series, selected)}
-        <p class="pulse-members-hint muted">Tap a ${unit} to see who was on the roster then.</p>
       </section>
-      <section class="pulse-members-roster" aria-label="On the roster">
+      <section class="pulse-members-roster" aria-label="Roster">
         <header class="pulse-members-roster-head">
-          <h2>On the roster</h2>
-          <p class="pulse-members-meta">${rows.length} ${rows.length === 1 ? 'person' : 'people'} · ${escapeHTML(joinedMeta)}</p>
+          <h2>Roster</h2>
         </header>
         ${pulseMembersTableMarkup(rows)}
       </section>

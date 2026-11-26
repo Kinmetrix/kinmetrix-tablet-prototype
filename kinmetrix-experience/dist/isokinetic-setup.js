@@ -152,7 +152,7 @@ function refreshSplitSetupPreview(){
  const fields=$('.isok-rule-fields');if(fields&&state.setup.type==='isokinetic')fields.innerHTML=setupChallengeField(state.setup.challengeAuto?'Auto: 1 kg below target.':'Set for this session. <button class="text-button" data-action="challenge-auto" id="challenge-auto">Use automatic threshold</button>')+setupNumberField('challengeHold','Stop if below for','s',1,5,1);
 }
 function teamAssessmentProtocolEditorActive(){
- return isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor'&&typeof assessmentWorkspaceTab==='function'&&assessmentWorkspaceTab()!=='rom';
+ return isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor';
 }
 Object.assign(setupActions,{
  'isok-tab':el=>{

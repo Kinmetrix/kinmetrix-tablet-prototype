@@ -175,6 +175,24 @@ function teamAssessmentProtocolDirty() {
   return JSON.stringify(teamAssessmentFromSetup(cfg)) !== JSON.stringify(normalizeTeamAssessment({...teamAssessmentConfig()}));
 }
 
+function teamRomFromSetup(cfg) {
+  return normalizeTeamRom({
+    positions: cfg.positions,
+    challenge: cfg.challenge,
+    romStillOn: cfg.romStillOn,
+    romStill: cfg.romStill,
+    romDropOn: cfg.romDropOn,
+    romDrop: cfg.romDrop
+  });
+}
+
+function teamAssessmentRomDirty() {
+  if (assessmentWorkspaceView() !== 'editor' || assessmentWorkspaceTab() !== 'rom') return false;
+  const cfg = state.setup;
+  if (!cfg || cfg.type !== 'rom' || state.stage !== 'team-assessment-edit') return false;
+  return JSON.stringify(teamRomFromSetup(cfg)) !== JSON.stringify(normalizeTeamRom({...teamRomConfig()}));
+}
+
 function persistTeamAssessmentFromSetup(cfg = state.setup) {
   teamSettings().assessment = teamAssessmentFromSetup(cfg);
 }
@@ -316,7 +334,7 @@ function assessmentChooserMiniRadial(positions) {
 }
 
 function teamAssessmentProtocolSaveAction() {
-  const dirty = teamAssessmentProtocolDirty();
+  const dirty = assessmentWorkspaceTab() === 'rom' ? teamAssessmentRomDirty() : teamAssessmentProtocolDirty();
   const status = dirty
     ? `<span class="save-status is-dirty" id="save-status" role="status" aria-live="polite">Unsaved changes</span>`
     : '';
@@ -326,7 +344,7 @@ function teamAssessmentProtocolSaveAction() {
 }
 
 function teamAssessmentUsesProtocolForm() {
-  return assessmentWorkspaceView() === 'editor' && assessmentWorkspaceTab() !== 'rom';
+  return assessmentWorkspaceView() === 'editor';
 }
 
 function protocolSegThumb() {
@@ -354,7 +372,7 @@ function teamAssessmentProtocolCoreRows() {
   const c = state.setup;
   const modeKey = assessmentProtocolModeKey(c.type);
   const modeName = sessionModes[modeKey].name;
-  const modeRow = `<div class="row"><span class="row-label" id="protocol-mode-label">Exercise</span><button type="button" id="assessment-mode-button" class="protocol-mode-button" data-action="open-assessment-mode-picker" aria-haspopup="dialog" aria-label="Change exercise mode, currently ${modeName}"><span class="protocol-mode-button-value">${modeName}</span>${icon('down', 'icon-sm')}</button></div>`;
+  const modeRow = `<button type="button" id="assessment-mode-button" class="row protocol-mode-row" data-action="open-assessment-mode-picker" aria-haspopup="dialog" aria-label="Change exercise mode, currently ${modeName}"><span class="row-label">Exercise mode</span><span class="protocol-mode-row-value">${modeName}${icon('chevron', 'icon-sm')}</span></button>`;
   const dirRow = `<div class="row"><span class="row-label" id="protocol-dir-label">Directions</span><div class="seg seg-row seg-2 segmented" role="group" aria-labelledby="protocol-dir-label">${protocolSegThumb()}${[4, 8].map(n => `<button type="button" id="setup-count-${n}" class="${c.positions === n ? 'active' : ''}" data-action="setup-positions" data-value="${n}" aria-pressed="${c.positions === n}">${n}</button>`).join('')}</div></div>`;
   const repsTotal = c.positions * c.reps;
   const repsRow = `<div class="row protocol-reps-row"><div class="protocol-reps-label-wrap"><span class="row-label" id="protocol-reps-label">Reps per direction</span><span class="protocol-reps-total tabular" id="protocol-reps-total">${repsTotal} total across ${c.positions} directions</span></div>${setupRepsControl()}</div>`;
@@ -412,11 +430,31 @@ function openProtocolPositions(angle) {
   $(`.protocol-positions-dir[data-angle="${state.setup.angle}"]`)?.focus();
 }
 
-function teamAssessmentProtocolFormMarkup() {
-  ensureTeamAssessmentEditor();
+function teamAssessmentRomSessionPage() {
+  const c = state.setup;
+  const dirRow = `<div class="row"><span class="row-label" id="protocol-dir-label">Directions</span><div class="seg seg-row seg-2 segmented" role="group" aria-labelledby="protocol-dir-label">${protocolSegThumb()}${[4, 8].map(n => `<button type="button" id="setup-count-${n}" class="${c.positions === n ? 'active' : ''}" data-action="setup-positions" data-value="${n}" aria-pressed="${c.positions === n}">${n}</button>`).join('')}</div></div>`;
+  const still = c.romStillOn
+    ? setupNumericControl({id: 'setup-romStill', key: 'romStill', label: 'no movement seconds', current: c.romStill, unit: 's', min: 1, max: 5, step: 1})
+    : '<span class="protocol-mode-row-value">Off</span>';
+  const drop = c.romDropOn
+    ? setupNumericControl({id: 'setup-romDrop', key: 'romDrop', label: 'force drop percent', current: c.romDrop, unit: '%', min: 5, max: 50, step: 5})
+    : '<span class="protocol-mode-row-value">Off</span>';
+  const stillRow = `<div class="row"><label class="check-label"><input type="checkbox" id="setup-romStillOn" data-setup-toggle="romStillOn" ${c.romStillOn ? 'checked' : ''}><span><strong>No movement</strong><small>Stops after holding at limit</small></span></label>${still}</div>`;
+  const dropRow = `<div class="row"><label class="check-label"><input type="checkbox" id="setup-romDropOn" data-setup-toggle="romDropOn" ${c.romDropOn ? 'checked' : ''}><span><strong>Force drop</strong><small>Stops when push releases</small></span></label>${drop}</div>`;
+  const challenge = setupNumberField('challenge', 'Challenge weight', 'kg', 0.5, 5, 0.5);
+  return `<div class="protocol-session-stack"><h2 class="sr-only" id="protocol-session-label">Session</h2><div class="protocol-group">${dirRow}</div><h2 class="group-title protocol-group-heading">Force</h2><div class="protocol-group protocol-force-group"><input id="target-weight" type="hidden" value="${c.weight}">${challenge}</div><p class="protocol-note" id="force-note">Light push needed before movement counts.</p><h2 class="group-title protocol-group-heading">Finish the rep when</h2><div class="protocol-group">${stillRow}${dropRow}</div><p class="protocol-note">Either rule can end the movement. Manual stop is always available.</p></div>`;
+}
+
+function teamAssessmentEditorFormMarkup() {
+  const rom = assessmentWorkspaceTab() === 'rom';
+  if (rom) ensureTeamRomEditor();
+  else ensureTeamAssessmentEditor();
   setupModeDefaults();
-  return `<section class="assessment-workspace assessment-workspace--protocol pager-page view-protocol assessment-protocol-form" aria-label="Protocol">
-    <div class="settings">${teamAssessmentProtocolSessionPage()}</div>
+  const settings = rom ? teamAssessmentRomSessionPage() : teamAssessmentProtocolSessionPage();
+  const label = rom ? 'Range of motion' : 'Protocol';
+  const view = rom ? 'view-rom' : 'view-protocol';
+  return `<section class="assessment-workspace assessment-workspace--protocol pager-page ${view} assessment-protocol-form" aria-label="${label}">
+    <div class="settings">${settings}</div>
     <section class="preview protocol-preview" id="team-assessment-preview" aria-labelledby="team-assessment-preview-title">${isokineticPreview({title: 'Your session', headingId: 'team-assessment-preview-title', showRangeSummary: false, card: true})}</section>
   </section>`;
 }
@@ -473,115 +511,9 @@ function teamAssessmentChooserMarkup() {
   </div>`;
 }
 
-function teamAssessmentModeTiles() {
-  const c = state.setup;
-  return `<div class="assessment-mode-grid" role="group" aria-label="Assessment mode">${standardExerciseModeKeys('assessment').map(key => {
-    const mode = sessionModes[key];
-    const glyph = key === 'strength' ? 'isometric' : key;
-    return `<button type="button" id="assessment-mode-${key}" class="assessment-mode-tile${c.type === key ? ' is-active' : ''}" data-action="assessment-mode" data-value="${key}" aria-pressed="${c.type === key}">${icon(glyph, 'icon-sm')}<strong>${mode.name}</strong><span>${escapeHTML(mode.short)}</span></button>`;
-  }).join('')}</div>`;
-}
-
-function teamAssessmentRomRulesMarkup() {
-  const c = state.setup;
-  const still = c.romStillOn
-    ? setupNumericControl({id: 'setup-romStill', key: 'romStill', label: 'no movement seconds', current: c.romStill, unit: 's', min: 1, max: 5, step: 1})
-    : '<span class="muted small">Off</span>';
-  const drop = c.romDropOn
-    ? setupNumericControl({id: 'setup-romDrop', key: 'romDrop', label: 'force drop percent', current: c.romDrop, unit: '%', min: 5, max: 50, step: 5})
-    : '<span class="muted small">Off</span>';
-  return `<div class="assessment-rom-rules">
-    <span class="assessment-radial-kicker">Finish the rep when</span>
-    <div class="assessment-rom-rule">
-      <label class="check-label"><input type="checkbox" id="setup-romStillOn" data-setup-toggle="romStillOn" ${c.romStillOn ? 'checked' : ''}><span><strong>No movement</strong><small>Stops after holding at limit</small></span></label>
-      ${still}
-    </div>
-    <div class="assessment-rom-rule">
-      <label class="check-label"><input type="checkbox" id="setup-romDropOn" data-setup-toggle="romDropOn" ${c.romDropOn ? 'checked' : ''}><span><strong>Force drop</strong><small>Stops when push releases</small></span></label>
-      ${drop}
-    </div>
-  </div>`;
-}
-
-function teamAssessmentRadialStage() {
-  const c = state.setup;
-  const angles = currentAngles();
-  const active = c.isokTab === 'tilts' ? c.angle : null;
-  const kind = setupTiltKind();
-  const xy = (a, r) => [220 + Math.sin(a * Math.PI / 180) * r, 212 - Math.cos(a * Math.PI / 180) * r];
-  const repsCount = kind === 'limit' ? 1 : c.reps;
-  const spokes = angles.map(a => {
-    const p = xy(a, 140);
-    const q = xy(a, 54);
-    const tilt = setupTilt(a);
-    const bad = !validTilt(tilt);
-    const cls = bad ? 'is-bad' : a === active ? 'is-selected' : tilt.changed ? 'is-custom' : '';
-    return `<line x1="${q[0]}" y1="${q[1]}" x2="${p[0]}" y2="${p[1]}" class="assessment-radial-spoke ${cls}"/>`;
-  }).join('');
-  const nodes = angles.map(a => {
-    const p = xy(a, 150);
-    const tilt = setupTilt(a);
-    const bad = !validTilt(tilt);
-    const selected = a === active;
-    const cls = ['assessment-radial-node', selected ? 'is-selected' : '', bad ? 'is-bad' : '', tilt.changed && !bad ? 'is-custom' : ''].filter(Boolean).join(' ');
-    const marks = Array.from({length: repsCount}, () => '<i></i>').join('');
-    const editWhat = setupHasFixedTilt() ? 'pad position' : kind === 'limit' ? 'start and max tilt' : 'tilt';
-    return `<button type="button" class="${cls}" style="left:${p[0] / 440 * 100}%;top:${p[1] / 424 * 100}%" data-action="isok-direction" data-angle="${a}" aria-pressed="${selected}" aria-label="${setupDirectionNames[a]}, ${a} degrees, ${setupTiltText(a)}. Edit ${editWhat}."><strong>${a}°</strong><span>${setupTiltText(a)}</span><span class="assessment-radial-marks" aria-hidden="true">${marks}</span></button>`;
-  }).join('');
-  const settingsSelected = active === null;
-  const workload = kind === 'limit' ? `${c.positions} directions · 1 movement each` : `${c.positions} dir × ${c.reps} reps`;
-  return `<section class="assessment-radial-canvas" aria-label="Directional canvas">
-    <div class="assessment-radial-meta">
-      <span class="assessment-pill">${escapeHTML(c.type === 'rom' ? 'Range of motion' : sessionModes[c.type].name)}</span>
-      <span class="assessment-pill assessment-pill--muted tabular">${escapeHTML(workload)}</span>
-    </div>
-    <div class="assessment-radial-stage" role="group" aria-label="${angles.length} directions. Tap a direction to edit tilt, or the center for global settings.">
-      <svg viewBox="0 0 440 424" aria-hidden="true">
-        <circle class="assessment-radial-orbit" cx="220" cy="212" r="140"/>
-        <circle class="assessment-radial-orbit assessment-radial-orbit--inner" cx="220" cy="212" r="88"/>
-        ${spokes}
-        ${personOrientation(220, 212, 1.24)}
-      </svg>
-      <button type="button" id="assessment-radial-settings" class="assessment-radial-center${settingsSelected ? ' is-selected' : ''}" data-action="isok-tab" data-value="session" aria-pressed="${settingsSelected}" aria-label="Assessment settings"></button>
-      ${nodes}
-    </div>
-    <p class="assessment-radial-help">${settingsSelected ? 'Tap a direction to set tilt. Center keeps global settings open.' : `${setupDirectionNames[active]} selected. Tap the center to return to settings.`}</p>
-  </section>`;
-}
-
-function teamAssessmentRadialInspector() {
-  const c = state.setup;
-  const settings = c.isokTab !== 'tilts';
-  const forceHelp = c.type === 'rom' ? 'Light push needed before movement counts.' : 'Team starting target. Assessed members use their own.';
-  if (settings) {
-    const head = c.type === 'rom'
-      ? `<div class="assessment-radial-inspector-head"><h2>Limit discovery</h2><p class="muted small">Maps comfortable movement in each direction. One movement per direction.</p></div>`
-      : `<div class="assessment-radial-inspector-head"><h2>Protocol defaults</h2><p class="muted small">Starting configuration when clinicians open a new team assessment.</p></div>`;
-    return `<aside class="assessment-radial-inspector" aria-label="Assessment settings">
-      ${head}
-      ${c.type === 'rom' ? '' : teamAssessmentModeTiles()}
-      ${isokSessionPanel(forceHelp)}
-      ${c.type === 'rom' ? teamAssessmentRomRulesMarkup() : ''}
-    </aside>`;
-  }
-  return `<aside class="assessment-radial-inspector" aria-label="Direction settings">
-    <div class="assessment-radial-dir-nav">
-      ${backNavButton('All settings', 'isok-tab', 'data-value="session" id="assessment-radial-settings-back" aria-label="Back to session settings"')}
-    </div>
-    ${isokTiltPanel()}
-  </aside>`;
-}
-
-function teamAssessmentRadialMarkup() {
-  if (assessmentWorkspaceTab() === 'rom') ensureTeamRomEditor();
-  else ensureTeamAssessmentEditor();
-  return `<div class="assessment-workspace assessment-workspace--radial">${teamAssessmentRadialStage()}${teamAssessmentRadialInspector()}</div>`;
-}
-
 function teamAssessmentWorkspaceMarkup() {
   if (assessmentWorkspaceView() !== 'editor') return teamAssessmentChooserMarkup();
-  if (assessmentWorkspaceTab() === 'rom') return teamAssessmentRadialMarkup();
-  return teamAssessmentProtocolFormMarkup();
+  return teamAssessmentEditorFormMarkup();
 }
 
 function teamSessionWorkspaceMarkup() {
@@ -765,13 +697,13 @@ function teamHubDetailHead(activeItem, cardId) {
   const library = isTeamHubLibraryId(cardId) ? cardId : null;
   const assessmentEditor = cardId === 'assessments' && assessmentWorkspaceView() === 'editor';
   const assessmentTab = assessmentEditor ? assessmentWorkspaceTab() : null;
-  const assessmentProtocolEditor = assessmentEditor && assessmentTab !== 'rom';
-  if (assessmentProtocolEditor) {
-    ensureTeamAssessmentEditor();
+  if (assessmentEditor) {
+    if (assessmentTab === 'rom') ensureTeamRomEditor();
+    else ensureTeamAssessmentEditor();
     setupModeDefaults();
   }
   const saveAssessment = library === 'assessments' && assessmentEditor
-    ? (assessmentTab === 'rom' ? button('Save', 'save-assessment-workspace', 'primary') : teamAssessmentProtocolSaveAction())
+    ? teamAssessmentProtocolSaveAction()
     : '';
   const saveSessionPlan = library === 'sessions' && sessionWorkspaceTab() === 'session-plan' ? button('Save', 'save-session-workspace', 'primary') : '';
   const createByLibrary = {
@@ -1006,7 +938,7 @@ const teamSettingsActions = {
     ui.assessmentView = 'editor';
     ui.teamTab = 'session';
     render();
-    $('#assessment-radial-settings')?.focus();
+    $(tab === 'rom' ? `#setup-count-${state.setup?.positions || 4}` : '#assessment-mode-button')?.focus();
   },
   'assessment-back-chooser': () => {
     if (!isTeamHubNav() || teamHubResolveCard() !== 'assessments') return;

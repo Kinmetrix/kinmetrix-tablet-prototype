@@ -510,7 +510,7 @@ const directoryActions={
   ui.assessmentView='editor';
   ui.teamTab='session';
   render();
-  $('#assessment-radial-settings')?.focus();
+  $(tab==='rom'?`#setup-count-${state.setup?.positions||4}`:'#assessment-mode-button')?.focus();
  },
  'session-tab':el=>{
   if(!isTeamHubNav()||teamHubResolveCard()!=='sessions')return;

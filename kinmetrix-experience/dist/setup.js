@@ -81,9 +81,10 @@ function setupValuePickerMarkup({id,key,label,values,current,unit=''}){
  const display=setupValueDisplay(current,unit);
  const options=open?values.map(value=>{
   const selected=Number(value)===Number(current);
-  return `<button type="button" class="protocol-value-option${selected?' is-selected':''}" data-action="setup-value-pick" data-key="${key}" data-value="${value}" role="option" aria-selected="${selected}">${escapeHTML(setupValueDisplay(value,unit))}</button>`;
+  const mark=selected?icon('check','icon-sm'):'<span class="protocol-value-option-mark" aria-hidden="true"></span>';
+  return `<button type="button" class="protocol-value-option${selected?' is-selected':''}" data-action="setup-value-pick" data-key="${key}" data-value="${value}" role="option" aria-selected="${selected}"><span class="protocol-value-option-label">${escapeHTML(setupValueDisplay(value,unit))}</span>${mark}</button>`;
  }).join(''):'';
- const popover=open?`<div class="protocol-value-popover" id="${id}-popover" role="listbox" aria-label="${escapeHTML(label)}">${options}</div>`:'';
+ const popover=open?`<div class="protocol-value-popover protocol-value-menu" id="${id}-popover" role="listbox" aria-label="${escapeHTML(label)}">${options}</div>`:'';
  return `<div class="protocol-value-anchor"><button type="button" class="protocol-mode-button protocol-value-button" id="${id}-button" data-action="setup-value-toggle" data-key="${key}" aria-haspopup="listbox" aria-expanded="${open}" aria-label="Change ${escapeHTML(label)}, currently ${escapeHTML(display)}"${open?` aria-controls="${id}-popover"`:''}><span class="protocol-mode-button-value">${escapeHTML(display)}</span>${icon('down','icon-sm')}</button>${popover}</div>`;
 }
 function setupNumberSheetMarkup({id,key,label,current,unit='',min,max,step}){
@@ -215,6 +216,35 @@ function setupValueFocus(key){
  if(key.startsWith('tilt:')){const parts=key.split(':');return `#tilt-${parts[1]}-${parts[2]}-button`;}
  return `#setup-${key}-button`;
 }
+function placeSetupValuePopover(){
+ const layer=document.getElementById?.('setup-value-layer');
+ const key=setupValuePickerKey();
+ if(!key){if(layer){layer.hidden=true;layer.replaceChildren();}return;}
+ const pop=document.querySelector?.('.protocol-value-popover');
+ if(!pop||!layer)return;
+ layer.hidden=false;
+ if(pop.parentElement!==layer)layer.appendChild(pop);
+ const btn=document.querySelector?.(setupValueFocus(key));
+ if(!btn?.getBoundingClientRect)return;
+ const gap=8,minW=240,r=btn.getBoundingClientRect();
+ const width=Math.max(minW,Math.round(r.width));
+ pop.style.width=`${width}px`;
+ const spaceBelow=window.innerHeight-r.bottom-gap;
+ const spaceAbove=r.top-gap;
+ const needed=pop.scrollHeight;
+ const openUp=spaceBelow<needed&&spaceAbove>spaceBelow;
+ const room=Math.max(132,openUp?spaceAbove:spaceBelow);
+ pop.style.maxHeight=`${Math.round(room)}px`;
+ const height=pop.offsetHeight||room;
+ let top=openUp?r.top-gap-height:r.bottom+gap;
+ let left=r.right-width;
+ left=Math.max(12,Math.min(left,window.innerWidth-width-12));
+ top=Math.max(12,Math.min(top,window.innerHeight-height-12));
+ pop.style.top=`${Math.round(top)}px`;
+ pop.style.left=`${Math.round(left)}px`;
+ pop.style.setProperty('--origin',openUp?'bottom right':'top right');
+ pop.querySelector('.protocol-value-option.is-selected')?.scrollIntoView({block:'nearest'});
+}
 const setupActions={
  'tilt-step':el=>{
   const angle=Number(el.dataset.angle),field=el.dataset.field,current=setupTilt(angle);if(!currentAngles().includes(angle)||!['start','end'].includes(field))return;
@@ -238,7 +268,6 @@ const setupActions={
   state.setup.valuePicker=setupValuePickerKey()===key?null:key;
   resetSetupAcceptance();
   renderSetupControl(setupValueFocus(key));
-  document.querySelector('.protocol-value-option.is-selected')?.scrollIntoView({block:'nearest'});
  },
  'setup-value-pick':el=>{
   const key=el.dataset.key;if(!applySetupKeyValue(key,el.dataset.value))return;
@@ -255,10 +284,11 @@ const setupActions={
 };
 document.addEventListener('click',event=>{
  if(!state.setup?.valuePicker)return;
- if(event.target.closest?.('.protocol-value-anchor,[data-action="setup-value-toggle"],[data-action="setup-value-pick"]'))return;
+ if(event.target.closest?.('.protocol-value-anchor,.protocol-value-popover,[data-action="setup-value-toggle"],[data-action="setup-value-pick"]'))return;
  state.setup.valuePicker=null;
  render();
 });
+window.addEventListener('resize',()=>{if(state.setup?.valuePicker)placeSetupValuePopover();});
 document.addEventListener('change',event=>{
  const el=event.target;
  if(el.id==='setup-mode')changeSetupMode(el.value);

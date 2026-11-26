@@ -143,6 +143,7 @@ function appRootView(){
 function render(){
  $('#app').innerHTML = appRootView();
  renderOverlay();
+ if(typeof placeSetupValuePopover==='function')placeSetupValuePopover();
  syncRepChartLayout();
  if(state.stage==='live'&&isMovementMode(state.setup.type))modeUpdateLive();
  if(state.nav==='find'&&!state.helpArticle&&!state.overlay) focusFindInput();
