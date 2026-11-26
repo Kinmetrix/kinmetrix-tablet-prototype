@@ -59,15 +59,58 @@ function setupIsometricModeLine(cfg){
  if(isIsometricEndurance(cfg))return setupModeLine.endurance;
  return setupModeLine.strength;
 }
-function clampHoldSeconds(value){return Math.max(2,Math.min(15,Math.round(Number(value)||6)));}
+const SETUP_REPS_MIN=1,SETUP_REPS_MAX=20;
+const SETUP_HOLD_SECONDS_MIN=2,SETUP_HOLD_SECONDS_MAX=20;
+const SETUP_VALUE_LIST_LIMIT=21;
+function clampHoldSeconds(value){return Math.max(SETUP_HOLD_SECONDS_MIN,Math.min(SETUP_HOLD_SECONDS_MAX,Math.round(Number(value)||6)));}
+function clampSetupReps(value){const n=Math.round(Number(value));return Number.isFinite(n)?Math.max(SETUP_REPS_MIN,Math.min(SETUP_REPS_MAX,n)):3;}
+function setupValueSteps(min,max,step=1){
+ const places=step<1?1:0,values=[];
+ for(let v=min;v<=max+1e-9;v+=step)values.push(Number(v.toFixed(places)));
+ return values;
+}
+function setupValuePickerKey(){return state.setup?.valuePicker||null;}
+function setupValueDisplay(value,unit=''){
+ const u=String(unit).trim();
+ if(!u)return String(value);
+ if(/^[°%]/.test(u))return `${value}${u}`;
+ return `${value} ${u}`;
+}
+function setupValuePickerMarkup({id,key,label,values,current,unit=''}){
+ const open=setupValuePickerKey()===key;
+ const display=setupValueDisplay(current,unit);
+ const options=open?values.map(value=>{
+  const selected=Number(value)===Number(current);
+  return `<button type="button" class="protocol-value-option${selected?' is-selected':''}" data-action="setup-value-pick" data-key="${key}" data-value="${value}" role="option" aria-selected="${selected}">${escapeHTML(setupValueDisplay(value,unit))}</button>`;
+ }).join(''):'';
+ const popover=open?`<div class="protocol-value-popover" id="${id}-popover" role="listbox" aria-label="${escapeHTML(label)}">${options}</div>`:'';
+ return `<div class="protocol-value-anchor"><button type="button" class="protocol-mode-button protocol-value-button" id="${id}-button" data-action="setup-value-toggle" data-key="${key}" aria-haspopup="listbox" aria-expanded="${open}" aria-label="Change ${escapeHTML(label)}, currently ${escapeHTML(display)}"${open?` aria-controls="${id}-popover"`:''}><span class="protocol-mode-button-value">${escapeHTML(display)}</span>${icon('down','icon-sm')}</button>${popover}</div>`;
+}
+function setupNumberSheetMarkup({id,key,label,current,unit='',min,max,step}){
+ const open=setupValuePickerKey()===key;
+ const display=setupValueDisplay(current,unit);
+ const unitText=String(unit).trim();
+ const sheet=open?`<div class="protocol-value-popover protocol-value-sheet" id="${id}-popover" role="dialog" aria-label="${escapeHTML(label)}"><label class="protocol-value-sheet-field"><span class="sr-only">${escapeHTML(label)}</span><input id="${id}-input" type="number" min="${min}" max="${max}" step="${step}" value="${current}" inputmode="decimal" data-setup-value-key="${key}"><span>${escapeHTML(unitText)}</span></label></div>`:'';
+ return `<div class="protocol-value-anchor"><button type="button" class="protocol-mode-button protocol-value-button" id="${id}-button" data-action="setup-value-toggle" data-key="${key}" aria-haspopup="dialog" aria-expanded="${open}" aria-label="Change ${escapeHTML(label)}, currently ${escapeHTML(display)}"${open?` aria-controls="${id}-popover"`:''}><span class="protocol-mode-button-value">${escapeHTML(display)}</span>${icon('down','icon-sm')}</button>${sheet}</div>`;
+}
+function setupNumericControl({id,key,label,current,unit='',min,max,step=1}){
+ const values=setupValueSteps(min,max,step);
+ if(values.length<=SETUP_VALUE_LIST_LIMIT)return setupValuePickerMarkup({id,key,label,values,current,unit});
+ return setupNumberSheetMarkup({id,key,label,current,unit,min,max,step});
+}
+function setupRepsControl(){
+ const reps=clampSetupReps(state.setup.reps);
+ state.setup.reps=reps;
+ return setupNumericControl({id:'setup-reps',key:'reps',label:'reps per direction',current:reps,min:SETUP_REPS_MIN,max:SETUP_REPS_MAX,step:1});
+}
 function setupIsometricHoldSecondsControl(){
  const cfg=state.setup,seconds=clampHoldSeconds(cfg.holdSeconds);
  cfg.holdSeconds=seconds;
- return setupStepper(seconds,{id:'setup-holdSeconds',action:'setup-step',attrs:'data-key="holdSeconds" data-step="1" data-min="2" data-max="15"',label:'hold seconds',min:2,max:15,current:seconds,unit:'s'});
+ return setupNumericControl({id:'setup-holdSeconds',key:'holdSeconds',label:'hold time',current:seconds,unit:'s',min:SETUP_HOLD_SECONDS_MIN,max:SETUP_HOLD_SECONDS_MAX,step:1});
 }
 function setupHoldStyleField(){
  const cfg=state.setup,style=isometricHoldStyle(cfg);
- return `<div class="setup-field setup-hold-time-field"><span class="setup-label" id="hold-style-label">Hold</span><div class="setup-hold-time-row hold-time-row${style==='endurance'?' hold-time-row--endurance':''}"><div class="segmented" role="group" aria-labelledby="hold-style-label">${[['timed','Timed'],['endurance','Endurance']].map(([key,label])=>`<button type="button" id="setup-hold-${key}" class="${style===key?'active':''}" data-action="setup-hold-style" data-value="${key}" aria-pressed="${style===key}">${label}</button>`).join('')}</div>${style==='timed'?setupIsometricHoldSecondsControl():''}</div>${style==='timed'?`<p class="setup-help" id="hold-seconds-help">Enter seconds (2–15). The rep ends when the timer runs out.</p>`:`<p class="setup-help">No countdown. Release or drop rules end the rep.</p>`}</div>`;
+ return `<div class="setup-field setup-hold-time-field"><span class="setup-label" id="hold-style-label">Hold</span><div class="setup-hold-time-row hold-time-row${style==='endurance'?' hold-time-row--endurance':''}"><div class="segmented" role="group" aria-labelledby="hold-style-label">${[['timed','Timed'],['endurance','Endurance']].map(([key,label])=>`<button type="button" id="setup-hold-${key}" class="${style===key?'active':''}" data-action="setup-hold-style" data-value="${key}" aria-pressed="${style===key}">${label}</button>`).join('')}</div>${style==='timed'?setupIsometricHoldSecondsControl():''}</div>${style==='timed'?`<p class="setup-help" id="hold-seconds-help">2–${SETUP_HOLD_SECONDS_MAX} seconds. The rep ends when the timer runs out.</p>`:`<p class="setup-help">No countdown. Release or drop rules end the rep.</p>`}</div>`;
 }
 function resetSetupAcceptance(){
  const begin=$('#begin-session-button');
@@ -91,7 +134,7 @@ function setupStepper(value,{id,action,attrs='',label,min,max,current,unit=''}){
 }
 function setupNumberField(key,label,unit,min,max,step=1,help=''){
  const value=state.setup[key];
- return `<div class="setup-field"><span class="setup-label">${label}</span>${setupStepper(value,{id:'setup-'+key,action:'setup-step',attrs:`data-key="${key}" data-step="${step}" data-min="${min}" data-max="${max}"`,label:label.toLowerCase(),min,max,current:value,unit})}${help?`<p class="setup-help">${help}</p>`:''}</div>`;
+ return `<div class="setup-field"><span class="setup-label">${label}</span>${setupNumericControl({id:'setup-'+key,key,label:label.toLowerCase(),current:value,unit,min,max,step})}${help?`<p class="setup-help">${help}</p>`:''}</div>`;
 }
 function setupForceField(help){
  const cfg=state.setup,p=person();
@@ -117,7 +160,7 @@ function setupDirectionGlyph(angle){
 }
 function setupTiltRow(angle){
  const cfg=state.setup,tilt=setupTilt(angle),kind=setupTiltKind(),name=setupDirectionNames[angle],valid=validTilt(tilt),pct=value=>Math.max(0,Math.min(100,value/SETUP_MAX_TILT*100));
- const step=(field,value,label)=>setupStepper(value??'–',{id:`tilt-${angle}-${field}`,action:'tilt-step',attrs:`data-angle="${angle}" data-field="${field}"`,label:`${name} ${label}`,min:0,max:SETUP_MAX_TILT,current:value,unit:'°'});
+ const step=(field,value,label)=>setupNumericControl({id:`tilt-${angle}-${field}`,key:`tilt:${angle}:${field}`,label:`${name} ${label}`,current:value,unit:'°',min:0,max:SETUP_MAX_TILT,step:1});
  const lo=Math.min(tilt.start,tilt.end??tilt.start),hi=Math.max(tilt.start,tilt.end??tilt.start);
  const controls=kind==='fixed'?step('start',tilt.start,'tilt'):`${step('start',tilt.start,'start tilt')}<span class="tilt-to" aria-hidden="true">${icon('arrow','icon-sm')}</span>${step('end',tilt.end,kind==='limit'?'max tilt':'end tilt')}`;
  const bar=kind==='fixed'?`<div class="tilt-track"><span class="tilt-marker" style="left:${pct(tilt.start)}%"></span></div><div class="tilt-scale"><span>0°</span><span>fixed at ${tilt.start}°</span><span>${SETUP_MAX_TILT}°</span></div>`:`<div class="tilt-track"><span class="tilt-span" style="left:${pct(lo)}%;width:${pct(hi-lo)}%"></span></div><div class="tilt-scale"><span>0°</span><span>${valid?`${hi-lo}° ${kind==='limit'?'allowed':'of travel'}`:'Check tilt'}</span><span>${SETUP_MAX_TILT}°</span></div>`;
@@ -134,7 +177,7 @@ function setupView(){
  <div class="session-title setup-heading"><div><div class="setup-title-row"><h1>${cfg.type==='rom'&&purpose==='assessment'?'Range of motion assessment':`${sessionModes[cfg.type].name} ${purpose}`}</h1>${cfg.type==='eccentric'?'<span class="badge setup-new">New</span>':''}${cfg.programLoad||cfg.type==='rom'?'':`<label class="setup-change"><span>Change exercise mode</span><select id="setup-mode" aria-label="Change exercise mode">${standardExerciseModeKeys(cfg.purpose).map(key=>`<option value="${key}" ${cfg.type===key?'selected':''}>${sessionModes[key].name}</option>`).join('')}</select></label>`}</div><p>${cfg.continuing?`${escapeHTML(cfg.programName)} · Session ${cfg.programSession} of ${cfg.programTotal} · `:''}${cfg.type==='strength'&&isIsometricEndurance(cfg)?'Endurance · ':''}${cfg.type==='rom'?setupModeLine.rom:setupIsometricModeLine(cfg)}</p></div><span class="badge neutral">Session setup</span></div>
  <section class="setup-strip" aria-label="Session settings">
   <div class="setup-field"><span class="setup-label" id="directions-label">Directions</span><div class="segmented" role="group" aria-labelledby="directions-label">${[4,8].map(n=>`<button id="setup-count-${n}" class="${cfg.positions===n?'active':''}" data-action="setup-positions" data-value="${n}" aria-pressed="${cfg.positions===n}">${n}</button>`).join('')}</div></div>
-  ${cfg.type==='rom'?'':`<div class="setup-field"><span class="setup-label" id="reps-label">Reps per direction</span><div class="stepper" role="group" aria-labelledby="reps-label"><button id="reps-minus" data-action="reps-minus" aria-label="Fewer reps" ${cfg.reps<=1?'disabled':''}>${icon('minus','icon-sm')}</button><output class="stepper-value" aria-live="polite">${cfg.reps}</output><button id="reps-plus" data-action="reps-plus" aria-label="More reps" ${cfg.reps>=5?'disabled':''}>${icon('plus','icon-sm')}</button></div></div>`}
+  ${cfg.type==='rom'?'':`<div class="setup-field"><span class="setup-label" id="reps-label">Reps per direction</span>${setupRepsControl()}</div>`}
   ${setupModeFields()}
  </section>
  ${programSetupPanel()}${setupFinishRules()}
@@ -145,6 +188,33 @@ function setupView(){
  <footer class="setup-start"><div class="setup-total"><strong>${cfg.positions*cfg.reps} ${cfg.positions*cfg.reps===1?'rep':'reps'}</strong> · ${cfg.positions} directions × ${cfg.reps} ${cfg.reps===1?'rep':'reps'}<small>${!state.deviceReady?'Device unavailable. Open Device in the sidebar and mark it ready before starting.':setupEndsText()+' · Simulated device'}</small></div>${button('Begin session '+icon('play','icon-sm'),'start-session','primary',`${!state.deviceReady||!setupIsValid()?'disabled':''} id="begin-session-button"`)}</footer></div>`;
 }
 function setTiltOverride(angle,values){const cfg=state.setup;cfg.tiltOverrides??={};cfg.tiltOverrides[cfg.type]??={};cfg.tiltOverrides[cfg.type][angle]=values;}
+function applySetupKeyValue(key,raw){
+ const cfg=state.setup,n=Number(raw);
+ if(key==='reps'){cfg.reps=clampSetupReps(raw);return true;}
+ if(key==='holdSeconds'){cfg.holdSeconds=clampHoldSeconds(raw);return true;}
+ if(key.startsWith('tilt:')){
+  const parts=key.split(':'),angle=Number(parts[1]),field=parts[2];
+  if(!currentAngles().includes(angle)||!['start','end'].includes(field)||!Number.isFinite(n))return false;
+  const current=setupTilt(angle),next=Math.max(0,Math.min(SETUP_MAX_TILT,Math.round(n)));
+  setTiltOverride(angle,{...tiltValues(current),[field]:next});
+  return true;
+ }
+ if(!['weight','endDrop','endCap','romStart','romMax','romStill','romDrop','eccCap','challenge','challengeHold'].includes(key)||!Number.isFinite(n))return false;
+ if(key==='challenge')cfg.challengeAuto=false;
+ if(key==='weight'){
+  cfg.weight=Math.max(1,Math.min(50,Math.round(n*2)/2));
+  cfg.forceEdited=true;
+  if(cfg.challengeAuto&&cfg.weight>=1)cfg.challenge=setupAutoChallenge(cfg.weight);
+  return true;
+ }
+ cfg[key]=n;
+ return true;
+}
+function setupValueFocus(key){
+ if(key==='reps')return '#setup-reps-button';
+ if(key.startsWith('tilt:')){const parts=key.split(':');return `#tilt-${parts[1]}-${parts[2]}-button`;}
+ return `#setup-${key}-button`;
+}
 const setupActions={
  'tilt-step':el=>{
   const angle=Number(el.dataset.angle),field=el.dataset.field,current=setupTilt(angle);if(!currentAngles().includes(angle)||!['start','end'].includes(field))return;
@@ -163,13 +233,32 @@ const setupActions={
   }
   resetSetupAcceptance();renderSetupControl('#'+el.id);if($('#'+el.id)?.disabled)$(`#setup-${key}-${Number(el.dataset.delta)>0?'minus':'plus'}`)?.focus({preventScroll:true});
  },
- 'challenge-auto':()=>{state.setup.challengeAuto=true;resetSetupAcceptance();renderSetupControl('#setup-challenge-plus');},
+ 'setup-value-toggle':el=>{
+  const key=el.dataset.key;if(!key)return;
+  state.setup.valuePicker=setupValuePickerKey()===key?null:key;
+  resetSetupAcceptance();
+  renderSetupControl(setupValueFocus(key));
+  document.querySelector('.protocol-value-option.is-selected')?.scrollIntoView({block:'nearest'});
+ },
+ 'setup-value-pick':el=>{
+  const key=el.dataset.key;if(!applySetupKeyValue(key,el.dataset.value))return;
+  state.setup.valuePicker=null;
+  resetSetupAcceptance();
+  renderSetupControl(setupValueFocus(key));
+ },
+ 'challenge-auto':()=>{state.setup.challengeAuto=true;resetSetupAcceptance();renderSetupControl('#setup-challenge-button');},
  'setup-speed':el=>{if(!eccentricSpeeds[el.dataset.value])return;state.setup.eccSpeed=el.dataset.value;resetSetupAcceptance();renderSetupControl('#'+el.id);},
  'tilt-apply-all':()=>{const angles=currentAngles(),source=tiltValues(setupTilt(angles[0]));angles.forEach(angle=>setTiltOverride(angle,{...source}));resetSetupAcceptance();renderSetupControl('#tilt-all');toast(`${setupDirectionNames[angles[0]]} tilt applied to every direction.`);},
  'tilt-reset-all':()=>{const cfg=state.setup;if(cfg.tiltOverrides)delete cfg.tiltOverrides[cfg.type];resetSetupAcceptance();renderSetupControl('#tilt-all');},
- 'reset-direction-tilt':el=>{const angle=Number(el.dataset.angle),overrides=state.setup.tiltOverrides?.[state.setup.type];if(overrides)delete overrides[angle];resetSetupAcceptance();renderSetupControl(`#tilt-${angle}-start-plus`);},
- 'setup-hold-style':el=>{if(state.setup.type!=='strength'||!['timed','endurance'].includes(el.dataset.value))return;state.setup.holdStyle=el.dataset.value;if(el.dataset.value==='timed')state.setup.holdSeconds=clampHoldSeconds(state.setup.holdSeconds);resetSetupAcceptance();renderSetupControl(el.dataset.value==='timed'?'#setup-holdSeconds-plus':'#'+el.id);}
+ 'reset-direction-tilt':el=>{const angle=Number(el.dataset.angle),overrides=state.setup.tiltOverrides?.[state.setup.type];if(overrides)delete overrides[angle];resetSetupAcceptance();renderSetupControl(`#tilt-${angle}-start-button`);},
+ 'setup-hold-style':el=>{if(state.setup.type!=='strength'||!['timed','endurance'].includes(el.dataset.value))return;state.setup.holdStyle=el.dataset.value;state.setup.valuePicker=null;if(el.dataset.value==='timed')state.setup.holdSeconds=clampHoldSeconds(state.setup.holdSeconds);resetSetupAcceptance();renderSetupControl(el.dataset.value==='timed'?'#setup-holdSeconds-button':'#'+el.id);}
 };
+document.addEventListener('click',event=>{
+ if(!state.setup?.valuePicker)return;
+ if(event.target.closest?.('.protocol-value-anchor,[data-action="setup-value-toggle"],[data-action="setup-value-pick"]'))return;
+ state.setup.valuePicker=null;
+ render();
+});
 document.addEventListener('change',event=>{
  const el=event.target;
  if(el.id==='setup-mode')changeSetupMode(el.value);
@@ -187,7 +276,11 @@ document.addEventListener('input',event=>{
  if(el.id==='setup-hold-seconds'){
   state.setup.holdSeconds=clampHoldSeconds(el.value);
   resetSetupAcceptance();
-  const output=$('#setup-holdSeconds-minus')?.parentElement?.querySelector('output');
-  if(output)output.textContent=state.setup.holdSeconds;
+  const output=$('#setup-holdSeconds-button .protocol-mode-button-value');
+  if(output)output.textContent=setupValueDisplay(state.setup.holdSeconds,'s');
+ }
+ if(el.dataset.setupValueKey){
+  applySetupKeyValue(el.dataset.setupValueKey,el.value);
+  resetSetupAcceptance();
  }
 });

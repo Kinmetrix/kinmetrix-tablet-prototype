@@ -178,6 +178,22 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .assessment-protocol-form .protocol-mode-button:hover{background:color-mix(in srgb,var(--muted) 20%,transparent)}
 .assessment-protocol-form .protocol-mode-button:active{transform:scale(.96)}
 .assessment-protocol-form .protocol-mode-button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.protocol-value-anchor{position:relative;display:inline-flex;justify-content:flex-end}
+.protocol-value-button{display:inline-flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px;min-width:6.75rem;padding:0 10px 0 14px;border:0;border-radius:9px;background:color-mix(in srgb,var(--muted) 14%,transparent);color:var(--ink);font:inherit;font-size:14px;font-weight:600;letter-spacing:-.005em;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.protocol-value-button .protocol-mode-button-value{flex:1;text-align:left;font-variant-numeric:tabular-nums}
+.protocol-value-button .icon{width:16px;height:16px;color:var(--muted);flex-shrink:0}
+.protocol-value-button:hover{background:color-mix(in srgb,var(--muted) 20%,transparent)}
+.protocol-value-button:active{transform:scale(.96)}
+.protocol-value-button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.protocol-value-popover{position:absolute;top:calc(100% + 6px);right:0;z-index:40;min-width:100%;max-height:min(320px,50vh);overflow:auto;padding:6px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 10px 28px rgba(15,17,21,.12)}
+.protocol-value-option{display:block;width:100%;border:0;background:transparent;border-radius:8px;padding:10px 12px;font-size:15px;font-weight:500;color:var(--ink);text-align:left;font-variant-numeric:tabular-nums;cursor:pointer}
+.protocol-value-option:hover,.protocol-value-option:focus-visible{background:var(--soft);outline:0}
+.protocol-value-option.is-selected{background:var(--selected);font-weight:600}
+.protocol-value-sheet{min-width:11.5rem}
+.protocol-value-sheet-field{display:flex;align-items:center;gap:8px;padding:6px 8px}
+.protocol-value-sheet-field input{width:5.5rem;min-height:40px;padding:0 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.protocol-value-sheet-field span{font-size:14px;font-weight:600;color:var(--muted)}
+.assessment-protocol-form .protocol-value-anchor,.assessment-protocol-form .protocol-value-button{min-width:10.75rem}
 .assessment-protocol-form .seg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:2px;border-radius:9px;background:color-mix(in srgb,var(--muted) 14%,transparent);touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .assessment-protocol-form .seg-thumb{position:absolute;top:2px;left:2px;bottom:2px;width:calc((100% - 4px) / var(--n,2));border-radius:7px;background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04);pointer-events:none;will-change:transform}
 .assessment-protocol-form .seg.segmented{display:grid;padding:2px;background:color-mix(in srgb,var(--muted) 14%,transparent);gap:0}
@@ -195,6 +211,7 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .assessment-protocol-form .protocol-force-group .setup-field:first-of-type{box-shadow:none}
 .assessment-protocol-form .protocol-force-group .setup-label{margin:0;font-size:17px;font-weight:500;letter-spacing:-.012em;color:var(--ink)}
 .assessment-protocol-form .protocol-force-group .setup-help{grid-column:1/-1;margin:0;font-size:13px;line-height:1.4;color:var(--muted)}
+.assessment-protocol-form .protocol-force-group .protocol-value-popover{top:auto;bottom:calc(100% + 6px)}
 .assessment-protocol-form .protocol-positions-panel{padding:16px 16px 18px}
 .assessment-protocol-form .protocol-positions-panel .isok-panel-intro{margin-bottom:14px}
 .assessment-protocol-form .protocol-positions-panel .isok-tilt-editor{padding-top:0;margin-top:0;border-top:0}

@@ -98,10 +98,10 @@ function normalizeTeamAssessment(raw) {
   assessment.holdStyle = assessment.activeMode === 'strength' && assessment.holdStyle === 'endurance' ? 'endurance' : 'timed';
   if (assessment.activeMode === 'strength' && assessment.holdStyle !== 'endurance') {
     const seconds = Number(assessment.holdSeconds);
-    assessment.holdSeconds = Number.isFinite(seconds) ? Math.min(15, Math.max(2, Math.round(seconds))) : TEAM_ASSESSMENT_DEFAULTS.holdSeconds;
+    assessment.holdSeconds = Number.isFinite(seconds) ? clampHoldSeconds(seconds) : TEAM_ASSESSMENT_DEFAULTS.holdSeconds;
   } else delete assessment.holdSeconds;
   assessment.positions = assessment.positions === 8 ? 8 : 4;
-  assessment.reps = [1, 2, 3, 4, 5].includes(assessment.reps) ? assessment.reps : 3;
+  assessment.reps = clampSetupReps(assessment.reps);
   assessment.weight = Math.min(50, Math.max(1, Number(assessment.weight) || TEAM_ASSESSMENT_DEFAULTS.weight));
   assessment.tiltStart = Math.min(SETUP_MAX_TILT, Math.max(0, Number(assessment.tiltStart) ?? TEAM_ASSESSMENT_DEFAULTS.tiltStart));
   assessment.tiltEnd = Math.min(SETUP_MAX_TILT, Math.max(assessment.tiltStart + 1, Number(assessment.tiltEnd) ?? TEAM_ASSESSMENT_DEFAULTS.tiltEnd));
@@ -363,7 +363,7 @@ function teamAssessmentProtocolCoreRows() {
   const modeName = sessionModes[modeKey].name;
   const modeRow = `<div class="row"><span class="row-label" id="protocol-mode-label">Exercise</span><button type="button" id="assessment-mode-button" class="protocol-mode-button" data-action="open-assessment-mode-picker" aria-haspopup="dialog" aria-label="Change exercise mode, currently ${modeName}"><span class="protocol-mode-button-value">${modeName}</span>${icon('down', 'icon-sm')}</button></div>`;
   const dirRow = `<div class="row"><span class="row-label" id="protocol-dir-label">Directions</span><div class="seg seg-row seg-2 segmented" role="group" aria-labelledby="protocol-dir-label">${protocolSegThumb()}${[4, 8].map(n => `<button type="button" id="setup-count-${n}" class="${c.positions === n ? 'active' : ''}" data-action="setup-positions" data-value="${n}" aria-pressed="${c.positions === n}">${n}</button>`).join('')}</div></div>`;
-  const repsRow = `<div class="row"><span class="row-label" id="protocol-reps-label">Reps per direction</span><div class="stepper protocol-stepper" role="group" aria-labelledby="protocol-reps-label"><button type="button" class="protocol-step" id="reps-minus" data-action="reps-minus" aria-label="Fewer reps" ${c.reps <= 1 ? 'disabled' : ''}>${icon('minus', 'icon-sm')}</button><output class="stepper-value" id="protocol-reps-value" aria-live="polite">${c.reps}</output><button type="button" class="protocol-step" id="reps-plus" data-action="reps-plus" aria-label="More reps" ${c.reps >= 5 ? 'disabled' : ''}>${icon('plus', 'icon-sm')}</button></div></div>`;
+  const repsRow = `<div class="row"><span class="row-label" id="protocol-reps-label">Reps per direction</span>${setupRepsControl()}</div>`;
   return `${modeRow}${dirRow}${repsRow}`;
 }
 
@@ -376,7 +376,7 @@ function teamAssessmentProtocolHoldBlock() {
     ? `<div class="row" id="hold-row"><span class="row-label" id="hold-time-label">Hold time</span>${setupIsometricHoldSecondsControl()}</div>`
     : '';
   const note = style === 'timed'
-    ? '2–15 s. Timer ends the rep.'
+    ? `2–${SETUP_HOLD_SECONDS_MAX} s. Timer ends the rep.`
     : 'No timer; release rules end the rep.';
   return `<h2 class="group-title protocol-group-heading">Hold</h2><div class="protocol-group">${holdStyleRow}${holdTimeRow}</div><p class="protocol-note" id="hold-note">${note}</p>`;
 }
@@ -479,10 +479,10 @@ function teamAssessmentModeTiles() {
 function teamAssessmentRomRulesMarkup() {
   const c = state.setup;
   const still = c.romStillOn
-    ? setupStepper(c.romStill, {id: 'setup-romStill', action: 'setup-step', attrs: 'data-key="romStill" data-step="1" data-min="1" data-max="5"', label: 'No movement seconds', min: 1, max: 5, current: c.romStill, unit: 's'})
+    ? setupNumericControl({id: 'setup-romStill', key: 'romStill', label: 'no movement seconds', current: c.romStill, unit: 's', min: 1, max: 5, step: 1})
     : '<span class="muted small">Off</span>';
   const drop = c.romDropOn
-    ? setupStepper(c.romDrop, {id: 'setup-romDrop', action: 'setup-step', attrs: 'data-key="romDrop" data-step="5" data-min="5" data-max="50"', label: 'Force drop percent', min: 5, max: 50, current: c.romDrop, unit: '%'})
+    ? setupNumericControl({id: 'setup-romDrop', key: 'romDrop', label: 'force drop percent', current: c.romDrop, unit: '%', min: 5, max: 50, step: 5})
     : '<span class="muted small">Off</span>';
   return `<div class="assessment-rom-rules">
     <span class="assessment-radial-kicker">Finish the rep when</span>

@@ -79,7 +79,7 @@ function padArcGaugeSVG(tilt,kind,valid,label){
 function isokTiltPanel(options={}){
  const {compact=false}=options;
  const c=state.setup,a=currentAngles().includes(c.angle)?c.angle:0,t=setupTilt(a),kind=setupTiltKind(),valid=validTilt(t),summary=setupTiltText(a);c.angle=a;
- const step=(field,label)=>`<div><span class="setup-label">${label}</span>${setupStepper(t[field],{id:`tilt-${a}-${field}`,action:'tilt-step',attrs:`data-angle="${a}" data-field="${field}"`,label:`${setupDirectionNames[a]} ${label.toLowerCase()}`,min:0,max:SETUP_MAX_TILT,current:t[field],unit:'°'})}</div>`;
+ const step=(field,label)=>`<div><span class="setup-label">${label}</span>${setupNumericControl({id:`tilt-${a}-${field}`,key:`tilt:${a}:${field}`,label:`${setupDirectionNames[a]} ${label.toLowerCase()}`,current:t[field],unit:'°',min:0,max:SETUP_MAX_TILT,step:1})}</div>`;
  const intro=compact
   ?(kind==='fixed'?'Pad angle held for the rep. Tap a direction on the preview to switch.':kind==='return'?'Start and end pad angles for the resisted return. Tap a direction on the preview.':'Start and end pad angles for each rep. Tap a direction on the preview.')
   :(kind==='fixed'?'Pad position for each direction. The pad stays at this angle for the whole rep.':kind==='limit'?'Start and maximum tilt for comfortable movement. Separate from the directions around the head.':kind==='return'?'Start and end positions for the return path. The device moves the pad from start toward end; the person resists.':'Start and end positions of the pad. These are tilt angles, separate from the directions around the head.');
@@ -109,7 +109,7 @@ function isokSessionPanel(forceHelp){
 }
 function splitMainFields(forceHelp){
  const c=state.setup;
- const reps=c.type==='rom'?'':`<div class="setup-field"><span class="setup-label" id="reps-label">Reps per direction</span><div class="stepper" role="group" aria-labelledby="reps-label"><button id="reps-minus" data-action="reps-minus" aria-label="Fewer reps" ${c.reps<=1?'disabled':''}>${icon('minus','icon-sm')}</button><output class="stepper-value">${c.reps}</output><button id="reps-plus" data-action="reps-plus" aria-label="More reps" ${c.reps>=5?'disabled':''}>${icon('plus','icon-sm')}</button></div></div>`;
+ const reps=c.type==='rom'?'':`<div class="setup-field"><span class="setup-label" id="reps-label">Reps per direction</span>${setupRepsControl()}</div>`;
  return `<div class="isok-main-fields"><div class="setup-field"><span class="setup-label" id="directions-label">Directions</span><div class="segmented" role="group" aria-labelledby="directions-label">${[4,8].map(n=>`<button id="setup-count-${n}" class="${c.positions===n?'active':''}" data-action="setup-positions" data-value="${n}" aria-pressed="${c.positions===n}">${n} directions</button>`).join('')}</div></div>${reps}${splitModeFieldsBlock(forceHelp)}</div>`;
 }
 function isokStopSummary(){const c=state.setup;return `<p class="isok-stop-copy">Movement starts above <strong>${isokForceText(c.challenge)}</strong>. The pad stops if effort stays below this for <strong>${c.challengeHold} s</strong>.</p>`;}
@@ -141,6 +141,7 @@ function teamAssessmentProtocolEditorActive(){
 Object.assign(setupActions,{
  'isok-tab':el=>{
   state.setup.isokTab=el.dataset.value==='tilts'?'tilts':'session';
+  state.setup.valuePicker=null;
   if(isTeamAssessmentSetupContext())directoryUI().programs.teamTab=state.setup.isokTab;
   const team=isTeamAssessmentSetupContext()&&typeof assessmentWorkspaceView==='function'&&assessmentWorkspaceView()==='editor';
   const protocol=teamAssessmentProtocolEditorActive();

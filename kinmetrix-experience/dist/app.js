@@ -338,7 +338,7 @@ const actions={
  'assess':()=>openSessionPicker('strength','assessment'),'train':()=>openSessionPicker('strength','session'),'continue-program':el=>beginProgram(el.dataset.programId),'start-rom':()=>beginSetup('assessment','rom'),
 
  'setup-type':el=>changeSetupMode(el.dataset.type),'setup-positions':el=>{state.setup.positions=Number(el.dataset.value);if(state.setup.programLoad){const plan=memberPrograms().find(p=>p.id===state.setup.programId);if(plan){const resolved=resolveProgramTargets(plan,state.personId,state.setup.positions);state.setup.targets=resolved.targets;state.setup.programSource=resolved.source;}}if(!currentAngles().includes(state.setup.angle))state.setup.angle=0;resetSetupAcceptance();renderSetupControl('#setup-count-'+el.dataset.value);},
- 'reps-minus':()=>{state.setup.reps=Math.max(1,state.setup.reps-1);resetSetupAcceptance();renderSetupControl(state.setup.reps===1?'#reps-plus':'#reps-minus');},'reps-plus':()=>{state.setup.reps=Math.min(5,state.setup.reps+1);resetSetupAcceptance();renderSetupControl(state.setup.reps===5?'#reps-minus':'#reps-plus');},
+ 'reps-minus':()=>{state.setup.reps=clampSetupReps(state.setup.reps-1);resetSetupAcceptance();renderSetupControl('#setup-reps-button');},'reps-plus':()=>{state.setup.reps=clampSetupReps(state.setup.reps+1);resetSetupAcceptance();renderSetupControl('#setup-reps-button');},
  'leave-setup':()=>{state.stage=null;state.nav='people';state.tab='overview';render();},'start-session':startSession,'begin-rep':beginRep,
  'complete-rep':()=>completeRep(),'manual-rep':()=>completeRep(state.setup.type==='rom'?'Manual limit recorded':isIsometricEndurance(state.setup)?'Effort released':'Manual stop'),
  'pause-session':()=>{state.session.paused=!state.session.paused;render();updateLive();},

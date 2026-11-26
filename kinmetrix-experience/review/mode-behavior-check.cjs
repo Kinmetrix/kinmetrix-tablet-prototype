@@ -79,14 +79,14 @@ state.setup={purpose:'session',type:'isokinetic',positions:4,reps:3,weight:12,ac
 setupModeDefaults();
 const planBefore=setupView();
 assert.ok(planBefore.includes('12 reps total'));
-assert.ok(!planBefore.includes('id="tilt-0-start-plus"'),'tilt controls stay out of the main session view');
+assert.ok(!planBefore.includes('id="tilt-0-start-button"'),'tilt controls stay out of the main session view');
 actions['setup-positions']({dataset:{value:'8'}});
 actions['reps-plus']();
 assert.ok(setupView().includes('32 reps total'));
 assert.equal((isokineticDiagram().match(/<i>/g)||[]).length,32);
 actions['isok-direction']({dataset:{angle:'135'}});
 assert.equal(state.setup.isokTab,'tilts');
-assert.ok(setupView().includes('id="tilt-135-start-plus"'));
+assert.ok(setupView().includes('id="tilt-135-start-button"'));
 assert.match(isokineticDiagram(),/isok-node selected/);
 setTiltOverride(135,{start:12,end:31});
 actions['tilt-apply-selected']();
