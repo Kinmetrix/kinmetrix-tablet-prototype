@@ -124,12 +124,12 @@ function pulseMedianValue(values) {
 }
 
 function teamKpiDeltaForce(current, previous, options) {
-  if (options?.comparePrior === false) return 'Comparable isometric visits';
-  if (current == null && previous == null) return 'No comparable visits';
-  if (current == null) return 'No comparable visits this period';
-  if (previous == null) return 'No comparable visits in prior period';
+  if (options?.comparePrior === false) return 'All time';
+  if (current == null && previous == null) return 'No paired visits';
+  if (current == null) return 'No paired visits';
+  if (previous == null) return 'No prior data';
   const diff = current - previous;
-  if (Math.abs(diff) < 0.05) return 'Unchanged vs prior';
+  if (Math.abs(diff) < 0.05) return 'Flat vs prior';
   const sign = diff > 0 ? '+' : '−';
   const pct = previous !== 0 ? (diff / Math.abs(previous)) * 100 : 0;
   return `${sign}${Math.abs(diff).toFixed(1)} kg (${sign}${Math.abs(pct).toFixed(0)}%) vs prior`;
@@ -551,6 +551,89 @@ function pulsePerformancePieMarkup(counts) {
     body = `${paths}${dividers.join('')}`;
   }
   return `<svg class="pulse-kpi-pie" viewBox="0 0 56 56" width="52" height="52" aria-hidden="true">${pulsePerformancePiePatternDefs(prefix)}${body}</svg>`;
+}
+
+const PULSE_KPI_MINI_CHART = {width: 56, height: 56, pad: 6, plotW: 44, plotH: 36};
+
+function pulseMemberJoinedAtMap(roster) {
+  return new Map(
+    pulseLifecycleEventCatalog(roster)
+      .filter(event => event.type === 'user_created' || event.type === 'user_joined')
+      .map(event => [event.memberId, event.at])
+  );
+}
+
+function pulseRosterCountAt(roster, at) {
+  const joinedAt = pulseMemberJoinedAtMap(roster);
+  let count = 0;
+  for (const person of roster) {
+    const join = joinedAt.get(person.id);
+    if (join == null || join <= at) count++;
+  }
+  return count;
+}
+
+function pulseChartBucketEndMs(key, mode, windowEnd) {
+  if (mode === 'day') return Math.min(key + PULSE_DAY_MS - 1, windowEnd);
+  if (mode === 'week') return Math.min(key + 7 * PULSE_DAY_MS - 1, windowEnd);
+  const date = new Date(key);
+  const next = Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
+  return Math.min(next - 1, windowEnd);
+}
+
+function pulseKpiMembersStepValues(roster, window, mode) {
+  const keys = pulseChartBucketKeys(window, mode);
+  return keys.map(key => pulseRosterCountAt(roster, pulseChartBucketEndMs(key, mode, window.end)));
+}
+
+function pulseKpiActivityLineValues(activityAll, window, mode) {
+  return pulseActivityChartSeries(activityAll, window, mode).buckets.map(bucket => bucket.total);
+}
+
+function pulseKpiMiniChartCoords(values, max) {
+  const {pad, plotW, plotH} = PULSE_KPI_MINI_CHART;
+  const safeMax = Math.max(1, max);
+  const count = values.length;
+  if (!count) return [];
+  const spanX = count > 1 ? plotW / (count - 1) : 0;
+  return values.map((value, index) => ({
+    x: pad + (count > 1 ? spanX * index : plotW / 2),
+    y: pad + plotH - (value / safeMax) * plotH
+  }));
+}
+
+function pulseKpiMiniLinePath(coords) {
+  if (!coords.length) return '';
+  if (coords.length === 1) {
+    const point = coords[0];
+    const x2 = point.x + Math.min(8, PULSE_KPI_MINI_CHART.plotW / 2);
+    return `M ${point.x.toFixed(2)} ${point.y.toFixed(2)} L ${x2.toFixed(2)} ${point.y.toFixed(2)}`;
+  }
+  return coords.map((point, index) => `${index ? 'L' : 'M'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(' ');
+}
+
+function pulseKpiMiniStepPath(coords) {
+  if (!coords.length) return '';
+  let path = `M ${coords[0].x.toFixed(2)} ${coords[0].y.toFixed(2)}`;
+  for (let index = 1; index < coords.length; index++) {
+    path += ` H ${coords[index].x.toFixed(2)} V ${coords[index].y.toFixed(2)}`;
+  }
+  return path;
+}
+
+function pulseKpiMiniChartMarkup(values, {step = false} = {}) {
+  if (!values?.length) return '';
+  const max = Math.max(...values);
+  const coords = pulseKpiMiniChartCoords(values, max);
+  const baseline = PULSE_KPI_MINI_CHART.pad + PULSE_KPI_MINI_CHART.plotH;
+  const path = step ? pulseKpiMiniStepPath(coords) : pulseKpiMiniLinePath(coords);
+  const kind = step ? 'step' : 'line';
+  const x1 = PULSE_KPI_MINI_CHART.pad;
+  const x2 = x1 + PULSE_KPI_MINI_CHART.plotW;
+  return `<svg class="pulse-kpi-mini-chart pulse-kpi-mini-chart--${kind}" viewBox="0 0 56 56" width="52" height="52" aria-hidden="true">
+    <line class="pulse-kpi-mini-chart-base" x1="${x1}" y1="${baseline}" x2="${x2}" y2="${baseline}"/>
+    <path class="pulse-kpi-mini-chart-path" d="${path}" fill="none"/>
+  </svg>`;
 }
 
 function pulsePerformanceMiniStackRow(id, count, total) {
@@ -1707,23 +1790,38 @@ function pulseKpiButtonAriaLabel(kpi) {
   return `${label}, ${display}.${deltaPart}${perfPart} View ${detail}.`;
 }
 
-function pulseKpiStripCardBody(kpi) {
+function pulseKpiStripCardBody(kpi, model) {
   if (kpi.id === 'medianForceChange') return pulseKpiMedianForceCompactBody(kpi);
   const display = kpi.displayValue ?? kpi.value;
-  return `<span class="pulse-kpi-strip-main">
-    <span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}${icon('chevron', 'icon-sm pulse-kpi-strip-go')}</span>
+  const main = `<span class="pulse-kpi-strip-label">${pulseMetricLabel(kpi.id)}${icon('chevron', 'icon-sm pulse-kpi-strip-go')}</span>
     <span class="team-overview-kpi-value tabular">${escapeHTML(String(display))}</span>
-    ${kpi.deltaLabel ? `<p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>` : ''}
+    ${kpi.deltaLabel ? `<p class="team-overview-kpi-delta ${pulseKpiDeltaClass(kpi.deltaLabel)}">${escapeHTML(kpi.deltaLabel)}</p>` : ''}`;
+  let chart = '';
+  if (model?.window && model?.ui) {
+    if (kpi.id === 'totalActivity') {
+      chart = pulseKpiMiniChartMarkup(pulseKpiActivityLineValues(model.activityAll, model.window, model.ui.activityChartBucket));
+    } else if (kpi.id === 'membersTotal') {
+      chart = pulseKpiMiniChartMarkup(pulseKpiMembersStepValues(model.roster, model.window, model.ui.activityChartBucket), {step: true});
+    }
+  }
+  if (!chart) {
+    return `<span class="pulse-kpi-strip-main">${main}</span>`;
+  }
+  return `<span class="pulse-kpi-strip-compact">
+    <span class="pulse-kpi-strip-main">${main}</span>
+    <span class="pulse-kpi-strip-compact-right">
+      <span class="pulse-kpi-strip-visual">${chart}</span>
+    </span>
   </span>`;
 }
 
-function pulseKpiStrip(kpis, ui) {
+function pulseKpiStrip(kpis, ui, model) {
   return `<div class="pulse-kpi-strip" aria-label="Summary for this stretch">${kpis.map(kpi => {
     const selected = pulseKpiShowsSelected(ui, kpi.id);
-    const compact = kpi.id === 'medianForceChange' && kpi.performance?.total;
+    const compact = (kpi.id === 'medianForceChange' && kpi.performance?.total) || kpi.id === 'totalActivity' || kpi.id === 'membersTotal';
     const cardClass = `team-overview-kpi pulse-kpi-strip-card pulse-kpi-strip-button${selected ? ' is-selected' : ''}${compact ? ' pulse-kpi-strip-button--compact' : ''}`;
     return `<button type="button" class="${cardClass}" data-action="pulse-kpi" data-value="${kpi.id}" aria-pressed="${selected}" aria-label="${escapeHTML(pulseKpiButtonAriaLabel(kpi))}">
-      ${pulseKpiStripCardBody(kpi)}
+      ${pulseKpiStripCardBody(kpi, model)}
     </button>`;
   }).join('')}</div>`;
 }
@@ -1798,9 +1896,7 @@ function pulseSubScreenHead(model, title) {
   return `<header class="settings-pane-head team-overview-head pulse-head-compact pulse-sub-screen-head">
     <div class="settings-pane-head-row team-overview-head-row pulse-sub-screen-head-row">
       <div class="settings-pane-head-text pulse-screen-head">
-        <button type="button" class="icon-button pulse-scope-chip" data-action="pulse-screen-hub" aria-label="Back to Pulse" title="Back to Pulse">
-          ${icon('back', 'icon-sm')}
-        </button>
+        ${backNavButton('Pulse', 'pulse-screen-hub', 'aria-label="Back to Pulse"')}
         <h1>${escapeHTML(title)}</h1>
       </div>
       ${pulseRangeHeaderControls(model)}
@@ -2047,7 +2143,7 @@ function pulsePage() {
     <div class="settings-hub-pane pulse-layout" aria-label="Pulse">
       ${pulseHead(model)}
       <div class="pulse-hub-card">
-        ${pulseKpiStrip(model.kpis, model.ui)}
+        ${pulseKpiStrip(model.kpis, model.ui, model)}
         ${pulseActivityChartCard(model)}
         ${pulseHubBottomRow(model)}
       </div>
