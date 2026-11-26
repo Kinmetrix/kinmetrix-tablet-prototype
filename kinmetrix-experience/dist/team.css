@@ -198,7 +198,7 @@ main.settings-workspace.settings-hub-layout.settings-workspace-layout,.settings-
 .assessment-protocol-form .protocol-preview .isok-preview-heading strong{margin-left:6px;color:var(--ink);font-weight:600;border-left:0;padding-left:0}
 .assessment-protocol-form .protocol-preview .isok-radial{max-width:min(100%,328px);margin:4px auto 0}
 .assessment-protocol-form .protocol-preview .isok-node{border-radius:16px;box-shadow:inset 0 0 0 1px var(--line),0 1px 2px rgba(0,0,0,.06);transition:transform 100ms ease-out,box-shadow 150ms ease}
-.assessment-protocol-form .protocol-preview .isok-node:active{transform:scale(.94)}
+.assessment-protocol-form .protocol-preview .isok-node:active{transform:translate(-50%,-50%) scale(.94)}
 .assessment-protocol-form .protocol-preview .isok-node.selected{box-shadow:inset 0 0 0 2px var(--signal),0 1px 2px rgba(0,0,0,.06)}
 .assessment-protocol-form .protocol-preview .isok-diagram-help{margin:0;font-size:14px;line-height:1.4;color:var(--muted)}
 @media(max-width:980px){.assessment-protocol-form.view-protocol{grid-template-columns:1fr}}
